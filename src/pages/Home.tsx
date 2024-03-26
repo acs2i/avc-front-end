@@ -1,5 +1,6 @@
 import React from "react";
 import Card from "../components/Card";
+import Header from "../components/Header";
 
 type Product = {
   reference: string;
@@ -31,6 +32,8 @@ const products: Product[] = [
 
 export default function Home() {
   return (
+    <>
+    <Header titlePage="Recherche Produit"/>
     <Card title="Recherche" subtitle="Recherche">
       <div className="flex justify-between items-center mb-4">
           <div className="flex items-center">
@@ -106,6 +109,7 @@ export default function Home() {
           +Créer un produit
         </button>
     </Card>
+    </>
  
   );
 }

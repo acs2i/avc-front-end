@@ -14,7 +14,7 @@ export const LINKS: Link[] = [
   },
   {
     name: "Liste des fournisseurs",
-    link: "/",
+    link: "/suppliers",
     icon : Truck
   },
   
