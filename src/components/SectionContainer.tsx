@@ -5,26 +5,24 @@ export default function SectionContainer({
 }) {
   return (
     <section
-      className="relative h-screen w-full"
+      className="relative h-screen w-[100%]"
       style={{
         backgroundColor: "#f1f1f1",
-        minHeight: "100vh",
-        overflow: "auto",
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
       }}
     >
       <div
-        className="fixed top-0 w-100 h-screen"
+        className="fixed top-0 w-[100%] h-screen"
         style={{ overflow: "hidden" }}
       >
         <img
           src="img/background_forest.jpg"
-          className="w-100 h-screen"
+          className="w-full h-full"
           style={{
-            ["object-fit"]: "cover",
             opacity: "0.4",
             filter: "grayscale(100%)",
+            objectFit: "cover",
           }}
         />
       </div>
