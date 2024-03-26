@@ -26,7 +26,7 @@ export default function SectionContainer({
           }}
         />
       </div>
-      {children}
+      <div className="relative">{children}</div>
     </section>
   );
 }
