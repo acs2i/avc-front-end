@@ -50,9 +50,14 @@ export default function Header({ titlePage }: { titlePage: string }) {
             </span>
           </MenuItem>
           <Divider />
-          <MenuItem onClick={handleClose} className="flex items-center justify-center gap-3">
-            <LogOut className="text-red-500" />
-            <span className="font-bold text-gray-700">Déconnexion</span>
+          <MenuItem
+            onClick={handleClose}
+            
+          >
+            <div className="flex items-center justify-center gap-3 w-full">
+              <LogOut className="text-red-500" />
+              <span className="font-bold text-gray-700">Déconnexion</span>
+            </div>
           </MenuItem>
         </Menu>
 

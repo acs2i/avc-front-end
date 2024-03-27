@@ -5,6 +5,7 @@ import PageContainer from "./components/PageContainer";
 import SectionContainer from "./components/SectionContainer";
 import LoginPage from "./pages/login/LoginPage";
 import { useLocation } from "react-router-dom";
+import CreateProduct from "./pages/product/CreateProduct";
 
 function App() {
   const location = useLocation();
@@ -24,6 +25,7 @@ function App() {
           <PageContainer>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/create-product" element={<CreateProduct />} />
               <Route path="/login" element={<LoginPage />} />
             </Routes>
           </PageContainer>
