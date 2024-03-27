@@ -1,6 +1,9 @@
 import React from "react";
 import Card from "../components/Card";
 import Header from "../components/Header";
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
 
 type Product = {
   reference: string;
@@ -49,26 +52,15 @@ export default function Home() {
               <option>Sous-famille</option>
             </select>
             <div className="ml-4 flex items-center">
-              <label htmlFor="strict-toggle" className="flex items-center cursor-pointer">
-                <div className="relative">
-                  <input
-                    id="strict-toggle"
-                    type="checkbox"
-                    className="hidden"
-                  />
-                  <div className="toggle__line w-10 h-6 bg-gray-400 rounded-full shadow-inner"></div>
-                  <div className="toggle__dot absolute w-4 h-4 bg-white rounded-full shadow inset-y-0 left-0"></div>
-                </div>
-                <div className="ml-3 text-gray-700 font-medium">Strict</div>
-              </label>
+                <FormControlLabel className="ml-3 text-gray-700 font-medium" control={<Switch />} label="Strict" />
             </div>
           </div>
-          <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+          <button className="bg-green-800 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
             Valider
           </button>
         </div>
 
-        <h2 className="text-2xl font-bold text-green-500 mb-4">Résultats</h2>
+        <h2 className="text-2xl font-bold text-green-800 mb-4">Résultats</h2>
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-green-800">
             <tr>
