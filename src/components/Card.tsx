@@ -1,4 +1,5 @@
-import React from 'react'
+import React from "react";
+
 
 type InFosCard = {
   title: string;
@@ -6,11 +7,15 @@ type InFosCard = {
   children: React.ReactNode;
 };
 
-
-export default function Card({title, subtitle, children}: InFosCard) {
+export default function Card({ title, subtitle, children }: InFosCard) {
   return (
-    <section className="bg-white shadow-md rounded-lg p-6 mt-8">
-      {children}
+    <section className="bg-white shadow-md rounded-lg mt-8 flex flex-col gap-7">
+      <div className="bg-green-800 py-5 px-5">
+        <h2 className="text-white font-bold text-2xl">{title}</h2>
+      </div>
+      <div className="py-5 px-5">
+        {children}
+      </div>
     </section>
-  )
+  );
 }

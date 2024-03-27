@@ -4,6 +4,8 @@ import Header from "../components/Header";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import Fuse from 'fuse.js';
+import { Plus } from "lucide-react";
+import { Link } from "react-router-dom";
 
 type Product = {
   reference: string;
@@ -154,9 +156,11 @@ export default function Home() {
             </tbody>
           </table>
         </div>
-        <button className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded mt-4">
-          +Créer un produit
-        </button>
+        <Link to="/create-product" className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded mt-4 flex items-center gap-3 w-[200px]">
+          Créer un produit
+          <Plus/>
+        </Link>
+       
       </Card>
     </div>
   );
