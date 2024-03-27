@@ -24,12 +24,7 @@ export default function SectionContainer({
 
   return (
     <section
-      className="relative h-screen w-[100%]"
-      style={{
-        backgroundColor: "#f1f1f1",
-        backgroundSize: "cover",
-        backgroundRepeat: "no-repeat",
-      }}
+      className="relative w-[100%] bg-[#f1f1f1]"
     >
       <div
         className="fixed top-0 w-[100%] h-screen"
