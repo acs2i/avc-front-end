@@ -1,8 +1,27 @@
+import { useLocation } from "react-router-dom";
+
+
+
 export default function SectionContainer({
   children,
 }: {
   children: React.ReactNode;
 }) {
+
+  const defaultBackground = "img/background_forest.jpg";
+
+  type BackgroundPaths = {
+    [key: string]: string;
+  };
+  
+ const backgroundPaths: BackgroundPaths = {
+  "/login": "img/background.png",
+};
+  
+  const location = useLocation();
+  const pathname = location.pathname;
+  const backgroundImage = backgroundPaths[pathname] || defaultBackground;;
+
   return (
     <section
       className="relative h-screen w-[100%]"
@@ -17,7 +36,7 @@ export default function SectionContainer({
         style={{ overflow: "hidden" }}
       >
         <img
-          src="img/background_forest.jpg"
+          src={backgroundImage}
           className="w-full h-full"
           style={{
             opacity: "0.4",
