@@ -8,6 +8,7 @@ import LoginPage from "./pages/login/LoginPage";
 import { useLocation } from "react-router-dom";
 import CreateProductPage from "./pages/product/CreateProductPage";
 import Header from "./components/Header";
+import { LINKS } from "./utils";
 
 function App() {
   const location = useLocation();
@@ -19,13 +20,19 @@ function App() {
       : location.pathname === path
   );
 
+  const getPageTitle = () => {
+    const currentPath = location.pathname.split("/")[1];
+    const link = LINKS.find((link) => link.link.includes(currentPath));
+    return link ? link.name : "caca boom";
+  };
+
   return (
     <>
       <div className="flex">
         {shouldShowNavbar && <Sidebar />}
         <SectionContainer>
           <PageContainer>
-            <Header titlePage="rrrrr"/>
+            <Header titlePage={getPageTitle()}/>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route
