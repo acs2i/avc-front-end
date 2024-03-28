@@ -1,13 +1,44 @@
 import { Pen } from "lucide-react";
 import Card from "../../components/Card";
-import React from "react";
+import React, { useState } from "react";
 import { Tooltip } from "@mui/material";
+import { LINKCARD } from "../../utils/index";
+import { LinkCard } from "@/type";
 
 export default function CreateProductPage() {
+  const [page, setPage] = useState("progress");
+
   return (
     <div>
+      <div>
+        <button>Créer produit</button>
+      </div>
       <Card title="Créez votre produit">
-        <form className="flex flex-col gap-4 w-[80%] mx-auto">
+        <div className="flex items-center gap-7 mt-4">
+          {LINKCARD.map((link: LinkCard) => (
+            <button
+              className={`font-bold text-gray-600 ${
+                page === link.page ? "text-green-700" : ""
+              }`}
+              onClick={() => setPage(link.page)}
+            >
+              {link.name}
+            </button>
+          ))}
+        </div>
+
+        {page === "progress" && (
+          <div className="mt-7">
+            <h1>Hello from progress</h1>
+          </div>
+        )}
+
+        {page === "valided" && (
+          <div className="mt-7">
+            <h1>Hello from valided</h1>
+          </div>
+        )}
+        {/* <form className="flex flex-col gap-4 w-[80%] mx-auto">
           <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
             <div className="flex flex-col gap-3">
               <label className="text-sm font-medium text-gray-900 whitespace-nowrap">
@@ -151,7 +182,7 @@ export default function CreateProductPage() {
               Annuler
             </button>
           </div>
-        </form>
+        </form> */}
       </Card>
     </div>
   );

@@ -10,3 +10,8 @@ export type Suppliers = {
     name : string,
     arobase: string
 }
+
+export type LinkCard = {
+    name: string,
+    page: string
+}

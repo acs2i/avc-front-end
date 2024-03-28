@@ -8,11 +8,11 @@ type InFosCard = {
 
 export default function Card({ title, children }: InFosCard) {
   return (
-    <section className="bg-white shadow-md rounded-lg mt-8 flex flex-col gap-7">
+    <section className="bg-white shadow-md rounded-lg flex flex-col gap-1">
       <div className="bg-green-800 py-3 px-5">
         <h2 className="text-white font-bold text-lg">{title}</h2>
       </div>
-      <div className="py-5 px-5">
+      <div className="py-2 px-5">
         {children}
       </div>
     </section>
