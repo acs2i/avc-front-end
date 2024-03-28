@@ -3,10 +3,9 @@ import Card from "../../components/Card";
 import React from "react";
 
 
-export default function CreateProduct() {
+export default function CreateProductPage() {
   return (
     <div>
-      <Header titlePage="Création Produit" />
       <Card title="Créez votre produit" subtitle="">
         <form className="flex flex-col gap-8">
           <div className="gap-5 grid grid-cols-2 grid-template-columns: [label] 1fr [select] 2fr;">

@@ -31,7 +31,7 @@ export default function Header({ titlePage }: { titlePage: string }) {
           aria-expanded={open ? "true" : undefined}
           onClick={handleClick}
         >
-          <Avatar src="img/user_img.png" alt="Non user" />
+          <Avatar src="/img/user_img.png" alt="Non user" />
         </Button>
         <Menu
           id="basic-menu"
@@ -44,7 +44,7 @@ export default function Header({ titlePage }: { titlePage: string }) {
           className="mt-3"
         >
           <MenuItem onClick={handleClose} className="flex items-center gap-3">
-            <Avatar src="img/logo.png" alt="Lien portail fournisseur" />
+            <Avatar src="/img/logo.png" alt="Lien portail fournisseur" />
             <span className="font-bold text-gray-700">
               Portail Fournisseurs
             </span>
