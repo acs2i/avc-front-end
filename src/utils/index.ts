@@ -1,4 +1,4 @@
-import { Link, Suppliers } from "@/type";
+import { Link, LinkCard, Suppliers } from "@/type";
 import { Home, Pen, Truck, ShoppingCart } from "lucide-react";
 
 export const LINKS: Link[] = [
@@ -50,5 +50,24 @@ export const SUPPLIERS: Suppliers[] = [
     code: "ERCFGJ89",
     name: "Michelle la chienne",
     arobase: "67G67899"
+  },
+];
+
+export const LINKCARD: LinkCard[] = [
+  {
+    name: "En cours",
+    page: "progress"
+  },
+  {
+    name: "Validé",
+    page: "valided"
+  },
+  {
+    name: "Confirmé",
+    page: "confirmed"
+  },
+  {
+    name: "Exporté",
+    page: "exported"
   },
 ];
