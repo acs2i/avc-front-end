@@ -21,8 +21,16 @@ function App() {
   );
 
   const getPageTitle = () => {
-    const currentPath = location.pathname.split("/")[1];
-    const link = LINKS.find((link) => link.link.includes(currentPath));
+    const currentPath = location.pathname;
+    const link = LINKS.find((link) => {
+      if (link.link.includes(":")) {
+        // Vérifie si le lien contient un paramètre dynamique
+        const linkPattern = new RegExp(`^${link.link.replace(/:id/, "\\d+")}$`);
+        return linkPattern.test(currentPath);
+      } else {
+        return currentPath === link.link;
+      }
+    });
     return link ? link.name : "caca boom";
   };
 

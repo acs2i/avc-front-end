@@ -4,38 +4,8 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Fuse from "fuse.js";
 import { Link, useNavigate } from "react-router-dom";
-import { Pen} from "lucide-react";
-
-type Product = {
-  id: number;
-  reference: string;
-  name: string;
-  family: string;
-  subFamily: string;
-  brand: string;
-  collection: string;
-};
-
-const products: Product[] = [
-  {
-    id: 1,
-    reference: "03.800010198",
-    name: "Chaussures D'intervention ZEPHYR TF MID",
-    family: "Chaussures",
-    subFamily: "Chaussures De Randonnée",
-    brand: "ZEPHYR",
-    collection: "LOWA",
-  },
-  {
-    id: 2,
-    reference: "02.82910006",
-    name: "Sac À Dos Alpinisme PAPANG 37",
-    family: "Alpinisme",
-    subFamily: "Sacs À Dos Et Accessoires",
-    brand: "CILAO",
-    collection: "PAPANG",
-  },
-];
+import { Pen } from "lucide-react";
+import { products } from "../utils";
 
 const fuse = new Fuse(products, {
   keys: ["name", "reference", "family", "subFamily", "brand", "collection"],
