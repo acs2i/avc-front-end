@@ -4,12 +4,9 @@ import Header from "../components/Header";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import Fuse from 'fuse.js';
-<<<<<<< HEAD
-import { Plus } from "lucide-react";
-import { Link } from "react-router-dom";
-=======
 import { Link, useNavigate  } from "react-router-dom";
->>>>>>> 5aac0bbf42e84eda304eb021201e79a5dacf47cc
+import { Plus } from "lucide-react";
+
 
 type Product = {
   id: number;
