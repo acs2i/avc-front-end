@@ -189,13 +189,13 @@ export default function Home() {
             </tbody>
           </table>
         </div>
-        <div className="flex justify-center">
+        <div className="flex justify-center mt-5">
           <Link
             to="/product/create-product"
-            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded mt-4 flex items-center gap-3 w-[200px]"
+            className="w-[200px] bg-gradient-to-r from-orange-600 to-orange-400 text-white font-bold py-2 rounded-3xl hover:brightness-125 flex items-center justify-center gap-1"
           >
             Créer un produit
-            <Pen />
+            <Pen size={20} />
           </Link>
         </div>
       </Card>

@@ -9,6 +9,7 @@ import { useLocation } from "react-router-dom";
 import CreateProductPage from "./pages/product/CreateProductPage";
 import Header from "./components/Header";
 import { LINKS } from "./utils";
+import SuppliersListPage from "./pages/suppliers/SuppliersListPage";
 
 function App() {
   const location = useLocation();
@@ -40,6 +41,7 @@ function App() {
                 element={<CreateProductPage />}
               />
               <Route path="/product/:id" element={<SingleProductPage />} />
+              <Route path="/suppliers/suppliers-list" element={<SuppliersListPage />} />
               <Route path="/login" element={<LoginPage />} />
             </Routes>
           </PageContainer>

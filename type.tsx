@@ -4,3 +4,9 @@ export type Link = {
     icon: any,
     showInSidebar: boolean
 }
+
+export type Suppliers = {
+    code: string,
+    name : string,
+    arobase: string
+}
