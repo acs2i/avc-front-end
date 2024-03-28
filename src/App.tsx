@@ -29,7 +29,7 @@ function App() {
               <Route path="/create-product" element={<CreateProduct />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/product/:id" element={<Product />} />
-              </Routes>
+            </Routes>
           </PageContainer>
         </SectionContainer>
       </div>

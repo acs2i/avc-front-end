@@ -16,10 +16,5 @@ export const LINKS: Link[] = [
     name: "Liste des fournisseurs",
     link: "/suppliers",
     icon : Truck
-  },
-  {
-    name: "Page Produit",
-    link: "/product/:id",
-    icon : ShoppingCart
-  },
+  }
 ];
