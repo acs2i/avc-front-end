@@ -32,7 +32,7 @@ function App() {
         {shouldShowNavbar && <Sidebar />}
         <SectionContainer>
           <PageContainer>
-            <Header titlePage={getPageTitle()}/>
+            <Header titlePage={getPageTitle()} />
             <Routes>
               <Route path="/" element={<Home />} />
               <Route
@@ -41,7 +41,7 @@ function App() {
               />
               <Route path="/product/:id" element={<SingleProductPage />} />
               <Route path="/login" element={<LoginPage />} />
-              </Routes>
+            </Routes>
           </PageContainer>
         </SectionContainer>
       </div>
