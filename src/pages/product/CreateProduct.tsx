@@ -134,7 +134,7 @@ export default function CreateProduct() {
           </div>
 
           <div className="flex gap-2">
-            <button className="bg-green-600 text-white font-bold py-2 px-4 rounded-md hover:brightness-125">
+            <button className="bg-green-600 text-white font-bold py-1 px-4 rounded-md hover:brightness-125">
               Valider
             </button>
             <button className="bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:brightness-125">
