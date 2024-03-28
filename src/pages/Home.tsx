@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Card from "../components/Card";
-import Header from "../components/Header";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Fuse from "fuse.js";
