@@ -8,14 +8,14 @@ export default function SectionContainer({
   children: React.ReactNode;
 }) {
 
-  const defaultBackground = "img/background_forest.jpg";
+  const defaultBackground = "/img/background_forest.jpg";
 
   type BackgroundPaths = {
     [key: string]: string;
   };
   
  const backgroundPaths: BackgroundPaths = {
-  "/login": "img/background.png",
+  "/login": "/img/background.png",
 };
   
   const location = useLocation();

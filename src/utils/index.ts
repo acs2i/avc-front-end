@@ -5,16 +5,25 @@ export const LINKS: Link[] = [
   {
     name: "Accueil",
     link: "/",
-    icon : Home
+    icon: Home,
+    showInSidebar: true,
   },
   {
     name: "Créer un produit",
-    link: "/create-product",
-    icon : Pen
+    link: "/product/create-product",
+    icon: Pen,
+    showInSidebar: true,
   },
   {
     name: "Liste des fournisseurs",
     link: "/suppliers",
-    icon : Truck
-  }
+    icon: Truck,
+    showInSidebar: true,
+  },
+  {
+    name: "Page Produit",
+    link: "/product/:id",
+    icon: ShoppingCart,
+    showInSidebar: false,
+  },
 ];
