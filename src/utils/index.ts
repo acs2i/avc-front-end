@@ -1,5 +1,5 @@
 import { Link } from "@/type";
-import { Home, Pen, Truck } from "lucide-react";
+import { Home, Pen, Truck, ShoppingCart } from "lucide-react";
 
 export const LINKS: Link[] = [
   {
@@ -17,5 +17,9 @@ export const LINKS: Link[] = [
     link: "/suppliers",
     icon : Truck
   },
-  
+  {
+    name: "Page Produit",
+    link: "/product/:id",
+    icon : ShoppingCart
+  },
 ];

@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
+import Product from "./pages/Product";
 import Sidebar from "./components/Sidebar";
 import PageContainer from "./components/PageContainer";
 import SectionContainer from "./components/SectionContainer";
@@ -17,7 +18,7 @@ function App() {
   );
 
   return (
-    <>
+    
       <div className="flex">
         {shouldShowNavbar && <Sidebar />}
         <SectionContainer>
@@ -25,11 +26,12 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/product/:id" element={<Product />} />
             </Routes>
           </PageContainer>
         </SectionContainer>
       </div>
-    </>
+    
   );
 }
 
