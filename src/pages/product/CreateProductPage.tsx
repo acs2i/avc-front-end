@@ -1,4 +1,3 @@
-import Header from "../../components/Header";
 import Card from "../../components/Card";
 import React from "react";
 

@@ -24,7 +24,9 @@ export default function Sidebar() {
                 location.pathname === link.link ? "text-orange-400" : ""
               } ${location.pathname !== link.link ? "hover:text-orange-300" : ""}`}
             >
-              {React.createElement(link.icon, { size: 19 })}
+              {React.createElement(link.icon, {
+                size: location.pathname === link.link ? 25 : 19,
+              })}
             </Link>
           </Tooltip>
         ))}
