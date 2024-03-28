@@ -4,12 +4,7 @@ import Header from "../components/Header";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import Fuse from 'fuse.js';
-<<<<<<< HEAD
-import { Plus } from "lucide-react";
-import { Link } from "react-router-dom";
-=======
 import { Link, useNavigate  } from "react-router-dom";
->>>>>>> 5aac0bbf42e84eda304eb021201e79a5dacf47cc
 
 type Product = {
   id: number;
@@ -47,7 +42,7 @@ const fuse = new Fuse(products, {
   includeMatches: true
 });
 
-export default function Home() {
+export default function Product() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFamily, setSelectedFamily] = useState('');
   const [selectedSubFamily, setSelectedSubFamily] = useState('');
@@ -84,7 +79,7 @@ export default function Home() {
   const subFamilies = Array.from(new Set(products.map((product) => product.subFamily)));
 
   const targetProduct = (id: Product) => {
-    navigate(`/product/${id}`);
+    navigate(`/product?id=${id}`);
   };
 
   return (
@@ -168,11 +163,9 @@ export default function Home() {
             </tbody>
           </table>
         </div>
-        <Link to="/create-product" className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded mt-4 flex items-center gap-3 w-[200px]">
-          Créer un produit
-          <Plus/>
-        </Link>
-       
+        <button className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded mt-4">
+          +Créer un produit
+        </button>
       </Card>
     </div>
   );
