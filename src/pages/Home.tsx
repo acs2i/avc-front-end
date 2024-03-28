@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import Card from "../components/Card";
 import Header from "../components/Header";
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
-import Fuse from 'fuse.js';
-import { Link, useNavigate  } from "react-router-dom";
-import { Plus } from "lucide-react";
-
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Switch from "@mui/material/Switch";
+import Fuse from "fuse.js";
+import { Link, useNavigate } from "react-router-dom";
+import { Pen} from "lucide-react";
 
 type Product = {
   id: number;
@@ -21,33 +20,33 @@ type Product = {
 const products: Product[] = [
   {
     id: 1,
-    reference: '03.800010198',
-    name: 'Chaussures D\'intervention ZEPHYR TF MID',
-    family: 'Chaussures',
-    subFamily: 'Chaussures De Randonnée',
-    brand: 'ZEPHYR',
-    collection: 'LOWA',
+    reference: "03.800010198",
+    name: "Chaussures D'intervention ZEPHYR TF MID",
+    family: "Chaussures",
+    subFamily: "Chaussures De Randonnée",
+    brand: "ZEPHYR",
+    collection: "LOWA",
   },
   {
     id: 2,
-    reference: '02.82910006',
-    name: 'Sac À Dos Alpinisme PAPANG 37',
-    family: 'Alpinisme',
-    subFamily: 'Sacs À Dos Et Accessoires',
-    brand: 'CILAO',
-    collection: 'PAPANG',
-  }
+    reference: "02.82910006",
+    name: "Sac À Dos Alpinisme PAPANG 37",
+    family: "Alpinisme",
+    subFamily: "Sacs À Dos Et Accessoires",
+    brand: "CILAO",
+    collection: "PAPANG",
+  },
 ];
 
 const fuse = new Fuse(products, {
-  keys: ['name', 'reference', 'family', 'subFamily', 'brand', 'collection'],
-  includeMatches: true
+  keys: ["name", "reference", "family", "subFamily", "brand", "collection"],
+  includeMatches: true,
 });
 
 export default function Home() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedFamily, setSelectedFamily] = useState('');
-  const [selectedSubFamily, setSelectedSubFamily] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedFamily, setSelectedFamily] = useState("");
+  const [selectedSubFamily, setSelectedSubFamily] = useState("");
   const [isStrict, setIsStrict] = useState(false);
   const navigate = useNavigate();
 
@@ -59,7 +58,9 @@ export default function Home() {
     setSelectedFamily(event.target.value);
   };
 
-  const handleSubFamilyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleSubFamilyChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     setSelectedSubFamily(event.target.value);
   };
 
@@ -68,17 +69,27 @@ export default function Home() {
   };
 
   const filteredProducts = isStrict
-    ? fuse.search(`${searchTerm} ${selectedFamily} ${selectedSubFamily}`).map(result => result.item)
-    : products.filter(product =>
-        Object.values(product).some(value =>
-          value.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (selectedFamily && product.family.toLowerCase() === selectedFamily.toLowerCase()) ||
-          (selectedSubFamily && product.subFamily.toLowerCase() === selectedSubFamily.toLowerCase())
+    ? fuse
+        .search(`${searchTerm} ${selectedFamily} ${selectedSubFamily}`)
+        .map((result) => result.item)
+    : products.filter((product) =>
+        Object.values(product).some(
+          (value) =>
+            value.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (selectedFamily &&
+              product.family.toLowerCase() === selectedFamily.toLowerCase()) ||
+            (selectedSubFamily &&
+              product.subFamily.toLowerCase() ===
+                selectedSubFamily.toLowerCase())
         )
       );
 
-  const families = Array.from(new Set(products.map((product) => product.family)));
-  const subFamilies = Array.from(new Set(products.map((product) => product.subFamily)));
+  const families = Array.from(
+    new Set(products.map((product) => product.family))
+  );
+  const subFamilies = Array.from(
+    new Set(products.map((product) => product.subFamily))
+  );
 
   const targetProduct = (id: Product) => {
     navigate(`/product/${id}`);
@@ -86,7 +97,7 @@ export default function Home() {
 
   return (
     <div>
-      <Card title="Recherche" subtitle="Recherche">
+      <Card title="Recherche">
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <div className="flex items-center mb-4 md:mb-0">
             <input
@@ -96,7 +107,11 @@ export default function Home() {
               value={searchTerm}
               onChange={handleSearchChange}
             />
-            <select className="border border-gray-300 rounded-lg px-4 py-2 m-1" value={selectedFamily} onChange={handleFamilyChange}>
+            <select
+              className="border border-gray-300 rounded-lg px-4 py-2 m-1"
+              value={selectedFamily}
+              onChange={handleFamilyChange}
+            >
               <option value="">Famille</option>
               {families.map((family) => (
                 <option key={family} value={family}>
@@ -104,7 +119,11 @@ export default function Home() {
                 </option>
               ))}
             </select>
-            <select className="border border-gray-300 rounded-lg px-4 py-2 m-1" value={selectedSubFamily} onChange={handleSubFamilyChange}>
+            <select
+              className="border border-gray-300 rounded-lg px-4 py-2 m-1"
+              value={selectedSubFamily}
+              onChange={handleSubFamilyChange}
+            >
               <option value="">Sous-famille</option>
               {subFamilies.map((subFamily) => (
                 <option key={subFamily} value={subFamily}>
@@ -115,7 +134,9 @@ export default function Home() {
             <div className="ml-4 flex items-center">
               <FormControlLabel
                 className="ml-3 text-gray-700 font-medium"
-                control={<Switch checked={isStrict} onChange={handleStrictChange} />}
+                control={
+                  <Switch checked={isStrict} onChange={handleStrictChange} />
+                }
                 label="Strict"
               />
             </div>
@@ -124,51 +145,60 @@ export default function Home() {
             Valider
           </button>
         </div>
+      </Card>
 
-        <h2 className="text-2xl font-bold text-green-800 mb-4">Résultats</h2>
+      <Card title={`${products.length} résultats`}>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-green-800">
+          <table className="w-full text-sm text-left text-gray-500">
+            <thead className="text-xs text-gray-700 uppercase bg-blue-50">
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                <th scope="col" className="px-6 py-4">
                   RÉFÉRENCE
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                <th scope="col" className="px-6 py-4">
                   NOM
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                <th scope="col" className="px-6 py-4">
                   FAMILLE
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                <th scope="col" className="px-6 py-4">
                   SOUS-FAMILLE
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                <th scope="col" className="px-6 py-4">
                   MARQUE
                 </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                <th scope="col" className="px-6 py-4">
                   COLLECTION
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredProducts.map((product:Product) => (
-                <tr key={product.id} onClick={() => targetProduct((product.id as any))}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-grey-900 cursor-pointer">{product.reference}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-grey-500 cursor-pointer">{product.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-grey-500 cursor-pointer">{product.family}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-grey-500 cursor-pointer">{product.subFamily}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-grey-500 cursor-pointer">{product.brand}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-grey-500 cursor-pointer">{product.collection}</td>
+            <tbody>
+              {filteredProducts.map((product: Product) => (
+                <tr
+                  key={product.id}
+                  onClick={() => targetProduct(product.id as any)}
+                  className="bg-white border-b cursor-pointer hover:bg-slate-100"
+                >
+                  <td className="px-6 py-4">{product.reference}</td>
+                  <td className="px-6 py-4">{product.name}</td>
+                  <td className="px-6 py-4">{product.family}</td>
+                  <td className="px-6 py-4">{product.subFamily}</td>
+                  <td className="px-6 py-4">{product.brand}</td>
+                  <td className="px-6 py-4">{product.collection}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <Link to="/create-product" className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded mt-4 flex items-center gap-3 w-[200px]">
-          Créer un produit
-          <Plus/>
-        </Link>
-       
+        <div className="flex justify-center">
+          <Link
+            to="/product/create-product"
+            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded mt-4 flex items-center gap-3 w-[200px]"
+          >
+            Créer un produit
+            <Pen />
+          </Link>
+        </div>
       </Card>
     </div>
   );

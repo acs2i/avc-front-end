@@ -6,7 +6,7 @@ import React from "react";
 export default function CreateProductPage() {
   return (
     <div>
-      <Card title="Créez votre produit" subtitle="">
+      <Card title="Créez votre produit">
         <form className="flex flex-col gap-8">
           <div className="gap-5 grid grid-cols-2 grid-template-columns: [label] 1fr [select] 2fr;">
             <div className="flex items-center gap-4">
@@ -133,10 +133,10 @@ export default function CreateProductPage() {
           </div>
 
           <div className="flex gap-2">
-            <button className="bg-green-600 text-white font-bold py-1 px-4 rounded-md hover:brightness-125">
+            <button className="bg-green-600 text-white font-bold h-[35px] px-3 rounded-md hover:brightness-125 text-[12px]">
               Valider
             </button>
-            <button className="bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:brightness-125">
+            <button className="bg-red-600 text-white font-bold h-[35px] px-3 rounded-md hover:brightness-125 text-[12px]">
               Annuler
             </button>
           </div>
