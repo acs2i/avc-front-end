@@ -1,12 +1,13 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import Product from "./pages/Product";
+import SingleProductPage from "./pages/product/SingleProductPage";
 import Sidebar from "./components/Sidebar";
 import PageContainer from "./components/PageContainer";
 import SectionContainer from "./components/SectionContainer";
 import LoginPage from "./pages/login/LoginPage";
 import { useLocation } from "react-router-dom";
-import CreateProduct from "./pages/product/CreateProduct";
+import CreateProductPage from "./pages/product/CreateProductPage";
+import Header from "./components/Header";
 
 function App() {
   const location = useLocation();
@@ -24,12 +25,16 @@ function App() {
         {shouldShowNavbar && <Sidebar />}
         <SectionContainer>
           <PageContainer>
+            <Header titlePage="rrrrr"/>
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/create-product" element={<CreateProduct />} />
+              <Route
+                path="/product/create-product"
+                element={<CreateProductPage />}
+              />
+              <Route path="/product/:id" element={<SingleProductPage />} />
               <Route path="/login" element={<LoginPage />} />
-              <Route path="/product/:id" element={<Product />} />
-              </Routes>
+            </Routes>
           </PageContainer>
         </SectionContainer>
       </div>

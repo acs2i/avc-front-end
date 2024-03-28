@@ -9,7 +9,7 @@ export default function Sidebar() {
     <nav className="h-screen w-[70px] bg-white flex flex-col items-center gap-3">
       <div className="w-[40px] py-4">
         <Link to="/">
-          <img src="img/logo.png" alt="" />
+          <img src="/img/logo.png" alt="" />
         </Link>
         <div className="w-full h-[1px] bg-gray-200 mt-5"></div>
       </div>
