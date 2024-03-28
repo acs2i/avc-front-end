@@ -1,4 +1,4 @@
-import { Link } from "@/type";
+import { Link, Product } from "@/type";
 import { Home, Pen, Truck, ShoppingCart } from "lucide-react";
 
 export const LINKS: Link[] = [
@@ -27,17 +27,6 @@ export const LINKS: Link[] = [
     showInSidebar: false,
   },
 ];
-
-type Product = {
-  id: number;
-  reference: string;
-  name: string;
-  family: string;
-  subFamily: string;
-  brand: string;
-  collection: string;
-  img: string;
-};
 
 
 export const products: Product[] = [
