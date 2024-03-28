@@ -42,7 +42,7 @@ const fuse = new Fuse(products, {
   includeMatches: true
 });
 
-export default function Home() {
+export default function Product() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFamily, setSelectedFamily] = useState('');
   const [selectedSubFamily, setSelectedSubFamily] = useState('');
@@ -79,7 +79,7 @@ export default function Home() {
   const subFamilies = Array.from(new Set(products.map((product) => product.subFamily)));
 
   const targetProduct = (id: Product) => {
-    navigate(`/product/${id}`);
+    navigate(`/product?id=${id}`);
   };
 
   return (
