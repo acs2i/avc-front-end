@@ -9,7 +9,7 @@ export const LINKS: Link[] = [
     showInSidebar: true,
   },
   {
-    name: "Créer un produit",
+    name: "Création produit",
     link: "/product/create-product",
     icon: Pen,
     showInSidebar: true,
