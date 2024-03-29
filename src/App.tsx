@@ -42,7 +42,7 @@ function App() {
         {shouldShowNavbar && <Sidebar />}
         <SectionContainer>
           <PageContainer>
-            <Header titlePage={getPageTitle()} />
+            {shouldShowNavbar && <Header titlePage={getPageTitle()} />}
             <Routes>
               <Route path="/" element={<Home />} />
               <Route

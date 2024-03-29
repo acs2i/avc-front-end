@@ -4,7 +4,7 @@ import React from "react";
 
 export default function SuppliersListPage() {
   return (
-    <div>
+    <div className="flex flex-col gap-7 mt-7">
         
       <Card title="Rechercher un fournisseur">
         <div className="flex flex-col">

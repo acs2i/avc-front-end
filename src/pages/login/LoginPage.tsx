@@ -5,8 +5,8 @@ import React from "react";
 
 export default function LoginPage() {
   return (
-    <div className="w-full h-screen flex items-center justify-center">
-      <form className="h-[500px]  w-[400px] bg-white rounded-lg px-5 shadow-lg">
+    <div className="w-full h-screen flex justify-center">
+      <form className="h-[500px]  w-[400px] bg-white rounded-lg px-5 shadow-lg mt-[200px]">
         <div className="py-5 flex flex-col items-center justify-center gap-3">
           <Avatar src="img/logo.png" alt="logo AVC"/>
           <h1 className="text-[30px] font-bold">Connexion</h1>
