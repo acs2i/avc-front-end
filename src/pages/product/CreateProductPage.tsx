@@ -1,188 +1,287 @@
-import { Pen } from "lucide-react";
+import { MoveLeft, Plus, X } from "lucide-react";
+import { Link } from "react-router-dom";
 import Card from "../../components/Card";
 import React, { useState } from "react";
-import { Tooltip } from "@mui/material";
-import { LINKCARD } from "../../utils/index";
+import Button from "../../components/FormElements/Button";
+import { LINKCARD_EDIT, PRODUCT_CREATED } from "../../utils/index";
 import { LinkCard } from "@/type";
+import { Divider } from "@mui/material";
 
 export default function CreateProductPage() {
-  const [page, setPage] = useState("progress");
+  const [page, setPage] = useState("addProduct");
 
   return (
-    <div>
-      <div>
-        <button>Créer produit</button>
-      </div>
-      <Card title="Créez votre produit">
-        <div className="flex items-center gap-7 mt-4">
-          {LINKCARD.map((link: LinkCard) => (
-            <button
-              className={`font-bold text-gray-600 ${
-                page === link.page ? "text-green-700" : ""
-              }`}
-              onClick={() => setPage(link.page)}
-            >
-              {link.name}
-            </button>
-          ))}
+    <div className="mt-7">
+      <Link
+        to="/product"
+        className="flex items-center justify-start gap-3 mb-5 font-bold text-gray-600"
+      >
+        <MoveLeft />
+        <span>Retour</span>
+      </Link>
+      <Card title="Panel d'ajout">
+        <div className="mt-4 mb-[50px]">
+          <div className="flex items-center gap-7">
+            {LINKCARD_EDIT.map((link: LinkCard) => (
+              <>
+                <button
+                  className={`font-bold text-gray-600 ${
+                    page === link.page ? "text-green-700" : ""
+                  }`}
+                  onClick={() => setPage(link.page)}
+                >
+                  {link.name}
+                </button>
+                <div className="w-[1px] h-[20px] bg-gray-300"></div>
+              </>
+            ))}
+          </div>
+          <div className="mt-6">
+            <Divider />
+          </div>
         </div>
 
-        {page === "progress" && (
-          <div className="mt-7">
-            <h1>Hello from progress</h1>
+        {page === "addProduct" && (
+          <div className="mt-7 mb-7">
+            <form className="flex flex-col gap-4 w-[60%] mx-auto">
+              <h4 className="text-center text-3xl text-gray-600 mb-5">
+                <span className="font-bold text-gray-700">Ajout</span> d'un
+                produit
+              </h4>
+              <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
+                <div className="flex flex-col gap-3">
+                  <label className="text-sm font-medium text-gray-900 whitespace-nowrap">
+                    Référence :
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Entrez la référence du produit"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
+                  />
+                </div>
+              </div>
+              <div className="gap-5 grid grid-cols-2 grid-template-columns: [label] 1fr [select] 2fr;">
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between gap-3 w-full">
+                    <label className="text-sm font-medium text-gray-900 whitespace-nowrap">
+                      Famille :
+                    </label>
+                  </div>
+                  <select
+                    name="familly"
+                    id="familly"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
+                    style={{ gridColumn: "select" }}
+                  >
+                    <option value="">Choissisir une famille</option>
+                    <option value="famille">Famille</option>
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between gap-3 w-full">
+                    <label className="text-sm font-medium text-gray-900 whitespace-nowrap">
+                      Sous-famille :
+                    </label>
+                  </div>
+                  <select
+                    name="familly"
+                    id="familly"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
+                    style={{ gridColumn: "select" }}
+                  >
+                    <option value="">Choissisir une sous-famille</option>
+                    <option value="famille">Sous-famille</option>
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between gap-3 w-full">
+                    <label className="text-sm font-medium text-gray-900 whitespace-nowrap">
+                      Marque :
+                    </label>
+                  </div>
+                  <select
+                    name="familly"
+                    id="familly"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
+                    style={{ gridColumn: "select" }}
+                  >
+                    <option value="">Choissisir une marque</option>
+                    <option value="famille">Marque</option>
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between gap-3 w-full">
+                    <label className="text-sm font-medium text-gray-900 whitespace-nowrap">
+                      Collection :
+                    </label>
+                  </div>
+                  <select
+                    name="familly"
+                    id="familly"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
+                    style={{ gridColumn: "select" }}
+                  >
+                    <option value="">Choissisir une collection</option>
+                    <option value="famille">Collection</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex gap-2 mt-3">
+                <Button size="small" green>
+                  <Plus />
+                  Ajouter
+                </Button>
+                <Button size="small" danger>
+                  <X />
+                  Annuler
+                </Button>
+              </div>
+            </form>
           </div>
         )}
 
-        {page === "valided" && (
-          <div className="mt-7">
-            <h1>Hello from valided</h1>
+        {page === "addFamilly" && (
+          <div className="mt-7 mb-7">
+            <form className="flex flex-col gap-4 w-[60%] mx-auto">
+              <h4 className="text-center text-3xl text-gray-600 mb-5">
+                <span className="font-bold text-gray-700">Ajout</span> d'une
+                famille
+              </h4>
+              <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
+                <div className="flex flex-col gap-3">
+                  <label className="text-sm font-medium text-gray-900 whitespace-nowrap">
+                    Nom de la famille :
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Entrez le nom de la famille"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-2 mt-7">
+                <Button size="small" green>
+                  <Plus />
+                  Ajouter
+                </Button>
+                <Button size="small" danger>
+                  <X />
+                  Annuler
+                </Button>
+              </div>
+            </form>
           </div>
         )}
-        {/* <form className="flex flex-col gap-4 w-[80%] mx-auto">
-          <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
-            <div className="flex flex-col gap-3">
-              <label className="text-sm font-medium text-gray-900 whitespace-nowrap">
-                Nom du produit :
-              </label>
-              <input
-                type="text"
-                placeholder="Entrez le nom du produit"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
-              />
-            </div>
+
+        {page === "addSubFamilly" && (
+          <div className="mt-7 mb-7">
+            <form className="flex flex-col gap-4 w-[60%] mx-auto">
+              <h4 className="text-center text-3xl text-gray-600 mb-5">
+                <span className="font-bold text-gray-700">Ajout</span> d'une
+                sous-famille
+              </h4>
+              <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
+                <div className="flex flex-col gap-3">
+                  <label className="text-sm font-medium text-gray-900 whitespace-nowrap">
+                    Nom de la sous-famille :
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Entrez le nom de la famille"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
+                  />
+                </div>
+              </div>
+              <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between gap-3 w-full">
+                    <label className="text-sm font-medium text-gray-900 whitespace-nowrap">
+                      Lien avec une famille :
+                    </label>
+                  </div>
+                  <select
+                    name="familly"
+                    id="familly"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
+                    style={{ gridColumn: "select" }}
+                  >
+                    <option value="">Choissisir une famille</option>
+                    <option value="famille">Famille</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex gap-2 mt-7">
+                <Button size="small" green>
+                  <Plus />
+                  Ajouter
+                </Button>
+                <Button size="small" danger>
+                  <X />
+                  Annuler
+                </Button>
+              </div>
+            </form>
           </div>
-          <div className="gap-5 grid grid-cols-2 grid-template-columns: [label] 1fr [select] 2fr;">
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between gap-3 w-full">
-                <label className="text-sm font-medium text-gray-900 whitespace-nowrap">
-                  Famille
-                </label>
+        )}
 
-                <div className="cursor-pointer">
-                  <span className="text-blue-500 text-[12px] hover:text-blue-400">Ajouter une famille</span>
+        {page === "addSubSubFamilly" && (
+          <div className="mt-7 mb-7">
+            <form className="flex flex-col gap-4 w-[60%] mx-auto">
+              <h4 className="text-center text-3xl text-gray-600 mb-5">
+                <span className="font-bold text-gray-700">Ajout</span> d'une
+                sous-sous-famille
+              </h4>
+              <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
+                <div className="flex flex-col gap-3">
+                  <label className="text-sm font-medium text-gray-900 whitespace-nowrap">
+                    Nom de la sous-sous-famille :
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Entrez le nom de la famille"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
+                  />
                 </div>
               </div>
-              <select
-                name="familly"
-                id="familly"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
-                style={{ gridColumn: "select" }}
-              >
-                <option value="">Choissisir une famille</option>
-                <option value="famille">Famille</option>
-              </select>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between gap-3 w-full">
-                <label className="text-sm font-medium text-gray-900 whitespace-nowrap">
-                  Sous-famille
-                </label>
-                <div className="cursor-pointer">
-                  <span className="text-blue-500 text-[12px] hover:text-blue-400">Ajouter une sous-famille</span>
+              <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between gap-3 w-full">
+                    <label className="text-sm font-medium text-gray-900 whitespace-nowrap">
+                      Lien avec une sous-famille :
+                    </label>
+                  </div>
+                  <select
+                    name="familly"
+                    id="familly"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
+                    style={{ gridColumn: "select" }}
+                  >
+                    <option value="">Choissisir une sous-famille</option>
+                    <option value="famille">Sous-famille</option>
+                  </select>
                 </div>
               </div>
-              <select
-                name="familly"
-                id="familly"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
-                style={{ gridColumn: "select" }}
-              >
-                <option value="">Choissisir une sous-famille</option>
-                <option value="famille">Sous-famille</option>
-              </select>
-            </div>
 
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between gap-3 w-full">
-                <label className="text-sm font-medium text-gray-900 whitespace-nowrap">
-                  Marque
-                </label>
-                <div className="cursor-pointer">
-                  <span className="text-blue-500 text-[12px] hover:text-blue-400">Créer une marque</span>
-                </div>
+              <div className="flex gap-2 mt-7">
+                <Button size="small" green>
+                  <Plus />
+                  Ajouter
+                </Button>
+                <Button size="small" danger>
+                  <X />
+                  Annuler
+                </Button>
               </div>
-              <select
-                name="familly"
-                id="familly"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
-                style={{ gridColumn: "select" }}
-              >
-                <option value="">Choissisir une marque</option>
-                <option value="famille">Marque</option>
-              </select>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between gap-3 w-full">
-                <label className="text-sm font-medium text-gray-900 whitespace-nowrap">
-                  Collection
-                </label>
-                <div className="cursor-pointer">
-                  <span className="text-blue-500 text-[12px] hover:text-blue-400">Créer une collection</span>
-                </div>
-              </div>
-              <select
-                name="familly"
-                id="familly"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
-                style={{ gridColumn: "select" }}
-              >
-                <option value="">Choissisir une collection</option>
-                <option value="famille">Collection</option>
-              </select>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between gap-3 w-full">
-                <label className="text-sm font-medium text-gray-900 whitespace-nowrap">
-                  Taille
-                </label>
-                <div className="cursor-pointer">
-                  <span className="text-blue-500 text-[12px] hover:text-blue-400">Créer une taille</span>
-                </div>
-              </div>
-              <select
-                name="familly"
-                id="familly"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
-                style={{ gridColumn: "select" }}
-              >
-                <option value="">Choissisir une taille</option>
-                <option value="famille">Taille</option>
-              </select>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between gap-3 w-full">
-                <label className="text-sm font-medium text-gray-900 whitespace-nowrap">
-                  Couleur
-                </label>
-                <div className="cursor-pointer">
-                  <span className="text-blue-500 text-[12px] hover:text-blue-400">Créer une couleur</span>
-                </div>
-              </div>
-              <select
-                name="familly"
-                id="familly"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
-                style={{ gridColumn: "select" }}
-              >
-                <option value="">Choissisir une couleur</option>
-                <option value="famille">Couleur</option>
-              </select>
-            </div>
+            </form>
           </div>
-
-          <div className="flex gap-2 mt-7">
-            <button className="bg-green-600 text-white font-bold h-[35px] px-3 rounded-md hover:brightness-125 text-[12px]">
-              Valider
-            </button>
-            <button className="bg-red-600 text-white font-bold h-[35px] px-3 rounded-md hover:brightness-125 text-[12px]">
-              Annuler
-            </button>
-          </div>
-        </form> */}
+        )}
+        
       </Card>
     </div>
   );

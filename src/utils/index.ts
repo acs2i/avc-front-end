@@ -1,4 +1,4 @@
-import { Link, LinkCard, Suppliers } from "@/type";
+import { Link, LinkCard, ProductsCreated, Suppliers } from "@/type";
 import { Home, Pen, Truck, ShoppingCart } from "lucide-react";
 
 export const LINKS: Link[] = [
@@ -9,10 +9,16 @@ export const LINKS: Link[] = [
     showInSidebar: true,
   },
   {
-    name: "Création produit",
-    link: "/product/create-product",
+    name: "Création",
+    link: "/product",
     icon: Pen,
     showInSidebar: true,
+  },
+  {
+    name: "Ajout d'un nouveau produit",
+    link: "/product/create-product",
+    icon: Pen,
+    showInSidebar: false,
   },
   {
     name: "Liste des fournisseurs",
@@ -59,15 +65,101 @@ export const LINKCARD: LinkCard[] = [
     page: "progress"
   },
   {
-    name: "Validé",
-    page: "valided"
+    name: "Finalisés",
+    page: "done"
+  },
+];
+
+export const LINKCARD_EDIT: LinkCard[] = [
+  {
+    name: "Ajouter un produit",
+    page: "addProduct"
   },
   {
-    name: "Confirmé",
-    page: "confirmed"
+    name: "Ajouter une famille",
+    page: "addFamilly"
   },
   {
-    name: "Exporté",
-    page: "exported"
+    name: "Ajouter une sous-famille",
+    page: "addSubFamilly"
   },
+  {
+    name: "Ajouter une sous-sous-famille",
+    page: "addSubSubFamilly"
+  },
+  {
+    name: "Ajouter une marque",
+    page: "addBrand"
+  },
+  {
+    name: "Ajouter une collection",
+    page: "addCollection"
+  },
+  
+
+];
+
+
+export const PRODUCT_CREATED: ProductsCreated[] = [
+  {
+    id: 1,
+    ref: "03.800010198",
+    name: "Chaussures d'intervention ZEPHYR TF MID",
+    familly: "chaussures",
+    subFamilly: "chaussures de randonnée",
+    brand: "ZEPHYR",
+    collection: "LOWA",
+    status: 1
+  },
+  {
+    id: 2,
+    ref: "02.829910006",
+    name: "Sac à dos alpinisme PAPANG 37",
+    familly: "alpinisme",
+    subFamilly: "Sacs à dos et accessoires",
+    brand: "CILAO",
+    collection: "PAPANG",
+    status: 0
+  },
+  {
+    id: 3,
+    ref: "055.808120142",
+    name: "Luge toupie SUPERSTAR",
+    familly: "ski/ski de randonnée",
+    subFamilly: "luges",
+    brand: "FRENDO",
+    collection: "SUPERSTAR",
+    status: 1
+  },
+  {
+    id: 4,
+    ref: "44.822648552",
+    name: "Manchons booster ELITE EVOLUTION",
+    familly: "vêtements",
+    subFamilly: "gants, bonnets et accessoires",
+    brand: "BV SPORT",
+    collection: "EVOLUTION",
+    status: 1
+  },
+  {
+    id: 5,
+    ref: "11.835910095",
+    name: "T-SHIRT MC ARCY M",
+    familly: "Grimpe / Escalade / Slackline ",
+    subFamilly: "Vêtements d'escalde",
+    brand: "ARCY",
+    collection: "ARCY",
+    status: 0
+  },
+  {
+    id: 6,
+    ref: "19.805930241",
+    name: "Chaussures de running CLIFTON 9 M",
+    familly: "chaussures",
+    subFamilly: "chaussures lifestyle",
+    brand: "HOKA",
+    collection: "CLIFTON",
+    status: 0
+  },
+  
 ];

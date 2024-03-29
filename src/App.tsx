@@ -6,7 +6,8 @@ import PageContainer from "./components/PageContainer";
 import SectionContainer from "./components/SectionContainer";
 import LoginPage from "./pages/login/LoginPage";
 import { useLocation } from "react-router-dom";
-import CreateProductPage from "./pages/product/CreateProductPage";
+import CreatedProductPage from "./pages/product/CreatedProductPage";
+import CreateProductPage from "./pages/product/CreateProductpage";
 import Header from "./components/Header";
 import { LINKS } from "./utils";
 import SuppliersListPage from "./pages/suppliers/SuppliersListPage";
@@ -22,8 +23,16 @@ function App() {
   );
 
   const getPageTitle = () => {
-    const currentPath = location.pathname.split("/")[1];
-    const link = LINKS.find((link) => link.link.includes(currentPath));
+    const currentPath = location.pathname;
+    const link = LINKS.find((link) => {
+      if (link.link.includes(":")) {
+        // Vérifie si le lien contient un paramètre dynamique
+        const linkPattern = new RegExp(`^${link.link.replace(/:id/, "\\d+")}$`);
+        return linkPattern.test(currentPath);
+      } else {
+        return currentPath === link.link;
+      }
+    });
     return link ? link.name : "caca boom";
   };
 
@@ -37,6 +46,10 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route
+                path="/product"
+                element={<CreatedProductPage />}
+              />
+               <Route
                 path="/product/create-product"
                 element={<CreateProductPage />}
               />
