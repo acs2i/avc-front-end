@@ -4,7 +4,7 @@ import Button from "../../components/FormElements/Button";
 import { LINKCARD, PRODUCT_CREATED } from "../../utils/index";
 import { LinkCard } from "@/type";
 import { Divider } from "@mui/material";
-import { CircleDotDashed, Eye } from "lucide-react";
+import { CircleCheck, CircleDotDashed, Plus } from "lucide-react";
 
 export default function CreatedProductPage() {
   const [page, setPage] = useState("progress");
@@ -12,7 +12,8 @@ export default function CreatedProductPage() {
   return (
     <div className="mt-7">
       <div className="flex justify-end mb-5">
-        <Button size="medium" orange to="/product/create-product">
+        <Button size="small" orange to="/product/create-product">
+          <Plus />
           Ajouter un produit
         </Button>
       </div>
@@ -24,7 +25,7 @@ export default function CreatedProductPage() {
                 <button
                   className={`font-bold text-gray-600 ${
                     page === link.page ? "text-green-700" : ""
-                  }`}
+                  } ${page === link.page ? "animate-bounce" : ""}`}
                   onClick={() => setPage(link.page)}
                 >
                   {link.name}
@@ -41,7 +42,8 @@ export default function CreatedProductPage() {
         {page === "progress" && (
           <div className="flex flex-col gap-4">
             <h4 className="text-center text-3xl text-gray-600 mb-5">
-              <span className="font-bold text-gray-700">Ajouts</span> non finalisés
+              <span className="font-bold text-gray-700">Ajouts</span> non
+              finalisés
             </h4>
             <table className="w-full text-sm text-left text-gray-500">
               <thead className="text-xs text-gray-700 uppercase bg-sky-50">
@@ -70,7 +72,7 @@ export default function CreatedProductPage() {
                 {PRODUCT_CREATED.filter((product) => product.status === 0) // Filtrer les produits avec status 1 (en cours de validation)
                   .map((product, i) => (
                     <>
-                      <tr className="bg-white border-b cursor-pointer hover:bg-slate-100">
+                      <tr className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold">
                         <td className="px-6 py-4">{product.ref}</td>
                         <td className="px-6 py-4">{product.name}</td>
                         <td className="px-6 py-4">{product.familly}</td>
@@ -79,7 +81,9 @@ export default function CreatedProductPage() {
                         <td className="px-6 py-4">
                           <Button size="small" warning>
                             Finaliser
-                            <CircleDotDashed/>
+                            <div className="animate-ping">
+                              <CircleDotDashed size={20} />
+                            </div>
                           </Button>
                         </td>
                       </tr>
@@ -122,7 +126,7 @@ export default function CreatedProductPage() {
                 {PRODUCT_CREATED.filter((product) => product.status === 1) // Filtrer les produits avec status 1 (en cours de validation)
                   .map((product, i) => (
                     <>
-                      <tr className="bg-white border-b cursor-pointer hover:bg-slate-100">
+                      <tr className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold">
                         <td className="px-6 py-4">{product.ref}</td>
                         <td className="px-6 py-4">{product.name}</td>
                         <td className="px-6 py-4">{product.familly}</td>
@@ -131,7 +135,9 @@ export default function CreatedProductPage() {
                         <td className="px-6 py-4">
                           <Button size="small" green>
                             Consulter
-                            <Eye/>
+                            <div className="animate-ping">
+                              <CircleCheck size={20} />
+                            </div>
                           </Button>
                         </td>
                       </tr>

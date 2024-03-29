@@ -21,11 +21,25 @@ export default function Sidebar() {
             <Link
               to={link.link}
               className={`text-gray-400 ${
-                location.pathname === link.link ? "text-orange-400" : ""
-              } ${location.pathname !== link.link ? "hover:text-orange-300" : ""}`}
+                new RegExp(`^${link.link}(/.*)?$`).test(location.pathname)
+                  ? "text-orange-400"
+                  : ""
+              } ${
+                !new RegExp(`^${link.link}(/.*)?$`).test(location.pathname)
+                  ? "hover:text-orange-300"
+                  : ""
+              } ${
+                new RegExp(`^${link.link}(/.*)?$`).test(location.pathname)
+                  ? "animate-bounce"
+                  : ""
+              }`}
             >
               {React.createElement(link.icon, {
-                size: location.pathname === link.link ? 25 : 19,
+                size: new RegExp(`^${link.link}(/.*)?$`).test(
+                  location.pathname
+                )
+                  ? 25
+                  : 19,
               })}
             </Link>
           </Tooltip>

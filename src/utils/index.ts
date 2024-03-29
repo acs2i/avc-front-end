@@ -34,8 +34,6 @@ export const LINKS: Link[] = [
   },
 ];
 
-
-
 export const SUPPLIERS: Suppliers[] = [
   {
     code: "ERCFGJ89",
@@ -99,7 +97,6 @@ export const LINKCARD_EDIT: LinkCard[] = [
 
 ];
 
-
 export const PRODUCT_CREATED: ProductsCreated[] = [
   {
     id: 1,
@@ -160,6 +157,26 @@ export const PRODUCT_CREATED: ProductsCreated[] = [
     brand: "HOKA",
     collection: "CLIFTON",
     status: 0
+  },
+  {
+    id: 7,
+    ref: "19.8054568",
+    name: "Chaussures de randonnée AEQUILIBRIUM TREK GTX",
+    familly: "chaussures",
+    subFamilly: "chaussures de randonnée",
+    brand: "AEQUILIBRIUM",
+    collection: "LA SPORTIVA",
+    status: 0
+  },
+  {
+    id: 7,
+    ref: "19.80545656656",
+    name: "t-shirt Merino PW 140 SEAMLESS",
+    familly: "sous-vêtements",
+    subFamilly: "alpinisme",
+    brand: "ODLO",
+    collection: "ODLO",
+    status: 1
   },
   
 ];

@@ -1,11 +1,12 @@
+import React, { useState } from "react";
 import { MoveLeft, Plus, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import Card from "../../components/Card";
-import React, { useState } from "react";
 import Button from "../../components/FormElements/Button";
-import { LINKCARD_EDIT, PRODUCT_CREATED } from "../../utils/index";
+import { LINKCARD_EDIT} from "../../utils/index";
 import { LinkCard } from "@/type";
 import { Divider } from "@mui/material";
+
 
 export default function CreateProductPage() {
   const [page, setPage] = useState("addProduct");
@@ -27,7 +28,7 @@ export default function CreateProductPage() {
                 <button
                   className={`font-bold text-gray-600 ${
                     page === link.page ? "text-green-700" : ""
-                  }`}
+                  } ${page === link.page ? "animate-bounce" : ""}`}
                   onClick={() => setPage(link.page)}
                 >
                   {link.name}
@@ -281,7 +282,6 @@ export default function CreateProductPage() {
             </form>
           </div>
         )}
-        
       </Card>
     </div>
   );
