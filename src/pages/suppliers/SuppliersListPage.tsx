@@ -1,4 +1,4 @@
-import Card from "../../components/Card";
+import Card from "../../components/Shared/Card";
 import { SUPPLIERS } from "../../utils/index";
 import React from "react";
 

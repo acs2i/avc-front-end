@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LINKS } from "../utils";
+import { LINKS } from "../../utils";
 import { Tooltip } from "@mui/material";
 
 export default function Sidebar() {

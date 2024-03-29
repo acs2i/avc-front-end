@@ -8,8 +8,11 @@ export default function LoginPage() {
     <div className="w-full h-screen flex justify-center">
       <form className="h-[500px]  w-[400px] bg-white rounded-lg px-5 shadow-lg mt-[200px]">
         <div className="py-5 flex flex-col items-center justify-center gap-3">
-          <Avatar src="img/logo.png" alt="logo AVC"/>
-          <h1 className="text-[30px] font-bold">Connexion</h1>
+          <div className="relative">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+            <Avatar src="img/logo.png" alt="logo AVC" />
+          </div>
+          <h1 className="text-4xl text-gray-600">Connexion</h1>
         </div>
         <div className="mt-5 h-[250px] flex flex-col justify-between">
           <div className="flex flex-col">
@@ -27,7 +30,7 @@ export default function LoginPage() {
               placeholder="Entrez votre mot de passe"
               label="Mot de passe"
             />
-            <div className="w-full flex justify-end cursor-pointer text-[12px]">
+            <div className="w-full flex justify-end cursor-pointer text-[12px] text-blue-500">
               <Link to="/">Mot de passe oublié ?</Link>
             </div>
           </div>

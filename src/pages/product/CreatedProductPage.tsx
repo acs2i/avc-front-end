@@ -1,4 +1,4 @@
-import Card from "../../components/Card";
+import Card from "../../components/Shared/Card";
 import React, { useState } from "react";
 import Button from "../../components/FormElements/Button";
 import { LINKCARD, PRODUCT_CREATED } from "../../utils/index";
@@ -45,25 +45,25 @@ export default function CreatedProductPage() {
               <span className="font-bold text-gray-700">Ajouts</span> non
               finalisés
             </h4>
-            <table className="w-full text-sm text-left text-gray-500">
-              <thead className="text-xs text-gray-700 uppercase bg-sky-50">
+            <table className="w-full text-left">
+              <thead className="uppercase bg-blue-50">
                 <tr>
-                  <th scope="col" className="px-6 py-4">
+                  <th scope="col" className="px-6 py-6">
                     Référence
                   </th>
-                  <th scope="col" className="px-6 py-4">
+                  <th scope="col" className="px-6 py-6">
                     NOM
                   </th>
-                  <th scope="col" className="px-6 py-4">
+                  <th scope="col" className="px-6 py-6">
                     Famille
                   </th>
-                  <th scope="col" className="px-6 py-4">
+                  <th scope="col" className="px-6 py-6">
                     Sous-famille
                   </th>
-                  <th scope="col" className="px-6 py-4">
+                  <th scope="col" className="px-6 py-6">
                     Status
                   </th>
-                  <th scope="col" className="px-6 py-4">
+                  <th scope="col" className="px-6 py-6">
                     Action
                   </th>
                 </tr>
@@ -72,7 +72,7 @@ export default function CreatedProductPage() {
                 {PRODUCT_CREATED.filter((product) => product.status === 0) // Filtrer les produits avec status 1 (en cours de validation)
                   .map((product, i) => (
                     <>
-                      <tr className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold">
+                      <tr className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold text-sm text-gray-500">
                         <td className="px-6 py-4">{product.ref}</td>
                         <td className="px-6 py-4">{product.name}</td>
                         <td className="px-6 py-4">{product.familly}</td>
@@ -99,25 +99,25 @@ export default function CreatedProductPage() {
             <h4 className="text-center text-3xl text-gray-600 mb-5">
               <span className="font-bold text-gray-700">Ajouts</span> finalisés
             </h4>
-            <table className="w-full text-sm text-left text-gray-500">
-              <thead className="text-xs text-gray-700 uppercase bg-sky-50">
+            <table className="w-full text-left">
+              <thead className="uppercase bg-blue-50">
                 <tr>
-                  <th scope="col" className="px-6 py-4">
+                <th scope="col" className="px-6 py-6">
                     Référence
                   </th>
-                  <th scope="col" className="px-6 py-4">
+                  <th scope="col" className="px-6 py-6">
                     NOM
                   </th>
-                  <th scope="col" className="px-6 py-4">
+                  <th scope="col" className="px-6 py-6">
                     Famille
                   </th>
-                  <th scope="col" className="px-6 py-4">
+                  <th scope="col" className="px-6 py-6">
                     Sous-famille
                   </th>
-                  <th scope="col" className="px-6 py-4">
+                  <th scope="col" className="px-6 py-6">
                     Status
                   </th>
-                  <th scope="col" className="px-6 py-4">
+                  <th scope="col" className="px-6 py-6">
                     Action
                   </th>
                 </tr>
@@ -126,7 +126,7 @@ export default function CreatedProductPage() {
                 {PRODUCT_CREATED.filter((product) => product.status === 1) // Filtrer les produits avec status 1 (en cours de validation)
                   .map((product, i) => (
                     <>
-                      <tr className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold">
+                      <tr className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold text-sm text-gray-500">
                         <td className="px-6 py-4">{product.ref}</td>
                         <td className="px-6 py-4">{product.name}</td>
                         <td className="px-6 py-4">{product.familly}</td>
