@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Card from "../components/Card";
+import Card from "../components/Shared/Card";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import Fuse from "fuse.js";
@@ -146,60 +146,59 @@ export default function Home() {
         </div>
       </Card>
 
-    
-        <Card title={`${products.length} résultats`}>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left text-gray-500">
-              <thead className="text-xs text-gray-700 uppercase bg-blue-50">
-                <tr>
-                  <th scope="col" className="px-6 py-4">
-                    RÉFÉRENCE
-                  </th>
-                  <th scope="col" className="px-6 py-4">
-                    NOM
-                  </th>
-                  <th scope="col" className="px-6 py-4">
-                    FAMILLE
-                  </th>
-                  <th scope="col" className="px-6 py-4">
-                    SOUS-FAMILLE
-                  </th>
-                  <th scope="col" className="px-6 py-4">
-                    MARQUE
-                  </th>
-                  <th scope="col" className="px-6 py-4">
-                    COLLECTION
-                  </th>
+      <Card title={`${products.length} résultats`}>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead className="uppercase bg-blue-50">
+              <tr>
+                <th scope="col" className="px-6 py-4">
+                  RÉFÉRENCE
+                </th>
+                <th scope="col" className="px-6 py-6">
+                  NOM
+                </th>
+                <th scope="col" className="px-6 py-6">
+                  Famille
+                </th>
+                <th scope="col" className="px-6 py-6">
+                  Sous-famille
+                </th>
+                <th scope="col" className="px-6 py-6">
+                  MARQUE
+                </th>
+                <th scope="col" className="px-6 py-6">
+                  COLLECTION
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredProducts.map((product: Product) => (
+                <tr
+                  key={product.id}
+                  onClick={() => targetProduct(product.id as any)}
+                  className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold text-sm text-gray-500"
+                >
+                  <td className="px-6 py-4">{product.reference}</td>
+                  <td className="px-6 py-4">{product.name}</td>
+                  <td className="px-6 py-4">{product.family}</td>
+                  <td className="px-6 py-4">{product.subFamily}</td>
+                  <td className="px-6 py-4">{product.brand}</td>
+                  <td className="px-6 py-4">{product.collection}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {filteredProducts.map((product: Product) => (
-                  <tr
-                    key={product.id}
-                    onClick={() => targetProduct(product.id as any)}
-                    className="bg-white border-b cursor-pointer hover:bg-slate-100"
-                  >
-                    <td className="px-6 py-4">{product.reference}</td>
-                    <td className="px-6 py-4">{product.name}</td>
-                    <td className="px-6 py-4">{product.family}</td>
-                    <td className="px-6 py-4">{product.subFamily}</td>
-                    <td className="px-6 py-4">{product.brand}</td>
-                    <td className="px-6 py-4">{product.collection}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="flex justify-center mt-5">
-            <Link
-              to="/product/create-product"
-              className="w-[200px] bg-gradient-to-r from-orange-600 to-orange-400 text-white font-bold py-2 rounded-3xl hover:brightness-125 flex items-center justify-center gap-1"
-            >
-              Créer un produit
-              <Pen size={20} />
-            </Link>
-          </div>
-        </Card>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="flex justify-center mt-5">
+          <Link
+            to="/product/create-product"
+            className="w-[200px] bg-gradient-to-r from-orange-600 to-orange-400 text-white font-bold py-2 rounded-3xl hover:brightness-125 flex items-center justify-center gap-1"
+          >
+            Créer un produit
+            <Pen size={20} />
+          </Link>
+        </div>
+      </Card>
     </div>
   );
 }

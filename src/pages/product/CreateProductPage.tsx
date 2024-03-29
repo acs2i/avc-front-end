@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { MoveLeft, Plus, X } from "lucide-react";
 import { Link } from "react-router-dom";
-import Card from "../../components/Card";
+import Card from "../../components/Shared/Card";
 import Button from "../../components/FormElements/Button";
 import { LINKCARD_EDIT} from "../../utils/index";
 import { LinkCard } from "@/type";

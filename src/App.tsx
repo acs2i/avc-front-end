@@ -1,14 +1,14 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import SingleProductPage from "./pages/product/SingleProductPage";
-import Sidebar from "./components/Sidebar";
-import PageContainer from "./components/PageContainer";
-import SectionContainer from "./components/SectionContainer";
+import Sidebar from "./components/Shared/Sidebar";
+import PageContainer from "./components/Shared/PageContainer";
+import SectionContainer from "./components/Shared/SectionContainer";
 import LoginPage from "./pages/login/LoginPage";
 import { useLocation } from "react-router-dom";
 import CreatedProductPage from "./pages/product/CreatedProductPage";
 import CreateProductPage from "./pages/product/CreateProductpage";
-import Header from "./components/Header";
+import Header from "./components/Shared/Header";
 import { LINKS } from "./utils";
 import SuppliersListPage from "./pages/suppliers/SuppliersListPage";
 
