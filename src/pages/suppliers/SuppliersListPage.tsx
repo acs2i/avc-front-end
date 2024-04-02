@@ -27,32 +27,32 @@ export default function SuppliersListPage() {
 
       <Card title="Résultats">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left text-gray-500">
-            <thead className="text-xs text-gray-700 uppercase bg-sky-50">
-              <tr>
-                <th scope="col" className="px-6 py-4">
-                  CODE
-                </th>
-                <th scope="col" className="px-6 py-4">
-                  NOM
-                </th>
-                <th scope="col" className="px-6 py-4">
-                  @
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {SUPPLIERS.map((supplier, i) => (
-                <>
-                  <tr className="bg-white border-b cursor-pointer hover:bg-slate-100">
-                    <td className="px-6 py-4">{supplier.code}</td>
-                    <td className="px-6 py-4">{supplier.name}</td>
-                    <td className="px-6 py-4">{supplier.arobase}</td>
-                  </tr>
-                </>
-              ))}
-            </tbody>
-          </table>
+        <table className="w-full text-left">
+              <thead className="uppercase bg-blue-50">
+                <tr>
+                  <th scope="col" className="px-6 py-6">
+                    CODE
+                  </th>
+                  <th scope="col" className="px-6 py-6">
+                    NOM
+                  </th>
+                  <th scope="col" className="px-6 py-6">
+                    @
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {SUPPLIERS.map((supplier, i) => (
+                    <>
+                      <tr className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold text-sm text-gray-500">
+                        <td className="px-6 py-4">{supplier.code}</td>
+                        <td className="px-6 py-4">{supplier.name}</td>
+                        <td className="px-6 py-4">{supplier.arobase}</td>
+                      </tr>
+                    </>
+                  ))}
+              </tbody>
+            </table>
         </div>
       </Card>
 
