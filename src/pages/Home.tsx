@@ -5,40 +5,13 @@ import Switch from "@mui/material/Switch";
 import Fuse from "fuse.js";
 import { Link, useNavigate } from "react-router-dom";
 import { Pen } from "lucide-react";
+import { PRODUCT_CREATED } from "../utils";
+import { ProductsCreated } from "@/type";
 
-type Product = {
-  id: number;
-  reference: string;
-  name: string;
-  family: string;
-  subFamily: string;
-  brand: string;
-  collection: string;
-};
 
-const products: Product[] = [
-  {
-    id: 1,
-    reference: "03.800010198",
-    name: "Chaussures D'intervention ZEPHYR TF MID",
-    family: "Chaussures",
-    subFamily: "Chaussures De Randonnée",
-    brand: "ZEPHYR",
-    collection: "LOWA",
-  },
-  {
-    id: 2,
-    reference: "02.82910006",
-    name: "Sac À Dos Alpinisme PAPANG 37",
-    family: "Alpinisme",
-    subFamily: "Sacs À Dos Et Accessoires",
-    brand: "CILAO",
-    collection: "PAPANG",
-  },
-];
 
-const fuse = new Fuse(products, {
-  keys: ["name", "reference", "family", "subFamily", "brand", "collection"],
+const fuse = new Fuse(PRODUCT_CREATED, {
+  keys: ["name", "ref", "family", "subFamily", "brand", "collection"],
   includeMatches: true,
 });
 
@@ -71,26 +44,26 @@ export default function Home() {
     ? fuse
         .search(`${searchTerm} ${selectedFamily} ${selectedSubFamily}`)
         .map((result) => result.item)
-    : products.filter((product) =>
+    : PRODUCT_CREATED.filter((product) =>
         Object.values(product).some(
           (value) =>
             value.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
             (selectedFamily &&
-              product.family.toLowerCase() === selectedFamily.toLowerCase()) ||
+              product.familly.toLowerCase() === selectedFamily.toLowerCase()) ||
             (selectedSubFamily &&
-              product.subFamily.toLowerCase() ===
+              product.subFamilly.toLowerCase() ===
                 selectedSubFamily.toLowerCase())
         )
       );
 
   const families = Array.from(
-    new Set(products.map((product) => product.family))
+    new Set(PRODUCT_CREATED.map((product) => product.familly))
   );
   const subFamilies = Array.from(
-    new Set(products.map((product) => product.subFamily))
+    new Set(PRODUCT_CREATED.map((product) => product.subFamilly))
   );
 
-  const targetProduct = (id: Product) => {
+  const targetProduct = (id: ProductsCreated) => {
     navigate(`/product/${id}`);
   };
 
@@ -124,9 +97,9 @@ export default function Home() {
               onChange={handleSubFamilyChange}
             >
               <option value="">Sous-famille</option>
-              {subFamilies.map((subFamily) => (
-                <option key={subFamily} value={subFamily}>
-                  {subFamily}
+              {subFamilies.map((subFamilly) => (
+                <option key={subFamilly} value={subFamilly}>
+                  {subFamilly}
                 </option>
               ))}
             </select>
@@ -146,7 +119,7 @@ export default function Home() {
         </div>
       </Card>
 
-      <Card title={`${products.length} résultats`}>
+      <Card title={`${PRODUCT_CREATED.length} résultats`}>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead className="uppercase bg-blue-50">
@@ -172,16 +145,16 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {filteredProducts.map((product: Product) => (
+              {filteredProducts.map((product) => (
                 <tr
                   key={product.id}
                   onClick={() => targetProduct(product.id as any)}
                   className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold text-sm text-gray-500"
                 >
-                  <td className="px-6 py-4">{product.reference}</td>
+                  <td className="px-6 py-4">{product.ref}</td>
                   <td className="px-6 py-4">{product.name}</td>
-                  <td className="px-6 py-4">{product.family}</td>
-                  <td className="px-6 py-4">{product.subFamily}</td>
+                  <td className="px-6 py-4">{product.familly}</td>
+                  <td className="px-6 py-4">{product.subFamilly}</td>
                   <td className="px-6 py-4">{product.brand}</td>
                   <td className="px-6 py-4">{product.collection}</td>
                 </tr>

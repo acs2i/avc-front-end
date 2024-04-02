@@ -254,7 +254,7 @@ export default function CreateProductPage() {
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center justify-between gap-3 w-full">
                     <label className="text-sm font-medium text-gray-900 whitespace-nowrap">
-                      Lien avec une sous-famille :
+                      Lien avec une famille :
                     </label>
                   </div>
                   <select
@@ -263,8 +263,8 @@ export default function CreateProductPage() {
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
                     style={{ gridColumn: "select" }}
                   >
-                    <option value="">Choissisir une sous-famille</option>
-                    <option value="famille">Sous-famille</option>
+                    <option value="">Choissisir une famille</option>
+                    <option value="famille">Famille</option>
                   </select>
                 </div>
               </div>
