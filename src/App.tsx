@@ -7,10 +7,10 @@ import SectionContainer from "./components/Shared/SectionContainer";
 import LoginPage from "./pages/login/LoginPage";
 import { useLocation } from "react-router-dom";
 import CreatedProductPage from "./pages/product/CreatedProductPage";
-import CreateProductPage from "./pages/product/CreateProductpage";
 import Header from "./components/Shared/Header";
 import { LINKS } from "./utils";
 import SuppliersListPage from "./pages/suppliers/SuppliersListPage";
+import CreateProductPage from "./pages/product/CreateProductPage";
 
 function App() {
   const location = useLocation();
