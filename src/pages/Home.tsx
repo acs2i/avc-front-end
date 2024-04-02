@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Card from "../components/Shared/Card";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
@@ -7,8 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Pen } from "lucide-react";
 import { PRODUCT_CREATED } from "../utils";
 import { ProductsCreated } from "@/type";
-
-
+import { getFormData, setFormData, clearStorageData } from "../utils/func/LocalStorage";
 
 const fuse = new Fuse(PRODUCT_CREATED, {
   keys: ["name", "ref", "family", "subFamily", "brand", "collection"],
@@ -21,23 +20,60 @@ export default function Home() {
   const [selectedSubFamily, setSelectedSubFamily] = useState("");
   const [isStrict, setIsStrict] = useState(false);
   const navigate = useNavigate();
+  const email = "example@email.com"; // Remplacez par l'adresse e-mail de l'utilisateur actuel
+  const formName = "searchForm";
+  const pageName = window.location.pathname;
+
+  useEffect(() => {
+    const formData = getFormData(email, formName, pageName);
+    setSearchTerm(formData.searchTerm || "");
+    setSelectedFamily(formData.selectedFamily || "");
+    setSelectedSubFamily(formData.selectedSubFamily || "");
+    setIsStrict(formData.isStrict || false);
+  }, [email, formName, pageName]);
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
+    const value = event.target.value;
+    setSearchTerm(value);
+    setFormData(email, formName, pageName, {
+      searchTerm: value,
+      selectedFamily,
+      selectedSubFamily,
+      isStrict,
+    });
   };
 
   const handleFamilyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedFamily(event.target.value);
+    const value = event.target.value;
+    setSelectedFamily(value);
+    setFormData(email, formName, pageName, {
+      searchTerm,
+      selectedFamily: value,
+      selectedSubFamily,
+      isStrict,
+    });
   };
 
-  const handleSubFamilyChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    setSelectedSubFamily(event.target.value);
+  const handleSubFamilyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    setSelectedSubFamily(value);
+    setFormData(email, formName, pageName, {
+      searchTerm,
+      selectedFamily,
+      selectedSubFamily: value,
+      isStrict,
+    });
   };
 
   const handleStrictChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setIsStrict(event.target.checked);
+    const value = event.target.checked;
+    setIsStrict(value);
+    setFormData(email, formName, pageName, {
+      searchTerm,
+      selectedFamily,
+      selectedSubFamily,
+      isStrict: value,
+    });
   };
 
   const filteredProducts = isStrict
@@ -175,3 +211,56 @@ export default function Home() {
     </div>
   );
 }
+
+// Voici des exemples d'utilisation de la fonction clearStorageData pour effacer les données du localStorage selon différents critères :
+
+// Effacer les données pour un email spécifique :
+
+
+
+// Copy code
+// <button
+//   onClick={() => clearStorageData("example@email.com")}
+//   className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+// >
+//   Clear Data for example@email.com
+// </button>
+
+
+// Effacer les données pour un formulaire spécifique (formName) :
+
+
+
+// Copy code
+// <button
+//   onClick={() => clearStorageData(undefined, "searchForm")}
+//   className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+// >
+//   Clear Data for Search Form
+// </button>
+
+
+// Effacer les données pour une page spécifique (pageName) :
+// jsx
+
+
+// Copy code
+// <button
+//   onClick={() => clearStorageData(undefined, undefined, "/home")}
+//   className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+// >
+//   Clear Data for /home page
+// </button>
+
+
+// Effacer toutes les données du localStorage :
+// jsx
+
+
+// Copy code
+// <button
+//   onClick={() => clearStorageData()}
+//   className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+// >
+//   Clear All Data
+// </button>
