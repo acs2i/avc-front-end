@@ -3,12 +3,22 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+
+import { setLogout } from "../../store/store";
 import { LogOut } from "lucide-react";
 import Divider from "@mui/material/Divider";
 
+
 export default function Header({ titlePage }: { titlePage: string }) {
+  const user = useSelector((state:any) => state.auth.user);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+console.log(user)
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -50,11 +60,14 @@ export default function Header({ titlePage }: { titlePage: string }) {
             </span>
           </MenuItem>
           <Divider />
-          <MenuItem
-            onClick={handleClose}
-            
-          >
-            <div className="flex items-center justify-center gap-3 w-full">
+          <MenuItem onClick={handleClose}>
+            <div
+              className="flex items-center justify-center gap-3 w-full"
+              onClick={() => {
+                dispatch(setLogout());
+                navigate("/login");
+              }}
+            >
               <LogOut className="text-red-500" />
               <span className="font-bold text-gray-700">Déconnexion</span>
             </div>
@@ -62,8 +75,8 @@ export default function Header({ titlePage }: { titlePage: string }) {
         </Menu>
 
         <div className="flex flex-col">
-          <span className="text-[17px] font-bold text-gray-700">Philippe</span>
-          <span className="text-[14px] text-gray-500">Email</span>
+          <span className="text-[17px] font-bold text-gray-700">{user.username}</span>
+          <span className="text-[14px] text-gray-500">{user.email}</span>
         </div>
       </div>
     </div>
