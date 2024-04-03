@@ -75,8 +75,8 @@ console.log(user)
         </Menu>
 
         <div className="flex flex-col">
-          <span className="text-[17px] font-bold text-gray-700">{user.username}</span>
-          <span className="text-[14px] text-gray-500">{user.email}</span>
+          <span className="text-[17px] font-bold text-gray-700">{user ? user.username : "philippe"}</span>
+          <span className="text-[14px] text-gray-500">{user ? user.email : "cacaboom@hotmzil.fr"}</span>
         </div>
       </div>
     </div>
