@@ -34,7 +34,7 @@ interface RootState {
 
 const rootReducer = {
   auth: persistedReducer,
-  // autres reducers ici
+
 };
 
 export const store = configureStore<RootState>({
