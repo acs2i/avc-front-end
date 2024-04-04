@@ -10,13 +10,13 @@ export const LINKS: Link[] = [
   },
   {
     name: "Création",
-    link: "/product",
+    link: "/edit",
     icon: Pen,
     showInSidebar: true,
   },
   {
     name: "Ajout d'un nouveau produit",
-    link: "/product/create-product",
+    link: "/edit/edit-product",
     icon: Pen,
     showInSidebar: false,
   },
