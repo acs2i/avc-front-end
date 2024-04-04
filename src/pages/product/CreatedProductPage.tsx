@@ -12,7 +12,7 @@ export default function CreatedProductPage() {
   return (
     <div className="mt-7">
       <div className="flex justify-end mb-5">
-        <Button size="small" orange to="/product/create-product">
+        <Button size="small" orange to="/edit/edit-product">
           <Plus />
           Ajouter un produit
         </Button>

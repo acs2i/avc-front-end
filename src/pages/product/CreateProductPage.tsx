@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { MoveLeft, Plus, X } from "lucide-react";
+import { MoveLeft, Plus, Save, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import Card from "../../components/Shared/Card";
 import Button from "../../components/FormElements/Button";
@@ -14,7 +14,7 @@ export default function CreateProductPage() {
   return (
     <div className="mt-7">
       <Link
-        to="/product"
+        to="/edit"
         className="flex items-center justify-start gap-3 mb-5 font-bold text-gray-600"
       >
         <MoveLeft />
@@ -132,6 +132,10 @@ export default function CreateProductPage() {
               </div>
 
               <div className="flex gap-2 mt-3">
+                <Button size="small" green>
+                  <Save />
+                  Enregistrer
+                </Button>
                 <Button size="small" green>
                   <Plus />
                   Ajouter
