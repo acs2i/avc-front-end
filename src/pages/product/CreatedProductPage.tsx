@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import Button from "../../components/FormElements/Button";
 import { LINKCARD, PRODUCT_CREATED } from "../../utils/index";
 import { LinkCard } from "@/type";
-import { Divider } from "@mui/material";
-import { CircleCheck, CircleDotDashed, Plus } from "lucide-react";
+import { Divider, Tooltip } from "@mui/material";
+import { CircleCheck, CircleDotDashed, Plus, Trash } from "lucide-react";
 
 export default function CreatedProductPage() {
   const [page, setPage] = useState("progress");
@@ -78,13 +78,18 @@ export default function CreatedProductPage() {
                         <td className="px-6 py-4">{product.familly}</td>
                         <td className="px-6 py-4">{product.subFamilly}</td>
                         <td className="px-6 py-4 font-bold">En cours...</td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 flex items-center gap-3">
                           <Button size="small" warning>
                             Finaliser
                             <div className="animate-ping">
                               <CircleDotDashed size={20} />
                             </div>
                           </Button>
+                          <Tooltip title="Supprimer">
+                            <div>
+                              <Trash color="crimson" />
+                            </div>
+                          </Tooltip>
                         </td>
                       </tr>
                     </>
@@ -102,7 +107,7 @@ export default function CreatedProductPage() {
             <table className="w-full text-left">
               <thead className="uppercase bg-blue-50">
                 <tr>
-                <th scope="col" className="px-6 py-6">
+                  <th scope="col" className="px-6 py-6">
                     Référence
                   </th>
                   <th scope="col" className="px-6 py-6">

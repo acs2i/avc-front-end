@@ -121,8 +121,8 @@ export default function Home() {
               onChange={handleFamilyChange}
             >
               <option value="">Famille</option>
-              {families.map((family) => (
-                <option key={family} value={family}>
+              {families.map((family, index) => (
+                <option key={index} value={family}>
                   {family}
                 </option>
               ))}
@@ -181,9 +181,9 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {filteredProducts.map((product) => (
+              {filteredProducts.map((product, index) => (
                 <tr
-                  key={product.id}
+                  key={index}
                   onClick={() => targetProduct(product.id as any)}
                   className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold text-sm text-gray-500"
                 >
