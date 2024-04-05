@@ -7,105 +7,46 @@ import { Link, useNavigate } from "react-router-dom";
 import { Pen } from "lucide-react";
 import { PRODUCT_CREATED } from "../utils";
 import { ProductsCreated } from "@/type";
-import { getFormData, setFormData, clearStorageData } from "../utils/func/LocalStorage";
-
-const fuse = new Fuse(PRODUCT_CREATED, {
-  keys: ["name", "ref", "family", "subFamily", "brand", "collection"],
-  includeMatches: true,
-});
 
 export default function Home() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFamily, setSelectedFamily] = useState("");
-  const [selectedSubFamily, setSelectedSubFamily] = useState("");
-  const [isStrict, setIsStrict] = useState(false);
-  const navigate = useNavigate();
-  const email = "example@email.com"; // Remplacez par l'adresse e-mail de l'utilisateur actuel
-  const formName = "searchForm";
-  const pageName = window.location.pathname;
+  const [products, setProducts] = useState({ products: [] });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const formData = getFormData(email, formName, pageName);
-    setSearchTerm(formData.searchTerm || "");
-    setSelectedFamily(formData.selectedFamily || "");
-    setSelectedSubFamily(formData.selectedSubFamily || "");
-    setIsStrict(formData.isStrict || false);
-  }, [email, formName, pageName]);
+    fetchProducts();
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
-    setSearchTerm(value);
-    setFormData(email, formName, pageName, {
-      searchTerm: value,
-      selectedFamily,
-      selectedSubFamily,
-      isStrict,
-    });
-  };
+  }, []);
 
-  const handleFamilyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value;
-    setSelectedFamily(value);
-    setFormData(email, formName, pageName, {
-      searchTerm,
-      selectedFamily: value,
-      selectedSubFamily,
-      isStrict,
-    });
-  };
+  console.log(products)
 
-  const handleSubFamilyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value;
-    setSelectedSubFamily(value);
-    setFormData(email, formName, pageName, {
-      searchTerm,
-      selectedFamily,
-      selectedSubFamily: value,
-      isStrict,
-    });
-  };
-
-  const handleStrictChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.checked;
-    setIsStrict(value);
-    setFormData(email, formName, pageName, {
-      searchTerm,
-      selectedFamily,
-      selectedSubFamily,
-      isStrict: value,
-    });
-  };
-
-  const filteredProducts = isStrict
-    ? fuse
-        .search(`${searchTerm} ${selectedFamily} ${selectedSubFamily}`)
-        .map((result) => result.item)
-    : PRODUCT_CREATED.filter((product) =>
-        Object.values(product).some(
-          (value) =>
-            value.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (selectedFamily &&
-              product.familly.toLowerCase() === selectedFamily.toLowerCase()) ||
-            (selectedSubFamily &&
-              product.subFamilly.toLowerCase() ===
-                selectedSubFamily.toLowerCase())
-        )
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/product`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
-
-  const families = Array.from(
-    new Set(PRODUCT_CREATED.map((product) => product.familly))
-  );
-  const subFamilies = Array.from(
-    new Set(PRODUCT_CREATED.map((product) => product.subFamilly))
-  );
-
-  const targetProduct = (id: ProductsCreated) => {
-    navigate(`/product/${id}`);
+  
+      const data = await response.json();
+      setProducts(data);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    } finally {
+      setIsLoading(false); // Définir isLoading à false après avoir récupéré les données
+    }
   };
+
+  if (isLoading) {
+    return <div>Chargement en cours...</div>;
+  }
 
   return (
     <div className="flex flex-col gap-7 mt-7">
-      <Card title="Recherche">
+      {/* <Card title="Recherche">
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <div className="flex items-center mb-4 md:mb-0">
             <input
@@ -153,7 +94,7 @@ export default function Home() {
             Valider
           </button>
         </div>
-      </Card>
+      </Card> */}
 
       <Card title={`${PRODUCT_CREATED.length} résultats`}>
         <div className="overflow-x-auto">
@@ -181,20 +122,27 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {filteredProducts.map((product, index) => (
-                <tr
-                  key={index}
-                  onClick={() => targetProduct(product.id as any)}
-                  className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold text-sm text-gray-500"
-                >
-                  <td className="px-6 py-4">{product.ref}</td>
-                  <td className="px-6 py-4">{product.name}</td>
-                  <td className="px-6 py-4">{product.familly}</td>
-                  <td className="px-6 py-4">{product.subFamilly}</td>
-                  <td className="px-6 py-4">{product.brand}</td>
-                  <td className="px-6 py-4">{product.collection}</td>
+              {products.products.length > 0 ? (
+                products.products.map((product : any) => (
+                  <tr
+                    key={product._id}
+                    className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold text-sm text-gray-500"
+                  >
+                    <td className="px-6 py-4">{product.reference}</td>
+                    <td className="px-6 py-4">{product.name}</td>
+                    <td className="px-6 py-4">{product.familly}</td>
+                    <td className="px-6 py-4">{product.subFamilly}</td>
+                    <td className="px-6 py-4">{product.brand}</td>
+                    <td className="px-6 py-4">{product.collection}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="px-6 py-4 text-center">
+                    Aucun produit à afficher
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
@@ -211,56 +159,3 @@ export default function Home() {
     </div>
   );
 }
-
-// Voici des exemples d'utilisation de la fonction clearStorageData pour effacer les données du localStorage selon différents critères :
-
-// Effacer les données pour un email spécifique :
-
-
-
-// Copy code
-// <button
-//   onClick={() => clearStorageData("example@email.com")}
-//   className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-// >
-//   Clear Data for example@email.com
-// </button>
-
-
-// Effacer les données pour un formulaire spécifique (formName) :
-
-
-
-// Copy code
-// <button
-//   onClick={() => clearStorageData(undefined, "searchForm")}
-//   className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-// >
-//   Clear Data for Search Form
-// </button>
-
-
-// Effacer les données pour une page spécifique (pageName) :
-// jsx
-
-
-// Copy code
-// <button
-//   onClick={() => clearStorageData(undefined, undefined, "/home")}
-//   className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-// >
-//   Clear Data for /home page
-// </button>
-
-
-// Effacer toutes les données du localStorage :
-// jsx
-
-
-// Copy code
-// <button
-//   onClick={() => clearStorageData()}
-//   className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-// >
-//   Clear All Data
-// </button>
