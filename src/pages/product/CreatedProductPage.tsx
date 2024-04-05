@@ -4,7 +4,7 @@ import Button from "../../components/FormElements/Button";
 import { LINKCARD, PRODUCT_CREATED } from "../../utils/index";
 import { LinkCard } from "@/type";
 import { Divider, Tooltip } from "@mui/material";
-import { CircleCheck, CircleDotDashed, Plus, Trash } from "lucide-react";
+import { CircleCheck, CircleDotDashed, Plus, Trash2 } from "lucide-react";
 
 export default function CreatedProductPage() {
   const [page, setPage] = useState("progress");
@@ -69,7 +69,7 @@ export default function CreatedProductPage() {
                 </tr>
               </thead>
               <tbody>
-                {PRODUCT_CREATED.filter((product) => product.status === 0) // Filtrer les produits avec status 1 (en cours de validation)
+                {PRODUCT_CREATED.filter((product) => product.status === 0)
                   .map((product, i) => (
                     <>
                       <tr className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold text-sm text-gray-500">
@@ -86,8 +86,8 @@ export default function CreatedProductPage() {
                             </div>
                           </Button>
                           <Tooltip title="Supprimer">
-                            <div>
-                              <Trash color="crimson" />
+                            <div className="text-red-400 hover:text-red-600">
+                              <Trash2 size={20} />
                             </div>
                           </Tooltip>
                         </td>
