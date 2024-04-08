@@ -18,7 +18,6 @@ export default function Header({ titlePage }: { titlePage: string }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-console.log(user)
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);

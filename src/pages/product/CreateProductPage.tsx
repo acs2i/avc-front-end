@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MoveLeft, Plus, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import Card from "../../components/Shared/Card";
@@ -6,10 +6,60 @@ import Button from "../../components/FormElements/Button";
 import { LINKCARD_EDIT} from "../../utils/index";
 import { LinkCard } from "@/type";
 import { Divider } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { getFormData, setFormData, clearStorageData } from "../../utils/func/LocalStorage";
 
 
 export default function CreateProductPage() {
   const [page, setPage] = useState("addProduct");
+  const [refTerm, setRefTerm] = useState("");
+  const [nameFamille, setNameFamilleTerm] = useState("");
+  const [selectedLinkFamily, setSelectedLinkFamily] = useState("");
+  const [selectedSubFamily, setSelectedSubFamily] = useState("");
+  const [isStrict, setIsStrict] = useState(false);
+
+  const user = useSelector((state:any) => state.auth.user);
+  const email = user.email; 
+  const formName = page;
+  const pageName = window.location.pathname;
+
+  useEffect(() => {
+    const formData = getFormData(email, formName, pageName);
+    setRefTerm(formData.refTerm || "");
+    setNameFamilleTerm(formData.nameFamille || "");
+    setSelectedLinkFamily(formData.selectedLinkFamily || "");
+  }, [email, formName, pageName]);
+
+  const handleRefChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setRefTerm(value);
+    setFormData(email, formName, pageName, {
+      refTerm: value,
+      nameFamille,
+      selectedLinkFamily
+    });
+  };
+
+  const handleNameFamilleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setNameFamilleTerm(value);
+    setFormData(email, formName, pageName, {
+      refTerm,
+      nameFamille: value,
+      selectedLinkFamily
+    });
+  };
+
+  const handleLinkFamilyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    setSelectedLinkFamily(value);
+    setFormData(email, formName, pageName, {
+      refTerm,
+      nameFamille,
+      selectedLinkFamily: value
+    });
+  };
+
 
   return (
     <div className="mt-7">
@@ -58,6 +108,8 @@ export default function CreateProductPage() {
                     type="text"
                     placeholder="Entrez la référence du produit"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
+                    value={refTerm}
+                    onChange={handleRefChange}
                   />
                 </div>
               </div>
@@ -157,10 +209,17 @@ export default function CreateProductPage() {
                   <label className="text-sm font-medium text-gray-900 whitespace-nowrap">
                     Nom de la famille :
                   </label>
+                  {/* <input
+                    type="text"
+                    placeholder="Entrez le nom de la famille"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
+                  /> */}
                   <input
                     type="text"
                     placeholder="Entrez le nom de la famille"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
+                    value={nameFamille}
+                    onChange={handleNameFamilleChange}
                   />
                 </div>
               </div>
@@ -195,6 +254,8 @@ export default function CreateProductPage() {
                     type="text"
                     placeholder="Entrez le nom de la famille"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
+                    value={nameFamille}
+                    onChange={handleNameFamilleChange}
                   />
                 </div>
               </div>
@@ -209,6 +270,8 @@ export default function CreateProductPage() {
                     name="familly"
                     id="familly"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
+                    value={selectedLinkFamily}
+                    onChange={handleLinkFamilyChange}
                     style={{ gridColumn: "select" }}
                   >
                     <option value="">Choissisir une famille</option>
@@ -247,6 +310,8 @@ export default function CreateProductPage() {
                     type="text"
                     placeholder="Entrez le nom de la famille"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
+                    value={nameFamille}
+                    onChange={handleNameFamilleChange}
                   />
                 </div>
               </div>
@@ -261,6 +326,8 @@ export default function CreateProductPage() {
                     name="familly"
                     id="familly"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none w-full p-2.5"
+                    value={selectedLinkFamily}
+                    onChange={handleLinkFamilyChange}
                     style={{ gridColumn: "select" }}
                   >
                     <option value="">Choissisir une famille</option>

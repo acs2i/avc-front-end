@@ -8,6 +8,7 @@ import { Pen } from "lucide-react";
 import { PRODUCT_CREATED } from "../utils";
 import { ProductsCreated } from "@/type";
 import { getFormData, setFormData, clearStorageData } from "../utils/func/LocalStorage";
+import { useDispatch, useSelector } from "react-redux";
 
 const fuse = new Fuse(PRODUCT_CREATED, {
   keys: ["name", "ref", "family", "subFamily", "brand", "collection"],
@@ -20,8 +21,10 @@ export default function Home() {
   const [selectedSubFamily, setSelectedSubFamily] = useState("");
   const [isStrict, setIsStrict] = useState(false);
   const navigate = useNavigate();
-  const email = "example@email.com"; // Remplacez par l'adresse e-mail de l'utilisateur actuel
-  const formName = "searchForm";
+  const user = useSelector((state:any) => state.auth.user);
+  console.log(user.email);
+  const email = user.email; // Remplacez par l'adresse e-mail de l'utilisateur actuel
+  const formName = "home";
   const pageName = window.location.pathname;
 
   useEffect(() => {
