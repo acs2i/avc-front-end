@@ -97,6 +97,27 @@ export const LINKCARD_EDIT: LinkCard[] = [
 
 ];
 
+export const LINKCARD_PRODUCT: LinkCard[] = [
+  {
+    name: "Details du produit",
+    page: "details"
+  },
+  {
+    name: "Les tailles",
+    page: "sizes"
+  },
+  {
+    name: "Les Couleurs",
+    page: "colors"
+  },
+  {
+    name: "Les prix",
+    page: "prices"
+  },
+ 
+
+];
+
 export const PRODUCT_CREATED: ProductsCreated[] = [
   {
     id: 1,
