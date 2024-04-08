@@ -1,38 +1,73 @@
 import Card from "../../components/Shared/Card";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "../../components/FormElements/Button";
 import { LINKCARD, PRODUCT_CREATED } from "../../utils/index";
 import { LinkCard } from "@/type";
 import { Divider, Tooltip } from "@mui/material";
 import { CircleCheck, CircleDotDashed, Plus, Trash2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function CreatedProductPage() {
   const [page, setPage] = useState("progress");
+  const [products, setProducts] = useState({ products: [] });
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/product`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+      setProducts(data);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    } finally {
+      setIsLoading(false); // Définir isLoading à false après avoir récupéré les données
+    }
+  };
+
+  if (isLoading) {
+    return <div>Chargement en cours...</div>;
+  }
 
   return (
     <div className="mt-7">
-      <div className="flex justify-end mb-5">
-        <Button size="small" orange to="/edit/edit-product">
-          <Plus />
-          Ajouter un produit
-        </Button>
-      </div>
       <Card title="Les produits créés">
         <div className="mt-4 mb-[30px]">
-          <div className="flex items-center gap-7">
-            {LINKCARD.map((link: LinkCard) => (
-              <>
-                <button
-                  className={`font-bold text-gray-600 ${
-                    page === link.page ? "text-green-700" : ""
-                  } ${page === link.page ? "animate-bounce" : ""}`}
-                  onClick={() => setPage(link.page)}
-                >
-                  {link.name}
-                </button>
-                <div className="w-[1px] h-[20px] bg-gray-300"></div>
-              </>
-            ))}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-7">
+              {LINKCARD.map((link: LinkCard) => (
+                <>
+                  <button
+                    className={`font-bold text-gray-600 ${
+                      page === link.page ? "text-green-700" : ""
+                    } ${page === link.page ? "animate-bounce" : ""}`}
+                    onClick={() => setPage(link.page)}
+                  >
+                    {link.name}
+                  </button>
+                  <div className="w-[1px] h-[20px] bg-gray-300"></div>
+                </>
+              ))}
+            </div>
+            <Link
+              to="/edit/edit-product"
+              className="text-[14px] text-sky-700 hover:text-sky-400 flex items-center gap-2"
+            >
+              <Plus size={14} />
+              <span>Ajouter un produit</span>
+            </Link>
           </div>
           <div className="mt-6">
             <Divider />
@@ -69,31 +104,37 @@ export default function CreatedProductPage() {
                 </tr>
               </thead>
               <tbody>
-                {PRODUCT_CREATED.filter((product) => product.status === 0)
-                  .map((product, i) => (
-                    <>
-                      <tr className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold text-sm text-gray-500">
-                        <td className="px-6 py-4">{product.ref}</td>
-                        <td className="px-6 py-4">{product.name}</td>
-                        <td className="px-6 py-4">{product.familly}</td>
-                        <td className="px-6 py-4">{product.subFamilly}</td>
-                        <td className="px-6 py-4 font-bold">En cours...</td>
-                        <td className="px-6 py-4 flex items-center gap-3">
-                          <Button size="small" warning>
-                            Finaliser
-                            <div className="animate-ping">
-                              <CircleDotDashed size={20} />
-                            </div>
-                          </Button>
-                          <Tooltip title="Supprimer">
-                            <div className="text-red-400 hover:text-red-600">
-                              <Trash2 size={20} />
-                            </div>
-                          </Tooltip>
-                        </td>
-                      </tr>
-                    </>
-                  ))}
+                {products.products.length > 0
+                  ? products.products
+                      .filter((product: any) => product.status === 0)
+                      .map((product: any) => (
+                        <>
+                          <tr
+                            className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold text-sm text-gray-500"
+                            key={product._id}
+                          >
+                            <td className="px-6 py-4">{product.reference}</td>
+                            <td className="px-6 py-4">{product.name}</td>
+                            <td className="px-6 py-4">{product.familly}</td>
+                            <td className="px-6 py-4">{product.subFamilly}</td>
+                            <td className="px-6 py-4 font-bold">En cours...</td>
+                            <td className="px-6 py-4 flex items-center gap-3">
+                              <Button size="small" warning>
+                                Finaliser
+                                <div className="animate-ping">
+                                  <CircleDotDashed size={20} />
+                                </div>
+                              </Button>
+                              <Tooltip title="Supprimer">
+                                <div className="text-red-400 hover:text-red-600">
+                                  <Trash2 size={20} />
+                                </div>
+                              </Tooltip>
+                            </td>
+                          </tr>
+                        </>
+                      ))
+                  : ""}
               </tbody>
             </table>
           </div>
@@ -128,26 +169,43 @@ export default function CreatedProductPage() {
                 </tr>
               </thead>
               <tbody>
-                {PRODUCT_CREATED.filter((product) => product.status === 1) // Filtrer les produits avec status 1 (en cours de validation)
-                  .map((product, i) => (
-                    <>
-                      <tr className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold text-sm text-gray-500">
-                        <td className="px-6 py-4">{product.ref}</td>
-                        <td className="px-6 py-4">{product.name}</td>
-                        <td className="px-6 py-4">{product.familly}</td>
-                        <td className="px-6 py-4">{product.subFamilly}</td>
-                        <td className="px-6 py-4 font-bold">Terminé</td>
-                        <td className="px-6 py-4">
-                          <Button size="small" green>
-                            Consulter
-                            <div className="animate-ping">
-                              <CircleCheck size={20} />
-                            </div>
-                          </Button>
-                        </td>
-                      </tr>
-                    </>
-                  ))}
+                {products.products.length > 0 ? (
+                  products.products
+                    .filter((product: any) => product.status === 1)
+                    .map((product: any) => (
+                      <>
+                        <tr
+                          className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold text-sm text-gray-500"
+                          key={product._id}
+                        >
+                          <td className="px-6 py-4">{product.reference}</td>
+                          <td className="px-6 py-4">{product.name}</td>
+                          <td className="px-6 py-4">{product.familly}</td>
+                          <td className="px-6 py-4">{product.subFamilly}</td>
+                          <td className="px-6 py-4 font-bold">En cours...</td>
+                          <td className="px-6 py-4 flex items-center gap-3">
+                            <Button size="small" green>
+                              Afficher
+                              <div className="animate-ping">
+                                <CircleCheck size={20} />
+                              </div>
+                            </Button>
+                            <Tooltip title="Supprimer">
+                              <div className="text-red-400 hover:text-red-600">
+                                <Trash2 size={20} />
+                              </div>
+                            </Tooltip>
+                          </td>
+                        </tr>
+                      </>
+                    ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center">
+                      Aucun produit à afficher
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

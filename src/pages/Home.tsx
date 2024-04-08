@@ -2,18 +2,14 @@ import React, { useState, useEffect } from "react";
 import Card from "../components/Shared/Card";
 import { Link, useNavigate } from "react-router-dom";
 import { Pen } from "lucide-react";
-import { PRODUCT_CREATED } from "../utils";
-import { ProductsCreated } from "@/type";
-import { getFormData, setFormData, clearStorageData } from "../utils/func/LocalStorage";
+
 
 
 export default function Home() {
   const [products, setProducts] = useState({ products: [] });
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-  const email = "example@email.com"; // Remplacez par l'adresse e-mail de l'utilisateur actuel
-  const formName = "searchForm";
-  const pageName = window.location.pathname;
+
 
   useEffect(() => {
     fetchProducts();

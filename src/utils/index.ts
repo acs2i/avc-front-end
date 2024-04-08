@@ -78,14 +78,6 @@ export const LINKCARD_EDIT: LinkCard[] = [
     page: "addFamilly"
   },
   {
-    name: "Ajouter une sous-famille",
-    page: "addSubFamilly"
-  },
-  {
-    name: "Ajouter une sous-sous-famille",
-    page: "addSubSubFamilly"
-  },
-  {
     name: "Ajouter une marque",
     page: "addBrand"
   },

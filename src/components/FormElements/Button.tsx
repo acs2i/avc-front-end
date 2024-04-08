@@ -22,7 +22,7 @@ interface ButtonProps {
 const Button: React.FC<ButtonProps> = (props) => {
   const buttonClasses = `
     font-inherit text-center py-4 px-6 rounded-lg font-bold flex items-center gap-2
-    ${props.size === "small" ? "text-sm py-[8px] px-[15px]" : ""}
+    ${props.size === "small" ? "text-xs py-[8px] px-[10px]" : ""}
     ${props.size === "medium" ? "text-md py-[15px] px-[20px]" : ""}
     ${props.size === "big" ? "text-lg flex items-center justify-center gap-2.5 w-full" : ""}
     ${props.orange ? "bg-gradient-to-r from-orange-600 to-orange-400 border border-orange-500 text-white hover:brightness-125" : ""}
