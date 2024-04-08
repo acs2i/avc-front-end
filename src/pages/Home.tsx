@@ -1,23 +1,17 @@
 import React, { useState, useEffect } from "react";
 import Card from "../components/Shared/Card";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
-import Fuse from "fuse.js";
 import { Link, useNavigate } from "react-router-dom";
 import { Pen } from "lucide-react";
-import { PRODUCT_CREATED } from "../utils";
-import { ProductsCreated } from "@/type";
+
 
 export default function Home() {
   const [products, setProducts] = useState({ products: [] });
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchProducts();
-
   }, []);
-
-  console.log(products)
 
   const fetchProducts = async () => {
     try {
@@ -30,7 +24,7 @@ export default function Home() {
           },
         }
       );
-  
+
       const data = await response.json();
       setProducts(data);
     } catch (error) {
@@ -96,7 +90,7 @@ export default function Home() {
         </div>
       </Card> */}
 
-      <Card title={`${PRODUCT_CREATED.length} résultats`}>
+      <Card title={`${products.products.length} résultats`}>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead className="uppercase bg-blue-50">
@@ -123,17 +117,18 @@ export default function Home() {
             </thead>
             <tbody>
               {products.products.length > 0 ? (
-                products.products.map((product : any) => (
+                products.products.map((product: any) => (
                   <tr
                     key={product._id}
                     className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold text-sm text-gray-500"
+                    onClick={() => navigate(`product/${product._id}`)}
                   >
                     <td className="px-6 py-4">{product.reference}</td>
                     <td className="px-6 py-4">{product.name}</td>
                     <td className="px-6 py-4">{product.familly}</td>
                     <td className="px-6 py-4">{product.subFamilly}</td>
                     <td className="px-6 py-4">{product.brand}</td>
-                    <td className="px-6 py-4">{product.collection}</td>
+                    <td className="px-6 py-4">{product.productCollection}</td>
                   </tr>
                 ))
               ) : (

@@ -27,7 +27,7 @@ function App() {
     const link = LINKS.find((link) => {
       if (link.link.includes(":")) {
         // Vérifie si le lien contient un paramètre dynamique
-        const linkPattern = new RegExp(`^${link.link.replace(/:id/, "\\d+")}$`);
+        const linkPattern = new RegExp(`^${link.link.replace(/:id/, ".*")}$`);
         return linkPattern.test(currentPath);
       } else {
         return currentPath === link.link;
