@@ -8,7 +8,7 @@ interface StorageData {
   };
 }
 
-const STORAGE_KEY = 'myAppData';
+const STORAGE_KEY = 'AVC';
 const EXPIRES_IN_HOURS = 48;
 
 const getStorageData = (): StorageData => {
