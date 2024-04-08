@@ -74,6 +74,7 @@ export default function LoginPage() {
               label="Identifiant"
               value={formData.username}
               onChange={handleChange}
+              orange
             />
             <Input
               element="input"
@@ -83,6 +84,7 @@ export default function LoginPage() {
               label="Mot de passe"
               value={formData.password}
               onChange={handleChange}
+              orange
             />
             <div className="w-full flex justify-end cursor-pointer text-[12px] text-blue-500">
               <Link to="/">Mot de passe oublié ?</Link>
