@@ -143,14 +143,14 @@ export default function CreateProductPage() {
                   placeholder="Ajouter la référence du produit"
                   gray
                 />
-                {/* <Input
+                <Input
                   element="input"
                   id="name"
                   label="Nom du produit :"
                   onChange={handleLinkFamilyChange}
-                  placeholder="Ajouter le nom du produit"
+                  placeholder="Ajouter le libellé du produit"
                   gray
-                /> */}
+                />
               </div>
               <div className="gap-5 grid grid-cols-2 grid-template-columns: [label] 1fr [select] 2fr;">
                 <div className="flex flex-col gap-3">
@@ -233,7 +233,7 @@ export default function CreateProductPage() {
                     id="name"
                     label="Nom de la famille :"
                     onChange={handleLinkFamilyChange}
-                    placeholder="Ajouter le nom du produit"
+                    placeholder="Ajouter le libellé de la famille"
                     gray
                   />
                 </div>
