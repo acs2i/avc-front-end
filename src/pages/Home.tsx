@@ -42,55 +42,17 @@ export default function Home() {
 
   return (
     <div className="flex flex-col gap-7 mt-7">
-      {/* <Card title="Recherche">
+      <Card title="Recherche">
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <div className="flex items-center mb-4 md:mb-0">
-            <input
-              type="text"
-              placeholder="Rechercher"
-              className="border border-gray-300 rounded-lg px-4 py-2 w-full md:w-64 m-1"
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
-            <select
-              className="border border-gray-300 rounded-lg px-4 py-2 m-1"
-              value={selectedFamily}
-              onChange={handleFamilyChange}
-            >
-              <option value="">Famille</option>
-              {families.map((family, index) => (
-                <option key={index} value={family}>
-                  {family}
-                </option>
-              ))}
-            </select>
-            <select
-              className="border border-gray-300 rounded-lg px-4 py-2 m-1"
-              value={selectedSubFamily}
-              onChange={handleSubFamilyChange}
-            >
-              <option value="">Sous-famille</option>
-              {subFamilies.map((subFamilly) => (
-                <option key={subFamilly} value={subFamilly}>
-                  {subFamilly}
-                </option>
-              ))}
-            </select>
-            <div className="ml-4 flex items-center">
-              <FormControlLabel
-                className="ml-3 text-gray-700 font-medium"
-                control={
-                  <Switch checked={isStrict} onChange={handleStrictChange} />
-                }
-                label="Strict"
-              />
-            </div>
+           
+        
           </div>
           <button className="bg-green-800 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
             Valider
           </button>
         </div>
-      </Card> */}
+      </Card>
 
       <Card title={`${products.products.length} résultats`}>
         <div className="overflow-x-auto">
