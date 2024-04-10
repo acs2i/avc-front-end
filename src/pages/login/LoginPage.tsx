@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { setLogin } from "../../store/store";
+import { VALIDATOR_REQUIRE } from "../../utils/validator";
 
 interface FormData {
   username: string;
@@ -74,6 +75,7 @@ export default function LoginPage() {
               label="Identifiant"
               value={formData.username}
               onChange={handleChange}
+              validators={[VALIDATOR_REQUIRE()]}
               orange
             />
             <Input
@@ -84,6 +86,7 @@ export default function LoginPage() {
               label="Mot de passe"
               value={formData.password}
               onChange={handleChange}
+              validators={[VALIDATOR_REQUIRE()]}
               orange
             />
             <div className="w-full flex justify-end cursor-pointer text-[12px] text-blue-500">
