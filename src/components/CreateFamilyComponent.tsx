@@ -187,12 +187,14 @@ export default function CreateFamilyComponent() {
               onChange={handleFamilyChange}
               validators={[VALIDATOR_REQUIRE()]}
               placeholder="Ajouter le libellé de la famille"
+              required
               gray
             />
+
           </div>
         </div>
 
-        <div className="flex gap-2 mt-7">
+        <div className="flex gap-2 mt-3">
           <Button size="small" green type="submit">
             <Plus size={15} />
             Ajouter
@@ -234,6 +236,7 @@ export default function CreateFamilyComponent() {
                   onChange={handleSubFamilyChange}
                   validators={[VALIDATOR_REQUIRE()]}
                   placeholder="Ajouter le libellé de la sous-famille"
+                  required
                   gray
                 />
                 <Input
@@ -243,11 +246,12 @@ export default function CreateFamilyComponent() {
                   onChange={handleFamilyId}
                   options={options}
                   placeholder="Selectionner une famille à lier"
+                  required
                 />
               </div>
             </div>
 
-            <div className="flex gap-2 mt-7">
+            <div className="flex gap-2 mt-3">
               <Button size="small" green type="submit">
                 <Plus size={15} />
                 Ajouter
