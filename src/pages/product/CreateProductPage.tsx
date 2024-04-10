@@ -129,6 +129,7 @@ export default function CreateProductPage() {
                   label="Référence du produit :"
                   validators={[VALIDATOR_REQUIRE()]}
                   placeholder="Ajouter la référence du produit"
+                  required
                   gray
                 />
                 <Input
@@ -137,6 +138,7 @@ export default function CreateProductPage() {
                   label="Nom du produit :"
                   validators={[VALIDATOR_REQUIRE()]}
                   placeholder="Ajouter le libellé du produit"
+                  required
                   gray
                 />
               </div>
@@ -148,6 +150,7 @@ export default function CreateProductPage() {
                     label="Famille :"
                     onChange={handleFamilyChange}
                     options={options}
+                    required
                     placeholder="Selectionner une famille"
                   />
                 </div>
@@ -168,7 +171,7 @@ export default function CreateProductPage() {
                     element="select"
                     id="brand"
                     label="Marque :"
-                
+                    required
                     options={famillies.famillies}
                     placeholder="Selectionner une marque"
                   />
@@ -179,7 +182,7 @@ export default function CreateProductPage() {
                     element="select"
                     id="productcollection"
                     label="Collection :"
-                 
+                    required
                     options={famillies.famillies}
                     placeholder="Selectionner une collection"
                   />

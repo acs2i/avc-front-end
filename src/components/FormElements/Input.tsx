@@ -14,6 +14,7 @@ type InputProps = {
   placeholderColor?: string;
   orange?: boolean;
   gray?: boolean;
+  required?: boolean;
   rows?: number;
   options?: { value: string; label: string; name: string }[];
   label?: string;
@@ -73,10 +74,15 @@ const Input: React.FC<InputProps> = (props) => {
   };
 
   const InputClasses = `
-    fw-full h-[50px] focus:outline-none ${
+    w-full h-[50px] focus:outline-none ${
       props.orange ? "border-b-2 border-orange-400" : ""
     }
     ${props.gray ? "border-b-[1px] border-gray-300" : ""}
+    ${
+      !inputState.isValid &&
+      inputState.isTouched &&
+      "border-b-[1px] border-red-300"
+    }
   `;
 
   const element =
@@ -88,6 +94,7 @@ const Input: React.FC<InputProps> = (props) => {
         onChange={changeHandler}
         onBlur={touchHandler}
         value={props.value}
+        required={props.required}
         onKeyDown={props.onKeyDown}
         className={InputClasses}
       />
@@ -105,6 +112,7 @@ const Input: React.FC<InputProps> = (props) => {
         id={props.id}
         onChange={props.onChange}
         onBlur={props.onBlur}
+        required={props.required}
         value={props.value}
         className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
       >
@@ -120,13 +128,21 @@ const Input: React.FC<InputProps> = (props) => {
     ) : null;
 
   return (
-    <div className={`flex flex-col mb-[20px]`}>
-      <label htmlFor={props.id} className="text-[15px] font-bold text-gray-500">
-        {props.label}
-      </label>
+    <div className={`flex flex-col mt-3`}>
+      <div>
+        <label
+          htmlFor={props.id}
+          className="relative text-[15px] font-bold text-gray-500"
+        >
+          {props.label}
+        {props.required && <span className="absolute top-[-5px] right-[-10px] text-red-400">*</span>}
+        </label>
+      </div>
       {element}
       {!inputState.isValid && inputState.isTouched && (
-        <div className="mt-3 text-red-500 rounded-md">Veuillez remplir ce champ</div>
+        <div className="mt-2 text-red-500 text-[12px]">
+          Veuillez remplir ce champ
+        </div>
       )}
     </div>
   );

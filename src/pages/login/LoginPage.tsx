@@ -13,6 +13,7 @@ interface FormData {
 }
 
 export default function LoginPage() {
+  const [error, setError] =  useState<string | null>("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [formData, setFormData] = useState<FormData>({
@@ -22,18 +23,22 @@ export default function LoginPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
+    setError("");
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -44,9 +49,10 @@ export default function LoginPage() {
             token: data.token,
           })
         );
-        navigate("/")
+        navigate("/");
       } else {
-        console.error("Erreur lors de la connexion");
+        const errorData = await response.json();
+        setError(errorData.error);
       }
     } catch (error) {
       console.error("Erreur lors de la requête", error);
@@ -55,7 +61,10 @@ export default function LoginPage() {
 
   return (
     <div className="w-full h-screen flex justify-center">
-      <form className="h-[500px]  w-[400px] bg-white rounded-lg px-5 shadow-lg mt-[200px]" onSubmit={handleSubmit}>
+      <form
+        className="h-[500px]  w-[400px] bg-white rounded-lg px-5 shadow-lg mt-[200px]"
+        onSubmit={handleSubmit}
+      >
         <div className="py-5 flex flex-col items-center justify-center gap-3">
           <div className="relative">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
@@ -63,21 +72,27 @@ export default function LoginPage() {
           </div>
           <h1 className="text-4xl text-gray-600">Connexion</h1>
         </div>
-        <div
-          className="mt-5 h-[250px] flex flex-col justify-between"
-        >
+        <div className="mt-5 h-[250px] flex flex-col justify-between">
           <div className="flex flex-col">
-            <Input
-              element="input"
-              id="username"
-              type="text"
-              placeholder="Entrez votre identifiant"
-              label="Identifiant"
-              value={formData.username}
-              onChange={handleChange}
-              validators={[VALIDATOR_REQUIRE()]}
-              orange
-            />
+            <div>
+              <Input
+                element="input"
+                id="username"
+                type="text"
+                placeholder="Entrez votre identifiant"
+                label="Identifiant"
+                value={formData.username}
+                onChange={handleChange}
+                validators={[VALIDATOR_REQUIRE()]}
+                required
+                orange
+              />
+              {error && error === "Cet utilisateur n'existe pas." && (
+                <div>
+                  <span className="text-red-400 text-[15px]">{error}</span>
+                </div>
+              )}
+            </div>
             <Input
               element="input"
               id="password"
@@ -87,14 +102,23 @@ export default function LoginPage() {
               value={formData.password}
               onChange={handleChange}
               validators={[VALIDATOR_REQUIRE()]}
+              required
               orange
             />
-            <div className="w-full flex justify-end cursor-pointer text-[12px] text-blue-500">
+             {error && error === "L'identifiant et le mot de passe ne correspondent pas" && (
+                <div>
+                  <span className="text-red-400 text-[15px]">{error}</span>
+                </div>
+              )}
+            <div className="w-full flex justify-end cursor-pointer text-[12px] text-blue-500 mt-[12px]">
               <Link to="/">Mot de passe oublié ?</Link>
             </div>
           </div>
           <div className="w-full mt-5">
-            <button type="submit" className="w-full bg-gradient-to-r from-orange-600 to-orange-400 text-white font-bold py-2 rounded-3xl hover:brightness-125">
+            <button
+              type="submit"
+              className="w-full bg-gradient-to-r from-orange-600 to-orange-400 text-white font-bold py-2 rounded-3xl hover:brightness-125"
+            >
               Valider
             </button>
           </div>
