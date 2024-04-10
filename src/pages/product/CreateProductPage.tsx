@@ -17,11 +17,12 @@ import {
 export default function CreateProductPage() {
   const [page, setPage] = useState("addProduct");
   const [famillies, setFamillies] = useState({ famillies: [] });
+  const [subFamillies, setSubFamillies] = useState({ subFamillies: [] });
   const [refTerm, setRefTerm] = useState("");
   const [nameFamille, setNameFamilleTerm] = useState("");
   const [selectedLinkFamily, setSelectedLinkFamily] = useState("");
   const [selectedSubFamily, setSelectedSubFamily] = useState("");
-  const [isStrict, setIsStrict] = useState(false);
+
 
   const user = useSelector((state: any) => state.auth.user);
   const email = user.email;
@@ -89,8 +90,29 @@ export default function CreateProductPage() {
     }
   };
 
+  const fetchSubFamilies = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/familly/subFamilly`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+      setSubFamillies(data);
+      console.log(famillies);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
   useEffect(() => {
     fetchFamilies();
+    fetchSubFamilies();
   }, []);
 
   return (
@@ -170,7 +192,7 @@ export default function CreateProductPage() {
                     id="subfamilly"
                     label="Sous-famille :"
                     onChange={handleLinkFamilyChange}
-                    options={famillies.famillies}
+                    options={subFamillies.subFamillies}
                     placeholder="Selectionner une sous-famille"
                   />
                 </div>
