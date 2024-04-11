@@ -141,7 +141,7 @@ const Input: React.FC<InputProps> = (props) => {
       {element}
       {!inputState.isValid && inputState.isTouched && (
         <div className="mt-2 text-red-500 text-[12px]">
-          Veuillez remplir ce champ
+          Le champ ne doit pas être vide
         </div>
       )}
     </div>
