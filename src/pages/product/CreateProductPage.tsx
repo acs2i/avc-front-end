@@ -17,6 +17,8 @@ import {
 export default function CreateProductPage() {
   const [page, setPage] = useState("addProduct");
   const [famillies, setFamillies] = useState({ famillies: [] });
+  const [brands, setBrands] = useState({ brands: [] });
+  const [collections, setCollections] = useState({ collections: [] });
   const [refTerm, setRefTerm] = useState("");
   const [nameFamille, setNameFamilleTerm] = useState("");
   const [selectedLinkFamily, setSelectedLinkFamily] = useState("");
@@ -89,8 +91,50 @@ export default function CreateProductPage() {
     }
   };
 
+  const fetchBrands = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/brand`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+      setBrands(data);
+      console.log(brands);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
+  const fetchCollections = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/collection`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+      setCollections(data);
+      console.log(collections);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
   useEffect(() => {
     fetchFamilies();
+    fetchBrands();
+    fetchCollections();
   }, []);
 
   return (
@@ -181,7 +225,7 @@ export default function CreateProductPage() {
                     id="brand"
                     label="Marque :"
                     onChange={handleLinkFamilyChange}
-                    options={famillies.famillies}
+                    options={brands.brands}
                     placeholder="Selectionner une marque"
                   />
                 </div>
@@ -192,7 +236,7 @@ export default function CreateProductPage() {
                     id="productcollection"
                     label="Collection :"
                     onChange={handleLinkFamilyChange}
-                    options={famillies.famillies}
+                    options={collections.collections}
                     placeholder="Selectionner une collection"
                   />
                 </div>
