@@ -8,67 +8,38 @@ import { LINKCARD_EDIT } from "../../utils/index";
 import { LinkCard } from "@/type";
 import { Divider } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getFormData,
-  setFormData,
-  clearStorageData,
-} from "../../utils/func/LocalStorage";
+import CreateFamilyComponent from "../../components/CreateFamilyComponent";
+import CreateBrandComponent from "../../components/CreateBrandComponent";
+import CreateCollectionComponent from "../../components/CreateCollectionComponent";
+import { VALIDATOR_REQUIRE } from "../../utils/validator";
 
 export default function CreateProductPage() {
   const [page, setPage] = useState("addProduct");
-  const [famillies, setFamillies] = useState({ famillies: [] });
+  const [famillyId, setfamillyId] = useState<string | null>(null);
   const [brands, setBrands] = useState({ brands: [] });
   const [collections, setCollections] = useState({ collections: [] });
-  const [refTerm, setRefTerm] = useState("");
-  const [nameFamille, setNameFamilleTerm] = useState("");
-  const [selectedLinkFamily, setSelectedLinkFamily] = useState("");
-  const [selectedSubFamily, setSelectedSubFamily] = useState("");
-  const [isStrict, setIsStrict] = useState(false);
-
+  const [famillyValue, setfamillyValue] = useState<string | null>(null);
+  const [famillies, setFamillies] = useState<{ famillies: any[] }>({
+    famillies: [],
+  });
+  const [subFamillies, setSubFamillies] = useState<{ subFamillies: any[] }>({
+    subFamillies: [],
+  });
   const user = useSelector((state: any) => state.auth.user);
-  const email = user.email;
-  const formName = page;
-  const pageName = window.location.pathname;
 
-  useEffect(() => {
-    const formData = getFormData(email, formName, pageName);
-    setRefTerm(formData.refTerm || "");
-    setNameFamilleTerm(formData.nameFamille || "");
-    setSelectedLinkFamily(formData.selectedLinkFamily || "");
-  }, [email, formName, pageName]);
+  const options = famillies?.famillies.map((familly: any) => ({
+    value: familly._id,
+    label: familly.name,
+    name: familly.name,
+  }));
 
-  const handleRefChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFamilyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
-    setRefTerm(value);
-    setFormData(email, formName, pageName, {
-      refTerm: value,
-      nameFamille,
-      selectedLinkFamily,
-    });
-  };
-
-  const handleNameFamilleChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const value = event.target.value;
-    setNameFamilleTerm(value);
-    setFormData(email, formName, pageName, {
-      refTerm,
-      nameFamille: value,
-      selectedLinkFamily,
-    });
-  };
-
-  const handleLinkFamilyChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const value = event.target.value;
-    setSelectedLinkFamily(value);
-    setFormData(email, formName, pageName, {
-      refTerm,
-      nameFamille,
-      selectedLinkFamily: value,
-    });
+    const selectedFamilyObject =
+      famillies?.famillies.find((familly: any) => familly._id === value) ??
+      null;
+    setfamillyId(value);
+    setfamillyValue(selectedFamilyObject?.name);
   };
 
   const fetchFamilies = async () => {
@@ -85,7 +56,25 @@ export default function CreateProductPage() {
 
       const data = await response.json();
       setFamillies(data);
-      console.log(famillies);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
+  const fetchSubFamilies = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/familly/subFamilly/${famillyId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+      setSubFamillies(data);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     }
@@ -135,7 +124,12 @@ export default function CreateProductPage() {
     fetchFamilies();
     fetchBrands();
     fetchCollections();
-  }, []);
+    if (famillyId) {
+      fetchSubFamilies();
+    } else {
+      setSubFamillies({ subFamillies: [] });
+    }
+  }, [famillyId]);
 
   return (
     <div className="mt-7">
@@ -149,8 +143,8 @@ export default function CreateProductPage() {
       <Card title="Panel d'ajout">
         <div className="mt-4 mb-[50px]">
           <div className="flex items-center gap-7">
-            {LINKCARD_EDIT.map((link: LinkCard) => (
-              <>
+            {LINKCARD_EDIT.map((link: LinkCard, i) => (
+              <React.Fragment key={i}>
                 <button
                   className={`font-bold text-gray-600 ${
                     page === link.page ? "text-green-700" : ""
@@ -160,7 +154,7 @@ export default function CreateProductPage() {
                   {link.name}
                 </button>
                 <div className="w-[1px] h-[20px] bg-gray-300"></div>
-              </>
+              </React.Fragment>
             ))}
           </div>
           <div className="mt-6">
@@ -183,16 +177,18 @@ export default function CreateProductPage() {
                   element="input"
                   id="reference"
                   label="Référence du produit :"
-                  onChange={handleLinkFamilyChange}
+                  validators={[VALIDATOR_REQUIRE()]}
                   placeholder="Ajouter la référence du produit"
+                  required
                   gray
                 />
                 <Input
                   element="input"
                   id="name"
                   label="Nom du produit :"
-                  onChange={handleLinkFamilyChange}
+                  validators={[VALIDATOR_REQUIRE()]}
                   placeholder="Ajouter le libellé du produit"
+                  required
                   gray
                 />
               </div>
@@ -202,8 +198,9 @@ export default function CreateProductPage() {
                     element="select"
                     id="familly"
                     label="Famille :"
-                    onChange={handleLinkFamilyChange}
-                    options={famillies.famillies}
+                    onChange={handleFamilyChange}
+                    options={options}
+                    required
                     placeholder="Selectionner une famille"
                   />
                 </div>
@@ -213,8 +210,7 @@ export default function CreateProductPage() {
                     element="select"
                     id="subfamilly"
                     label="Sous-famille :"
-                    onChange={handleLinkFamilyChange}
-                    options={famillies.famillies}
+                    options={subFamillies.subFamillies}
                     placeholder="Selectionner une sous-famille"
                   />
                 </div>
@@ -224,7 +220,7 @@ export default function CreateProductPage() {
                     element="select"
                     id="brand"
                     label="Marque :"
-                    onChange={handleLinkFamilyChange}
+                    required
                     options={brands.brands}
                     placeholder="Selectionner une marque"
                   />
@@ -235,7 +231,7 @@ export default function CreateProductPage() {
                     element="select"
                     id="productcollection"
                     label="Collection :"
-                    onChange={handleLinkFamilyChange}
+                    required
                     options={collections.collections}
                     placeholder="Selectionner une collection"
                   />
@@ -244,14 +240,14 @@ export default function CreateProductPage() {
 
               <div className="flex gap-2 mt-3">
                 <Button size="small" green>
-                  <Save size={15} />
-                  Enregistrer
-                </Button>
-                <Button size="small" green>
                   <Plus size={15} />
                   Ajouter
                 </Button>
-                <Button size="small" danger>
+                <Button size="small" inverse>
+                  <Save size={15} />
+                  Enregistrer dans brouillon
+                </Button>
+                <Button size="small" cancel>
                   <X size={15} />
                   Annuler
                 </Button>
@@ -262,38 +258,19 @@ export default function CreateProductPage() {
 
         {page === "addFamilly" && (
           <div className="mt-7 mb-7">
-            <form className="flex flex-col gap-4 w-[60%] mx-auto">
-            <div className="flex items-center gap-3 h-[70px]">
-                <div className="h-2/3 w-[8px] bg-emerald-700"></div>
-                <h4 className="text-3xl text-gray-600">
-                  <span className="font-bold text-gray-700">Ajout</span> d'une
-                  famille
-                </h4>
-              </div>
-              <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
-                <div className="flex flex-col gap-3">
-                  <Input
-                    element="input"
-                    id="name"
-                    label="Nom de la famille :"
-                    onChange={handleLinkFamilyChange}
-                    placeholder="Ajouter le libellé de la famille"
-                    gray
-                  />
-                </div>
-              </div>
+            <CreateFamilyComponent />
+          </div>
+        )}
 
-              <div className="flex gap-2 mt-7">
-                <Button size="small" green>
-                  <Plus size={15} />
-                  Ajouter
-                </Button>
-                <Button size="small" danger>
-                  <X size={15} />
-                  Annuler
-                </Button>
-              </div>
-            </form>
+        {page === "addBrand" && (
+          <div className="mt-7 mb-7">
+            <CreateBrandComponent />
+          </div>
+        )}
+
+        {page === "addCollection" && (
+          <div className="mt-7 mb-7">
+            <CreateCollectionComponent />
           </div>
         )}
       </Card>
