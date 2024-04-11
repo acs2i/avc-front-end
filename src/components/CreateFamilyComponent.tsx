@@ -185,7 +185,7 @@ export default function CreateFamilyComponent() {
       >
         <div className="flex items-center gap-3 h-[70px]">
           <div className="h-2/3 w-[8px] bg-emerald-700"></div>
-          <h4 className="text-3xl text-gray-600 cursor-pointer" onClick={handleOpenFamilyCollapse}>
+          <h4 className="text-3xl text-gray-600 cursor-pointer select-none" onClick={handleOpenFamilyCollapse}>
             <span className="font-bold text-gray-700">Ajout</span> d'une famille
           </h4>
           <button className="focus:outline-none text-gray-500">
@@ -232,7 +232,7 @@ export default function CreateFamilyComponent() {
         <div className="flex items-center gap-3 h-[70px]">
           <div className="h-2/3 w-[8px] bg-emerald-700"></div>
           <h4
-            className="text-3xl text-gray-600 cursor-pointer"
+            className="text-3xl text-gray-600 cursor-pointer select-none"
             onClick={handleOpenSubFamilyCollapse}
           >
             <span className="font-bold text-gray-700">Ajout</span> d'une
@@ -291,7 +291,7 @@ export default function CreateFamilyComponent() {
         <div className="flex items-center gap-3 h-[70px]">
           <div className="h-2/3 w-[8px] bg-emerald-700"></div>
           <h4
-            className="text-3xl text-gray-600 cursor-pointer"
+            className="text-3xl text-gray-600 cursor-pointer select-none"
             onClick={handleOpenSubSubFamilyCollapse}
           >
             <span className="font-bold text-gray-700">Ajout</span> d'une
