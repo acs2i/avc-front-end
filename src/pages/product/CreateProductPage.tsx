@@ -9,14 +9,20 @@ import { LinkCard } from "@/type";
 import { Divider } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import CreateFamilyComponent from "../../components/CreateFamilyComponent";
+import CreateBrandComponent from "../../components/CreateBrandComponent";
+import CreateCollectionComponent from "../../components/CreateCollectionComponent";
 import { VALIDATOR_REQUIRE } from "../../utils/validator";
 
 export default function CreateProductPage() {
   const [page, setPage] = useState("addProduct");
   const [famillyId, setfamillyId] = useState<string | null>(null);
   const [famillyValue, setfamillyValue] = useState<string | null>(null);
-  const [famillies, setFamillies] = useState<{ famillies: any[] }>({ famillies: [] });
-  const [subFamillies, setSubFamillies] = useState<{ subFamillies: any[] }>({ subFamillies: [] });
+  const [famillies, setFamillies] = useState<{ famillies: any[] }>({
+    famillies: [],
+  });
+  const [subFamillies, setSubFamillies] = useState<{ subFamillies: any[] }>({
+    subFamillies: [],
+  });
   const user = useSelector((state: any) => state.auth.user);
 
   const options = famillies?.famillies.map((familly: any) => ({
@@ -31,7 +37,7 @@ export default function CreateProductPage() {
       famillies?.famillies.find((familly: any) => familly._id === value) ??
       null;
     setfamillyId(value);
-    setfamillyValue(selectedFamilyObject?.name)
+    setfamillyValue(selectedFamilyObject?.name);
   };
 
   const fetchFamilies = async () => {
@@ -76,7 +82,7 @@ export default function CreateProductPage() {
     fetchFamilies();
     if (famillyId) {
       fetchSubFamilies();
-    }else{
+    } else {
       setSubFamillies({ subFamillies: [] });
     }
   }, [famillyId]);
@@ -160,7 +166,6 @@ export default function CreateProductPage() {
                     element="select"
                     id="subfamilly"
                     label="Sous-famille :"
-                  
                     options={subFamillies.subFamillies}
                     placeholder="Selectionner une sous-famille"
                   />
@@ -191,14 +196,14 @@ export default function CreateProductPage() {
 
               <div className="flex gap-2 mt-3">
                 <Button size="small" green>
-                  <Save size={15} />
-                  Enregistrer
-                </Button>
-                <Button size="small" green>
                   <Plus size={15} />
                   Ajouter
                 </Button>
-                <Button size="small" danger>
+                <Button size="small" inverse>
+                  <Save size={15} />
+                  Enregistrer dans brouillon
+                </Button>
+                <Button size="small" cancel>
                   <X size={15} />
                   Annuler
                 </Button>
@@ -209,7 +214,19 @@ export default function CreateProductPage() {
 
         {page === "addFamilly" && (
           <div className="mt-7 mb-7">
-            <CreateFamilyComponent/>
+            <CreateFamilyComponent />
+          </div>
+        )}
+
+        {page === "addBrand" && (
+          <div className="mt-7 mb-7">
+            <CreateBrandComponent />
+          </div>
+        )}
+
+        {page === "addCollection" && (
+          <div className="mt-7 mb-7">
+            <CreateCollectionComponent />
           </div>
         )}
       </Card>

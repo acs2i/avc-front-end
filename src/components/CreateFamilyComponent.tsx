@@ -47,32 +47,6 @@ export default function CreateFamilyComponent() {
     });
   };
 
-  const options = famillies?.famillies.map((familly: any) => ({
-    value: familly._id,
-    label: familly.name,
-    name: familly.name,
-  }));
-
-  const handleFamilyId = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value;
-    const selectedFamilyObject =
-      famillies?.famillies.find((familly: any) => familly._id === value) ??
-      null;
-    setfamilyId(value);
-  };
-
-  const handleFamilyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value;
-    setFamillyValue(value);
-  };
-
-  const handleSubFamilyChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const value = event.target.value;
-    setSubFamillyValue(value);
-  };
-
   const handleOpenSubFamilyCollapse = (event: any) => {
     event.preventDefault();
     setOpenSubFamily(!openSubFamily);
@@ -83,25 +57,36 @@ export default function CreateFamilyComponent() {
     setOpenSubSubFamily(!openSubSubFamily);
   };
 
-  const fetchFamilies = async () => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/familly`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+  const options = famillies?.famillies.map((familly: any) => ({
+    value: familly._id,
+    label: familly.name,
+    name: familly.name,
+  }));
 
-      const data = await response.json();
-      setFamillies(data);
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-    }
+  // Fonction qui récupère l'id de la famille
+  const handleFamilyId = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    const selectedFamilyObject =
+      famillies?.famillies.find((familly: any) => familly._id === value) ??
+      null;
+    setfamilyId(value);
   };
 
+  // Fonction qui récupère la valeur de la famille
+  const handleFamilyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    setFamillyValue(value);
+  };
+
+  // Fonction qui récupère la valeur de la sous-famille
+  const handleSubFamilyChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const value = event.target.value;
+    setSubFamillyValue(value);
+  };
+
+  // Fonction qui crée une famille
   const handleCreateFamily = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
@@ -129,6 +114,27 @@ export default function CreateFamilyComponent() {
     }
   };
 
+// Fonction qui récupère les familles pour lier avec sous-famille
+  const fetchFamilies = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/familly`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+      setFamillies(data);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
+// Fonction qui crée une sous-famille
   const handleCreateSubFamily = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
@@ -160,7 +166,6 @@ export default function CreateFamilyComponent() {
     }
   };
 
-  console.log(famillyValue)
 
   useEffect(() => {
     fetchFamilies();
@@ -168,6 +173,7 @@ export default function CreateFamilyComponent() {
 
   return (
     <div>
+        {/* Ajout d'une famille */}
       <form
         className="flex flex-col gap-4 w-[60%] mx-auto"
         onSubmit={handleCreateFamily}
@@ -199,7 +205,7 @@ export default function CreateFamilyComponent() {
             <Plus size={15} />
             Ajouter
           </Button>
-          <Button size="small" danger>
+          <Button size="small" cancel>
             <X size={15} />
             Annuler
           </Button>
@@ -208,7 +214,7 @@ export default function CreateFamilyComponent() {
 
       {/* Ajout d'une sous-famille */}
       <form
-        className="flex flex-col gap-4 w-[60%] mx-auto mt-[80px]"
+        className="flex flex-col gap-4 w-[60%] mx-auto mt-[50px]"
         onSubmit={handleCreateSubFamily}
       >
         <div className="flex items-center gap-3 h-[70px]">
@@ -256,7 +262,7 @@ export default function CreateFamilyComponent() {
                 <Plus size={15} />
                 Ajouter
               </Button>
-              <Button size="small" danger>
+              <Button size="small" cancel>
                 <X size={15} />
                 Annuler
               </Button>
@@ -267,7 +273,7 @@ export default function CreateFamilyComponent() {
 
       {/* Ajout d'une sous-sous-famille */}
       <form
-        className="flex flex-col gap-4 w-[60%] mx-auto mt-[80px]"
+        className="flex flex-col gap-4 w-[60%] mx-auto mt-[50px]"
         onSubmit={handleCreateSubFamily}
       >
         <div className="flex items-center gap-3 h-[70px]">
@@ -313,7 +319,7 @@ export default function CreateFamilyComponent() {
                 <Plus size={15} />
                 Ajouter
               </Button>
-              <Button size="small" danger>
+              <Button size="small" cancel>
                 <X size={15} />
                 Annuler
               </Button>
