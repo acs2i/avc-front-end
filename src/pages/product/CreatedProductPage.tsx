@@ -119,15 +119,12 @@ export default function CreatedProductPage() {
                             <td className="px-6 py-4">{product.subFamilly}</td>
                             <td className="px-6 py-4 font-bold">En cours...</td>
                             <td className="px-6 py-4 flex items-center gap-3">
-                              <Button size="small" warning>
-                                Finaliser
-                                <div className="animate-ping">
-                                  <CircleDotDashed size={20} />
-                                </div>
+                              <Button size="small" inverse>
+                                Editer
                               </Button>
                               <Tooltip title="Supprimer">
                                 <div className="text-red-400 hover:text-red-600">
-                                  <Trash2 size={20} />
+                                  <Trash2 size={15} />
                                 </div>
                               </Tooltip>
                             </td>
@@ -186,13 +183,10 @@ export default function CreatedProductPage() {
                           <td className="px-6 py-4 flex items-center gap-3">
                             <Button size="small" green>
                               Afficher
-                              <div className="animate-ping">
-                                <CircleCheck size={20} />
-                              </div>
                             </Button>
                             <Tooltip title="Supprimer">
                               <div className="text-red-400 hover:text-red-600">
-                                <Trash2 size={20} />
+                                <Trash2 size={15} />
                               </div>
                             </Tooltip>
                           </td>

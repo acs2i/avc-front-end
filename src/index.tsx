@@ -19,6 +19,7 @@ import { PersistPartial } from "redux-persist/es/persistReducer";
 import storage from "redux-persist/lib/storage";
 import { PersistGate } from "redux-persist/integration/react";
 import { BrowserRouter } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 
 const persistConfig = {
   key: "root",
@@ -34,7 +35,6 @@ interface RootState {
 
 const rootReducer = {
   auth: persistedReducer,
-
 };
 
 export const store = configureStore<RootState>({
@@ -55,6 +55,7 @@ root.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistStore(store)}>
       <BrowserRouter>
+        <ToastContainer />
         <App />
       </BrowserRouter>
     </PersistGate>
