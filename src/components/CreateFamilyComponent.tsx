@@ -10,9 +10,10 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function CreateFamilyComponent() {
   const user = useSelector((state: any) => state.auth.user);
+  const [openFamily, setOpenFamily] = useState(false);
   const [openSubFamily, setOpenSubFamily] = useState(false);
-  const [familyId, setfamilyId] = useState<string | null>(null);
   const [openSubSubFamily, setOpenSubSubFamily] = useState(false);
+  const [familyId, setfamilyId] = useState<string | null>(null);
   const [famillyValue, setFamillyValue] = useState<string | null>(null);
   const [subFamillyValue, setSubFamillyValue] = useState<string | null>(null);
   const [famillies, setFamillies] = useState<{ famillies: any[] }>({
@@ -45,6 +46,11 @@ export default function CreateFamilyComponent() {
       progress: undefined,
       theme: "colored",
     });
+  };
+
+  const handleOpenFamilyCollapse = (event: any) => {
+    event.preventDefault();
+    setOpenFamily(!openFamily);
   };
 
   const handleOpenSubFamilyCollapse = (event: any) => {
@@ -114,7 +120,7 @@ export default function CreateFamilyComponent() {
     }
   };
 
-// Fonction qui récupère les familles pour lier avec sous-famille
+  // Fonction qui récupère les familles pour lier avec sous-famille
   const fetchFamilies = async () => {
     try {
       const response = await fetch(
@@ -134,7 +140,7 @@ export default function CreateFamilyComponent() {
     }
   };
 
-// Fonction qui crée une sous-famille
+  // Fonction qui crée une sous-famille
   const handleCreateSubFamily = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
@@ -166,50 +172,56 @@ export default function CreateFamilyComponent() {
     }
   };
 
-
   useEffect(() => {
     fetchFamilies();
   }, []);
 
   return (
     <div>
-        {/* Ajout d'une famille */}
+      {/* Ajout d'une famille */}
       <form
         className="flex flex-col gap-4 w-[60%] mx-auto"
         onSubmit={handleCreateFamily}
       >
         <div className="flex items-center gap-3 h-[70px]">
           <div className="h-2/3 w-[8px] bg-emerald-700"></div>
-          <h4 className="text-3xl text-gray-600">
+          <h4 className="text-3xl text-gray-600 cursor-pointer" onClick={handleOpenFamilyCollapse}>
             <span className="font-bold text-gray-700">Ajout</span> d'une famille
           </h4>
+          <button className="focus:outline-none text-gray-500">
+            {!openFamily && <ChevronDown size={25} />}
+            {openFamily && <ChevronUp size={25} />}
+          </button>
         </div>
-        <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
-          <div className="flex flex-col gap-3">
-            <Input
-              element="input"
-              id="name"
-              label="Nom de la famille :"
-              onChange={handleFamilyChange}
-              validators={[VALIDATOR_REQUIRE()]}
-              placeholder="Ajouter le libellé de la famille"
-              required
-              gray
-            />
+        <Collapse in={openFamily}>
+          <div>
+            <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
+              <div className="flex flex-col gap-3">
+                <Input
+                  element="input"
+                  id="name"
+                  label="Nom de la famille :"
+                  onChange={handleFamilyChange}
+                  validators={[VALIDATOR_REQUIRE()]}
+                  placeholder="Ajouter le libellé de la famille"
+                  required
+                  gray
+                />
+              </div>
+            </div>
 
+            <div className="flex gap-2 mt-3">
+              <Button size="small" green type="submit">
+                <Plus size={15} />
+                Ajouter
+              </Button>
+              <Button size="small" cancel>
+                <X size={15} />
+                Annuler
+              </Button>
+            </div>
           </div>
-        </div>
-
-        <div className="flex gap-2 mt-3">
-          <Button size="small" green type="submit">
-            <Plus size={15} />
-            Ajouter
-          </Button>
-          <Button size="small" cancel>
-            <X size={15} />
-            Annuler
-          </Button>
-        </div>
+        </Collapse>
       </form>
 
       {/* Ajout d'une sous-famille */}
@@ -219,14 +231,14 @@ export default function CreateFamilyComponent() {
       >
         <div className="flex items-center gap-3 h-[70px]">
           <div className="h-2/3 w-[8px] bg-emerald-700"></div>
-          <h4 className="text-3xl text-gray-600">
+          <h4
+            className="text-3xl text-gray-600 cursor-pointer"
+            onClick={handleOpenSubFamilyCollapse}
+          >
             <span className="font-bold text-gray-700">Ajout</span> d'une
             sous-famille
           </h4>
-          <button
-            onClick={handleOpenSubFamilyCollapse}
-            className="focus:outline-none text-gray-500"
-          >
+          <button className="focus:outline-none text-gray-500">
             {!openSubFamily && <ChevronDown size={25} />}
             {openSubFamily && <ChevronUp size={25} />}
           </button>
@@ -278,14 +290,14 @@ export default function CreateFamilyComponent() {
       >
         <div className="flex items-center gap-3 h-[70px]">
           <div className="h-2/3 w-[8px] bg-emerald-700"></div>
-          <h4 className="text-3xl text-gray-600">
+          <h4
+            className="text-3xl text-gray-600 cursor-pointer"
+            onClick={handleOpenSubSubFamilyCollapse}
+          >
             <span className="font-bold text-gray-700">Ajout</span> d'une
             sous-sous-famille
           </h4>
-          <button
-            onClick={handleOpenSubSubFamilyCollapse}
-            className="focus:outline-none text-gray-500"
-          >
+          <button className="focus:outline-none text-gray-500">
             {!openSubSubFamily && <ChevronDown size={25} />}
             {openSubSubFamily && <ChevronUp size={25} />}
           </button>
