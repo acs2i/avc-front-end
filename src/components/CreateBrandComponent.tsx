@@ -45,11 +45,11 @@ export default function CreateBrandComponent() {
     setBrandValue(value);
   };
 
-  const handleCreateFamily = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateBrand = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/familly/create`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/brand/create`,
         {
           method: "POST",
           headers: {
@@ -61,14 +61,14 @@ export default function CreateBrandComponent() {
 
       if (response.ok) {
         const data = await response.json();
-        notifySuccess("Famille créée avec succès!");
+        notifySuccess("Marque créée avec succès!");
       } else {
         console.error("Erreur lors de la connexion");
-        notifyError("Erreur lors de la création de la famille");
+        notifyError("Erreur lors de la création de la marque");
       }
     } catch (error) {
       console.error("Erreur lors de la requête", error);
-      notifyError("Erreur lors de la création de la famille");
+      notifyError("Erreur lors de la création de la marque");
     }
   };
 
@@ -77,7 +77,7 @@ export default function CreateBrandComponent() {
     <div>
       <form
         className="flex flex-col gap-4 w-[60%] mx-auto"
-        onSubmit={handleCreateFamily}
+        onSubmit={handleCreateBrand}
       >
         <div className="flex items-center gap-3 h-[70px]">
           <div className="h-2/3 w-[8px] bg-emerald-700"></div>
