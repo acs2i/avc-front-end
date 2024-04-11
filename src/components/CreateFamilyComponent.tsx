@@ -10,7 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function CreateFamilyComponent() {
   const user = useSelector((state: any) => state.auth.user);
-  const [openFamily, setOpenFamily] = useState(false);
+  const [openFamily, setOpenFamily] = useState(true);
   const [openSubFamily, setOpenSubFamily] = useState(false);
   const [openSubSubFamily, setOpenSubSubFamily] = useState(false);
   const [familyId, setfamilyId] = useState<string | null>(null);
@@ -183,9 +183,12 @@ export default function CreateFamilyComponent() {
         className="flex flex-col gap-4 w-[60%] mx-auto"
         onSubmit={handleCreateFamily}
       >
-        <div className="flex items-center gap-3 h-[70px]">
+        <div
+          className="flex items-center gap-3 h-[70px]"
+          onClick={handleOpenFamilyCollapse}
+        >
           <div className="h-2/3 w-[8px] bg-emerald-700"></div>
-          <h4 className="text-3xl text-gray-600 cursor-pointer select-none" onClick={handleOpenFamilyCollapse}>
+          <h4 className="text-3xl text-gray-600 cursor-pointer select-none">
             <span className="font-bold text-gray-700">Ajout</span> d'une famille
           </h4>
           <button className="focus:outline-none text-gray-500">
@@ -229,12 +232,12 @@ export default function CreateFamilyComponent() {
         className="flex flex-col gap-4 w-[60%] mx-auto mt-[50px]"
         onSubmit={handleCreateSubFamily}
       >
-        <div className="flex items-center gap-3 h-[70px]">
+        <div
+          className="flex items-center gap-3 h-[70px]"
+          onClick={handleOpenSubFamilyCollapse}
+        >
           <div className="h-2/3 w-[8px] bg-emerald-700"></div>
-          <h4
-            className="text-3xl text-gray-600 cursor-pointer select-none"
-            onClick={handleOpenSubFamilyCollapse}
-          >
+          <h4 className="text-3xl text-gray-600 cursor-pointer select-none">
             <span className="font-bold text-gray-700">Ajout</span> d'une
             sous-famille
           </h4>
@@ -288,12 +291,12 @@ export default function CreateFamilyComponent() {
         className="flex flex-col gap-4 w-[60%] mx-auto mt-[50px]"
         onSubmit={handleCreateSubFamily}
       >
-        <div className="flex items-center gap-3 h-[70px]">
+        <div
+          className="flex items-center gap-3 h-[70px]"
+          onClick={handleOpenSubSubFamilyCollapse}
+        >
           <div className="h-2/3 w-[8px] bg-emerald-700"></div>
-          <h4
-            className="text-3xl text-gray-600 cursor-pointer select-none"
-            onClick={handleOpenSubSubFamilyCollapse}
-          >
+          <h4 className="text-3xl text-gray-600 cursor-pointer select-none">
             <span className="font-bold text-gray-700">Ajout</span> d'une
             sous-sous-famille
           </h4>

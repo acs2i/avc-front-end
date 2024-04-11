@@ -10,7 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 export default function CreateCollectionComponent() {
   const user = useSelector((state: any) => state.auth.user);
-  const [brandValue, setBrandValue] = useState<string | null>(null);
+  const [collectionValue, setCollectionValue] = useState<string | null>(null);
 
   // Fonction pour afficher un toast de succès
   const notifySuccess = (message: any) => {
@@ -40,31 +40,31 @@ export default function CreateCollectionComponent() {
     });
   };
 
-  const handleBrandChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleCollectionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
-    setBrandValue(value);
+    setCollectionValue(value);
   };
 
   const handleCreateFamily = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/familly/create`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/collection/create`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ name: brandValue, creator: user._id }),
+          body: JSON.stringify({ name: collectionValue, creator: user._id }),
         }
       );
 
       if (response.ok) {
         const data = await response.json();
-        notifySuccess("Famille créée avec succès!");
+        notifySuccess("Collection créée avec succès!");
       } else {
         console.error("Erreur lors de la connexion");
-        notifyError("Erreur lors de la création de la famille");
+        notifyError("Erreur lors de la création de la collection");
       }
     } catch (error) {
       console.error("Erreur lors de la requête", error);
@@ -91,7 +91,7 @@ export default function CreateCollectionComponent() {
               element="input"
               id="brand"
               label="Libéllé de la collection :"
-              onChange={handleBrandChange}
+              onChange={handleCollectionChange}
               validators={[VALIDATOR_REQUIRE()]}
               placeholder="Ajouter le libellé de la collection"
               required
