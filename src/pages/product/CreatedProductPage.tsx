@@ -42,7 +42,7 @@ export default function CreatedProductPage() {
   }
 
   return (
-    <div className="mt-7">
+    <div className="mt-7 mb-[100px]">
       <Card title="Les produits créés">
         <div className="mt-4 mb-[30px]">
           <div className="flex items-center justify-between">

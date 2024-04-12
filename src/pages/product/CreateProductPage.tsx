@@ -29,6 +29,7 @@ interface FormData {
     size: any;
     price: any;
   };
+  status : number;
   creator: any;
 }
 
@@ -66,6 +67,7 @@ export default function CreateProductPage() {
       size: [],
       price: [],
     },
+    status : 0,
     creator: user._id,
   });
 
@@ -105,9 +107,7 @@ export default function CreateProductPage() {
     }
   };
   
-  
-
-  // Fonction pour afficher un toast de succès
+    // Fonction pour afficher un toast de succès
   const notifySuccess = (message: any) => {
     toast.success(message, {
       position: "bottom-right",
@@ -261,7 +261,7 @@ export default function CreateProductPage() {
     }
   }, [famillyId]);
 
-  console.log(formData);
+
 
   return (
     <div className="mt-7 mb-[100px]">
@@ -451,11 +451,11 @@ export default function CreateProductPage() {
               </div>
 
               <div className="flex gap-2 mt-5">
-                <Button size="small" green type="submit">
+                <Button size="small" green type="submit" onClick={() => setFormData({ ...formData, status: 1 })}>
                   <Plus size={15} />
                   Ajouter
                 </Button>
-                <Button size="small" inverse>
+                <Button size="small" inverse type="submit">
                   <Save size={15} />
                   Enregistrer dans brouillon
                 </Button>
