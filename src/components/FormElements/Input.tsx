@@ -1,6 +1,7 @@
 import React, { useReducer } from "react";
 import { validate } from "../../utils/validator";
 
+
 type Validator = {
   type: string;
   val?: number | undefined;
@@ -80,7 +81,7 @@ const Input: React.FC<InputProps> = (props) => {
     ${props.gray ? "border-b-[1px] border-gray-300" : ""}
     ${
       !inputState.isValid &&
-      inputState.isTouched &&
+      inputState.isTouched && props.required &&
       "border-b-[1px] border-red-300"
     }
   `;
@@ -125,7 +126,7 @@ const Input: React.FC<InputProps> = (props) => {
           </option>
         ))}
       </select>
-    ) : null;
+    ) :  null;
 
   return (
     <div className={`flex flex-col mt-3`}>
@@ -139,7 +140,7 @@ const Input: React.FC<InputProps> = (props) => {
         </label>
       </div>
       {element}
-      {!inputState.isValid && inputState.isTouched && (
+      {!inputState.isValid && inputState.isTouched && props.required && (
         <div className="mt-2 text-red-500 text-[12px]">
           Le champ ne doit pas être vide
         </div>

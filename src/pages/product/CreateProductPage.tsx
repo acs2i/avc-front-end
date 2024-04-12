@@ -7,25 +7,133 @@ import Button from "../../components/FormElements/Button";
 import { LINKCARD_EDIT } from "../../utils/index";
 import { LinkCard } from "@/type";
 import { Divider } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import CreateFamilyComponent from "../../components/CreateFamilyComponent";
 import CreateBrandComponent from "../../components/CreateBrandComponent";
 import CreateCollectionComponent from "../../components/CreateCollectionComponent";
 import { VALIDATOR_REQUIRE } from "../../utils/validator";
+import MultiSelect from "../../components/FormElements/MultiSelect";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+interface FormData {
+  reference: string;
+  name: string;
+  familly: any;
+  subFamilly: any;
+  brand: string;
+  productCollection: string;
+  uvc: {
+    code: string;
+    color: any;
+    size: any;
+    price: any;
+  };
+  creator: any;
+}
 
 export default function CreateProductPage() {
+  const user = useSelector((state: any) => state.auth.user);
   const [page, setPage] = useState("addProduct");
   const [famillyId, setfamillyId] = useState<string | null>(null);
   const [brands, setBrands] = useState({ brands: [] });
   const [collections, setCollections] = useState({ collections: [] });
-  const [famillyValue, setfamillyValue] = useState<string | null>(null);
   const [famillies, setFamillies] = useState<{ famillies: any[] }>({
     famillies: [],
   });
   const [subFamillies, setSubFamillies] = useState<{ subFamillies: any[] }>({
     subFamillies: [],
   });
-  const user = useSelector((state: any) => state.auth.user);
+  const sizes = [
+    { value: "XS", label: "XS", name: "XS" },
+    { value: "S", label: "S", name: "S" },
+    { value: "M", label: "M", name: "M" },
+    { value: "L", label: "L", name: "L" },
+    { value: "XL", label: "XL", name: "XL" },
+    { value: "XXL", label: "XXL", name: "XXL" },
+  ];
+
+  const [formData, setFormData] = useState<FormData>({
+    reference: "",
+    name: "",
+    familly: [],
+    subFamilly: [],
+    brand: "",
+    productCollection: "",
+    uvc: {
+      code: "",
+      color: [],
+      size: [],
+      price: [],
+    },
+    creator: user._id,
+  });
+
+  const handleChange = async (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement> | { target: { id: string; value: any } }
+  ) => {
+    const { id, value } = e.target || e;
+  
+    if(id === "familly") {
+      const selectedFamilyObject = famillies?.famillies.find(
+        (family: any) => family._id === value
+      );
+      if (selectedFamilyObject) {
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          familly: selectedFamilyObject.name,
+        }));
+        setfamillyId(value);
+      }
+    } else if (id === "size") {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        uvc: {
+          ...prevFormData.uvc,
+          [id]: value,
+        },
+      }));
+    } else {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [id]: value,
+        uvc: {
+          ...prevFormData.uvc,
+          [id]: value,
+        },
+      }));
+    }
+  };
+  
+  
+
+  // Fonction pour afficher un toast de succès
+  const notifySuccess = (message: any) => {
+    toast.success(message, {
+      position: "bottom-right",
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+    });
+  };
+
+  // Fonction pour afficher un toast d'erreur
+  const notifyError = (message: string) => {
+    toast.error(message, {
+      position: "bottom-right",
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
+  };
 
   const options = famillies?.famillies.map((familly: any) => ({
     value: familly._id,
@@ -33,14 +141,9 @@ export default function CreateProductPage() {
     name: familly.name,
   }));
 
-  const handleFamilyChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = event.target.value;
-    const selectedFamilyObject =
-      famillies?.famillies.find((familly: any) => familly._id === value) ??
-      null;
-    setfamillyId(value);
-    setfamillyValue(selectedFamilyObject?.name);
-  };
+  const selectedFamilyName = famillies?.famillies.find(
+    (family: any) => family._id === formData.familly
+  )?.name;
 
   const fetchFamilies = async () => {
     try {
@@ -120,6 +223,33 @@ export default function CreateProductPage() {
     }
   };
 
+  const handleCreateProduct = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/product/create`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        notifySuccess("Produit créée avec succès!");
+      } else {
+        console.error("Erreur lors de la connexion");
+        notifyError("Erreur lors de la création du produit");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+      notifyError("Erreur lors de la création du produit");
+    }
+  };
+
   useEffect(() => {
     fetchFamilies();
     fetchBrands();
@@ -131,8 +261,10 @@ export default function CreateProductPage() {
     }
   }, [famillyId]);
 
+  console.log(formData);
+
   return (
-    <div className="mt-7">
+    <div className="mt-7 mb-[100px]">
       <Link
         to="/edit"
         className="flex items-center justify-start gap-3 mb-5 font-bold text-gray-600"
@@ -164,7 +296,10 @@ export default function CreateProductPage() {
 
         {page === "addProduct" && (
           <div className="mt-7 mb-7">
-            <form className="flex flex-col gap-4 w-[60%] mx-auto">
+            <form
+              className="flex flex-col gap-4 w-[60%] mx-auto"
+              onSubmit={handleCreateProduct}
+            >
               <div className="flex items-center gap-3 h-[70px]">
                 <div className="h-2/3 w-[8px] bg-emerald-700"></div>
                 <h4 className="text-3xl text-gray-600">
@@ -172,74 +307,151 @@ export default function CreateProductPage() {
                   produit
                 </h4>
               </div>
-              <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
-                <Input
-                  element="input"
-                  id="reference"
-                  label="Référence du produit :"
-                  validators={[VALIDATOR_REQUIRE()]}
-                  placeholder="Ajouter la référence du produit"
-                  required
-                  gray
-                />
-                <Input
-                  element="input"
-                  id="name"
-                  label="Nom du produit :"
-                  validators={[VALIDATOR_REQUIRE()]}
-                  placeholder="Ajouter le libellé du produit"
-                  required
-                  gray
-                />
+
+              <div>
+                <div className="flex items-center gap-3 h-[70px]">
+                  <h5 className="text-2xl text-gray-600">
+                    <span className="font-bold text-gray-700">Création</span> de
+                    la fiche produit
+                  </h5>
+                </div>
+                <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
+                  <Input
+                    element="input"
+                    id="reference"
+                    label="Référence du produit :"
+                    value={formData.reference}
+                    onChange={handleChange}
+                    validators={[VALIDATOR_REQUIRE()]}
+                    placeholder="Ajouter la référence du produit"
+                    required
+                    gray
+                  />
+                  <Input
+                    element="input"
+                    id="name"
+                    label="Nom du produit :"
+                    value={formData.name}
+                    onChange={handleChange}
+                    validators={[VALIDATOR_REQUIRE()]}
+                    placeholder="Ajouter le libellé du produit"
+                    required
+                    gray
+                  />
+                </div>
+                <div className="gap-5 grid grid-cols-2 grid-template-columns: [label] 1fr [select] 2fr;">
+                  <div className="flex flex-col gap-3">
+                    <Input
+                      element="select"
+                      id="familly"
+                      label="Famille :"
+                      value={selectedFamilyName}
+                      onChange={handleChange}
+                      options={options}
+                      required
+                      placeholder="Selectionner une famille"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <Input
+                      element="select"
+                      id="subFamilly"
+                      label="Sous-famille :"
+                      value={formData.subFamilly}
+                      onChange={handleChange}
+                      options={subFamillies.subFamillies}
+                      placeholder="Selectionner une sous-famille"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <Input
+                      element="select"
+                      id="brand"
+                      label="Marque :"
+                      value={formData.brand}
+                      onChange={handleChange}
+                      required
+                      options={brands.brands}
+                      placeholder="Selectionner une marque"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <Input
+                      element="select"
+                      id="productCollection"
+                      label="Collection :"
+                      value={formData.productCollection}
+                      onChange={handleChange}
+                      required
+                      options={collections.collections}
+                      placeholder="Selectionner une collection"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-[50px]">
+                  <div className="flex items-center gap-3 h-[70px]">
+                    <h5 className="text-2xl text-gray-600">
+                      <span className="font-bold text-gray-700">Création</span>{" "}
+                      de l'uvc du produit
+                    </h5>
+                  </div>
+                  <div className="gap-5 grid grid-cols-2 grid-template-columns: [label] 1fr [select] 2fr;">
+                    <div className="flex flex-col gap-3">
+                      <Input
+                        element="input"
+                        id="code"
+                        label="Code fournisseur :"
+                        value={formData.uvc.code}
+                        onChange={handleChange}
+                        validators={[]}
+                        options={collections.collections}
+                        placeholder="Veuillez saisir le code fournisseur"
+                        gray
+                      />
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      <MultiSelect
+                        id="size"
+                        label="Tailles :"
+                        options={sizes}
+                        value={formData.uvc.size}
+                        onChange={(selectedOptions) => handleChange({ target: { id: "size", value: selectedOptions } })}
+                      />
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      <Input
+                        element="input"
+                        id="color"
+                        label="Couleurs :"
+                        value={formData.uvc.color}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder="Veuillez saisir le ou les couleurs"
+                        gray
+                      />
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      <Input
+                        element="input"
+                        id="price"
+                        label="Prix :"
+                        value={formData.uvc.price}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder="Veuillez saisir le prix"
+                        gray
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="gap-5 grid grid-cols-2 grid-template-columns: [label] 1fr [select] 2fr;">
-                <div className="flex flex-col gap-3">
-                  <Input
-                    element="select"
-                    id="familly"
-                    label="Famille :"
-                    onChange={handleFamilyChange}
-                    options={options}
-                    required
-                    placeholder="Selectionner une famille"
-                  />
-                </div>
 
-                <div className="flex flex-col gap-3">
-                  <Input
-                    element="select"
-                    id="subfamilly"
-                    label="Sous-famille :"
-                    options={subFamillies.subFamillies}
-                    placeholder="Selectionner une sous-famille"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-3">
-                  <Input
-                    element="select"
-                    id="brand"
-                    label="Marque :"
-                    required
-                    options={brands.brands}
-                    placeholder="Selectionner une marque"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-3">
-                  <Input
-                    element="select"
-                    id="productcollection"
-                    label="Collection :"
-                    required
-                    options={collections.collections}
-                    placeholder="Selectionner une collection"
-                  />
-                </div>
-              </div>
-
-              <div className="flex gap-2 mt-3">
-                <Button size="small" green>
+              <div className="flex gap-2 mt-5">
+                <Button size="small" green type="submit">
                   <Plus size={15} />
                   Ajouter
                 </Button>
