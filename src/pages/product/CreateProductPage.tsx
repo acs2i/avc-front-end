@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { MoveLeft, Plus, Save, X } from "lucide-react";
+import { Collapse } from "@mui/material";
+import { ChevronDown, ChevronUp, MoveLeft, Plus, Save, X } from "lucide-react";
 import Input from "../../components/FormElements/Input";
 import { Link } from "react-router-dom";
 import Card from "../../components/Shared/Card";
@@ -29,13 +30,15 @@ interface FormData {
     size: any;
     price: any;
   };
-  status : number;
+  status: number;
   creator: any;
 }
 
 export default function CreateProductPage() {
   const user = useSelector((state: any) => state.auth.user);
   const [page, setPage] = useState("addProduct");
+  const [uvcIsOpen, setUvcIsOpen] = useState(false);
+  const [createProductIsOpen, setCreateProductcIsOpen] = useState(true);
   const [famillyId, setfamillyId] = useState<string | null>(null);
   const [brands, setBrands] = useState({ brands: [] });
   const [collections, setCollections] = useState({ collections: [] });
@@ -45,6 +48,45 @@ export default function CreateProductPage() {
   const [subFamillies, setSubFamillies] = useState<{ subFamillies: any[] }>({
     subFamillies: [],
   });
+
+  // Fonction pour afficher un toast de succès
+  const notifySuccess = (message: any) => {
+    toast.success(message, {
+      position: "bottom-right",
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+    });
+  };
+
+  // Fonction pour afficher un toast d'erreur
+  const notifyError = (message: string) => {
+    toast.error(message, {
+      position: "bottom-right",
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
+  };
+
+  const handleOpenUvcCollapse = (event: any) => {
+    event.preventDefault();
+    setUvcIsOpen(!uvcIsOpen);
+  };
+
+  const handleOpenProductCollapse = (event: any) => {
+    event.preventDefault();
+    setCreateProductcIsOpen(!createProductIsOpen);
+  };
+
   const sizes = [
     { value: "XS", label: "XS", name: "XS" },
     { value: "S", label: "S", name: "S" },
@@ -67,16 +109,18 @@ export default function CreateProductPage() {
       size: [],
       price: [],
     },
-    status : 0,
+    status: 0,
     creator: user._id,
   });
 
   const handleChange = async (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement> | { target: { id: string; value: any } }
+    e:
+      | React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+      | { target: { id: string; value: any } }
   ) => {
     const { id, value } = e.target || e;
-  
-    if(id === "familly") {
+
+    if (id === "familly") {
       const selectedFamilyObject = famillies?.famillies.find(
         (family: any) => family._id === value
       );
@@ -105,34 +149,6 @@ export default function CreateProductPage() {
         },
       }));
     }
-  };
-  
-    // Fonction pour afficher un toast de succès
-  const notifySuccess = (message: any) => {
-    toast.success(message, {
-      position: "bottom-right",
-      autoClose: 3000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-    });
-  };
-
-  // Fonction pour afficher un toast d'erreur
-  const notifyError = (message: string) => {
-    toast.error(message, {
-      position: "bottom-right",
-      autoClose: 3000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
   };
 
   const options = famillies?.famillies.map((familly: any) => ({
@@ -261,10 +277,8 @@ export default function CreateProductPage() {
     }
   }, [famillyId]);
 
-
-
   return (
-    <div className="mt-7 mb-[100px]">
+    <div className="mt-7">
       <Link
         to="/edit"
         className="flex items-center justify-start gap-3 mb-5 font-bold text-gray-600"
@@ -309,96 +323,115 @@ export default function CreateProductPage() {
               </div>
 
               <div>
-                <div className="flex items-center gap-3 h-[70px]">
+                <div
+                  className="flex items-center gap-3 h-[70px]"
+                  onClick={handleOpenProductCollapse}
+                >
                   <h5 className="text-2xl text-gray-600">
                     <span className="font-bold text-gray-700">Création</span> de
                     la fiche produit
                   </h5>
+                  <button className="focus:outline-none text-gray-500">
+                    {!createProductIsOpen && <ChevronDown size={25} />}
+                    {createProductIsOpen && <ChevronUp size={25} />}
+                  </button>
                 </div>
-                <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
-                  <Input
-                    element="input"
-                    id="reference"
-                    label="Référence du produit :"
-                    value={formData.reference}
-                    onChange={handleChange}
-                    validators={[VALIDATOR_REQUIRE()]}
-                    placeholder="Ajouter la référence du produit"
-                    required
-                    gray
-                  />
-                  <Input
-                    element="input"
-                    id="name"
-                    label="Nom du produit :"
-                    value={formData.name}
-                    onChange={handleChange}
-                    validators={[VALIDATOR_REQUIRE()]}
-                    placeholder="Ajouter le libellé du produit"
-                    required
-                    gray
-                  />
+                <Collapse in={createProductIsOpen}>
+                  <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
+                    <Input
+                      element="input"
+                      id="reference"
+                      label="Référence du produit :"
+                      value={formData.reference}
+                      onChange={handleChange}
+                      validators={[VALIDATOR_REQUIRE()]}
+                      placeholder="Ajouter la référence du produit"
+                      required
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      id="name"
+                      label="Nom du produit :"
+                      value={formData.name}
+                      onChange={handleChange}
+                      validators={[VALIDATOR_REQUIRE()]}
+                      placeholder="Ajouter le libellé du produit"
+                      required
+                      gray
+                    />
+                  </div>
+                  <div className="gap-5 grid grid-cols-2 grid-template-columns: [label] 1fr [select] 2fr;">
+                    <div className="flex flex-col gap-3">
+                      <Input
+                        element="select"
+                        id="familly"
+                        label="Famille :"
+                        value={selectedFamilyName}
+                        onChange={handleChange}
+                        options={options}
+                        required
+                        placeholder="Selectionner une famille"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                      <Input
+                        element="select"
+                        id="subFamilly"
+                        label="Sous-famille :"
+                        value={formData.subFamilly}
+                        onChange={handleChange}
+                        options={subFamillies.subFamillies}
+                        placeholder="Selectionner une sous-famille"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                      <Input
+                        element="select"
+                        id="brand"
+                        label="Marque :"
+                        value={formData.brand}
+                        onChange={handleChange}
+                        required
+                        options={brands.brands}
+                        placeholder="Selectionner une marque"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-3">
+                      <Input
+                        element="select"
+                        id="productCollection"
+                        label="Collection :"
+                        value={formData.productCollection}
+                        onChange={handleChange}
+                        required
+                        options={collections.collections}
+                        placeholder="Selectionner une collection"
+                      />
+                    </div>
+                  </div>
+                </Collapse>
+              </div>
+              
+
+              <div>
+                <div
+                  className="flex items-center gap-3 h-[70px]"
+                  onClick={handleOpenUvcCollapse}
+                >
+                  <h5 className="text-2xl text-gray-600">
+                    <span className="font-bold text-gray-700">Création</span> de
+                    l'uvc du produit
+                  </h5>
+                  <button className="focus:outline-none text-gray-500">
+                    {!uvcIsOpen && <ChevronDown size={25} />}
+                    {uvcIsOpen && <ChevronUp size={25} />}
+                  </button>
                 </div>
-                <div className="gap-5 grid grid-cols-2 grid-template-columns: [label] 1fr [select] 2fr;">
-                  <div className="flex flex-col gap-3">
-                    <Input
-                      element="select"
-                      id="familly"
-                      label="Famille :"
-                      value={selectedFamilyName}
-                      onChange={handleChange}
-                      options={options}
-                      required
-                      placeholder="Selectionner une famille"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-3">
-                    <Input
-                      element="select"
-                      id="subFamilly"
-                      label="Sous-famille :"
-                      value={formData.subFamilly}
-                      onChange={handleChange}
-                      options={subFamillies.subFamillies}
-                      placeholder="Selectionner une sous-famille"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-3">
-                    <Input
-                      element="select"
-                      id="brand"
-                      label="Marque :"
-                      value={formData.brand}
-                      onChange={handleChange}
-                      required
-                      options={brands.brands}
-                      placeholder="Selectionner une marque"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-3">
-                    <Input
-                      element="select"
-                      id="productCollection"
-                      label="Collection :"
-                      value={formData.productCollection}
-                      onChange={handleChange}
-                      required
-                      options={collections.collections}
-                      placeholder="Selectionner une collection"
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-[50px]">
-                  <div className="flex items-center gap-3 h-[70px]">
-                    <h5 className="text-2xl text-gray-600">
-                      <span className="font-bold text-gray-700">Création</span>{" "}
-                      de l'uvc du produit
-                    </h5>
-                  </div>
+                <Collapse in={uvcIsOpen}>
                   <div className="gap-5 grid grid-cols-2 grid-template-columns: [label] 1fr [select] 2fr;">
                     <div className="flex flex-col gap-3">
                       <Input
@@ -419,7 +452,11 @@ export default function CreateProductPage() {
                         label="Tailles :"
                         options={sizes}
                         value={formData.uvc.size}
-                        onChange={(selectedOptions) => handleChange({ target: { id: "size", value: selectedOptions } })}
+                        onChange={(selectedOptions) =>
+                          handleChange({
+                            target: { id: "size", value: selectedOptions },
+                          })
+                        }
                       />
                     </div>
                     <div className="flex flex-col gap-3">
@@ -447,11 +484,16 @@ export default function CreateProductPage() {
                       />
                     </div>
                   </div>
-                </div>
+                </Collapse>
               </div>
 
               <div className="flex gap-2 mt-5">
-                <Button size="small" green type="submit" onClick={() => setFormData({ ...formData, status: 1 })}>
+                <Button
+                  size="small"
+                  green
+                  type="submit"
+                  onClick={() => setFormData({ ...formData, status: 1 })}
+                >
                   <Plus size={15} />
                   Ajouter
                 </Button>

@@ -1,10 +1,10 @@
 import Card from "../../components/Shared/Card";
 import React, { useState, useEffect } from "react";
 import Button from "../../components/FormElements/Button";
-import { LINKCARD, PRODUCT_CREATED } from "../../utils/index";
+import { LINKCARD} from "../../utils/index";
 import { LinkCard } from "@/type";
 import { Divider, Tooltip } from "@mui/material";
-import { CircleCheck, CircleDotDashed, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function CreatedProductPage() {
