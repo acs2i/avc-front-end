@@ -62,19 +62,19 @@ export default function Home() {
                 <th scope="col" className="px-6 py-4">
                   RÉFÉRENCE
                 </th>
-                <th scope="col" className="px-6 py-6">
+                <th scope="col" className="px-6 py-4">
                   NOM
                 </th>
-                <th scope="col" className="px-6 py-6">
+                <th scope="col" className="px-6 py-4">
                   Famille
                 </th>
-                <th scope="col" className="px-6 py-6">
+                <th scope="col" className="px-6 py-4">
                   Sous-famille
                 </th>
-                <th scope="col" className="px-6 py-6">
+                <th scope="col" className="px-6 py-4">
                   MARQUE
                 </th>
-                <th scope="col" className="px-6 py-6">
+                <th scope="col" className="px-6 py-4">
                   COLLECTION
                 </th>
               </tr>

@@ -83,22 +83,22 @@ export default function CreatedProductPage() {
             <table className="w-full text-left">
               <thead className="uppercase bg-blue-50">
                 <tr>
-                  <th scope="col" className="px-6 py-6">
+                  <th scope="col" className="px-6 py-4">
                     Référence
                   </th>
-                  <th scope="col" className="px-6 py-6">
+                  <th scope="col" className="px-6 py-4">
                     NOM
                   </th>
-                  <th scope="col" className="px-6 py-6">
+                  <th scope="col" className="px-6 py-4">
                     Famille
                   </th>
-                  <th scope="col" className="px-6 py-6">
+                  <th scope="col" className="px-6 py-4">
                     Sous-famille
                   </th>
-                  <th scope="col" className="px-6 py-6">
+                  <th scope="col" className="px-6 py-4">
                     Status
                   </th>
-                  <th scope="col" className="px-6 py-6">
+                  <th scope="col" className="px-6 py-4">
                     Action
                   </th>
                 </tr>
@@ -113,12 +113,12 @@ export default function CreatedProductPage() {
                             className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold text-sm text-gray-500"
                             key={product._id}
                           >
-                            <td className="px-6 py-4">{product.reference}</td>
-                            <td className="px-6 py-4">{product.name}</td>
-                            <td className="px-6 py-4">{product.familly}</td>
-                            <td className="px-6 py-4">{product.subFamilly}</td>
-                            <td className="px-6 py-4 font-bold">En cours...</td>
-                            <td className="px-6 py-4 flex items-center gap-3">
+                            <td className="px-6 py-3">{product.reference}</td>
+                            <td className="px-6 py-3">{product.name}</td>
+                            <td className="px-6 py-3">{product.familly}</td>
+                            <td className="px-6 py-3">{product.subFamilly}</td>
+                            <td className="px-6 py-3 font-bold">En cours...</td>
+                            <td className="px-6 py-3 flex items-center gap-3">
                               <Button size="small" inverse>
                                 Editer
                               </Button>
@@ -145,22 +145,22 @@ export default function CreatedProductPage() {
             <table className="w-full text-left">
               <thead className="uppercase bg-blue-50">
                 <tr>
-                  <th scope="col" className="px-6 py-6">
+                  <th scope="col" className="px-6 py-4">
                     Référence
                   </th>
-                  <th scope="col" className="px-6 py-6">
+                  <th scope="col" className="px-6 py-4">
                     NOM
                   </th>
-                  <th scope="col" className="px-6 py-6">
+                  <th scope="col" className="px-6 py-4">
                     Famille
                   </th>
-                  <th scope="col" className="px-6 py-6">
+                  <th scope="col" className="px-6 py-4">
                     Sous-famille
                   </th>
-                  <th scope="col" className="px-6 py-6">
+                  <th scope="col" className="px-6 py-4">
                     Status
                   </th>
-                  <th scope="col" className="px-6 py-6">
+                  <th scope="col" className="px-6 py-4">
                     Action
                   </th>
                 </tr>
@@ -175,12 +175,12 @@ export default function CreatedProductPage() {
                           className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold text-sm text-gray-500"
                           key={product._id}
                         >
-                          <td className="px-6 py-4">{product.reference}</td>
-                          <td className="px-6 py-4">{product.name}</td>
-                          <td className="px-6 py-4">{product.familly}</td>
-                          <td className="px-6 py-4">{product.subFamilly}</td>
-                          <td className="px-6 py-4 font-bold">En cours...</td>
-                          <td className="px-6 py-4 flex items-center gap-3">
+                          <td className="px-6 py-3">{product.reference}</td>
+                          <td className="px-6 py-3">{product.name}</td>
+                          <td className="px-6 py-3">{product.familly}</td>
+                          <td className="px-6 py-3">{product.subFamilly}</td>
+                          <td className="px-6 py-3 font-bold">En cours...</td>
+                          <td className="px-6 py-3 flex items-center gap-3">
                             <Button size="small" green>
                               Afficher
                             </Button>

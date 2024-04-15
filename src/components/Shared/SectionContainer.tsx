@@ -24,7 +24,7 @@ export default function SectionContainer({
 
   return (
     <section
-      className="relative w-[100%] bg-[#f1f1f1]"
+      className="relative w-[100%] h-screen bg-[#f1f1f1]"
     >
       <div
         className="fixed top-0 w-[100%] h-screen"
