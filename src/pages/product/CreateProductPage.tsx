@@ -415,7 +415,6 @@ export default function CreateProductPage() {
                   </div>
                 </Collapse>
               </div>
-              
 
               <div>
                 <div
@@ -432,7 +431,8 @@ export default function CreateProductPage() {
                   </button>
                 </div>
                 <Collapse in={uvcIsOpen}>
-                  <div className="gap-5 grid grid-cols-2 grid-template-columns: [label] 1fr [select] 2fr;">
+                  <h6>Uvc 1</h6>
+                  <div className="gap-5 grid grid-cols-2 grid-template-columns: [label] 1fr [select] 2fr; mb-[50px]">
                     <div className="flex flex-col gap-3">
                       <Input
                         element="input"
@@ -484,6 +484,8 @@ export default function CreateProductPage() {
                       />
                     </div>
                   </div>
+
+         
                 </Collapse>
               </div>
 
