@@ -8,7 +8,7 @@ export default function Sidebar() {
   const visibleLinks = LINKS.filter((link) => link.showInSidebar);
 
   return (
-    <nav className="h-screen w-[70px] bg-white flex flex-col items-center gap-3">
+    <nav className="fixed h-screen w-[70px] bg-white flex flex-col items-center gap-3 z-[30000000]">
       <div className="w-[40px] py-4">
         <Link to="/">
           <img src="/img/logo.png" alt="" />
