@@ -20,8 +20,8 @@ import "react-toastify/dist/ReactToastify.css";
 interface FormData {
   reference: string;
   name: string;
-  familly: any;
-  subFamilly: any;
+  family: any;
+  subFamily: any;
   brand: string;
   productCollection: string;
   uvc: {
@@ -39,7 +39,7 @@ export default function CreateProductPage() {
   const [page, setPage] = useState("addProduct");
   const [uvcIsOpen, setUvcIsOpen] = useState(false);
   const [createProductIsOpen, setCreateProductcIsOpen] = useState(true);
-  const [famillyId, setfamillyId] = useState<string | null>(null);
+  const [familyId, setfamilyId] = useState<string | null>(null);
   const [brands, setBrands] = useState({ brands: [] });
   const [collections, setCollections] = useState({ collections: [] });
   const [famillies, setFamillies] = useState<{ famillies: any[] }>({
@@ -99,8 +99,8 @@ export default function CreateProductPage() {
   const [formData, setFormData] = useState<FormData>({
     reference: "",
     name: "",
-    familly: [],
-    subFamilly: [],
+    family: [],
+    subFamily: [],
     brand: "",
     productCollection: "",
     uvc: {
@@ -120,16 +120,16 @@ export default function CreateProductPage() {
   ) => {
     const { id, value } = e.target || e;
 
-    if (id === "familly") {
+    if (id === "family") {
       const selectedFamilyObject = famillies?.famillies.find(
         (family: any) => family._id === value
       );
       if (selectedFamilyObject) {
         setFormData((prevFormData) => ({
           ...prevFormData,
-          familly: selectedFamilyObject.name,
+          family: selectedFamilyObject.name,
         }));
-        setfamillyId(value);
+        setfamilyId(value);
       }
     } else if (id === "size") {
       setFormData((prevFormData) => ({
@@ -151,20 +151,20 @@ export default function CreateProductPage() {
     }
   };
 
-  const options = famillies?.famillies.map((familly: any) => ({
-    value: familly._id,
-    label: familly.name,
-    name: familly.name,
+  const options = famillies?.famillies.map((family: any) => ({
+    value: family._id,
+    label: family.name,
+    name: family.name,
   }));
 
   const selectedFamilyName = famillies?.famillies.find(
-    (family: any) => family._id === formData.familly
+    (family: any) => family._id === formData.family
   )?.name;
 
   const fetchFamilies = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/familly`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/family`,
         {
           method: "GET",
           headers: {
@@ -183,7 +183,7 @@ export default function CreateProductPage() {
   const fetchSubFamilies = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/familly/subFamilly/${famillyId}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/family/subFamily/${familyId}`,
         {
           method: "GET",
           headers: {
@@ -270,12 +270,12 @@ export default function CreateProductPage() {
     fetchFamilies();
     fetchBrands();
     fetchCollections();
-    if (famillyId) {
+    if (familyId) {
       fetchSubFamilies();
     } else {
       setSubFamillies({ subFamillies: [] });
     }
-  }, [famillyId]);
+  }, [familyId]);
 
   return (
     <div className="mt-7">
@@ -365,7 +365,7 @@ export default function CreateProductPage() {
                     <div className="flex flex-col gap-3">
                       <Input
                         element="select"
-                        id="familly"
+                        id="family"
                         label="Famille :"
                         value={selectedFamilyName}
                         onChange={handleChange}
@@ -378,9 +378,9 @@ export default function CreateProductPage() {
                     <div className="flex flex-col gap-3">
                       <Input
                         element="select"
-                        id="subFamilly"
+                        id="subFamily"
                         label="Sous-famille :"
-                        value={formData.subFamilly}
+                        value={formData.subFamily}
                         onChange={handleChange}
                         options={subFamillies.subFamillies}
                         placeholder="Selectionner une sous-famille"
