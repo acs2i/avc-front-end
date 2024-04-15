@@ -76,7 +76,7 @@ export default function SingleProductPage() {
               <h2 className="text-2xl text-gray-600 font-bold font-montserrat">
                 {product?.product.name}
               </h2>
-              <div className="grid md:grid-cols-2 gap-4 mt-5">
+              <div className="grid grid-cols-1 gap-4 mt-5">
                 <div className="overflow-x-auto">
                   <table className="table-auto">
                     <tbody className="capitalize font-bold">
@@ -108,14 +108,43 @@ export default function SingleProductPage() {
                           {product?.product.productCollection}
                         </td>
                       </tr>
+                      <tr>
+                        <td className="px-4 py-4 text-gray-700">Uvc :</td>
+                        <td className="px-4 py-4 text-gray-500 font-normal">
+                          {product?.product.uvc.map((item: any, index: any) => (
+                            <table key={index} className="w-full">
+                              <thead>
+                                <tr>
+                                  <th className="px-4 py-2 text-left text-center">
+                                    Tailles
+                                  </th>
+                                  <th className="px-4 py-2 text-left">
+                                    Couleurs
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <td className="px-4 py-2 border flex items-center gap-4 ">
+                                    {item.size.map((item: any) => (
+                                      <span>{item}</span>
+                                    ))}
+                                  </td>
+                                  <td className="px-4 py-2 border">
+                                    {item.color.map((item: any) => (
+                                      <span>{item}</span>
+                                    ))}
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          ))}
+                        </td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <tbody className="capitalize font-bold"></tbody>
-                  </table>
-                </div>
+         
               </div>
             </div>
           </div>
