@@ -38,7 +38,7 @@ function App() {
 
   return (
     <>
-      <div className="flex">
+      <div className="flex realtive">
         {shouldShowNavbar && <Sidebar />}
         <SectionContainer>
           <PageContainer>
