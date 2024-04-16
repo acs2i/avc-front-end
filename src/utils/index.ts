@@ -1,4 +1,4 @@
-import { Link, LinkCard, ProductsCreated, Suppliers } from "@/type";
+import { Filters_1, Link, LinkCard, ProductsCreated, Suppliers } from "@/type";
 import { Home, Pen, Truck, ShoppingCart } from "lucide-react";
 
 export const LINKS: Link[] = [
@@ -193,3 +193,24 @@ export const PRODUCT_CREATED: ProductsCreated[] = [
   },
   
 ];
+
+export const FILTERS_1: Filters_1[] = [
+  {
+    title: "Mon filtre",
+  },
+  {
+    title: "Mon filtre",
+  },
+  {
+    title: "Mon filtre",
+  },
+  {
+    title: "Mon filtre",
+  },
+  {
+    title: "Mon filtre",
+  },
+  {
+    title: "Mon filtre",
+  },
+]

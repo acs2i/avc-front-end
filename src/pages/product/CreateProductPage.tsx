@@ -287,7 +287,7 @@ export default function CreateProductPage() {
         <span>Retour</span>
       </Link>
       <Card title="Panel d'ajout">
-        <div className="mt-4 mb-[50px]">
+        <div className="mt-4 mb-[50px] px-4">
           <div className="flex items-center gap-7">
             {LINKCARD_EDIT.map((link: LinkCard, i) => (
               <React.Fragment key={i}>

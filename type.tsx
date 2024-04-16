@@ -26,3 +26,7 @@ export type ProductsCreated = {
   collection: string;
   status: number;
 };
+
+export type Filters_1 = {
+  title: string;
+};
