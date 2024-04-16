@@ -27,7 +27,7 @@ export default function SectionContainer({
       className="relative w-[100%] h-[1500px]"
     >
       <div
-        className="fixed top-0 h-full"
+        className="fixed top-0 h-full w-full"
         style={{ overflow: "hidden" }}
       >
         <img

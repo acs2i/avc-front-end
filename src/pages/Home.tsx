@@ -7,7 +7,7 @@ import truncateText from "../utils/func/Formattext";
 import Button from "../components/FormElements/Button";
 
 export default function Home() {
-  const [products, setProducts] = useState({ products: [] });
+  const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModify, setIsModify] = useState(false);
   const navigate = useNavigate();
@@ -30,10 +30,11 @@ export default function Home() {
 
       const data = await response.json();
       setProducts(data);
+
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     } finally {
-      setIsLoading(false); // Définir isLoading à false après avoir récupéré les données
+      setIsLoading(false); 
     }
   };
 
@@ -203,8 +204,8 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {products.products.length > 0 ? (
-                products.products.map((product: any) => (
+              {products && products?.length > 0 ? (
+                products?.map((product: any) => (
                   <tr
                     key={product._id}
                     className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-500 even:bg-slate-50 whitespace-nowrap"
