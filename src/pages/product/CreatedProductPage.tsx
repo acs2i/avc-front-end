@@ -6,6 +6,7 @@ import { LinkCard } from "@/type";
 import { Divider, Tooltip } from "@mui/material";
 import { Plus, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import truncateText from "../../utils/func/Formattext";
 
 export default function CreatedProductPage() {
   const [page, setPage] = useState("progress");
@@ -44,7 +45,7 @@ export default function CreatedProductPage() {
   return (
     <div className="mt-7 mb-[100px]">
       <Card title="Les produits créés">
-        <div className="mt-4 mb-[30px]">
+        <div className="mt-4 mb-[30px] px-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-7">
               {LINKCARD.map((link: LinkCard) => (
@@ -81,13 +82,13 @@ export default function CreatedProductPage() {
               finalisés
             </h4>
             <table className="w-full text-left">
-              <thead className="uppercase bg-blue-50">
+              <thead className="bg-green-900 text-sm text-white">
                 <tr>
                   <th scope="col" className="px-6 py-4">
                     Référence
                   </th>
                   <th scope="col" className="px-6 py-4">
-                    NOM
+                    Nom
                   </th>
                   <th scope="col" className="px-6 py-4">
                     Famille
@@ -110,13 +111,13 @@ export default function CreatedProductPage() {
                       .map((product: any) => (
                         <>
                           <tr
-                            className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold text-sm text-gray-500"
+                           className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-500 even:bg-slate-50 whitespace-nowrap"
                             key={product._id}
                           >
-                            <td className="px-6 py-3">{product.reference}</td>
-                            <td className="px-6 py-3">{product.name}</td>
-                            <td className="px-6 py-3">{product.familly}</td>
-                            <td className="px-6 py-3">{product.subFamilly}</td>
+                            <td className="px-6 py-3 font-bold">{product.reference}</td>
+                            <td className="px-6 py-3">{truncateText(product.name, 30)}</td>
+                            <td className="px-6 py-3">{truncateText(product.family.join(', '), 30)}</td>
+                            <td className="px-6 py-3">{truncateText(product.subFamily.join(', '), 50)}</td>
                             <td className="px-6 py-3 font-bold">En cours...</td>
                             <td className="px-6 py-3 flex items-center gap-3">
                               <Button size="small" inverse>
@@ -143,13 +144,13 @@ export default function CreatedProductPage() {
               <span className="font-bold text-gray-700">Ajouts</span> finalisés
             </h4>
             <table className="w-full text-left">
-              <thead className="uppercase bg-blue-50">
+              <thead className="bg-green-900 text-sm text-white">
                 <tr>
                   <th scope="col" className="px-6 py-4">
                     Référence
                   </th>
                   <th scope="col" className="px-6 py-4">
-                    NOM
+                    Nom
                   </th>
                   <th scope="col" className="px-6 py-4">
                     Famille
@@ -172,14 +173,14 @@ export default function CreatedProductPage() {
                     .map((product: any) => (
                       <>
                         <tr
-                          className="bg-white border-b cursor-pointer hover:bg-slate-100 capitalize font-bold text-sm text-gray-500"
+                          className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-500 even:bg-slate-50 whitespace-nowrap"
                           key={product._id}
                         >
-                          <td className="px-6 py-3">{product.reference}</td>
-                          <td className="px-6 py-3">{product.name}</td>
-                          <td className="px-6 py-3">{product.familly}</td>
-                          <td className="px-6 py-3">{product.subFamilly}</td>
-                          <td className="px-6 py-3 font-bold">En cours...</td>
+                          <td className="px-6 py-3 font-bold">{product.reference}</td>
+                          <td className="px-6 py-3">{truncateText(product.name, 30)}</td>
+                            <td className="px-6 py-3">{truncateText(product.family.join(', '), 30)}</td>
+                            <td className="px-6 py-3">{truncateText(product.subFamily.join(', '), 50)}</td>
+                          <td className="px-6 py-3 font-bold">Validé</td>
                           <td className="px-6 py-3 flex items-center gap-3">
                             <Button size="small" green>
                               Afficher
