@@ -83,7 +83,7 @@ export default function SingleProductPage() {
                       <tr>
                         <td className="px-4 py-4 text-gray-700">Famille :</td>
                         <td className="px-4 py-4 text-gray-500 font-normal">
-                          {product?.product.familly}
+                          {product?.product.family}
                         </td>
                       </tr>
                       <tr>
@@ -91,7 +91,7 @@ export default function SingleProductPage() {
                           Sous-famille :
                         </td>
                         <td className="px-4 py-4 text-gray-500 font-normal">
-                          {product?.product.subFamilly}
+                          {product?.product.subFamily}
                         </td>
                       </tr>
                       <tr>
