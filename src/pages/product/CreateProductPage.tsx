@@ -27,6 +27,11 @@ interface Collection {
   name: string;
 }
 
+interface SubFamily {
+  _id: string;
+  name: string;
+}
+
 interface Brand {
   _id: string;
   name: string;
@@ -46,7 +51,7 @@ interface FormData {
     price: any;
   };
   status: number;
-  creator: any;
+  creatorId: any;
 }
 
 export default function CreateProductPage() {
@@ -54,9 +59,9 @@ export default function CreateProductPage() {
   const [page, setPage] = useState("addProduct");
   const [uvcIsOpen, setUvcIsOpen] = useState(false);
   const [createProductIsOpen, setCreateProductcIsOpen] = useState(true);
-  const [familyId, setfamilyId] = useState<string | null>(null);
+  const [familyId, setFamilyId] = useState<string>("");
   const [famillies, setFamillies] = useState<Family[]>([]);
-  const [brands, setBrands] = useState({ brands: [] });
+  const [brands, setBrands] = useState<Brand[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [subFamillies, setSubFamillies] = useState<{ subFamillies: any[] }>({
     subFamillies: [],
@@ -123,7 +128,7 @@ export default function CreateProductPage() {
       price: [],
     },
     status: 0,
-    creator: user._id,
+    creatorId: user._id,
   });
 
   const handleChange = async (
@@ -142,7 +147,7 @@ export default function CreateProductPage() {
           ...prevFormData,
           family: selectedFamilyObject.name,
         }));
-        setfamilyId(value);
+        setFamilyId(value);
       }
     } else if (id === "size") {
       setFormData((prevFormData) => ({
@@ -175,9 +180,15 @@ export default function CreateProductPage() {
   )?.name;
 
   const collectionOptions = collections?.map((collection: Collection) => ({
-    value: collection._id,
+    value: collection.name,
     label: collection.name,
     name: collection.name,
+  }));
+
+  const brandOptions = brands?.map((brand: Brand) => ({
+    value: brand.name,
+    label: brand.name,
+    name: brand.name,
   }));
 
   const fetchFamilies = async () => {
@@ -399,7 +410,7 @@ export default function CreateProductPage() {
                         label="Sous-famille :"
                         value={formData.subFamily}
                         onChange={handleChange}
-                        options={subFamillies.subFamillies}
+                        options={familyId ? Array.isArray(subFamillies) ? subFamillies : [] : []}
                         placeholder="Selectionner une sous-famille"
                       />
                     </div>
@@ -412,7 +423,7 @@ export default function CreateProductPage() {
                         value={formData.brand}
                         onChange={handleChange}
                         required
-                        options={brands.brands}
+                        options={brandOptions}
                         placeholder="Selectionner une marque"
                       />
                     </div>
