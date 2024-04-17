@@ -8,9 +8,19 @@ import { Plus, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import truncateText from "../../utils/func/Formattext";
 
+
+interface Product {
+  _id: string;
+  name: string;
+  family: any;
+  subFamily: any;
+  brand: string;
+  productCollection: string;
+}
+
 export default function CreatedProductPage() {
   const [page, setPage] = useState("progress");
-  const [products, setProducts] = useState();
+  const [products, setProducts] = useState<Product[]>([]);;
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -167,8 +177,8 @@ export default function CreatedProductPage() {
                 </tr>
               </thead>
               <tbody>
-                {products.products.length > 0 ? (
-                  products.products
+                {products.length > 0 ? (
+                  products
                     .filter((product: any) => product.status === 1)
                     .map((product: any) => (
                       <>

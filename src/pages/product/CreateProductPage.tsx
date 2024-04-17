@@ -17,11 +17,9 @@ import MultiSelect from "../../components/FormElements/MultiSelect";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-
 interface Family {
   _id: string;
   name: string;
-
 }
 
 interface Collection {
@@ -58,7 +56,7 @@ export default function CreateProductPage() {
   const [createProductIsOpen, setCreateProductcIsOpen] = useState(true);
   const [familyId, setfamilyId] = useState<string | null>(null);
   const [famillies, setFamillies] = useState<Family[]>([]);
-  const [brands, setBrands] = useState({brands: []});
+  const [brands, setBrands] = useState({ brands: [] });
   const [collections, setCollections] = useState<Collection[]>([]);
   const [subFamillies, setSubFamillies] = useState<{ subFamillies: any[] }>({
     subFamillies: [],
@@ -172,7 +170,6 @@ export default function CreateProductPage() {
     name: family.name,
   }));
 
-   
   const selectedFamilyName = famillies?.find(
     (family: Family) => family._id === formData.family
   )?.name;
@@ -182,7 +179,6 @@ export default function CreateProductPage() {
     label: collection.name,
     name: collection.name,
   }));
-  
 
   const fetchFamilies = async () => {
     try {
@@ -255,7 +251,6 @@ export default function CreateProductPage() {
 
       const data = await response.json();
       setCollections(data);
-   
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     }
@@ -505,8 +500,6 @@ export default function CreateProductPage() {
                       />
                     </div>
                   </div>
-
-         
                 </Collapse>
               </div>
 
