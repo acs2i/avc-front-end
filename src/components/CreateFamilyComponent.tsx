@@ -15,9 +15,7 @@ export default function CreateFamilyComponent() {
   const [familyId, setfamilyId] = useState<string | null>(null);
   const [famillyValue, setFamillyValue] = useState<string | null>(null);
   const [subFamillyValue, setSubFamillyValue] = useState<string | null>(null);
-  const [famillies, setFamillies] = useState<{ famillies: any[] }>({
-    famillies: [],
-  });
+  const [families, setFamillies] = useState([]);
 
   // Fonction pour afficher un toast de succès
   const notifySuccess = (message: any) => {
@@ -57,17 +55,17 @@ export default function CreateFamilyComponent() {
     setOpenSubFamily(!openSubFamily);
   };
 
-  const options = famillies?.famillies.map((familly: any) => ({
-    value: familly._id,
-    label: familly.name,
-    name: familly.name,
+  const options = families?.map((family: any) => ({
+    value: family._id,
+    label: family.name,
+    name: family.name,
   }));
 
   // Fonction qui récupère l'id de la famille
   const handleFamilyId = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
     const selectedFamilyObject =
-      famillies?.famillies.find((familly: any) => familly._id === value) ??
+      families?.find((family: any) => family._id === value) ??
       null;
     setfamilyId(value);
   };
@@ -91,13 +89,13 @@ export default function CreateFamilyComponent() {
     e.preventDefault();
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/familly/create`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/family/create`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ name: famillyValue, creator: user._id }),
+          body: JSON.stringify({ name: famillyValue, creatorId: user._id }),
         }
       );
 
@@ -118,7 +116,7 @@ export default function CreateFamilyComponent() {
   const fetchFamilies = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/familly`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/family`,
         {
           method: "GET",
           headers: {
@@ -139,7 +137,7 @@ export default function CreateFamilyComponent() {
     e.preventDefault();
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/familly/subFamilly/create`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/family/subFamilly/create`,
         {
           method: "POST",
           headers: {
@@ -147,8 +145,8 @@ export default function CreateFamilyComponent() {
           },
           body: JSON.stringify({
             name: subFamillyValue,
-            familly: familyId,
-            creator: user._id,
+            family: familyId,
+            creatorId: user._id,
           }),
         }
       );
@@ -256,7 +254,7 @@ export default function CreateFamilyComponent() {
                 />
                 <Input
                   element="select"
-                  id="familly"
+                  id="family"
                   label="Liaison avec une famille :"
                   onChange={handleFamilyId}
                   options={options}

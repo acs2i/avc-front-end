@@ -55,11 +55,11 @@ export default function CreateProductPage() {
   const [uvcIsOpen, setUvcIsOpen] = useState(false);
   const [createProductIsOpen, setCreateProductcIsOpen] = useState(true);
   const [familyId, setfamilyId] = useState<string | null>(null);
-  const [famillies, setFamillies] = useState<Family[]>([]);
+  const [families, setFamilies] = useState<Family[]>([]);
   const [brands, setBrands] = useState({ brands: [] });
   const [collections, setCollections] = useState<Collection[]>([]);
-  const [subFamillies, setSubFamillies] = useState<{ subFamillies: any[] }>({
-    subFamillies: [],
+  const [subFamilies, setSubFamilies] = useState<{ subFamilies: any[] }>({
+    subFamilies: [],
   });
 
   // Fonction pour afficher un toast de succès
@@ -123,7 +123,7 @@ export default function CreateProductPage() {
       price: [],
     },
     status: 0,
-    creator: user._id,
+    creator: user?  user._id : undefined,
   });
 
   const handleChange = async (
@@ -133,8 +133,8 @@ export default function CreateProductPage() {
   ) => {
     const { id, value } = e.target || e;
 
-    if (id === "family") {
-      const selectedFamilyObject = famillies?.find(
+    if (id === "family" && families && families.length > 0) {
+      const selectedFamilyObject = families?.find(
         (family: any) => family._id === value
       );
       if (selectedFamilyObject) {
@@ -164,15 +164,15 @@ export default function CreateProductPage() {
     }
   };
 
-  const options = famillies?.map((family: Family) => ({
+  const options = families ? families?.map((family: Family) => ({
     value: family._id,
     label: family.name,
     name: family.name,
-  }));
+  })) : {};
 
-  const selectedFamilyName = famillies?.find(
+  const selectedFamilyName = families?.find(
     (family: Family) => family._id === formData.family
-  )?.name;
+  )?.name ?? "";
 
   const collectionOptions = collections?.map((collection: Collection) => ({
     value: collection._id,
@@ -193,7 +193,7 @@ export default function CreateProductPage() {
       );
 
       const data = await response.json();
-      setFamillies(data);
+      setFamilies(data);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     }
@@ -212,7 +212,7 @@ export default function CreateProductPage() {
       );
 
       const data = await response.json();
-      setSubFamillies(data);
+      setSubFamilies(data);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     }
@@ -290,7 +290,7 @@ export default function CreateProductPage() {
     if (familyId) {
       fetchSubFamilies();
     } else {
-      setSubFamillies({ subFamillies: [] });
+      setSubFamilies({ subFamilies: [] });
     }
   }, [familyId]);
 
@@ -399,7 +399,7 @@ export default function CreateProductPage() {
                         label="Sous-famille :"
                         value={formData.subFamily}
                         onChange={handleChange}
-                        options={subFamillies.subFamillies}
+                        options={subFamilies.subFamilies}
                         placeholder="Selectionner une sous-famille"
                       />
                     </div>
