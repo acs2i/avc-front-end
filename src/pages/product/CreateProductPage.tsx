@@ -94,6 +94,7 @@ export default function CreateProductPage() {
     event.preventDefault();
     setUvcIsOpen(!uvcIsOpen);
   };
+  
 
   const handleOpenProductCollapse = (event: any) => {
     event.preventDefault();
