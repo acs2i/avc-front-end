@@ -462,7 +462,6 @@ export default function CreateProductPage() {
                         value={formData.uvc.code}
                         onChange={handleChange}
                         validators={[]}
-                        options={collections.collections}
                         placeholder="Veuillez saisir le code fournisseur"
                         gray
                       />
