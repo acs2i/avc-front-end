@@ -6,8 +6,18 @@ import { FILTERS_1 } from "../utils";
 import truncateText from "../utils/func/Formattext";
 import Button from "../components/FormElements/Button";
 
+
+interface Product {
+  _id: string;
+  name: string;
+  family: any;
+  subFamily: any;
+  brand: string;
+  productCollection: string;
+}
+
 export default function Home() {
-  const [products, setProducts] = useState({ products: [] });;
+  const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModify, setIsModify] = useState(false);
   const navigate = useNavigate();
@@ -203,8 +213,8 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {products && products.products?.length > 0 ? (
-                products.products?.map((product: any) => (
+              {products && products.length > 0 ? (
+                products.map((product: any) => (
                   
                   <tr
                     key={product._id}
