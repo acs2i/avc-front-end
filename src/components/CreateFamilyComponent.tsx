@@ -129,6 +129,7 @@ export default function CreateFamilyComponent() {
 
       const data = await response.json();
       setFamillies(data);
+      console.log(data)
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     }
@@ -169,6 +170,7 @@ export default function CreateFamilyComponent() {
   useEffect(() => {
     fetchFamilies();
   }, []);
+
 
   return (
     <div>
