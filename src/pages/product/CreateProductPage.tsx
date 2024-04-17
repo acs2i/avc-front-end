@@ -17,6 +17,23 @@ import MultiSelect from "../../components/FormElements/MultiSelect";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+
+interface Family {
+  _id: string;
+  name: string;
+
+}
+
+interface Collection {
+  _id: string;
+  name: string;
+}
+
+interface Brand {
+  _id: string;
+  name: string;
+}
+
 interface FormData {
   reference: string;
   name: string;
@@ -40,11 +57,9 @@ export default function CreateProductPage() {
   const [uvcIsOpen, setUvcIsOpen] = useState(false);
   const [createProductIsOpen, setCreateProductcIsOpen] = useState(true);
   const [familyId, setfamilyId] = useState<string | null>(null);
-  const [brands, setBrands] = useState({ brands: [] });
-  const [collections, setCollections] = useState({ collections: [] });
-  const [famillies, setFamillies] = useState<{ famillies: any[] }>({
-    famillies: [],
-  });
+  const [famillies, setFamillies] = useState<Family[]>([]);
+  const [brands, setBrands] = useState({brands: []});
+  const [collections, setCollections] = useState<Collection[]>([]);
   const [subFamillies, setSubFamillies] = useState<{ subFamillies: any[] }>({
     subFamillies: [],
   });
@@ -121,7 +136,7 @@ export default function CreateProductPage() {
     const { id, value } = e.target || e;
 
     if (id === "family") {
-      const selectedFamilyObject = famillies?.famillies.find(
+      const selectedFamilyObject = famillies?.find(
         (family: any) => family._id === value
       );
       if (selectedFamilyObject) {
@@ -151,15 +166,22 @@ export default function CreateProductPage() {
     }
   };
 
-  const options = famillies?.famillies.map((family: any) => ({
+  const options = famillies?.map((family: Family) => ({
     value: family._id,
     label: family.name,
     name: family.name,
   }));
 
-  const selectedFamilyName = famillies?.famillies.find(
-    (family: any) => family._id === formData.family
+  const collectionOptions = collections?.map((collection: Collection) => ({
+    value: collection._id,
+    label: collection.name,
+    name: collection.name,
+  }));
+  
+  const selectedFamilyName = famillies?.find(
+    (family: Family) => family._id === formData.family
   )?.name;
+  
 
   const fetchFamilies = async () => {
     try {
@@ -213,7 +235,6 @@ export default function CreateProductPage() {
 
       const data = await response.json();
       setBrands(data);
-      console.log(brands);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     }
@@ -233,7 +254,7 @@ export default function CreateProductPage() {
 
       const data = await response.json();
       setCollections(data);
-      console.log(collections);
+   
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     }
@@ -408,7 +429,7 @@ export default function CreateProductPage() {
                         value={formData.productCollection}
                         onChange={handleChange}
                         required
-                        options={collections.collections}
+                        options={collectionOptions}
                         placeholder="Selectionner une collection"
                       />
                     </div>

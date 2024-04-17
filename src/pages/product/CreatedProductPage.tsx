@@ -115,9 +115,9 @@ export default function CreatedProductPage() {
                             key={product._id}
                           >
                             <td className="px-6 py-3 font-bold">{product.reference}</td>
-                            <td className="px-6 py-3">{truncateText(product.name, 30)}</td>
-                            <td className="px-6 py-3">{truncateText(product.family.join(', '), 30)}</td>
-                            <td className="px-6 py-3">{truncateText(product.subFamily.join(', '), 50)}</td>
+                            <td className="px-6 py-3">{product.name}</td>
+                            <td className="px-6 py-3">{product.family}</td>
+                            <td className="px-6 py-3">{product.subFamily}</td>
                             <td className="px-6 py-3 font-bold">En cours...</td>
                             <td className="px-6 py-3 flex items-center gap-3">
                               <Button size="small" inverse>

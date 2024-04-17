@@ -7,7 +7,7 @@ import truncateText from "../utils/func/Formattext";
 import Button from "../components/FormElements/Button";
 
 export default function Home() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState({ products: [] });;
   const [isLoading, setIsLoading] = useState(true);
   const [isModify, setIsModify] = useState(false);
   const navigate = useNavigate();
@@ -30,7 +30,6 @@ export default function Home() {
 
       const data = await response.json();
       setProducts(data);
-
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     } finally {
@@ -135,7 +134,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 w-full">
         <div className="relative w-full shadow-2xl">
           <input
             type="search"
@@ -204,8 +203,9 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {products && products?.length > 0 ? (
-                products?.map((product: any) => (
+              {products && products.products?.length > 0 ? (
+                products.products?.map((product: any) => (
+                  
                   <tr
                     key={product._id}
                     className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-500 even:bg-slate-50 whitespace-nowrap"
@@ -227,13 +227,13 @@ export default function Home() {
                     )}
                     <td className="px-6 py-4 font-bold">{product.reference}</td>
                     <td className="px-6 py-4">
-                      {truncateText(product.name, 30)}
+                      {product.name}
                     </td>
                     <td className="px-6 py-4">
-                      {truncateText(product.family.join(", "), 30)}
+                      {product.family}
                     </td>
                     <td className="px-6 py-4">
-                      {truncateText(product.subFamily.join(", "), 50)}
+                      {product.subFamily}
                     </td>
                     <td className="px-6 py-4">{product.brand}</td>
                     <td className="px-6 py-4">{product.productCollection}</td>
