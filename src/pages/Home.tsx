@@ -6,6 +6,7 @@ import { FILTERS_1 } from "../utils";
 import truncateText from "../utils/func/Formattext";
 import Button from "../components/FormElements/Button";
 
+
 interface Product {
   _id: string;
   name: string;
@@ -20,8 +21,6 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [isModify, setIsModify] = useState(false);
   const navigate = useNavigate();
-
-  const colors = ["bg-gray-700", "bg-gray-500", "bg-gray-300"];
 
   useEffect(() => {
     fetchProducts();
@@ -44,7 +43,7 @@ export default function Home() {
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); 
     }
   };
 
@@ -216,6 +215,7 @@ export default function Home() {
             <tbody>
               {products && products.length > 0 ? (
                 products.map((product: any) => (
+                  
                   <tr
                     key={product._id}
                     className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-500 even:bg-slate-50 whitespace-nowrap"
@@ -236,17 +236,14 @@ export default function Home() {
                       </td>
                     )}
                     <td className="px-6 py-4 font-bold">{product.reference}</td>
-                    <td className="px-6 py-4">{product.name}</td>
-                    <td className="px-6 py-4">{product.family}</td>
-                    <td className="px-6 py-4 flex items-center gap-2">
-                      {product.subFamily.map((subFamily: any, index: any) => (
-                        <span
-                          key={index}
-                          className={`${colors[index]} text-white px-2 py-1 rounded-md`}
-                        >
-                          {subFamily}
-                        </span>
-                      ))}
+                    <td className="px-6 py-4">
+                      {product.name}
+                    </td>
+                    <td className="px-6 py-4">
+                      {product.family}
+                    </td>
+                    <td className="px-6 py-4">
+                      {product.subFamily}
                     </td>
                     <td className="px-6 py-4">{product.brand}</td>
                     <td className="px-6 py-4">{product.productCollection}</td>

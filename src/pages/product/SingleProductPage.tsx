@@ -7,7 +7,7 @@ import { Pen } from "lucide-react";
 import { Divider } from "@mui/material";
 
 export default function SingleProductPage() {
-  const [product, setProduct] = useState<{ product: any } | null>(null);
+  const [product, setProduct] = useState< any | null>({});  // create an interface for product
   const [page, setPage] = useState("details");
 
   const { id } = useParams();
@@ -21,16 +21,15 @@ export default function SingleProductPage() {
       `${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`
     );
     const data = await response.json();
-    console.log(data);
 
-    if (data && data.product) {
+    if (data) {
       setProduct(data);
     }
+    console.log(data)
   };
-
   return (
     <section className="mt-7">
-      <Card title={`Article n°${product?.product.reference}`}>
+      <Card title={`Article n°${product?.reference}`}>
       <div className="mt-4 mb-[30px] px-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-7">
@@ -60,7 +59,7 @@ export default function SingleProductPage() {
             <div className="flex-col row-span-3 justify-center">
               <div className="border border-gray-300 rounded-lg overflow-hidden">
                 <img
-                  src={product?.product.imgPath}
+                  src={product?.imgPath}
                   alt=""
                   className="w-full h-auto rounded-lg transition-all duration-[20s] transform scale-100 hover:scale-150 shadow-none hover:shadow-lg"
                 />
@@ -68,7 +67,7 @@ export default function SingleProductPage() {
             </div>
             <div className="flex-col col-span-2 justify-center">
               <h2 className="text-2xl text-gray-600 font-bold font-montserrat">
-                {product?.product.name}
+                {product?.name}
               </h2>
               <div className="grid grid-cols-1 gap-4 mt-5">
                 <div className="overflow-x-auto">
@@ -77,7 +76,7 @@ export default function SingleProductPage() {
                       <tr>
                         <td className="px-4 py-4 text-gray-700">Famille :</td>
                         <td className="px-4 py-4 text-gray-500 font-normal">
-                          {product?.product.family}
+                          {product?.family}
                         </td>
                       </tr>
                       <tr>
@@ -85,13 +84,13 @@ export default function SingleProductPage() {
                           Sous-famille :
                         </td>
                         <td className="px-4 py-4 text-gray-500 font-normal">
-                          {product?.product.subFamily}
+                          {product?.subFamily}
                         </td>
                       </tr>
                       <tr>
                         <td className="px-4 py-4 text-gray-700">Marque :</td>
                         <td className="px-4 py-4 text-gray-500 font-normal">
-                          {product?.product.brand}
+                          {product?.brand}
                         </td>
                       </tr>
                       <tr>
@@ -99,13 +98,13 @@ export default function SingleProductPage() {
                           Collection :
                         </td>
                         <td className="px-4 py-4 text-gray-500 font-normal">
-                          {product?.product.productCollection}
+                          {product?.productCollection}
                         </td>
                       </tr>
                       <tr>
                         <td className="px-4 py-4 text-gray-700">Uvc :</td>
-                        {/* <td className="px-4 py-4 text-gray-500 font-normal">
-                          {product?.product.uvc.map((item: any, index: any) => (
+                        <td className="px-4 py-4 text-gray-500 font-normal">
+                          {product&& product.uvc && product?.uvc.map((item: any, index: any) => (
                             <table key={index} className="w-full">
                               <thead>
                                 <tr>
@@ -120,12 +119,12 @@ export default function SingleProductPage() {
                               <tbody>
                                 <tr>
                                   <td className="px-4 py-2 border flex items-center gap-4 ">
-                                    {item.size.map((item: any) => (
+                                    {item && item.size && item.size.map((item: any) => (
                                       <span>{item}</span>
                                     ))}
                                   </td>
                                   <td className="px-4 py-2 border">
-                                    {item.color.map((item: any) => (
+                                    {item && item.size && item.color.map((item: any) => (
                                       <span>{item}</span>
                                     ))}
                                   </td>
@@ -133,7 +132,7 @@ export default function SingleProductPage() {
                               </tbody>
                             </table>
                           ))}
-                        </td> */}
+                        </td>
                       </tr>
                     </tbody>
                   </table>

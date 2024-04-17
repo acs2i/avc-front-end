@@ -99,7 +99,6 @@ export default function CreateProductPage() {
     event.preventDefault();
     setUvcIsOpen(!uvcIsOpen);
   };
-  
 
   const handleOpenProductCollapse = (event: any) => {
     event.preventDefault();
@@ -131,6 +130,9 @@ export default function CreateProductPage() {
     status: 0,
     creatorId: user._id,
   });
+
+  console.log(formData)
+
 
   const handleChange = async (
     e:
@@ -186,11 +188,6 @@ export default function CreateProductPage() {
     name: collection.name,
   }));
 
-  const brandOptions = brands?.map((brand: Brand) => ({
-    value: brand.name,
-    label: brand.name,
-    name: brand.name,
-  }));
 
   const fetchFamilies = async () => {
     try {
@@ -424,7 +421,7 @@ export default function CreateProductPage() {
                         value={formData.brand}
                         onChange={handleChange}
                         required
-                        options={brandOptions}
+                        options={brands}
                         placeholder="Selectionner une marque"
                       />
                     </div>

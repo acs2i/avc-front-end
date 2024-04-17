@@ -55,7 +55,7 @@ export default function CreateBrandComponent() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ name: brandValue, creator: user._id }),
+          body: JSON.stringify({ name: brandValue, creatorId: user._id }),
         }
       );
 
