@@ -137,7 +137,7 @@ export default function CreateFamilyComponent() {
     e.preventDefault();
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/family/subFamilly/create`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/family/subFamily/create`,
         {
           method: "POST",
           headers: {
@@ -145,7 +145,7 @@ export default function CreateFamilyComponent() {
           },
           body: JSON.stringify({
             name: subFamillyValue,
-            family: familyId,
+            familyId,
             creatorId: user._id,
           }),
         }

@@ -55,7 +55,7 @@ export default function CreateCollectionComponent() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ name: collectionValue, creator: user._id }),
+          body: JSON.stringify({ name: collectionValue, creatorId: user._id }),
         }
       );
 
