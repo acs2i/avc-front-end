@@ -172,15 +172,16 @@ export default function CreateProductPage() {
     name: family.name,
   }));
 
+   
+  const selectedFamilyName = famillies?.find(
+    (family: Family) => family._id === formData.family
+  )?.name;
+
   const collectionOptions = collections?.map((collection: Collection) => ({
     value: collection._id,
     label: collection.name,
     name: collection.name,
   }));
-  
-  const selectedFamilyName = famillies?.find(
-    (family: Family) => family._id === formData.family
-  )?.name;
   
 
   const fetchFamilies = async () => {
