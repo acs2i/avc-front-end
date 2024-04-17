@@ -21,11 +21,8 @@ export default function SingleProductPage() {
       `${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`
     );
     const data = await response.json();
-    console.log(data);
 
     if (data) {
-      console.log("HERE 2: " ,data.product)
-
       setProduct(data);
     }
   };
