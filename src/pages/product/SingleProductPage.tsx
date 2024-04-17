@@ -31,38 +31,32 @@ export default function SingleProductPage() {
   return (
     <section className="mt-7">
       <Card title={`Article n°${product?.product.reference}`}>
-        <div className="h-[70px] w-[100%] flex items-center justify-between">
-          <div className="flex items-center gap-7">
-            {LINKCARD_PRODUCT.map((link: LinkCard) => (
-              <>
-                <button
-                  className={`font-bold text-gray-600 ${
-                    page === link.page ? "text-green-700" : ""
-                  } ${page === link.page ? "animate-bounce" : ""}`}
-                  onClick={() => setPage(link.page)}
-                >
-                  {link.name}
-                </button>
-                <div className="w-[1px] h-[20px] bg-gray-300"></div>
-              </>
-            ))}
+      <div className="mt-4 mb-[30px] px-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-7">
+              {LINKCARD_PRODUCT.map((link: LinkCard) => (
+                <>
+                  <button
+                    className={`font-bold text-gray-600 ${
+                      page === link.page ? "text-green-700" : ""
+                    } ${page === link.page ? "animate-bounce" : ""}`}
+                    onClick={() => setPage(link.page)}
+                  >
+                    {link.name}
+                  </button>
+                  <div className="w-[1px] h-[20px] bg-gray-300"></div>
+                </>
+              ))}
+            </div>
           </div>
-          <div>
-            <Link
-              to="/"
-              className="text-[14px] text-sky-700 hover:text-sky-400 flex items-center gap-2"
-            >
-              <Pen size={14} />
-              <span>Modifier</span>
-            </Link>
+          <div className="mt-6">
+            <Divider />
           </div>
         </div>
 
-        <Divider />
-
         {/* Product Detail */}
         {page === "details" && (
-          <div className="flex grid-rows-3 grid-flow-col gap-4 mt-5">
+          <div className="flex grid-rows-3 grid-flow-col gap-4 mt-5 px-4">
             <div className="flex-col row-span-3 justify-center">
               <div className="border border-gray-300 rounded-lg overflow-hidden">
                 <img
@@ -110,7 +104,7 @@ export default function SingleProductPage() {
                       </tr>
                       <tr>
                         <td className="px-4 py-4 text-gray-700">Uvc :</td>
-                        <td className="px-4 py-4 text-gray-500 font-normal">
+                        {/* <td className="px-4 py-4 text-gray-500 font-normal">
                           {product?.product.uvc.map((item: any, index: any) => (
                             <table key={index} className="w-full">
                               <thead>
@@ -139,7 +133,7 @@ export default function SingleProductPage() {
                               </tbody>
                             </table>
                           ))}
-                        </td>
+                        </td> */}
                       </tr>
                     </tbody>
                   </table>
