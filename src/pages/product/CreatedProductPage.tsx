@@ -10,7 +10,7 @@ import truncateText from "../../utils/func/Formattext";
 
 export default function CreatedProductPage() {
   const [page, setPage] = useState("progress");
-  const [products, setProducts] = useState({ products: [] });
+  const [products, setProducts] = useState();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -105,8 +105,8 @@ export default function CreatedProductPage() {
                 </tr>
               </thead>
               <tbody>
-                {products.products.length > 0
-                  ? products.products
+                {products.length > 0
+                  ? products
                       .filter((product: any) => product.status === 0)
                       .map((product: any) => (
                         <>
