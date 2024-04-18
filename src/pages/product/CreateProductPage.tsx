@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { Collapse } from "@mui/material";
+import React, { useState} from "react";
+import { Collapse, CircularProgress } from "@mui/material";
 import { ChevronDown, ChevronUp, MoveLeft, Plus, Save, X } from "lucide-react";
 import Input from "../../components/FormElements/Input";
 import { Link } from "react-router-dom";
 import Card from "../../components/Shared/Card";
 import Button from "../../components/FormElements/Button";
-import { LINKCARD_EDIT } from "../../utils/index";
+import { LINKCARD_EDIT, Sizes } from "../../utils/index";
 import { LinkCard } from "@/type";
 import { Divider } from "@mui/material";
 import { useSelector } from "react-redux";
@@ -14,8 +14,9 @@ import CreateBrandComponent from "../../components/CreateBrandComponent";
 import CreateCollectionComponent from "../../components/CreateCollectionComponent";
 import { VALIDATOR_REQUIRE } from "../../utils/validator";
 import MultiSelect from "../../components/FormElements/MultiSelect";
-import { toast } from "react-toastify";
+import useNotify from "../../utils/hooks/useToast";
 import "react-toastify/dist/ReactToastify.css";
+import useFetch from "../../utils/hooks/usefetch";
 
 interface Family {
   _id: string;
@@ -57,63 +58,11 @@ interface FormData {
 export default function CreateProductPage() {
   const user = useSelector((state: any) => state.auth.user);
   const [page, setPage] = useState("addProduct");
+  const [isLoading, setIsLoading] = useState(false);
   const [uvcIsOpen, setUvcIsOpen] = useState(false);
   const [createProductIsOpen, setCreateProductcIsOpen] = useState(true);
   const [familyId, setFamilyId] = useState<string>("");
-  const [famillies, setFamillies] = useState<Family[]>([]);
-  const [brands, setBrands] = useState<Brand[]>([]);
-  const [collections, setCollections] = useState<Collection[]>([]);
-  const [subFamillies, setSubFamillies] = useState<{ subFamillies: any[] }>({
-    subFamillies: [],
-  });
-
-  // Fonction pour afficher un toast de succès
-  const notifySuccess = (message: any) => {
-    toast.success(message, {
-      position: "bottom-right",
-      autoClose: 3000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-    });
-  };
-
-  // Fonction pour afficher un toast d'erreur
-  const notifyError = (message: string) => {
-    toast.error(message, {
-      position: "bottom-right",
-      autoClose: 3000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
-  };
-
-  const handleOpenUvcCollapse = (event: any) => {
-    event.preventDefault();
-    setUvcIsOpen(!uvcIsOpen);
-  };
-
-  const handleOpenProductCollapse = (event: any) => {
-    event.preventDefault();
-    setCreateProductcIsOpen(!createProductIsOpen);
-  };
-
-  const sizes = [
-    { value: "XS", label: "XS", name: "XS" },
-    { value: "S", label: "S", name: "S" },
-    { value: "M", label: "M", name: "M" },
-    { value: "L", label: "L", name: "L" },
-    { value: "XL", label: "XL", name: "XL" },
-    { value: "XXL", label: "XXL", name: "XXL" },
-  ];
-
+  const { notifySuccess, notifyError } = useNotify();
   const [formData, setFormData] = useState<FormData>({
     reference: "",
     name: "",
@@ -130,10 +79,35 @@ export default function CreateProductPage() {
     status: 0,
     creatorId: user._id,
   });
+  const resetForm = () => {
+    setFormData({
+      reference: "",
+      name: "",
+      family: [],
+      subFamily: [],
+      brand: "",
+      productCollection: "",
+      uvc: {
+        code: "",
+        color: [],
+        size: [],
+        price: [],
+      },
+      status: 0,
+      creatorId: user._id,
+    });
+  };
 
-  console.log(formData)
+  const handleOpenUvcCollapse = (event: any) => {
+    event.preventDefault();
+    setUvcIsOpen(!uvcIsOpen);
+  };
+  const handleOpenProductCollapse = (event: any) => {
+    event.preventDefault();
+    setCreateProductcIsOpen(!createProductIsOpen);
+  };
 
-
+  // Récupération données
   const handleChange = async (
     e:
       | React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -172,108 +146,40 @@ export default function CreateProductPage() {
     }
   };
 
-  const options = famillies?.map((family: Family) => ({
-    value: family._id,
-    label: family.name,
-    name: family.name,
-  }));
+  // Fonctions récupération des données (famille, sous-famille, marques, collection)
+  const { data: famillies } = useFetch<Family[]>(
+    `${process.env.REACT_APP_URL_DEV}/api/v1/family`
+  );
 
+  const { data: subFamillies } = useFetch(
+    familyId &&
+      `${process.env.REACT_APP_URL_DEV}/api/v1/family/subFamily/${familyId}`
+  );
+
+  const { data: brands } = useFetch<Brand[]>(
+    `${process.env.REACT_APP_URL_DEV}/api/v1/brand`
+  );
+
+  const { data: collections } = useFetch<Collection[]>(
+    `${process.env.REACT_APP_URL_DEV}/api/v1/collection`
+  );
+
+  // Mapping des données pour crée les options des input select
+  const options =
+    famillies?.map(({ _id, name }) => ({ value: _id, label: name, name })) ??
+    [];
   const selectedFamilyName = famillies?.find(
     (family: Family) => family._id === formData.family
   )?.name;
+  const collectionOptions =
+    collections?.map(({ name }) => ({ value: name, label: name, name })) ?? [];
+  const brandOptions =
+    brands?.map(({ name }) => ({ value: name, label: name, name })) ?? [];
 
-  const collectionOptions = collections?.map((collection: Collection) => ({
-    value: collection.name,
-    label: collection.name,
-    name: collection.name,
-  }));
-
-  const brandOptions = brands?.map((brand: Brand) => ({
-    value: brand.name,
-    label: brand.name,
-    name: brand.name,
-  }));
-
-
-
-  const fetchFamilies = async () => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/family`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const data = await response.json();
-      setFamillies(data);
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-    }
-  };
-
-  const fetchSubFamilies = async () => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/family/subFamily/${familyId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const data = await response.json();
-      setSubFamillies(data);
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-    }
-  };
-
-  const fetchBrands = async () => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/brand`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const data = await response.json();
-      setBrands(data);
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-    }
-  };
-
-  const fetchCollections = async () => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/collection`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const data = await response.json();
-      setCollections(data);
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-    }
-  };
-
+  // Envoi du formulaire de création de produit
   const handleCreateProduct = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/product/create`,
@@ -289,6 +195,8 @@ export default function CreateProductPage() {
       if (response.ok) {
         const data = await response.json();
         notifySuccess("Produit créée avec succès!");
+        setIsLoading(false);
+        resetForm();
       } else {
         console.error("Erreur lors de la connexion");
         notifyError("Erreur lors de la création du produit");
@@ -298,17 +206,6 @@ export default function CreateProductPage() {
       notifyError("Erreur lors de la création du produit");
     }
   };
-
-  useEffect(() => {
-    fetchFamilies();
-    fetchBrands();
-    fetchCollections();
-    if (familyId) {
-      fetchSubFamilies();
-    } else {
-      setSubFamillies({ subFamillies: [] });
-    }
-  }, [familyId]);
 
   return (
     <div className="mt-7">
@@ -415,7 +312,13 @@ export default function CreateProductPage() {
                         label="Sous-famille :"
                         value={formData.subFamily}
                         onChange={handleChange}
-                        options={familyId ? Array.isArray(subFamillies) ? subFamillies : [] : []}
+                        options={
+                          familyId
+                            ? Array.isArray(subFamillies)
+                              ? subFamillies
+                              : []
+                            : []
+                        }
                         placeholder="Selectionner une sous-famille"
                       />
                     </div>
@@ -482,7 +385,7 @@ export default function CreateProductPage() {
                       <MultiSelect
                         id="size"
                         label="Tailles :"
-                        options={sizes}
+                        options={Sizes}
                         value={formData.uvc.size}
                         onChange={(selectedOptions) =>
                           handleChange({
@@ -519,25 +422,31 @@ export default function CreateProductPage() {
                 </Collapse>
               </div>
 
-              <div className="flex gap-2 mt-5">
-                <Button
-                  size="small"
-                  green
-                  type="submit"
-                  onClick={() => setFormData({ ...formData, status: 1 })}
-                >
-                  <Plus size={15} />
-                  Ajouter
-                </Button>
-                <Button size="small" inverse type="submit">
-                  <Save size={15} />
-                  Enregistrer dans brouillon
-                </Button>
-                <Button size="small" cancel>
-                  <X size={15} />
-                  Annuler
-                </Button>
-              </div>
+              {!isLoading ? (
+                <div className="flex gap-2 mt-5">
+                  <Button
+                    size="small"
+                    green
+                    type="submit"
+                    onClick={() => setFormData({ ...formData, status: 1 })}
+                  >
+                    <Plus size={15} />
+                    Ajouter
+                  </Button>
+                  <Button size="small" inverse type="submit">
+                    <Save size={15} />
+                    Enregistrer dans brouillon
+                  </Button>
+                  <Button size="small" cancel>
+                    <X size={15} />
+                    Annuler
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex justify-center gap-2 mt-5">
+                  <CircularProgress color="success" />
+                </div>
+              )}
             </form>
           </div>
         )}

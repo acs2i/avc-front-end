@@ -1,55 +1,32 @@
 import React, { useEffect, useState } from "react";
-import { Collapse } from "@mui/material";
+import { CircularProgress, Collapse } from "@mui/material";
 import Input from "./FormElements/Input";
 import Button from "./FormElements/Button";
 import { ChevronDown, ChevronUp, Plus, X } from "lucide-react";
 import { useSelector } from "react-redux";
 import { VALIDATOR_REQUIRE } from "../utils/validator";
-import { toast } from "react-toastify";
+import useNotify from "../utils/hooks/useToast";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function CreateFamilyComponent() {
   const user = useSelector((state: any) => state.auth.user);
+  const [isFamilyLoading, setIsFamilyLoading] = useState(false);
+  const [isSubFamilyLoading, setIsSubFamilyLoading] = useState(false);
   const [openFamily, setOpenFamily] = useState(true);
   const [openSubFamily, setOpenSubFamily] = useState(false);
   const [familyId, setfamilyId] = useState<string | null>(null);
-  const [famillyValue, setFamillyValue] = useState<string | null>(null);
-  const [subFamillyValue, setSubFamillyValue] = useState<string | null>(null);
+  const [famillyValue, setFamillyValue] = useState<string>("");
+  const [subFamillyValue, setSubFamillyValue] = useState<string>("");
   const [families, setFamillies] = useState([]);
-
-  // Fonction pour afficher un toast de succès
-  const notifySuccess = (message: any) => {
-    toast.success(message, {
-      position: "bottom-right",
-      autoClose: 3000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-    });
+  const { notifySuccess, notifyError } = useNotify();
+  const resetForm = () => {
+    setFamillyValue("");
+    setSubFamillyValue("");
   };
-
-  // Fonction pour afficher un toast d'erreur
-  const notifyError = (message: string) => {
-    toast.error(message, {
-      position: "bottom-right",
-      autoClose: 3000,
-      hideProgressBar: true,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "colored",
-    });
-  };
-
   const handleOpenFamilyCollapse = (event: any) => {
     event.preventDefault();
     setOpenFamily(!openFamily);
   };
-
   const handleOpenSubFamilyCollapse = (event: any) => {
     event.preventDefault();
     setOpenSubFamily(!openSubFamily);
@@ -65,8 +42,7 @@ export default function CreateFamilyComponent() {
   const handleFamilyId = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
     const selectedFamilyObject =
-      families?.find((family: any) => family._id === value) ??
-      null;
+      families?.find((family: any) => family._id === value) ?? null;
     setfamilyId(value);
   };
 
@@ -87,6 +63,7 @@ export default function CreateFamilyComponent() {
   // Fonction qui crée une famille
   const handleCreateFamily = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsFamilyLoading(true);
     try {
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/family/create`,
@@ -102,6 +79,9 @@ export default function CreateFamilyComponent() {
       if (response.ok) {
         const data = await response.json();
         notifySuccess("Famille créée avec succès!");
+        setIsFamilyLoading(false);
+        resetForm();
+        fetchFamilies();
       } else {
         console.error("Erreur lors de la connexion");
         notifyError("Erreur lors de la création de la famille");
@@ -135,6 +115,7 @@ export default function CreateFamilyComponent() {
   // Fonction qui crée une sous-famille
   const handleCreateSubFamily = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsSubFamilyLoading(true)
     try {
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/family/subFamily/create`,
@@ -154,6 +135,8 @@ export default function CreateFamilyComponent() {
       if (response.ok) {
         const data = await response.json();
         notifySuccess("Sous-famille créée avec succès!");
+        setIsSubFamilyLoading(false)
+        resetForm();
       } else {
         console.error("Erreur lors de la connexion");
         notifyError("Erreur lors de la création de la sous-famille");
@@ -196,6 +179,7 @@ export default function CreateFamilyComponent() {
                   element="input"
                   id="name"
                   label="Nom de la famille :"
+                  value={famillyValue}
                   onChange={handleFamilyChange}
                   validators={[VALIDATOR_REQUIRE()]}
                   placeholder="Ajouter le libellé de la famille"
@@ -205,16 +189,22 @@ export default function CreateFamilyComponent() {
               </div>
             </div>
 
-            <div className="flex gap-2 mt-3">
-              <Button size="small" green type="submit">
-                <Plus size={15} />
-                Ajouter
-              </Button>
-              <Button size="small" cancel>
-                <X size={15} />
-                Annuler
-              </Button>
-            </div>
+            {!isFamilyLoading ? (
+              <div className="flex gap-2 mt-3">
+                <Button size="small" green type="submit">
+                  <Plus size={15} />
+                  Ajouter
+                </Button>
+                <Button size="small" cancel>
+                  <X size={15} />
+                  Annuler
+                </Button>
+              </div>
+            ) : (
+              <div className="flex justify-center gap-2 mt-3">
+                <CircularProgress color="success" />
+              </div>
+            )}
           </div>
         </Collapse>
       </form>
@@ -246,6 +236,7 @@ export default function CreateFamilyComponent() {
                   element="input"
                   id="name"
                   label="Nom de la sous-famille :"
+                  value={subFamillyValue}
                   onChange={handleSubFamilyChange}
                   validators={[VALIDATOR_REQUIRE()]}
                   placeholder="Ajouter le libellé de la sous-famille"
@@ -264,21 +255,25 @@ export default function CreateFamilyComponent() {
               </div>
             </div>
 
-            <div className="flex gap-2 mt-3">
-              <Button size="small" green type="submit">
-                <Plus size={15} />
-                Ajouter
-              </Button>
-              <Button size="small" cancel>
-                <X size={15} />
-                Annuler
-              </Button>
-            </div>
+            {!isSubFamilyLoading ? (
+              <div className="flex gap-2 mt-3">
+                <Button size="small" green type="submit">
+                  <Plus size={15} />
+                  Ajouter
+                </Button>
+                <Button size="small" cancel>
+                  <X size={15} />
+                  Annuler
+                </Button>
+              </div>
+            ) : (
+              <div className="flex justify-center gap-2 mt-3">
+                <CircularProgress color="success" />
+              </div>
+            )}
           </div>
         </Collapse>
       </form>
-
-      
     </div>
   );
 }

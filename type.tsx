@@ -16,15 +16,10 @@ export type LinkCard = {
   page: string;
 };
 
-export type ProductsCreated = {
-  id: number;
-  ref: string;
+export type Size = {
+  value: string;
+  label: string;
   name: string;
-  familly: string;
-  subFamilly: string;
-  brand: string;
-  collection: string;
-  status: number;
 };
 
 export type Filters_1 = {
