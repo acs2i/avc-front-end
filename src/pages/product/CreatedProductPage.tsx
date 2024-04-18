@@ -1,13 +1,12 @@
 import Card from "../../components/Shared/Card";
 import React, { useState, useEffect } from "react";
 import Button from "../../components/FormElements/Button";
-import { LINKCARD} from "../../utils/index";
+import { LINKCARD } from "../../utils/index";
 import { LinkCard } from "@/type";
 import { Divider, Tooltip } from "@mui/material";
 import { Plus, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import truncateText from "../../utils/func/Formattext";
-
 
 interface Product {
   _id: string;
@@ -20,8 +19,9 @@ interface Product {
 
 export default function CreatedProductPage() {
   const [page, setPage] = useState("progress");
-  const [products, setProducts] = useState<Product[]>([]);;
+  const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const colors = ["bg-gray-700", "bg-gray-500", "bg-gray-400"];
 
   useEffect(() => {
     fetchProducts();
@@ -92,7 +92,7 @@ export default function CreatedProductPage() {
               finalisés
             </h4>
             <table className="w-full text-left">
-              <thead className="bg-green-900 text-sm text-white">
+              <thead className="bg-green-900 text-sm text-white text-center">
                 <tr>
                   <th scope="col" className="px-6 py-4">
                     Référence
@@ -114,20 +114,35 @@ export default function CreatedProductPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="text-center">
                 {products.length > 0
                   ? products
                       .filter((product: any) => product.status === 0)
                       .map((product: any) => (
                         <>
                           <tr
-                           className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-500 even:bg-slate-50 whitespace-nowrap"
+                            className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-500 even:bg-slate-50 whitespace-nowrap"
                             key={product._id}
                           >
-                            <td className="px-6 py-3 font-bold">{product.reference}</td>
-                            <td className="px-6 py-3">{product.name}</td>
-                            <td className="px-6 py-3">{product.family}</td>
-                            <td className="px-6 py-3">{product.subFamily}</td>
+                            <td className="px-6 py-3 font-bold">
+                              {product.reference}
+                            </td>
+                            <td className="px-6 py-3">
+                              {truncateText(product.name, 20)}
+                            </td>
+                            <td className="px-6 py-3 ">{product.family}</td>
+                            <td className="px-6 py-4 flex items-center gap-2">
+                              {product.subFamily.map(
+                                (subFamily: any, index: any) => (
+                                  <span
+                                    key={index}
+                                    className={`${colors[index]} text-white px-2 py-1 rounded-md text-[12px]`}
+                                  >
+                                    {subFamily}
+                                  </span>
+                                )
+                              )}
+                            </td>
                             <td className="px-6 py-3 font-bold">En cours...</td>
                             <td className="px-6 py-3 flex items-center gap-3">
                               <Button size="small" inverse>
@@ -154,7 +169,7 @@ export default function CreatedProductPage() {
               <span className="font-bold text-gray-700">Ajouts</span> finalisés
             </h4>
             <table className="w-full text-left">
-              <thead className="bg-green-900 text-sm text-white">
+              <thead className="bg-green-900 text-sm text-white text-center">
                 <tr>
                   <th scope="col" className="px-6 py-4">
                     Référence
@@ -176,7 +191,7 @@ export default function CreatedProductPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="text-center">
                 {products.length > 0 ? (
                   products
                     .filter((product: any) => product.status === 1)
@@ -186,10 +201,25 @@ export default function CreatedProductPage() {
                           className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-500 even:bg-slate-50 whitespace-nowrap"
                           key={product._id}
                         >
-                          <td className="px-6 py-3 font-bold">{product.reference}</td>
-                          <td className="px-6 py-3">{truncateText(product.name, 30)}</td>
-                            <td className="px-6 py-3">{truncateText(product.family.join(', '), 30)}</td>
-                            <td className="px-6 py-3">{truncateText(product.subFamily.join(', '), 50)}</td>
+                          <td className="px-6 py-3 font-bold">
+                            {product.reference}
+                          </td>
+                          <td className="px-6 py-3">
+                            {truncateText(product.name, 20)}
+                          </td>
+                          <td className="px-6 py-3">{product.family}</td>
+                          <td className="px-6 py-4 flex items-center gap-2">
+                              {product.subFamily.map(
+                                (subFamily: any, index: any) => (
+                                  <span
+                                    key={index}
+                                    className={`${colors[index]} text-white px-2 py-1 rounded-md text-[12px]`}
+                                  >
+                                    {subFamily}
+                                  </span>
+                                )
+                              )}
+                            </td>
                           <td className="px-6 py-3 font-bold">Validé</td>
                           <td className="px-6 py-3 flex items-center gap-3">
                             <Button size="small" green>

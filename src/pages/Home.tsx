@@ -5,7 +5,7 @@ import { Pen } from "lucide-react";
 import { FILTERS_1 } from "../utils";
 import truncateText from "../utils/func/Formattext";
 import Button from "../components/FormElements/Button";
-
+import { Tooltip } from "@mui/material";
 
 interface Product {
   _id: string;
@@ -21,6 +21,8 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [isModify, setIsModify] = useState(false);
   const navigate = useNavigate();
+
+  const colors = ["bg-gray-700", "bg-gray-500", "bg-gray-400"];
 
   useEffect(() => {
     fetchProducts();
@@ -43,7 +45,7 @@ export default function Home() {
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 
@@ -185,7 +187,7 @@ export default function Home() {
 
         <div className="overflow-x-auto bg-white rounded-lg shadow-md">
           <table className="w-full text-left">
-            <thead className="bg-green-900 text-sm text-white">
+            <thead className="bg-green-900 text-sm text-white text-center">
               <tr>
                 {isModify && (
                   <th scope="col" className="px-6 py-4">
@@ -212,10 +214,9 @@ export default function Home() {
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="text-center">
               {products && products.length > 0 ? (
                 products.map((product: any) => (
-                  
                   <tr
                     key={product._id}
                     className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-500 even:bg-slate-50 whitespace-nowrap"
@@ -236,14 +237,21 @@ export default function Home() {
                       </td>
                     )}
                     <td className="px-6 py-4 font-bold">{product.reference}</td>
-                    <td className="px-6 py-4">
-                      {product.name}
-                    </td>
-                    <td className="px-6 py-4">
-                      {product.family}
-                    </td>
-                    <td className="px-6 py-4">
-                      {product.subFamily}
+                    <Tooltip title={product.name} placement="top">
+                      <td className="px-6 py-4">
+                        {truncateText(product.name, 20)}
+                      </td>
+                    </Tooltip>
+                    <td className="px-6 py-4">{product.family}</td>
+                    <td className="px-6 py-4 flex items-center gap-2">
+                      {product.subFamily.map((subFamily: any, index: any) => (
+                        <span
+                          key={index}
+                          className={`${colors[index]} text-white px-2 py-1 rounded-md text-[12px]`}
+                        >
+                          {subFamily}
+                        </span>
+                      ))}
                     </td>
                     <td className="px-6 py-4">{product.brand}</td>
                     <td className="px-6 py-4">{product.productCollection}</td>

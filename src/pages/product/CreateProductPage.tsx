@@ -188,6 +188,13 @@ export default function CreateProductPage() {
     name: collection.name,
   }));
 
+  const brandOptions = brands?.map((brand: Brand) => ({
+    value: brand.name,
+    label: brand.name,
+    name: brand.name,
+  }));
+
+
 
   const fetchFamilies = async () => {
     try {
@@ -421,7 +428,7 @@ export default function CreateProductPage() {
                         value={formData.brand}
                         onChange={handleChange}
                         required
-                        options={brands}
+                        options={brandOptions}
                         placeholder="Selectionner une marque"
                       />
                     </div>
