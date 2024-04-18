@@ -1,36 +1,35 @@
 import { LINKCARD_PRODUCT } from "../../utils/index";
 import Card from "../../components/Shared/Card";
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import React, { useState } from "react";
+import { useParams } from "react-router-dom";
 import { LinkCard } from "@/type";
-import { Pen } from "lucide-react";
 import { Divider } from "@mui/material";
+import useFetch from "../../utils/hooks/usefetch";
+
+interface Product {
+  reference: string;
+  name: string;
+  family: any;
+  subFamily: string[];
+  brand: string;
+  productCollection: string;
+  imgPath: any;
+  status: number;
+}
 
 export default function SingleProductPage() {
-  const [product, setProduct] = useState< any | null>({});  // create an interface for product
   const [page, setPage] = useState("details");
-
   const { id } = useParams();
+  const colors = ["bg-gray-700", "bg-gray-500", "bg-gray-400"];
+  const { data: product } = useFetch<Product>(
+    `${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`
+  );
 
-  useEffect(() => {
-    getProduct();
-  }, [id]);
-
-  const getProduct = async () => {
-    const response = await fetch(
-      `${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`
-    );
-    const data = await response.json();
-
-    if (data) {
-      setProduct(data);
-    }
-    console.log(data)
-  };
+  console.log(product);
   return (
     <section className="mt-7">
       <Card title={`Article n°${product?.reference}`}>
-      <div className="mt-4 mb-[30px] px-4">
+        <div className="mt-4 mb-[30px] px-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-7">
               {LINKCARD_PRODUCT.map((link: LinkCard) => (
@@ -83,8 +82,17 @@ export default function SingleProductPage() {
                         <td className="px-4 py-4 text-gray-700">
                           Sous-famille :
                         </td>
-                        <td className="px-4 py-4 text-gray-500 font-normal">
-                          {product?.subFamily}
+                        <td className="px-4 py-4 flex items-center gap-2">
+                          {product?.subFamily.map(
+                            (subFamily: any, index: any) => (
+                              <span
+                                key={index}
+                                className={`${colors[index]} text-white px-2 py-1 rounded-md text-[12px]`}
+                              >
+                                {subFamily}
+                              </span>
+                            )
+                          )}
                         </td>
                       </tr>
                       <tr>
@@ -103,7 +111,7 @@ export default function SingleProductPage() {
                       </tr>
                       <tr>
                         <td className="px-4 py-4 text-gray-700">Uvc :</td>
-                        <td className="px-4 py-4 text-gray-500 font-normal">
+                        {/* <td className="px-4 py-4 text-gray-500 font-normal">
                           {product&& product.uvc && product?.uvc.map((item: any, index: any) => (
                             <table key={index} className="w-full">
                               <thead>
@@ -132,12 +140,11 @@ export default function SingleProductPage() {
                               </tbody>
                             </table>
                           ))}
-                        </td>
+                        </td> */}
                       </tr>
                     </tbody>
                   </table>
                 </div>
-         
               </div>
             </div>
           </div>
