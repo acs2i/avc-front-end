@@ -17,21 +17,32 @@ interface Product {
 }
 
 export default function Home() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(50);
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModify, setIsModify] = useState(false);
   const navigate = useNavigate();
-
   const colors = ["bg-gray-700", "bg-gray-500", "bg-gray-400"];
+  // const indexOfLastProduct = currentPage * limit;
+  // const indexOfFirstProduct = indexOfLastProduct - limit;
+  // const currentProducts = products.slice(
+  //   indexOfFirstProduct,
+  //   indexOfLastProduct
+  // );
+
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [currentPage]);
 
   const fetchProducts = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/product`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/product?page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -52,6 +63,8 @@ export default function Home() {
   if (isLoading) {
     return <div>Chargement en cours...</div>;
   }
+
+  console.log(currentPage);
 
   return (
     <div className="flex gap-7 mt-7">
@@ -177,6 +190,9 @@ export default function Home() {
         </div>
 
         <div className="flex justify-end w-full">
+          <button onClick={() => handlePageChange(currentPage + 1)}>
+            suivant
+          </button>
           <button
             className="text-[14px] text-sky-700 hover:text-sky-400 flex items-center gap-2"
             onClick={() => setIsModify((prev) => !prev)}

@@ -65,7 +65,7 @@ export default function SingleProductPage() {
               </div>
             </div>
             <div className="flex-col col-span-2 justify-center">
-              <h2 className="text-2xl text-gray-600 font-bold font-montserrat">
+              <h2 className="text-2xl text-gray-600 font-bold font-montserrat capitalize">
                 {product?.name}
               </h2>
               <div className="grid grid-cols-1 gap-4 mt-5">
@@ -82,7 +82,7 @@ export default function SingleProductPage() {
                         <td className="px-4 py-4 text-gray-700">
                           Sous-famille :
                         </td>
-                        <td className="px-4 py-4 flex items-center gap-2">
+                        <td className="px-4 py-4 flex items-center gap-2 select-none">
                           {product?.subFamily.map(
                             (subFamily: any, index: any) => (
                               <span
