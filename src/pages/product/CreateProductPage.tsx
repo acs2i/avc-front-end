@@ -18,6 +18,10 @@ import useNotify from "../../utils/hooks/useToast";
 import "react-toastify/dist/ReactToastify.css";
 import useFetch from "../../utils/hooks/usefetch";
 
+import CreatableSelect from "react-select/creatable";
+
+import { colourOptions } from "../../data";
+
 interface Family {
   _id: string;
   name: string;
@@ -54,6 +58,31 @@ interface FormData {
   status: number;
   creatorId: any;
 }
+
+const customStyles = {
+  control: (provided: any) => ({
+    ...provided,
+    border: "none",
+    boxShadow: "none",
+    "&:hover": {
+      border: "none",
+    },
+  }),
+  option: (provided: any, state: any) => ({
+    ...provided,
+    borderBottom: "1px solid #e5e5e5",
+    backgroundColor: state.isSelected ? "#e5e5e5" : "white",
+    color: state.isSelected ? "black" : "gray",
+    "&:hover": {
+      backgroundColor: "#e5e5e5",
+      color: "black",
+    },
+  }),
+  singleValue: (provided: any) => ({
+    ...provided,
+    color: "gray",
+  }),
+};
 
 export default function CreateProductPage() {
   const user = useSelector((state: any) => state.auth.user);
@@ -173,8 +202,8 @@ export default function CreateProductPage() {
   )?.name;
   const collectionOptions =
     collections?.map(({ name }) => ({ value: name, label: name, name })) ?? [];
-  const brandOptions =
-    brands?.map(({ name }) => ({ value: name, label: name, name })) ?? [];
+  const brandOptions: { value: string; label: string }[] =
+    brands?.map(({ name }) => ({ value: name, label: name })) ?? [];
 
   // Envoi du formulaire de création de produit
   const handleCreateProduct = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -313,29 +342,43 @@ export default function CreateProductPage() {
                       />
                     </div>
                     <div className="gap-5 grid grid-cols-2 grid-template-columns: [label] 1fr [select] 2fr;">
-                      <div className="flex flex-col gap-3">
-                        <Input
-                          element="select"
-                          id="brand"
-                          label="Marque :"
-                          value={formData.brand}
-                          onChange={handleChange}
-                          required
-                          options={brandOptions}
+                      <div className="flex flex-col gap-1">
+                        <div>
+                          <label className="relative text-[15px] font-bold text-gray-500">
+                            Marque :{" "}
+                            <span className="absolute top-[-5px] right-[-10px] text-red-400">
+                              *
+                            </span>
+                          </label>
+                        </div>
+                        <CreatableSelect
                           placeholder="Selectionner une marque"
+                          styles={customStyles}
+                          value={formData.brand}
+                          // onChange={handleChange}
+                          className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                          options={brandOptions}
+                          required
                         />
                       </div>
 
-                      <div className="flex flex-col gap-3">
-                        <Input
-                          element="select"
-                          id="productCollection"
-                          label="Collection :"
-                          value={formData.productCollection}
-                          onChange={handleChange}
-                          required
-                          options={collectionOptions}
+                      <div className="flex flex-col gap-1">
+                        <div>
+                          <label className="relative text-[15px] font-bold text-gray-500">
+                            Collection :{" "}
+                            <span className="absolute top-[-5px] right-[-10px] text-red-400">
+                              *
+                            </span>
+                          </label>
+                        </div>
+                        <CreatableSelect
                           placeholder="Selectionner une collection"
+                          styles={customStyles}
+                          value={formData.productCollection}
+                          // onChange={handleChange}
+                          className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                          options={collectionOptions}
+                          required
                         />
                       </div>
                     </div>
@@ -346,26 +389,39 @@ export default function CreateProductPage() {
                       Classification principale
                     </span>
                     <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
-                      <div className="flex flex-col gap-3">
-                        <Input
-                          element="select"
-                          id="family"
-                          label="Famille :"
+                      <div className="flex flex-col gap-1">
+                        <div>
+                          <label className="relative text-[15px] font-bold text-gray-500">
+                            Famille :{" "}
+                            <span className="absolute top-[-5px] right-[-10px] text-red-400">
+                              *
+                            </span>
+                          </label>
+                        </div>
+                        <CreatableSelect
+                          placeholder="Selectionner une famille"
+                          styles={customStyles}
                           value={selectedFamilyName}
-                          onChange={handleChange}
+                          //onChange={handleChange}
+                          className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
                           options={options}
                           required
-                          placeholder="Selectionner une famille"
+                          isMulti
                         />
                       </div>
 
-                      <div className="flex flex-col gap-3">
-                        <Input
-                          element="select"
-                          id="subFamily"
-                          label="Sous-famille :"
+                      <div className="flex flex-col gap-1">
+                        <div>
+                          <label className="relative text-[15px] font-bold text-gray-500">
+                            Sous-famille :{" "}
+                          </label>
+                        </div>
+                        <CreatableSelect
+                          placeholder="Selectionner une sous-famille"
+                          styles={customStyles}
                           value={formData.subFamily}
                           onChange={handleChange}
+                          className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
                           options={
                             familyId
                               ? Array.isArray(subFamillies)
@@ -373,7 +429,6 @@ export default function CreateProductPage() {
                                 : []
                               : []
                           }
-                          placeholder="Selectionner une sous-famille"
                         />
                       </div>
                     </div>
@@ -416,51 +471,60 @@ export default function CreateProductPage() {
                       Caractéristiques du produit
                     </span>
                     <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
-                      <Input
-                        element="select"
-                        id="name"
-                        label="Dimension :"
+                      <div>
+                        <label className="relative text-[15px] font-bold text-gray-500">
+                          Dimension :{" "}
+                        </label>
+                      </div>
+                      <CreatableSelect
+                        placeholder="Selectionner une dimension"
+                        styles={customStyles}
                         value={formData.reference}
                         onChange={handleChange}
-                        validators={[]}
-                        placeholder=""
-                        gray
+                        className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                        options={" "}
                       />
-                      <Input
-                        element="select"
-                        id="name"
-                        label="Composition :"
-                        value={formData.name}
+                      <div>
+                        <label className="relative text-[15px] font-bold text-gray-500">
+                          Composition :{" "}
+                        </label>
+                      </div>
+                      <CreatableSelect
+                        placeholder="Selectionner une composition"
+                        styles={customStyles}
+                        value={formData.reference}
                         onChange={handleChange}
-                        validators={[]}
-                        placeholder=""
-                        gray
+                        className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                        options={" "}
                       />
-                       <Input
-                        element="select"
-                        id="name"
-                        label="Collection :"
-                        value={formData.name}
+                      <div>
+                        <label className="relative text-[15px] font-bold text-gray-500">
+                          Collection :{" "}
+                        </label>
+                      </div>
+                      <CreatableSelect
+                        placeholder="Selectionner une collection"
+                        styles={customStyles}
+                        value={formData.reference}
                         onChange={handleChange}
-                        validators={[]}
-                        placeholder=""
-                        gray
+                        className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                        options={" "}
                       />
-                      <Input
-                        element="select"
-                        id="name"
-                        label="Thème :"
-                        value={formData.name}
+                      <div>
+                        <label className="relative text-[15px] font-bold text-gray-500">
+                        Thème :{" "}
+                        </label>
+                      </div>
+                      <CreatableSelect
+                        placeholder="Selectionner une thème"
+                        styles={customStyles}
+                        value={formData.reference}
                         onChange={handleChange}
-                        validators={[]}
-                        placeholder=""
-                        gray
+                        className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                        options={" "}
                       />
-                      
                     </div>
                   </div>
-
-
                 </div>
               </div>
 
@@ -481,7 +545,7 @@ export default function CreateProductPage() {
                 <Collapse in={uvcIsOpen}>
                   <h6>Uvc 1</h6>
                   <div className="gap-5 grid grid-cols-2 grid-template-columns: [label] 1fr [select] 2fr; mb-[50px]">
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-1">
                       <Input
                         element="input"
                         id="code"
@@ -493,7 +557,7 @@ export default function CreateProductPage() {
                         gray
                       />
                     </div>
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-1">
                       <MultiSelect
                         id="size"
                         label="Tailles :"
@@ -506,7 +570,7 @@ export default function CreateProductPage() {
                         }
                       />
                     </div>
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-1">
                       <Input
                         element="input"
                         id="color"
@@ -518,7 +582,7 @@ export default function CreateProductPage() {
                         gray
                       />
                     </div>
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-1">
                       <Input
                         element="input"
                         id="price"
