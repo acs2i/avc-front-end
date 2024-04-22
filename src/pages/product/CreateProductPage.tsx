@@ -1,4 +1,4 @@
-import React, { useState} from "react";
+import React, { useState } from "react";
 import { Collapse, CircularProgress } from "@mui/material";
 import { ChevronDown, ChevronUp, MoveLeft, Plus, Save, X } from "lucide-react";
 import Input from "../../components/FormElements/Input";
@@ -241,118 +241,230 @@ export default function CreateProductPage() {
         {page === "addProduct" && (
           <div className="mt-7 mb-7">
             <form
-              className="flex flex-col gap-4 w-[60%] mx-auto"
+              className="flex flex-col gap-4 w-[90%] mx-auto"
               onSubmit={handleCreateProduct}
             >
               <div className="flex items-center gap-3 h-[70px]">
                 <div className="h-2/3 w-[8px] bg-emerald-700"></div>
                 <h4 className="text-3xl text-gray-600">
-                  <span className="font-bold text-gray-700">Ajout</span> d'un
-                  produit
+                  <span className="font-bold text-gray-700">Création</span>{" "}
+                  d'une fiche produit
                 </h4>
               </div>
 
-              <div>
-                <div
-                  className="flex items-center gap-3 h-[70px]"
-                  onClick={handleOpenProductCollapse}
-                >
+              <div className="flex flex-col gap-7">
+                <div className="flex items-center gap-3 h-[70px]">
                   <h5 className="text-2xl text-gray-600">
-                    <span className="font-bold text-gray-700">Création</span> de
-                    la fiche produit
+                    <span className="font-bold text-gray-700">Page</span>{" "}
+                    principale
                   </h5>
-                  <button className="focus:outline-none text-gray-500">
-                    {!createProductIsOpen && <ChevronDown size={25} />}
-                    {createProductIsOpen && <ChevronUp size={25} />}
-                  </button>
                 </div>
-                <Collapse in={createProductIsOpen}>
-                  <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
-                    <Input
-                      element="input"
-                      id="reference"
-                      label="Référence du produit :"
-                      value={formData.reference}
-                      onChange={handleChange}
-                      validators={[VALIDATOR_REQUIRE()]}
-                      placeholder="Ajouter la référence du produit"
-                      required
-                      gray
-                    />
-                    <Input
-                      element="input"
-                      id="name"
-                      label="Nom du produit :"
-                      value={formData.name}
-                      onChange={handleChange}
-                      validators={[VALIDATOR_REQUIRE()]}
-                      placeholder="Ajouter le libellé du produit"
-                      required
-                      gray
-                    />
-                  </div>
-                  <div className="gap-5 grid grid-cols-2 grid-template-columns: [label] 1fr [select] 2fr;">
-                    <div className="flex flex-col gap-3">
+                <div className="flex gap-5 mt-6">
+                  <div className="relative flex-1 border border-gray-200 rounded-md px-4 py-7 shadow-md">
+                    <span className="absolute top-[-12px] bg-white px-3 text-[13px] italic">
+                      Identification
+                    </span>
+                    <div className="gap-5 grid grid-cols-2 grid-template-columns: [label] 1fr [select] 2fr;">
                       <Input
-                        element="select"
-                        id="family"
-                        label="Famille :"
-                        value={selectedFamilyName}
+                        element="input"
+                        id="reference"
+                        label="Référence :"
+                        value={formData.reference}
                         onChange={handleChange}
-                        options={options}
+                        validators={[VALIDATOR_REQUIRE()]}
+                        placeholder="Ajouter la référence du produit"
                         required
-                        placeholder="Selectionner une famille"
+                        gray
+                      />
+                      <Input
+                        element="input"
+                        id="name"
+                        label="Nom d'appel :"
+                        value={formData.name}
+                        onChange={handleChange}
+                        validators={[VALIDATOR_REQUIRE()]}
+                        placeholder="Ajouter le libellé du produit"
+                        required
+                        gray
                       />
                     </div>
-
-                    <div className="flex flex-col gap-3">
+                    <div className="gap-5 grid grid-cols-2 grid-template-columns: [label] 1fr [select] 2fr;">
                       <Input
-                        element="select"
-                        id="subFamily"
-                        label="Sous-famille :"
-                        value={formData.subFamily}
+                        element="input"
+                        id="reference"
+                        label="Désignation longue :"
+                        value={formData.reference}
                         onChange={handleChange}
-                        options={
-                          familyId
-                            ? Array.isArray(subFamillies)
-                              ? subFamillies
+                        validators={[VALIDATOR_REQUIRE()]}
+                        placeholder="Ajouter la référence du produit"
+                        required
+                        gray
+                      />
+                      <Input
+                        element="input"
+                        id="name"
+                        label="Désignation courte :"
+                        value={formData.name}
+                        onChange={handleChange}
+                        validators={[VALIDATOR_REQUIRE()]}
+                        placeholder=""
+                        required
+                        gray
+                      />
+                    </div>
+                    <div className="gap-5 grid grid-cols-2 grid-template-columns: [label] 1fr [select] 2fr;">
+                      <div className="flex flex-col gap-3">
+                        <Input
+                          element="select"
+                          id="brand"
+                          label="Marque :"
+                          value={formData.brand}
+                          onChange={handleChange}
+                          required
+                          options={brandOptions}
+                          placeholder="Selectionner une marque"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-3">
+                        <Input
+                          element="select"
+                          id="productCollection"
+                          label="Collection :"
+                          value={formData.productCollection}
+                          onChange={handleChange}
+                          required
+                          options={collectionOptions}
+                          placeholder="Selectionner une collection"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="relative w-1/3 border border-gray-200 rounded-md px-4 py-7 shadow-md">
+                    <span className="absolute top-[-12px] bg-white px-3 text-[13px] italic">
+                      Classification principale
+                    </span>
+                    <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
+                      <div className="flex flex-col gap-3">
+                        <Input
+                          element="select"
+                          id="family"
+                          label="Famille :"
+                          value={selectedFamilyName}
+                          onChange={handleChange}
+                          options={options}
+                          required
+                          placeholder="Selectionner une famille"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-3">
+                        <Input
+                          element="select"
+                          id="subFamily"
+                          label="Sous-famille :"
+                          value={formData.subFamily}
+                          onChange={handleChange}
+                          options={
+                            familyId
+                              ? Array.isArray(subFamillies)
+                                ? subFamillies
+                                : []
                               : []
-                            : []
-                        }
-                        placeholder="Selectionner une sous-famille"
-                      />
+                          }
+                          placeholder="Selectionner une sous-famille"
+                        />
+                      </div>
                     </div>
+                  </div>
+                </div>
 
-                    <div className="flex flex-col gap-3">
+                <div className="flex gap-5">
+                  <div className="relative w-2/3 border border-gray-200 rounded-md px-4 py-7 shadow-md">
+                    <span className="absolute top-[-12px] bg-white px-3 text-[13px] italic">
+                      Fournisseur principal
+                    </span>
+                    <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
                       <Input
-                        element="select"
-                        id="brand"
-                        label="Marque :"
-                        value={formData.brand}
+                        element="input"
+                        id="name"
+                        label="Nom :"
+                        value={formData.reference}
                         onChange={handleChange}
+                        validators={[VALIDATOR_REQUIRE()]}
+                        placeholder="Ajouter la référence du produit"
                         required
-                        options={brandOptions}
-                        placeholder="Selectionner une marque"
+                        gray
                       />
-                    </div>
-
-                    <div className="flex flex-col gap-3">
                       <Input
-                        element="select"
-                        id="productCollection"
-                        label="Collection :"
-                        value={formData.productCollection}
+                        element="input"
+                        id="name"
+                        label="Reférence produit :"
+                        value={formData.name}
                         onChange={handleChange}
+                        validators={[VALIDATOR_REQUIRE()]}
+                        placeholder="Ajouter le libellé du produit"
                         required
-                        options={collectionOptions}
-                        placeholder="Selectionner une collection"
+                        gray
                       />
                     </div>
                   </div>
-                </Collapse>
+
+                  <div className="relative w-1/3 border border-gray-200 rounded-md px-4 py-7 shadow-md">
+                    <span className="absolute top-[-12px] bg-white px-3 text-[13px] italic">
+                      Caractéristiques du produit
+                    </span>
+                    <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
+                      <Input
+                        element="select"
+                        id="name"
+                        label="Dimension :"
+                        value={formData.reference}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder=""
+                        gray
+                      />
+                      <Input
+                        element="select"
+                        id="name"
+                        label="Composition :"
+                        value={formData.name}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder=""
+                        gray
+                      />
+                       <Input
+                        element="select"
+                        id="name"
+                        label="Collection :"
+                        value={formData.name}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder=""
+                        gray
+                      />
+                      <Input
+                        element="select"
+                        id="name"
+                        label="Thème :"
+                        value={formData.name}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder=""
+                        gray
+                      />
+                      
+                    </div>
+                  </div>
+
+
+                </div>
               </div>
 
-              <div>
+              {/* <div>
                 <div
                   className="flex items-center gap-3 h-[70px]"
                   onClick={handleOpenUvcCollapse}
@@ -420,7 +532,7 @@ export default function CreateProductPage() {
                     </div>
                   </div>
                 </Collapse>
-              </div>
+              </div> */}
 
               {!isLoading ? (
                 <div className="flex gap-2 mt-5">
@@ -431,11 +543,11 @@ export default function CreateProductPage() {
                     onClick={() => setFormData({ ...formData, status: 1 })}
                   >
                     <Plus size={15} />
-                    Ajouter
+                    Créer
                   </Button>
                   <Button size="small" inverse type="submit">
                     <Save size={15} />
-                    Enregistrer dans brouillon
+                    Sauvegarder
                   </Button>
                   <Button size="small" cancel>
                     <X size={15} />

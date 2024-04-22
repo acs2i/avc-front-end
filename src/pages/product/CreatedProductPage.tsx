@@ -86,7 +86,7 @@ export default function CreatedProductPage() {
         </div>
 
         {page === "progress" && (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 overflow-x-auto">
             <h4 className="text-center text-3xl text-gray-600 mb-5">
               <span className="font-bold text-gray-700">Ajouts</span> non
               finalisés
@@ -131,7 +131,7 @@ export default function CreatedProductPage() {
                               {truncateText(product.name, 20)}
                             </td>
                             <td className="px-6 py-3 ">{product.family}</td>
-                            <td className="px-6 py-4 flex items-center gap-2">
+                            <td className="px-6 py-4 flex items-center justify-center gap-2">
                               {product.subFamily.map(
                                 (subFamily: any, index: any) => (
                                   <span

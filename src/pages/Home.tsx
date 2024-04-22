@@ -23,7 +23,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [isModify, setIsModify] = useState(false);
   const navigate = useNavigate();
-  const colors = ["bg-gray-700", "bg-gray-500", "bg-gray-400"];
+  const colors = ["text-gray-700", "text-gray-500", "text-gray-400"];
   // const indexOfLastProduct = currentPage * limit;
   // const indexOfFirstProduct = indexOfLastProduct - limit;
   // const currentProducts = products.slice(
@@ -64,11 +64,11 @@ export default function Home() {
     return <div>Chargement en cours...</div>;
   }
 
-  console.log(currentPage);
+
 
   return (
     <div className="flex gap-7 mt-7">
-      <div className="w-[300px] min-w-[300px] bg-white rounded-lg shadow-md">
+      {/* <div className="w-[300px] min-w-[300px] bg-white rounded-lg shadow-md">
         <div className="w-full bg-green-900 text-white p-4 rounded-t-md text-center">
           <span className="text-xl">Filtres</span>
         </div>
@@ -157,7 +157,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="flex flex-col gap-3 w-full">
         <div className="relative w-full shadow-2xl">
@@ -190,9 +190,6 @@ export default function Home() {
         </div>
 
         <div className="flex justify-end w-full">
-          <button onClick={() => handlePageChange(currentPage + 1)}>
-            suivant
-          </button>
           <button
             className="text-[14px] text-sky-700 hover:text-sky-400 flex items-center gap-2"
             onClick={() => setIsModify((prev) => !prev)}
@@ -263,7 +260,7 @@ export default function Home() {
                       {product.subFamily.map((subFamily: any, index: any) => (
                         <span
                           key={index}
-                          className={`${colors[index]} text-white px-2 py-1 rounded-md text-[12px]`}
+                          className={`${colors[index]} text-[12px] font-bold`}
                         >
                           {subFamily}
                         </span>

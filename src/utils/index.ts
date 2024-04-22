@@ -1,5 +1,5 @@
 import { Filters_1, Link, LinkCard, Size, Suppliers } from "@/type";
-import { Home, Pen, Truck, ShoppingCart } from "lucide-react";
+import { Home, Pen, Truck, ShoppingCart, Barcode, Settings } from "lucide-react";
 
 export const LINKS: Link[] = [
   {
@@ -11,7 +11,7 @@ export const LINKS: Link[] = [
   {
     name: "Création",
     link: "/edit",
-    icon: Pen,
+    icon: Barcode,
     showInSidebar: true,
   },
   {
@@ -19,6 +19,12 @@ export const LINKS: Link[] = [
     link: "/edit/edit-product",
     icon: Pen,
     showInSidebar: false,
+  },
+  {
+    name: "Paramètres",
+    link: "/parameters",
+    icon: Settings,
+    showInSidebar: true,
   },
   {
     name: "Liste des fournisseurs",
