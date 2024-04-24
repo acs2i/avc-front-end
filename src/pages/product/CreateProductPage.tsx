@@ -5,7 +5,7 @@ import Input from "../../components/FormElements/Input";
 import { Link } from "react-router-dom";
 import Card from "../../components/Shared/Card";
 import Button from "../../components/FormElements/Button";
-import { LINKCARD_EDIT} from "../../utils/index";
+import { LINKCARD_EDIT } from "../../utils/index";
 import { LinkCard } from "@/type";
 import { Divider } from "@mui/material";
 import { useSelector } from "react-redux";
@@ -124,15 +124,6 @@ export default function CreateProductPage() {
       status: 0,
       creatorId: user._id,
     });
-  };
-
-  const handleOpenUvcCollapse = (event: any) => {
-    event.preventDefault();
-    setUvcIsOpen(!uvcIsOpen);
-  };
-  const handleOpenProductCollapse = (event: any) => {
-    event.preventDefault();
-    setCreateProductcIsOpen(!createProductIsOpen);
   };
 
   // Récupération données
@@ -356,7 +347,6 @@ export default function CreateProductPage() {
                           value={formData.brand}
                           // onChange={handleChange}
                           className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                          options={brandOptions}
                           required
                         />
                       </div>
@@ -376,7 +366,6 @@ export default function CreateProductPage() {
                           value={formData.productCollection}
                           // onChange={handleChange}
                           className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                          options={collectionOptions}
                           required
                         />
                       </div>
@@ -403,7 +392,6 @@ export default function CreateProductPage() {
                           value={selectedFamilyName}
                           //onChange={handleChange}
                           className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                          options={options}
                           required
                           isMulti
                         />
@@ -479,9 +467,7 @@ export default function CreateProductPage() {
                         placeholder="Selectionner une dimension"
                         styles={customStyles}
                         value={formData.reference}
-                        onChange={handleChange}
                         className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                        options={" "}
                       />
                       <div>
                         <label className="relative text-[15px] font-bold text-gray-500">
@@ -492,9 +478,7 @@ export default function CreateProductPage() {
                         placeholder="Selectionner une composition"
                         styles={customStyles}
                         value={formData.reference}
-                        onChange={handleChange}
                         className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                        options={" "}
                       />
                       <div>
                         <label className="relative text-[15px] font-bold text-gray-500">
@@ -505,22 +489,18 @@ export default function CreateProductPage() {
                         placeholder="Selectionner une collection"
                         styles={customStyles}
                         value={formData.reference}
-                        onChange={handleChange}
                         className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                        options={" "}
                       />
                       <div>
                         <label className="relative text-[15px] font-bold text-gray-500">
-                        Thème :{" "}
+                          Thème :{" "}
                         </label>
                       </div>
                       <CreatableSelect
                         placeholder="Selectionner une thème"
                         styles={customStyles}
                         value={formData.reference}
-                        onChange={handleChange}
                         className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                        options={" "}
                       />
                     </div>
                   </div>
