@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import Card from "../../components/Shared/Card";
 import Button from "../../components/FormElements/Button";
 import CircularProgress from "@mui/material/CircularProgress";
+import Pagination from "@mui/material/Pagination";
+import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ChevronUp } from "lucide-react";
 
 type DataType = "LA1" | "LA2" | "LA3";
 
@@ -14,11 +16,17 @@ interface Family {
   YX_LIBELLE: string;
 }
 
-function ClassicationsPage() {
+function ClassificationsPage() {
   const [isModify, setIsModify] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const [prevSearchValue, setPrevSearchValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItem, setTotalItem] = useState(null);
+  const limit = 20;
+  const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const [families, setFamilies] = useState<Family[]>([]);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const typeLabels: { [key in DataType]: string } = {
     LA1: "Famille",
@@ -26,14 +34,44 @@ function ClassicationsPage() {
     LA3: "Sous-sous-famille",
   };
 
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
+    setCurrentPage(value);
+  };
+
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [currentPage]);
 
   const fetchProducts = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/family?page=${1}&limit=${20}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/family?page=${currentPage}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+      setFamilies(data.data);
+      setTotalItem(data.total);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSearch = async () => {
+    setIsLoading(true)
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/family/search?value=${searchValue}&page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -44,17 +82,28 @@ function ClassicationsPage() {
 
       const data = await response.json();
       setFamilies(data);
+      setTotalItem(data.length);
+      setPrevSearchValue(searchValue);
+      setIsLoading(false)
     } catch (error) {
       console.error("Erreur lors de la requête", error);
-    } finally {
-      setIsLoading(false);
+    }
+  };
+
+
+  const handleKeyDown = (event : any) => {
+    if (event.key === "Enter") {
+      handleSearch();
     }
   };
 
   return (
-    <div>
-      <div className="flex items-center gap-2 mb-3 cursor-pointer" onClick={() => navigate(-1)}>
-        <ArrowLeft/>
+    <div className="relative">
+      <div
+        className="flex items-center gap-2 mb-3 cursor-pointer"
+        onClick={() => navigate("/parameters")}
+      >
+        <ArrowLeft />
         <span>retour</span>
       </div>
       <Card title="Paramétrer les classifications">
@@ -65,27 +114,37 @@ function ClassicationsPage() {
               id="search-dropdown"
               className="block p-2.5 w-full text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-lg focus:ring-blue-500 focus:border-blue-500"
               placeholder="Rechercher une classification"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              onKeyDown={handleKeyDown}
             />
-            <button
-              type="submit"
-              className="absolute top-0 end-0 p-2.5 text-sm font-medium h-full text-white bg-green-800 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
-            >
-              <svg
-                className="w-4 h-4"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 20 20"
+            {!isLoading ? (
+              <button
+                type="submit"
+                className="absolute top-0 end-0 p-2.5 text-sm font-medium h-full text-white bg-green-800 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
+                onClick={handleSearch}
               >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                />
-              </svg>
-            </button>
+                <svg
+                  className="w-4 h-4"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                  />
+                </svg>
+              </button>
+            ) : (
+              <div className="absolute top-0 end-0 h-full rounded-e-lg">
+                <CircularProgress />
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-3">
             <Button
@@ -100,7 +159,20 @@ function ClassicationsPage() {
             </Button>
           </div>
         </div>
+        <div className="flex justify-center p-7">
+          <Stack spacing={2}>
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={handlePageChange}
+            />
+          </Stack>
+        </div>
         <div className="overflow-x-auto bg-white shadow-md">
+          <div className="px-3 mb-2 flex items-center gap-2">
+            <h4 className="text-xl"><span className="font-bold">{totalItem}</span> Classifications</h4>
+            {prevSearchValue && <span className="text-xl italic">{`"${prevSearchValue}"`}</span>}
+          </div>
           <table className="w-full text-left">
             <thead className="bg-blue-50 text-md text-gray-500">
               <tr>
@@ -147,7 +219,7 @@ function ClassicationsPage() {
               ) : (
                 <tr>
                   <td colSpan={6} className="px-6 py-7 text-center">
-                    <CircularProgress size={80} />
+                    {totalItem === null ? <CircularProgress size={80} /> : "Aucun Résultat"}
                   </td>
                 </tr>
               )}
@@ -155,8 +227,14 @@ function ClassicationsPage() {
           </table>
         </div>
       </Card>
+      <a
+        href="#top"
+        className="absolute bottom-0 right-[-60px] bg-orange-500 p-3 rounded-full text-white hover:bg-orange-400"
+      >
+        <ChevronUp />
+      </a>
     </div>
   );
 }
 
-export default ClassicationsPage;
+export default ClassificationsPage;

@@ -12,7 +12,9 @@ import { LINKS } from "./utils";
 import SuppliersListPage from "./pages/suppliers/SuppliersListPage";
 import CreateProductPage from "./pages/product/CreateProductPage";
 import ParamsMenuPage from "./pages/params/ParamsMenuPage";
-import ClassicationsPage from "./pages/params/ClassicationsPage";
+import ClassicationsPage from "./pages/params/ClassificationsPage";
+import CollectionPage from "./pages/params/CollectionPage";
+import ClassificationsPage from "./pages/params/ClassificationsPage";
 
 function App() {
   const location = useLocation();
@@ -61,7 +63,11 @@ function App() {
               />
                 <Route
                 path="/parameters/classification"
-                element={<ClassicationsPage />}
+                element={<ClassificationsPage />}
+              />
+                 <Route
+                path="/parameters/collection"
+                element={<CollectionPage />}
               />
               <Route path="/product/:id" element={<SingleProductPage />} />
               <Route path="/suppliers/suppliers-list" element={<SuppliersListPage />} />

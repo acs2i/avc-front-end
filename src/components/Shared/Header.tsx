@@ -28,7 +28,7 @@ export default function Header({ titlePage }: { titlePage: string }) {
   };
 
   return (
-    <div className="py-8 flex items-center justify-between">
+    <div className="py-8 flex items-center justify-between" id="top">
       <div>
         <h1 className="text-3xl font-bold text-gray-600">{titlePage}</h1>
       </div>

@@ -33,6 +33,12 @@ export const LINKS: Link[] = [
     showInSidebar: false,
   },
   {
+    name: "Collections",
+    link: "/parameters/collection",
+    icon: Settings,
+    showInSidebar: false,
+  },
+  {
     name: "Liste des fournisseurs",
     link: "/suppliers/suppliers-list",
     icon: Truck,
@@ -61,7 +67,7 @@ export const LINKS_Params: Params[] = [
   },
   {
     name: "Collections",
-    link: "/",
+    link: "/parameters/collection",
   },
   {
     name: "Marques",
