@@ -1,4 +1,4 @@
-import { Filters_1, Link, LinkCard, Size, Suppliers } from "@/type";
+import { Filters_1, Link, LinkCard, Size, Suppliers, Params } from "@/type";
 import { Home, Pen, Truck, ShoppingCart, Barcode, Settings } from "lucide-react";
 
 export const LINKS: Link[] = [
@@ -27,6 +27,12 @@ export const LINKS: Link[] = [
     showInSidebar: true,
   },
   {
+    name: "Classifications",
+    link: "/parameters/classification",
+    icon: Settings,
+    showInSidebar: false,
+  },
+  {
     name: "Liste des fournisseurs",
     link: "/suppliers/suppliers-list",
     icon: Truck,
@@ -38,6 +44,31 @@ export const LINKS: Link[] = [
     icon: ShoppingCart,
     showInSidebar: false,
   },
+];
+
+export const LINKS_Params: Params[] = [
+  {
+    name: "Classifications",
+    link: "/parameters/classification",
+  },
+  {
+    name: "Dimensions",
+    link: "/",
+  },
+  {
+    name: "Grilles de dimensions",
+    link: "/",
+  },
+  {
+    name: "Collections",
+    link: "/",
+  },
+  {
+    name: "Marques",
+    link: "/",
+  },
+ 
+ 
 ];
 
 export const SUPPLIERS: Suppliers[] = [

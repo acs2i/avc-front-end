@@ -11,7 +11,8 @@ import Header from "./components/Shared/Header";
 import { LINKS } from "./utils";
 import SuppliersListPage from "./pages/suppliers/SuppliersListPage";
 import CreateProductPage from "./pages/product/CreateProductPage";
-import CreateParams from "./pages/params/CreateParams";
+import ParamsMenuPage from "./pages/params/ParamsMenuPage";
+import ClassicationsPage from "./pages/params/ClassicationsPage";
 
 function App() {
   const location = useLocation();
@@ -56,7 +57,11 @@ function App() {
               />
                <Route
                 path="/parameters"
-                element={<CreateParams />}
+                element={<ParamsMenuPage />}
+              />
+                <Route
+                path="/parameters/classification"
+                element={<ClassicationsPage />}
               />
               <Route path="/product/:id" element={<SingleProductPage />} />
               <Route path="/suppliers/suppliers-list" element={<SuppliersListPage />} />
