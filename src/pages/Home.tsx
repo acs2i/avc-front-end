@@ -7,36 +7,27 @@ import truncateText from "../utils/func/Formattext";
 import Button from "../components/FormElements/Button";
 import { Tooltip } from "@mui/material";
 
-interface Product {
-  _id: string;
-  name: string;
-  family: any;
-  subFamily: any;
-  brand: string;
-  productCollection: string;
-}
+// interface Product {
+//   _id: string;
+//   GA_CODEARTICLE: number;
+//   GA_FERME: string;
+//   GA_FOURNPRINC: number;
+//   GA_LIBCOMPL: string;
+//   productCollection: string;
+// }
 
 export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [limit, setLimit] = useState(50);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModify, setIsModify] = useState(false);
   const navigate = useNavigate();
   const colors = ["text-gray-700", "text-gray-500", "text-gray-400"];
-  // const indexOfLastProduct = currentPage * limit;
-  // const indexOfFirstProduct = indexOfLastProduct - limit;
-  // const currentProducts = products.slice(
-  //   indexOfFirstProduct,
-  //   indexOfLastProduct
-  // );
-
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-  };
 
   useEffect(() => {
     fetchProducts();
+
   }, [currentPage]);
 
   const fetchProducts = async () => {
@@ -60,11 +51,10 @@ export default function Home() {
     }
   };
 
+
   if (isLoading) {
     return <div>Chargement en cours...</div>;
   }
-
-
 
   return (
     <div className="flex gap-7 mt-7">
@@ -200,7 +190,7 @@ export default function Home() {
 
         <div className="overflow-x-auto bg-white rounded-lg shadow-md">
           <table className="w-full text-left">
-            <thead className="bg-green-900 text-sm text-white text-center">
+            <thead className="bg-green-900 text-sm text-white">
               <tr>
                 {isModify && (
                   <th scope="col" className="px-6 py-4">
@@ -208,7 +198,7 @@ export default function Home() {
                   </th>
                 )}
                 <th scope="col" className="px-6 py-4">
-                  Référence
+                  Code Article
                 </th>
                 <th scope="col" className="px-6 py-4">
                   Libéllé
@@ -219,15 +209,9 @@ export default function Home() {
                 <th scope="col" className="px-6 py-4">
                   Sous-famille
                 </th>
-                <th scope="col" className="px-6 py-4">
-                  Marque
-                </th>
-                <th scope="col" className="px-6 py-4">
-                  Collection
-                </th>
               </tr>
             </thead>
-            <tbody className="text-center">
+            <tbody>
               {products && products.length > 0 ? (
                 products.map((product: any) => (
                   <tr
@@ -249,25 +233,10 @@ export default function Home() {
                         />
                       </td>
                     )}
-                    <td className="px-6 py-4 font-bold">{product.reference}</td>
-                    <Tooltip title={product.name} placement="top">
-                      <td className="px-6 py-4">
-                        {truncateText(product.name, 20)}
-                      </td>
-                    </Tooltip>
-                    <td className="px-6 py-4">{product.family}</td>
-                    <td className="px-6 py-4 flex items-center gap-2">
-                      {product.subFamily.map((subFamily: any, index: any) => (
-                        <span
-                          key={index}
-                          className={`${colors[index]} text-[12px] font-bold`}
-                        >
-                          {subFamily}
-                        </span>
-                      ))}
-                    </td>
-                    <td className="px-6 py-4">{product.brand}</td>
-                    <td className="px-6 py-4">{product.productCollection}</td>
+                    <td className="px-6 py-4 font-bold">{product.GA_CODEARTICLE}</td>
+                    <td className="px-6 py-4">{product.GA_LIBELLE}</td>
+                    <td className="px-6 py-4 flex items-center gap-2">{product.GA_LIBREART1}</td>
+                    <td className="px-6 py-4">{product.GA_LIBREART2}</td>
                   </tr>
                 ))
               ) : (

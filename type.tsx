@@ -5,6 +5,12 @@ export type Link = {
   showInSidebar: boolean;
 };
 
+export type Params = {
+  name: string;
+  link: string;
+};
+
+
 export type Suppliers = {
   code: string;
   name: string;
