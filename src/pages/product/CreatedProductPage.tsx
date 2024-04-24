@@ -21,7 +21,7 @@ export default function CreatedProductPage() {
   const [page, setPage] = useState("progress");
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const colors = ["bg-gray-700", "bg-gray-500", "bg-gray-400"];
+  const colors = ["text-gray-700", "text-gray-500", "text-gray-400"];
 
   useEffect(() => {
     fetchProducts();
@@ -131,12 +131,12 @@ export default function CreatedProductPage() {
                               {truncateText(product.name, 20)}
                             </td>
                             <td className="px-6 py-3 ">{product.family}</td>
-                            <td className="px-6 py-4 flex items-center justify-center gap-2">
+                            <td className="px-6 py-4 flex items-center gap-2">
                               {product.subFamily.map(
                                 (subFamily: any, index: any) => (
                                   <span
                                     key={index}
-                                    className={`${colors[index]} text-white px-2 py-1 rounded-md text-[12px]`}
+                                    className={`${colors[index]} text-[12px] font-bold`}
                                   >
                                     {subFamily}
                                   </span>
@@ -213,7 +213,7 @@ export default function CreatedProductPage() {
                                 (subFamily: any, index: any) => (
                                   <span
                                     key={index}
-                                    className={`${colors[index]} text-white px-2 py-1 rounded-md text-[12px]`}
+                                    className={`${colors[index]} text-[12px] font-bold`}
                                   >
                                     {subFamily}
                                   </span>
