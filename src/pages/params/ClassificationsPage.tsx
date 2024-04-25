@@ -5,8 +5,9 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ChevronUp } from "lucide-react";
+import { ArrowLeft, ChevronUp, SquarePen } from "lucide-react";
 import Spinner from "../../components/Shared/Spinner";
+import { Tooltip } from "@mui/material";
 
 type DataType = "LA1" | "LA2" | "LA3";
 
@@ -147,13 +148,6 @@ function ClassificationsPage() {
             )}
           </div>
           <div className="flex items-center gap-3">
-            <Button
-              size="small"
-              blue
-              onClick={() => setIsModify((prev) => !prev)}
-            >
-              {isModify ? "Arréter de modifier" : "Modifier"}
-            </Button>
             <Button size="small" blue>
               Créer une classification
             </Button>
@@ -188,7 +182,7 @@ function ClassificationsPage() {
                     #
                   </th>
                 )}
-                 <th scope="col" className="px-6 py-4 w-[350px]">
+                <th scope="col" className="px-6 py-4 w-[350px]">
                   Niveau
                 </th>
                 <th scope="col" className="px-6 py-4 w-[270px]">
@@ -196,6 +190,9 @@ function ClassificationsPage() {
                 </th>
                 <th scope="col" className="px-6 py-4">
                   Libéllé
+                </th>
+                <th scope="col" className="px-6 py-4 text-center">
+                  Modifier
                 </th>
               </tr>
             </thead>
@@ -221,6 +218,13 @@ function ClassificationsPage() {
                     </td>
                     <td className="px-6 py-4">{family.YX_CODE}</td>
                     <td className="px-6 py-4">{family.YX_LIBELLE}</td>
+                    <td className="px-6 py-4">
+                      <Tooltip title="Modifier">
+                        <div className="flex justify-center text-red-400">
+                          <SquarePen />
+                        </div>
+                      </Tooltip>
+                    </td>
                   </tr>
                 ))
               ) : (

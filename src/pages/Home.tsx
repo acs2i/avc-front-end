@@ -1,33 +1,50 @@
 import React, { useState, useEffect } from "react";
 import Card from "../components/Shared/Card";
-import { Link, useNavigate } from "react-router-dom";
-import { Pen } from "lucide-react";
-import { FILTERS_1 } from "../utils";
-import truncateText from "../utils/func/Formattext";
 import Button from "../components/FormElements/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import Pagination from "@mui/material/Pagination";
+import Stack from "@mui/material/Stack";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft, ChevronUp, SquarePen } from "lucide-react";
+import Spinner from "../components/Shared/Spinner";
 import { Tooltip } from "@mui/material";
+import truncateText from "../utils/func/Formattext";
 
-// interface Product {
-//   _id: string;
-//   GA_CODEARTICLE: number;
-//   GA_FERME: string;
-//   GA_FOURNPRINC: number;
-//   GA_LIBCOMPL: string;
-//   productCollection: string;
-// }
+interface Product {
+  _id: string;
+  GA_CODEARTICLE: number;
+  GA_FERME: string;
+  GA_FOURNPRINC: number;
+  GA_LIBCOMPL: string;
+  GA_LIBELLE: string;
+  GA_LIBREART1: any;
+  GA_LIBREART2: any;
+  GA_LIBREART4: any;
+  productCollection: string;
+}
 
 export default function Home() {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [limit, setLimit] = useState(50);
-  const [products, setProducts] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isModify, setIsModify] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const [prevSearchValue, setPrevSearchValue] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItem, setTotalItem] = useState(null);
+  const limit = 20;
+  const totalPages = Math.ceil((totalItem ?? 0) / limit);
+  const [products, setProducts] = useState<Product[]>([]);
   const navigate = useNavigate();
   const colors = ["text-gray-700", "text-gray-500", "text-gray-400"];
 
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
+    setCurrentPage(value);
+  };
+
   useEffect(() => {
     fetchProducts();
-
   }, [currentPage]);
 
   const fetchProducts = async () => {
@@ -44,6 +61,8 @@ export default function Home() {
 
       const data = await response.json();
       setProducts(data.data);
+      console.log(data);
+      setTotalItem(data.total);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     } finally {
@@ -51,214 +70,180 @@ export default function Home() {
     }
   };
 
+  const handleSearch = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/product/search?value=${searchValue}&page=${currentPage}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-  if (isLoading) {
-    return <div>Chargement en cours...</div>;
-  }
+      const data = await response.json();
+      setProducts(data);
+      setTotalItem(data.length);
+      setPrevSearchValue(searchValue);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
+  const handleKeyDown = (event: any) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
+  };
 
   return (
-    <div className="flex gap-7 mt-7">
-      {/* <div className="w-[300px] min-w-[300px] bg-white rounded-lg shadow-md">
-        <div className="w-full bg-green-900 text-white p-4 rounded-t-md text-center">
-          <span className="text-xl">Filtres</span>
-        </div>
-
-        <div className="flex flex-col justify-between mt-6 p-4 ">
-          <div className="flex flex-col gap-5">
-            <div>
-              <p className="mb-4 font-bold">Marques</p>
-              <div className="flex flex-col gap-1">
-                {FILTERS_1.map((filtre, i) => (
-                  <div className="flex items-center" key={i}>
-                    <input
-                      id="default-checkbox"
-                      type="checkbox"
-                      value=""
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <label className="ms-2 text-md text-gray-900 dark:text-gray-300">
-                      {filtre.title}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="mb-4 font-bold">Couleurs</p>
-              <div className="flex flex-col gap-1">
-                {FILTERS_1.map((filtre, i) => (
-                  <div className="flex items-center" key={i}>
-                    <input
-                      id="default-checkbox"
-                      type="checkbox"
-                      value=""
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <label className="ms-2 text-md text-gray-900 dark:text-gray-300">
-                      {filtre.title}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="mb-4 font-bold">Collections</p>
-              <div className="flex flex-col gap-1">
-                {FILTERS_1.map((filtre, i) => (
-                  <div className="flex items-center" key={i}>
-                    <input
-                      id="default-checkbox"
-                      type="checkbox"
-                      value=""
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <label className="ms-2 text-md text-gray-900 dark:text-gray-300">
-                      {filtre.title}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="mb-4 font-bold">Familles</p>
-              <div className="flex flex-col gap-1">
-                {FILTERS_1.map((filtre, i) => (
-                  <div className="flex items-center" key={i}>
-                    <input
-                      id="default-checkbox"
-                      type="checkbox"
-                      value=""
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <label className="ms-2 text-md text-gray-900 dark:text-gray-300">
-                      {filtre.title}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="flex items-center justify-center gap-3 w-full mt-5">
-              <button className="bg-slate-200 w-full py-2 rounded-md font-bold text-gray-600 hover:brightness-105">
-                Réinitialiser les filtres
+    <div className="relative">
+      <div
+        className="flex items-center gap-2 mb-3 cursor-pointer"
+        onClick={() => navigate("/parameters")}
+      >
+        <ArrowLeft />
+        <span>retour</span>
+      </div>
+      <Card title="Tous les produits">
+        <div className="flex items-center gap-4 p-7">
+          <div className="relative shadow-md flex-1">
+            <input
+              type="text"
+              id="search"
+              className="block p-2.5 w-full text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Rechercher une classification"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+            {!isLoading ? (
+              <button
+                type="submit"
+                className="absolute top-0 end-0 p-2.5 text-sm font-medium h-full text-white bg-green-800 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
+                onClick={handleSearch}
+              >
+                <svg
+                  className="w-4 h-4"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                  />
+                </svg>
               </button>
-            </div>
+            ) : (
+              <div className="absolute top-0 end-0 h-full rounded-e-lg">
+                <CircularProgress />
+              </div>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            <Button to="/edit" size="small" blue>
+              Créer un produit
+            </Button>
           </div>
         </div>
-      </div> */}
-
-      <div className="flex flex-col gap-3 w-full">
-        <div className="relative w-full shadow-2xl">
-          <input
-            type="search"
-            id="search-dropdown"
-            className="block p-2.5 w-full text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Rechercher..."
-          />
-          <button
-            type="submit"
-            className="absolute top-0 end-0 p-2.5 text-sm font-medium h-full text-white bg-green-800 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
-          >
-            <svg
-              className="w-4 h-4"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 20 20"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+        {products && products.length > 0 && (
+          <div className="flex justify-center p-7">
+            <Stack spacing={2}>
+              <Pagination
+                count={totalPages}
+                page={currentPage}
+                onChange={handlePageChange}
               />
-            </svg>
-          </button>
-        </div>
-
-        <div className="flex justify-end w-full">
-          <button
-            className="text-[14px] text-sky-700 hover:text-sky-400 flex items-center gap-2"
-            onClick={() => setIsModify((prev) => !prev)}
-          >
-            {!isModify ? "Modifier" : "Arrêter de modifier"}
-          </button>
-        </div>
-
-        <div className="overflow-x-auto bg-white rounded-lg shadow-md">
+            </Stack>
+          </div>
+        )}
+        <div className="overflow-x-auto bg-white shadow-md">
+          <div className="px-3 mb-2 flex items-center gap-2">
+            <h4 className="text-xl">
+              <span className="font-bold">{totalItem}</span> Collections pour
+            </h4>
+            {prevSearchValue && (
+              <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
+            )}
+          </div>
           <table className="w-full text-left">
-            <thead className="bg-green-900 text-sm text-white">
+            <thead className="bg-blue-50 text-xl text-gray-500 border">
               <tr>
-                {isModify && (
-                  <th scope="col" className="px-6 py-4">
-                    #
-                  </th>
-                )}
-                <th scope="col" className="px-6 py-4">
-                  Code Article
+                <th scope="col" className="px-6 py-4 w-[270px]">
+                  Code
                 </th>
-                <th scope="col" className="px-6 py-4">
-                  Libéllé
+                <th scope="col" className="px-6 py-4 w-[350px]">
+                  Libellé
                 </th>
-                <th scope="col" className="px-6 py-4">
+                <th scope="col" className="px-6 py-4 w-[350px]">
                   Famille
                 </th>
-                <th scope="col" className="px-6 py-4">
+                <th scope="col" className="px-6 py-4 w-[350px]">
                   Sous-famille
+                </th>
+                <th scope="col" className="px-6 py-4 w-[250px]">
+                  Marque
+                </th>
+                <th scope="col" className="px-6 py-4 text-center">
+                  Modifier
                 </th>
               </tr>
             </thead>
             <tbody>
               {products && products.length > 0 ? (
-                products.map((product: any) => (
+                products.map((product) => (
                   <tr
                     key={product._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-500 even:bg-slate-50 whitespace-nowrap"
-                    onClick={
-                      isModify
-                        ? () => {}
-                        : () => navigate(`product/${product._id}`)
-                    }
+                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-md text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
+                    onClick={() => navigate(`/product/${product._id}`)}
                   >
-                    {isModify && (
-                      <td className="px-6 py-4 font-bold">
-                        <input
-                          id="default-checkbox"
-                          type="checkbox"
-                          value=""
-                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                      </td>
-                    )}
-                    <td className="px-6 py-4 font-bold">{product.GA_CODEARTICLE}</td>
-                    <td className="px-6 py-4">{product.GA_LIBELLE}</td>
-                    <td className="px-6 py-4 flex items-center gap-2">{product.GA_LIBREART1}</td>
+                    <td className="px-6 py-4">{product.GA_CODEARTICLE}</td>
+                    <td className="px-6 py-4">{truncateText(product.GA_LIBELLE, 20)}</td>
+                    <td className="px-6 py-4">{product.GA_LIBREART1}</td>
                     <td className="px-6 py-4">{product.GA_LIBREART2}</td>
+                    <td className="px-6 py-4">{product.GA_LIBREART4}</td>
+                    <td className="px-6 py-4">
+                      <Tooltip title="Modifier">
+                        <div className="flex justify-center text-red-400">
+                          <SquarePen />
+                        </div>
+                      </Tooltip>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center">
-                    Aucun produit à afficher
+                  <td colSpan={6} className="px-6 py-7 text-center">
+                    {totalItem === null ? (
+                      <div className="flex justify-center overflow-hidden p-[30px]">
+                        <Spinner />
+                      </div>
+                    ) : (
+                      "Aucun Résultat"
+                    )}
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-        {/* <div className="flex justify-center mt-5">
-            <Link
-              to="/edit/edit-product"
-              className="w-[200px] bg-gradient-to-r from-orange-600 to-orange-400 text-white font-bold py-2 rounded-3xl hover:brightness-125 flex items-center justify-center gap-1"
-            >
-              Créer un produit
-              <Pen size={20} />
-            </Link>
-          </div> */}
-      </div>
+      </Card>
+      {totalItem !== null && totalItem > 10 && (
+        <a
+          href="#top"
+          className="absolute bottom-0 right-[-60px] bg-orange-500 p-3 rounded-full text-white hover:bg-orange-400"
+        >
+          <ChevronUp />
+        </a>
+      )}
     </div>
   );
 }
