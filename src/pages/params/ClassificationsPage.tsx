@@ -1,29 +1,24 @@
 import React, { useState, useEffect } from "react";
-import Card from "../components/Shared/Card";
-import Button from "../components/FormElements/Button";
+import Card from "../../components/Shared/Card";
+import Button from "../../components/FormElements/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronUp, SquarePen } from "lucide-react";
-import Spinner from "../components/Shared/Spinner";
+import Spinner from "../../components/Shared/Spinner";
 import { Tooltip } from "@mui/material";
-import truncateText from "../utils/func/Formattext";
 
-interface Product {
+type DataType = "LA1" | "LA2" | "LA3";
+
+interface Family {
   _id: string;
-  GA_CODEARTICLE: number;
-  GA_FERME: string;
-  GA_FOURNPRINC: number;
-  GA_LIBCOMPL: string;
-  GA_LIBELLE: string;
-  GA_LIBREART1: any;
-  GA_LIBREART2: any;
-  GA_LIBREART4: any;
-  productCollection: string;
+  YX_CODE: string;
+  YX_TYPE: DataType;
+  YX_LIBELLE: string;
 }
 
-export default function Home() {
+function ClassificationsPage() {
   const [isModify, setIsModify] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [prevSearchValue, setPrevSearchValue] = useState("");
@@ -32,9 +27,14 @@ export default function Home() {
   const [totalItem, setTotalItem] = useState(null);
   const limit = 20;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [families, setFamilies] = useState<Family[]>([]);
   const navigate = useNavigate();
-  const colors = ["text-gray-700", "text-gray-500", "text-gray-400"];
+
+  const typeLabels: { [key in DataType]: string } = {
+    LA1: "Famille",
+    LA2: "Sous-famille",
+    LA3: "Sous-sous-famille",
+  };
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -44,13 +44,13 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetchProducts();
+    fetchFamily();
   }, [currentPage]);
 
-  const fetchProducts = async () => {
+  const fetchFamily = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/product?page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/family?page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -60,8 +60,7 @@ export default function Home() {
       );
 
       const data = await response.json();
-      setProducts(data.data);
-      console.log(data);
+      setFamilies(data.data);
       setTotalItem(data.total);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
@@ -74,7 +73,7 @@ export default function Home() {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/product/search?value=${searchValue}&page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/family/search?value=${searchValue}&page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -84,7 +83,7 @@ export default function Home() {
       );
 
       const data = await response.json();
-      setProducts(data);
+      setFamilies(data);
       setTotalItem(data.length);
       setPrevSearchValue(searchValue);
       setIsLoading(false);
@@ -108,12 +107,12 @@ export default function Home() {
         <ArrowLeft />
         <span>retour</span>
       </div>
-      <Card title="Tous les produits">
+      <Card title="Paramétrer les classifications">
         <div className="flex items-center gap-4 p-7">
           <div className="relative shadow-md flex-1">
             <input
-              type="text"
-              id="search"
+              type="search"
+              id="search-dropdown"
               className="block p-2.5 w-full text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-lg focus:ring-blue-500 focus:border-blue-500"
               placeholder="Rechercher une classification"
               value={searchValue}
@@ -149,12 +148,13 @@ export default function Home() {
             )}
           </div>
           <div className="flex items-center gap-3">
-            <Button to="/edit" size="small" blue>
-              Créer un produit
+            <Button size="small" blue>
+              Créer une classification
             </Button>
           </div>
         </div>
-        {products && products.length > 0 && (
+
+        {families && families.length > 0 && (
           <div className="flex justify-center p-7">
             <Stack spacing={2}>
               <Pagination
@@ -168,7 +168,7 @@ export default function Home() {
         <div className="overflow-x-auto bg-white shadow-md">
           <div className="px-3 mb-2 flex items-center gap-2">
             <h4 className="text-xl">
-              <span className="font-bold">{totalItem}</span> Collections pour
+              <span className="font-bold">{totalItem}</span> Classifications
             </h4>
             {prevSearchValue && (
               <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
@@ -177,20 +177,19 @@ export default function Home() {
           <table className="w-full text-left">
             <thead className="bg-blue-50 text-xl text-gray-500 border">
               <tr>
+                {isModify && (
+                  <th scope="col" className="px-6 py-4">
+                    #
+                  </th>
+                )}
+                <th scope="col" className="px-6 py-4 w-[350px]">
+                  Niveau
+                </th>
                 <th scope="col" className="px-6 py-4 w-[270px]">
                   Code
                 </th>
-                <th scope="col" className="px-6 py-4 w-[350px]">
-                  Libellé
-                </th>
-                <th scope="col" className="px-6 py-4 w-[350px]">
-                  Famille
-                </th>
-                <th scope="col" className="px-6 py-4 w-[350px]">
-                  Sous-famille
-                </th>
-                <th scope="col" className="px-6 py-4 w-[250px]">
-                  Marque
+                <th scope="col" className="px-6 py-4">
+                  Libéllé
                 </th>
                 <th scope="col" className="px-6 py-4 text-center">
                   Modifier
@@ -198,18 +197,27 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {products && products.length > 0 ? (
-                products.map((product) => (
+              {families && families.length > 0 ? (
+                families.map((family) => (
                   <tr
-                    key={product._id}
+                    key={family._id}
                     className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-md text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
-                    onClick={() => navigate(`/product/${product._id}`)}
                   >
-                    <td className="px-6 py-4">{product.GA_CODEARTICLE}</td>
-                    <td className="px-6 py-4">{truncateText(product.GA_LIBELLE, 20)}</td>
-                    <td className="px-6 py-4">{product.GA_LIBREART1}</td>
-                    <td className="px-6 py-4">{product.GA_LIBREART2}</td>
-                    <td className="px-6 py-4">{product.GA_LIBREART4}</td>
+                    {isModify && (
+                      <td className="px-6 py-4">
+                        <input
+                          id="default-checkbox"
+                          type="checkbox"
+                          value=""
+                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                        />
+                      </td>
+                    )}
+                    <td className="px-6 py-4 flex items-center gap-2">
+                      {typeLabels[family.YX_TYPE]}
+                    </td>
+                    <td className="px-6 py-4">{family.YX_CODE}</td>
+                    <td className="px-6 py-4">{family.YX_LIBELLE}</td>
                     <td className="px-6 py-4">
                       <Tooltip title="Modifier">
                         <div className="flex justify-center text-red-400">
@@ -236,7 +244,7 @@ export default function Home() {
           </table>
         </div>
       </Card>
-      {totalItem !== null && totalItem > 10 && (
+      {totalItem !== null && totalItem > 15 && (
         <a
           href="#top"
           className="absolute bottom-0 right-[-60px] bg-orange-500 p-3 rounded-full text-white hover:bg-orange-400"
@@ -247,3 +255,5 @@ export default function Home() {
     </div>
   );
 }
+
+export default ClassificationsPage;

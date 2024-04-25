@@ -49,11 +49,11 @@ export default function SingleProductPage() {
           <div className="flex grid-rows-3 grid-flow-col gap-4 mt-5 px-4">
             <div className="flex-col row-span-3 justify-center">
               <div className="border border-gray-300 rounded-lg overflow-hidden">
-                <img
+                {/* <img
                   src={product?.imgPath}
                   alt=""
                   className="w-full h-auto rounded-lg transition-all duration-[20s] transform scale-100 hover:scale-150 shadow-none hover:shadow-lg"
-                />
+                /> */}
               </div>
             </div>
             <div className="flex-col col-span-2 justify-center">
