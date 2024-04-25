@@ -15,6 +15,8 @@ import ParamsMenuPage from "./pages/params/ParamsMenuPage";
 import ClassicationsPage from "./pages/params/ClassificationsPage";
 import CollectionPage from "./pages/params/CollectionPage";
 import ClassificationsPage from "./pages/params/ClassificationsPage";
+import DimensionPage from "./pages/params/DimensionPage";
+import BrandPage from "./pages/params/BrandPage";
 
 function App() {
   const location = useLocation();
@@ -68,6 +70,14 @@ function App() {
                  <Route
                 path="/parameters/collection"
                 element={<CollectionPage />}
+              />
+                  <Route
+                path="/parameters/dimension"
+                element={<DimensionPage />}
+              />
+                  <Route
+                path="/parameters/brand"
+                element={<BrandPage />}
               />
               <Route path="/product/:id" element={<SingleProductPage />} />
               <Route path="/suppliers/suppliers-list" element={<SuppliersListPage />} />

@@ -6,6 +6,7 @@ import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronUp } from "lucide-react";
+import Spinner from "../../components/Shared/Spinner";
 
 type DataType = "LA1" | "LA2" | "LA3";
 
@@ -42,10 +43,10 @@ function ClassificationsPage() {
   };
 
   useEffect(() => {
-    fetchProducts();
+    fetchFamily();
   }, [currentPage]);
 
-  const fetchProducts = async () => {
+  const fetchFamily = async () => {
     try {
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/family?page=${currentPage}&limit=${limit}`,
@@ -68,7 +69,7 @@ function ClassificationsPage() {
   };
 
   const handleSearch = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/family/search?value=${searchValue}&page=${currentPage}&limit=${limit}`,
@@ -84,14 +85,13 @@ function ClassificationsPage() {
       setFamilies(data);
       setTotalItem(data.length);
       setPrevSearchValue(searchValue);
-      setIsLoading(false)
+      setIsLoading(false);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     }
   };
 
-
-  const handleKeyDown = (event : any) => {
+  const handleKeyDown = (event: any) => {
     if (event.key === "Enter") {
       handleSearch();
     }
@@ -159,33 +159,40 @@ function ClassificationsPage() {
             </Button>
           </div>
         </div>
-        <div className="flex justify-center p-7">
-          <Stack spacing={2}>
-            <Pagination
-              count={totalPages}
-              page={currentPage}
-              onChange={handlePageChange}
-            />
-          </Stack>
-        </div>
+
+        {families && families.length > 0 && (
+          <div className="flex justify-center p-7">
+            <Stack spacing={2}>
+              <Pagination
+                count={totalPages}
+                page={currentPage}
+                onChange={handlePageChange}
+              />
+            </Stack>
+          </div>
+        )}
         <div className="overflow-x-auto bg-white shadow-md">
           <div className="px-3 mb-2 flex items-center gap-2">
-            <h4 className="text-xl"><span className="font-bold">{totalItem}</span> Classifications</h4>
-            {prevSearchValue && <span className="text-xl italic">{`"${prevSearchValue}"`}</span>}
+            <h4 className="text-xl">
+              <span className="font-bold">{totalItem}</span> Classifications
+            </h4>
+            {prevSearchValue && (
+              <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
+            )}
           </div>
           <table className="w-full text-left">
-            <thead className="bg-blue-50 text-md text-gray-500">
+            <thead className="bg-blue-50 text-xl text-gray-500 border">
               <tr>
                 {isModify && (
                   <th scope="col" className="px-6 py-4">
                     #
                   </th>
                 )}
-                <th scope="col" className="px-6 py-4">
-                  Code classification
-                </th>
-                <th scope="col" className="px-6 py-4">
+                 <th scope="col" className="px-6 py-4 w-[350px]">
                   Niveau
+                </th>
+                <th scope="col" className="px-6 py-4 w-[270px]">
+                  Code
                 </th>
                 <th scope="col" className="px-6 py-4">
                   Libéllé
@@ -197,7 +204,7 @@ function ClassificationsPage() {
                 families.map((family) => (
                   <tr
                     key={family._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
+                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-md text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
                   >
                     {isModify && (
                       <td className="px-6 py-4">
@@ -209,17 +216,23 @@ function ClassificationsPage() {
                         />
                       </td>
                     )}
-                    <td className="px-6 py-4">{family.YX_CODE}</td>
                     <td className="px-6 py-4 flex items-center gap-2">
                       {typeLabels[family.YX_TYPE]}
                     </td>
+                    <td className="px-6 py-4">{family.YX_CODE}</td>
                     <td className="px-6 py-4">{family.YX_LIBELLE}</td>
                   </tr>
                 ))
               ) : (
                 <tr>
                   <td colSpan={6} className="px-6 py-7 text-center">
-                    {totalItem === null ? <CircularProgress size={80} /> : "Aucun Résultat"}
+                    {totalItem === null ? (
+                      <div className="flex justify-center overflow-hidden p-[30px]">
+                        <Spinner />
+                      </div>
+                    ) : (
+                      "Aucun Résultat"
+                    )}
                   </td>
                 </tr>
               )}
@@ -227,12 +240,14 @@ function ClassificationsPage() {
           </table>
         </div>
       </Card>
-      <a
-        href="#top"
-        className="absolute bottom-0 right-[-60px] bg-orange-500 p-3 rounded-full text-white hover:bg-orange-400"
-      >
-        <ChevronUp />
-      </a>
+      {totalItem !== null && totalItem > 15 && (
+        <a
+          href="#top"
+          className="absolute bottom-0 right-[-60px] bg-orange-500 p-3 rounded-full text-white hover:bg-orange-400"
+        >
+          <ChevronUp />
+        </a>
+      )}
     </div>
   );
 }

@@ -8,6 +8,7 @@ export type Link = {
 export type Params = {
   name: string;
   link: string;
+  icon: any;
 };
 
 

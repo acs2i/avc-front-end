@@ -43,7 +43,7 @@ export default function Home() {
       );
 
       const data = await response.json();
-      setProducts(data);
+      setProducts(data.data);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     } finally {

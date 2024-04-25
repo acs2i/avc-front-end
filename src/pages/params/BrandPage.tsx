@@ -10,11 +10,11 @@ import Spinner from "../../components/Shared/Spinner";
 
 interface Collection {
   _id: string;
-  CODE: string;
-  LIBELLE: string;
+  YX_CODE: string;
+  YX_LIBELLE: string;
 }
 
-export default function CollectionPage() {
+export default function BrandPage() {
   const [isModify, setIsModify] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [prevSearchValue, setPrevSearchValue] = useState("");
@@ -23,7 +23,7 @@ export default function CollectionPage() {
   const [totalItem, setTotalItem] = useState(null);
   const limit = 20;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
-  const [collections, setCollections] = useState<Collection[]>([]);
+  const [brands, setBrands] = useState<Collection[]>([]);
   const navigate = useNavigate();
 
   const handlePageChange = (
@@ -34,13 +34,13 @@ export default function CollectionPage() {
   };
 
   useEffect(() => {
-    fetchCollections();
+    fetchBrands();
   }, [currentPage]);
 
-  const fetchCollections = async () => {
+  const fetchBrands = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/collection?page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/brand?page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -50,7 +50,8 @@ export default function CollectionPage() {
       );
 
       const data = await response.json();
-      setCollections(data.data);
+      setBrands(data.data);
+      console.log(data)
       setTotalItem(data.total);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
@@ -63,7 +64,7 @@ export default function CollectionPage() {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/collection/search?value=${searchValue}&page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/brand/search?value=${searchValue}&page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -73,7 +74,7 @@ export default function CollectionPage() {
       );
 
       const data = await response.json();
-      setCollections(data);
+      setBrands(data);
       setTotalItem(data.length);
       setPrevSearchValue(searchValue);
       setIsLoading(false);
@@ -97,7 +98,7 @@ export default function CollectionPage() {
         <ArrowLeft />
         <span>retour</span>
       </div>
-      <Card title="Paramétrer les collections">
+      <Card title="Paramétrer les marques">
         <div className="flex items-center gap-4 p-7">
           <div className="relative shadow-md flex-1">
             <input
@@ -150,7 +151,7 @@ export default function CollectionPage() {
             </Button>
           </div>
         </div>
-        {collections && collections.length > 0 && (
+        {brands && brands.length > 0 && (
           <div className="flex justify-center p-7">
             <Stack spacing={2}>
               <Pagination
@@ -187,10 +188,10 @@ export default function CollectionPage() {
               </tr>
             </thead>
             <tbody>
-              {collections && collections.length > 0 ? (
-                collections.map((collection) => (
+              {brands && brands.length > 0 ? (
+                brands.map((brand) => (
                   <tr
-                    key={collection._id}
+                    key={brand._id}
                     className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-md text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
                   >
                     {isModify && (
@@ -203,8 +204,8 @@ export default function CollectionPage() {
                         />
                       </td>
                     )}
-                    <td className="px-6 py-4">{collection.CODE}</td>
-                    <td className="px-6 py-4">{collection.LIBELLE}</td>
+                    <td className="px-6 py-4">{brand.YX_CODE}</td>
+                    <td className="px-6 py-4">{brand.YX_LIBELLE}</td>
                   </tr>
                 ))
               ) : (
