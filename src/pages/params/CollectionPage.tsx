@@ -4,7 +4,7 @@ import Button from "../../components/FormElements/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronUp, SquarePen } from "lucide-react";
 import Spinner from "../../components/Shared/Spinner";
 import { Tooltip } from "@mui/material";
@@ -158,14 +158,14 @@ export default function CollectionPage() {
         <div className="overflow-x-auto bg-white shadow-md">
           <div className="px-3 mb-2 flex items-center gap-2">
             <h4 className="text-xl">
-              <span className="font-bold">{totalItem}</span> Collections pour
+              <span className="font-bold">{totalItem}</span> Collections
             </h4>
             {prevSearchValue && (
               <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
             )}
           </div>
           <table className="w-full text-left">
-            <thead className="bg-blue-50 text-xl text-gray-500 border">
+            <thead className="bg-blue-50 text-md text-gray-500 border">
               <tr>
                 {isModify && (
                   <th scope="col" className="px-6 py-4">
@@ -188,7 +188,7 @@ export default function CollectionPage() {
                 collections.map((collection) => (
                   <tr
                     key={collection._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-md text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
+                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
                   >
                     {isModify && (
                       <td className="px-6 py-4">
@@ -203,10 +203,12 @@ export default function CollectionPage() {
                     <td className="px-6 py-4">{collection.CODE}</td>
                     <td className="px-6 py-4">{collection.LIBELLE}</td>
                     <td className="px-6 py-4">
-                      <Tooltip title="Modifier">
-                        <div className="flex justify-center text-red-400">
-                          <SquarePen />
-                        </div>
+                    <Tooltip title="Modifier">
+                        <Link to={`/parameters/collection/${collection._id}`}>
+                          <div className="flex justify-center text-red-400">
+                            <SquarePen />
+                          </div>
+                        </Link>
                       </Tooltip>
                     </td>
                   </tr>

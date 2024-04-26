@@ -17,6 +17,8 @@ import CollectionPage from "./pages/params/CollectionPage";
 import ClassificationsPage from "./pages/params/ClassificationsPage";
 import DimensionPage from "./pages/params/DimensionPage";
 import BrandPage from "./pages/params/BrandPage";
+import ClassificationUpdatePage from "./pages/params/ClassificationUpdatePage";
+import CollectionUpdatePage from "./pages/params/CollectionUpdatePage";
 
 function App() {
   const location = useLocation();
@@ -51,36 +53,35 @@ function App() {
             {shouldShowNavbar && <Header titlePage={getPageTitle()} />}
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/edit" element={<CreatedProductPage />} />
               <Route
-                path="/edit"
-                element={<CreatedProductPage />}
-              />
-               <Route
                 path="/edit/edit-product"
                 element={<CreateProductPage />}
               />
-               <Route
-                path="/parameters"
-                element={<ParamsMenuPage />}
-              />
-                <Route
+              <Route path="/parameters" element={<ParamsMenuPage />} />
+              <Route
                 path="/parameters/classification"
                 element={<ClassificationsPage />}
               />
-                 <Route
+              <Route
+                path="/parameters/classification/:id"
+                element={<ClassificationUpdatePage />}
+              />
+              <Route
                 path="/parameters/collection"
                 element={<CollectionPage />}
               />
-                  <Route
-                path="/parameters/dimension"
-                element={<DimensionPage />}
+              <Route
+                path="/parameters/collection/:id"
+                element={<CollectionUpdatePage />}
               />
-                  <Route
-                path="/parameters/brand"
-                element={<BrandPage />}
-              />
+              <Route path="/parameters/dimension" element={<DimensionPage />} />
+              <Route path="/parameters/brand" element={<BrandPage />} />
               <Route path="/product/:id" element={<SingleProductPage />} />
-              <Route path="/suppliers/suppliers-list" element={<SuppliersListPage />} />
+              <Route
+                path="/suppliers/suppliers-list"
+                element={<SuppliersListPage />}
+              />
               <Route path="/login" element={<LoginPage />} />
             </Routes>
           </PageContainer>

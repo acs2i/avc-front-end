@@ -2,7 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
-import authReducer from "./store/store";
+import authReducer from "./store/authSlice";
+import familyReducer from "./store/familySlice";
+import { combineReducers } from "redux";
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import {
@@ -27,18 +29,20 @@ const persistConfig = {
   version: 1,
 };
 
-const persistedReducer = persistReducer(persistConfig, authReducer);
-
 interface RootState {
   auth: any & PersistPartial;
+  family: any & PersistPartial;
 }
 
-const rootReducer = {
-  auth: persistedReducer,
-};
+const rootReducer = combineReducers({
+  auth: authReducer,
+  family: familyReducer,
+});
 
-export const store = configureStore<RootState>({
-  reducer: rootReducer,
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+export const store = configureStore({
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,

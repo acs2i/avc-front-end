@@ -4,7 +4,7 @@ import Input from "../../components/FormElements/Input";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
-import { setLogin } from "../../store/store";
+import { setLogin } from "../../store/authSlice";
 import { VALIDATOR_REQUIRE } from "../../utils/validator";
 
 interface FormData {

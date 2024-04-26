@@ -9,6 +9,7 @@ import { ArrowLeft, ChevronUp, SquarePen } from "lucide-react";
 import Spinner from "../components/Shared/Spinner";
 import { Tooltip } from "@mui/material";
 import truncateText from "../utils/func/Formattext";
+import { spawn } from "child_process";
 
 interface Product {
   _id: string;
@@ -20,6 +21,9 @@ interface Product {
   GA_LIBREART1: any;
   GA_LIBREART2: any;
   GA_LIBREART4: any;
+  family: any;
+  subFamily: any;
+  brand: any;
   productCollection: string;
 }
 
@@ -168,14 +172,14 @@ export default function Home() {
         <div className="overflow-x-auto bg-white shadow-md">
           <div className="px-3 mb-2 flex items-center gap-2">
             <h4 className="text-xl">
-              <span className="font-bold">{totalItem}</span> Collections pour
+              <span className="font-bold">{totalItem}</span> Produits
             </h4>
             {prevSearchValue && (
               <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
             )}
           </div>
           <table className="w-full text-left">
-            <thead className="bg-blue-50 text-xl text-gray-500 border">
+            <thead className="bg-blue-50 text-md text-gray-500 border">
               <tr>
                 <th scope="col" className="px-6 py-4 w-[270px]">
                   Code
@@ -192,9 +196,6 @@ export default function Home() {
                 <th scope="col" className="px-6 py-4 w-[250px]">
                   Marque
                 </th>
-                <th scope="col" className="px-6 py-4 text-center">
-                  Modifier
-                </th>
               </tr>
             </thead>
             <tbody>
@@ -202,20 +203,45 @@ export default function Home() {
                 products.map((product) => (
                   <tr
                     key={product._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-md text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
+                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
                     onClick={() => navigate(`/product/${product._id}`)}
                   >
                     <td className="px-6 py-4">{product.GA_CODEARTICLE}</td>
-                    <td className="px-6 py-4">{truncateText(product.GA_LIBELLE, 20)}</td>
-                    <td className="px-6 py-4">{product.GA_LIBREART1}</td>
-                    <td className="px-6 py-4">{product.GA_LIBREART2}</td>
-                    <td className="px-6 py-4">{product.GA_LIBREART4}</td>
                     <td className="px-6 py-4">
-                      <Tooltip title="Modifier">
-                        <div className="flex justify-center text-red-400">
-                          <SquarePen />
+                      {truncateText(product.GA_LIBELLE, 20)}
+                    </td>
+                    <td className="px-6 py-4">
+                      {product.family ? (
+                        <div>
+                          <span>{product.family?.YX_CODE}</span>
+                          <span className="mx-1">-</span>
+                          <span>{product.family?.YX_LIBELLE}</span>
                         </div>
-                      </Tooltip>
+                      ) : (
+                        <span>-</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      {product.subFamily ? (
+                        <div>
+                          <span>{product?.subFamily?.YX_CODE}</span>
+                          <span className="mx-1">-</span>
+                          <span>{product?.subFamily?.YX_LIBELLE}</span>
+                        </div>
+                      ) : (
+                        <span>-</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      {product.brand ? (
+                        <div>
+                          <span>{product?.brand?.YX_CODE}</span>
+                          <span className="mx-1">-</span>
+                          <span>{product?.brand?.YX_LIBELLE}</span>
+                        </div>
+                      ) : (
+                        <span>-</span>
+                      )}
                     </td>
                   </tr>
                 ))
