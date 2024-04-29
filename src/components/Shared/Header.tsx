@@ -6,7 +6,7 @@ import MenuItem from "@mui/material/MenuItem";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { setLogout } from "../../store/store";
+import { setLogout } from "../../store/authSlice";
 import { LogOut } from "lucide-react";
 import Divider from "@mui/material/Divider";
 
@@ -74,8 +74,8 @@ export default function Header({ titlePage }: { titlePage: string }) {
         </Menu>
 
         <div className="flex flex-col">
-          <span className="text-[17px] font-bold text-gray-700">{user ? user.username : "philippe"}</span>
-          <span className="text-[14px] text-gray-500">{user ? user.email : "cacaboom@hotmzil.fr"}</span>
+          <span className="text-[17px] font-bold text-gray-700">{user ? user.username : "test"}</span>
+          <span className="text-[14px] text-gray-500">{user ? user.email : "test@test.fr"}</span>
         </div>
       </div>
     </div>

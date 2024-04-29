@@ -4,8 +4,10 @@ import Button from "../../components/FormElements/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronUp, SquarePen } from "lucide-react";
+import { setFamily } from "../../store/familySlice";
+import { useDispatch } from "react-redux";
 import Spinner from "../../components/Shared/Spinner";
 import { Tooltip } from "@mui/material";
 
@@ -20,6 +22,7 @@ interface Family {
 
 function ClassificationsPage() {
   const [isModify, setIsModify] = useState(false);
+  const dispatch = useDispatch();
   const [searchValue, setSearchValue] = useState("");
   const [prevSearchValue, setPrevSearchValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -61,6 +64,7 @@ function ClassificationsPage() {
 
       const data = await response.json();
       setFamilies(data.data);
+      console.log(data);
       setTotalItem(data.total);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
@@ -175,7 +179,7 @@ function ClassificationsPage() {
             )}
           </div>
           <table className="w-full text-left">
-            <thead className="bg-blue-50 text-xl text-gray-500 border">
+            <thead className="bg-blue-50 text-md text-gray-500 border">
               <tr>
                 {isModify && (
                   <th scope="col" className="px-6 py-4">
@@ -201,7 +205,7 @@ function ClassificationsPage() {
                 families.map((family) => (
                   <tr
                     key={family._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-md text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
+                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
                   >
                     {isModify && (
                       <td className="px-6 py-4">
@@ -220,9 +224,11 @@ function ClassificationsPage() {
                     <td className="px-6 py-4">{family.YX_LIBELLE}</td>
                     <td className="px-6 py-4">
                       <Tooltip title="Modifier">
-                        <div className="flex justify-center text-red-400">
-                          <SquarePen />
-                        </div>
+                        <Link to={`/parameters/classification/${family._id}`}>
+                          <div className="flex justify-center text-red-400">
+                            <SquarePen />
+                          </div>
+                        </Link>
                       </Tooltip>
                     </td>
                   </tr>

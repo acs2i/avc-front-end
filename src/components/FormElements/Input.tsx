@@ -16,6 +16,7 @@ type InputProps = {
   orange?: boolean;
   gray?: boolean;
   required?: boolean;
+  disabled?: boolean;
   rows?: number;
   options?: { value: string; label: string; name: string }[];
   label?: string;
@@ -79,6 +80,7 @@ const Input: React.FC<InputProps> = (props) => {
       props.orange ? "border-b-2 border-orange-400" : ""
     }
     ${props.gray ? "border-b-[1px] border-gray-300" : ""}
+    ${props.disabled ? " bg-gray-200 rounded-md border border-white text-gray-500 italic px-3 cursor-not-allowed" : ""}
     ${
       !inputState.isValid &&
       inputState.isTouched && props.required &&
@@ -98,6 +100,7 @@ const Input: React.FC<InputProps> = (props) => {
         required={props.required}
         onKeyDown={props.onKeyDown}
         className={InputClasses}
+        disabled={props.disabled}
       />
     ) : props.element === "textarea" ? (
       <textarea

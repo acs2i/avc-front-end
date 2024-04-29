@@ -33,8 +33,20 @@ export const LINKS: Link[] = [
     showInSidebar: false,
   },
   {
+    name: "Modifier une classifications",
+    link: "/parameters/classification/:id",
+    icon: Settings,
+    showInSidebar: false,
+  },
+  {
     name: "Collections",
     link: "/parameters/collection",
+    icon: Settings,
+    showInSidebar: false,
+  },
+  {
+    name: "Modifier une collection",
+    link: "/parameters/collection/:id",
     icon: Settings,
     showInSidebar: false,
   },
