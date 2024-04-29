@@ -129,10 +129,15 @@ export default function SingleProductPage() {
                           <td className="px-4 py-2 text-gray-400 font-bold">
                             <div>
                               <span>{product[0].GA_LIBREART1}</span>
-                              <span className="mx-1">-</span>
-                              {product[0] && (
-                                <span>{product[0].family.YX_LIBELLE}</span>
-                              )}
+                              {product[0].family && (
+                                  <>
+                                    <span className="mx-1">-</span>
+                                    <span>
+                                      {product[0].family.YX_LIBELLE}
+                                    </span>
+                                    F
+                                  </>
+                                )}
                             </div>
                           </td>
                         </tr>
@@ -144,8 +149,15 @@ export default function SingleProductPage() {
                             <td className="px-4 py-2 text-gray-400 font-bold">
                               <div>
                                 <span>{product[0].GA_LIBREART2}</span>
-                                <span className="mx-1">-</span>
-                                <span>{product[0].subFamily.YX_LIBELLE}</span>
+                                {product[0].subFamily && (
+                                  <>
+                                    <span className="mx-1">-</span>
+                                    <span>
+                                      {product[0].subFamily.YX_LIBELLE}
+                                    </span>
+                                    F
+                                  </>
+                                )}
                               </div>
                             </td>
                           </tr>
