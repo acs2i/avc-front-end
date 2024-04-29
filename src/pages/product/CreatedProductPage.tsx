@@ -72,13 +72,9 @@ export default function CreatedProductPage() {
                 </>
               ))}
             </div>
-            <Link
-              to="/edit/edit-product"
-              className="text-[14px] text-sky-700 hover:text-sky-400 flex items-center gap-2"
-            >
-              <Plus size={14} />
-              <span>Ajouter un produit</span>
-            </Link>
+            <Button to="/edit/edit-product" size="small" blue>
+              Ajouter un produit
+            </Button>
           </div>
           <div className="mt-6">
             <Divider />

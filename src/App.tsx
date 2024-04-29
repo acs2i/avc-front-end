@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import SingleProductPage from "./pages/product/SingleProductPage";
@@ -21,6 +22,14 @@ import BrandPage from "./pages/params/BrandPage";
 function App() {
   const location = useLocation();
   const excludedPaths = ["/login"];
+
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0
+      // behavior: 'smooth'
+    });
+  }, [location.pathname]);
 
   const shouldShowNavbar = !excludedPaths.some((path) =>
     path.startsWith("*")
