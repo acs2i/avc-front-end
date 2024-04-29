@@ -74,8 +74,8 @@ export default function Header({ titlePage }: { titlePage: string }) {
         </Menu>
 
         <div className="flex flex-col">
-          <span className="text-[17px] font-bold text-gray-700">{user ? user.username : "philippe"}</span>
-          <span className="text-[14px] text-gray-500">{user ? user.email : "cacaboom@hotmzil.fr"}</span>
+          <span className="text-[17px] font-bold text-gray-700">{user ? user.username : "test"}</span>
+          <span className="text-[14px] text-gray-500">{user ? user.email : "test@test.fr"}</span>
         </div>
       </div>
     </div>
