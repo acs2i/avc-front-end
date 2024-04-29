@@ -8,6 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronUp, SquarePen } from "lucide-react";
 import { Tooltip } from "@mui/material";
 import Spinner from "../../components/Shared/Spinner";
+import ScrollToTop from '../../components/ScrollToTop';
 
 
 type DataType = "DI1" | "DI2";
@@ -248,12 +249,7 @@ export default function DimensionPage() {
         </div>
       </Card>
       {totalItem !== null && totalItem > 10 && (
-        <a
-          href="#top"
-          className="absolute bottom-0 right-[-60px] bg-orange-500 p-3 rounded-full text-white hover:bg-orange-400"
-        >
-          <ChevronUp />
-        </a>
+        <ScrollToTop scrollThreshold={300} />
       )}
     </div>
   );
