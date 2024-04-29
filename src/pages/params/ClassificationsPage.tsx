@@ -5,9 +5,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, ChevronUp, SquarePen } from "lucide-react";
-import { setFamily } from "../../store/familySlice";
-import { useDispatch } from "react-redux";
+import { ArrowLeft, SquarePen } from "lucide-react";
 import Spinner from "../../components/Shared/Spinner";
 import { Tooltip } from "@mui/material";
 import ScrollToTop from '../../components/ScrollToTop';
@@ -22,8 +20,6 @@ interface Family {
 }
 
 function ClassificationsPage() {
-  const [isModify, setIsModify] = useState(false);
-  const dispatch = useDispatch();
   const [searchValue, setSearchValue] = useState("");
   const [prevSearchValue, setPrevSearchValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -65,7 +61,6 @@ function ClassificationsPage() {
 
       const data = await response.json();
       setFamilies(data.data);
-      console.log(data);
       setTotalItem(data.total);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
@@ -170,7 +165,7 @@ function ClassificationsPage() {
             </Stack>
           </div>
         )}
-        <div className="overflow-x-auto bg-white shadow-md">
+        <div className="overflow-x-auto bg-white">
           <div className="px-3 mb-2 flex items-center gap-2">
             <h4 className="text-xl">
               <span className="font-bold">{totalItem}</span> Classifications

@@ -5,7 +5,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, ChevronUp, SquarePen } from "lucide-react";
+import { ArrowLeft, SquarePen } from "lucide-react";
 import { Tooltip } from "@mui/material";
 import Spinner from "../../components/Shared/Spinner";
 import ScrollToTop from '../../components/ScrollToTop';
@@ -20,10 +20,8 @@ interface Dimension {
 }
 
 export default function DimensionPage() {
-  const [isModify, setIsModify] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [prevSearchValue, setPrevSearchValue] = useState("");
-  const [type, setType] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItem, setTotalItem] = useState(null);
@@ -165,7 +163,7 @@ export default function DimensionPage() {
             </Stack>
           </div>
         )}
-        <div className="overflow-x-auto bg-white shadow-md">
+        <div className="overflow-x-auto bg-white">
           <div className="px-3 mb-2 flex items-center gap-2">
             <h4 className="text-xl">
               <span className="font-bold">{totalItem}</span> Dimensions

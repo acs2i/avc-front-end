@@ -28,10 +28,6 @@ interface Product {
 export default function SingleProductPage() {
   const [page, setPage] = useState("details");
   const { id } = useParams();
-  const colors = ["bg-gray-700", "bg-gray-500", "bg-gray-400"];
-  const color = ["100", "200", "300", "400", "500", "600"];
-  const size = ["39", "40", "40 1/2", "41", "41 1/2", "42", "43", "44"];
-  const numbers = [1, 2, 3, 4, 5, 6, 7, 8];
   const { data: product } = useFetch<Product[]>(
     `${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`
   );
@@ -47,7 +43,7 @@ export default function SingleProductPage() {
                 <button
                   className={`font-bold text-gray-600 ${
                     page === link.page ? "text-green-700" : ""
-                  } ${page === link.page ? "animate-bounce" : ""}`}
+                  }`}
                   onClick={() => setPage(link.page)}
                 >
                   {link.name}
@@ -65,7 +61,7 @@ export default function SingleProductPage() {
         {product && product.length > 0 && page === "details" && (
           <div className="flex grid-rows-3 grid-flow-col gap-4 mt-5 px-4">
             <div className="flex gap-[25px]">
-              <div className="h-[400px] w-[400px] border border-gray-300 rounded-lg overflow-hidden">
+              <div className="h-[400px] w-[400px] overflow-hidden">
                 {product[0].imgPath ? (
                   <img
                     src={product[0].imgPath}
@@ -81,52 +77,52 @@ export default function SingleProductPage() {
                 )}
               </div>
               <div className="flex-col col-span-2 justify-center">
-                <h2 className="text-2xl text-gray-600 font-bold font-montserrat capitalize">
+                <h2 className="text-3xl text-teal-600 font-bold font-montserrat capitalize">
                   {product[0].GA_LIBELLE}
                 </h2>
                 <div className="grid grid-cols-1 gap-4 mt-5">
                   <div className="overflow-x-auto">
                     <table className="table-auto">
-                      <tbody className="capitalize">
+                      <tbody className="capitalize text-sm text-gray-700">
                         <tr>
-                          <td className="px-4 py-2 text-gray-700 font-bold">
+                          <td className="py-2 font-bold">
                             Code article :
                           </td>
-                          <td className="px-4 py-2 text-gray-400 font-bold">
+                          <td className="px-4 py-2">
                             {product[0].GA_CODEARTICLE}
                           </td>
                         </tr>
                         <tr>
-                          <td className="px-4 py-2 text-gray-700 font-bold">
+                          <td className="py-2 font-bold">
                             Libellé complet :
                           </td>
-                          <td className="px-4 py-2 text-gray-400 font-bold">
+                          <td className="px-4 py-2">
                             {product[0].GA_LIBCOMPL}
                           </td>
                         </tr>
                         <tr>
-                          <td className="px-4 py-2 text-gray-700 font-bold">
+                          <td className="py-2 font-bold">
                             Libellé :
                           </td>
                           {product && (
-                            <td className="px-4 py-2 text-gray-400 font-bold">
+                            <td className="px-4 py-2">
                               {product[0].GA_LIBELLE}
                             </td>
                           )}
                         </tr>
                         <tr>
-                          <td className="px-4 py-2 text-gray-700 font-bold">
+                          <td className="py-2 font-bold">
                             Fournisseur principal :
                           </td>
-                          <td className="px-4 py-2 text-gray-400 font-bold">
+                          <td className="px-4 py-2">
                             {product[0].GA_FOURNPRINC}
                           </td>
                         </tr>
                         <tr>
-                          <td className="px-4 py-2 text-gray-700 font-bold">
+                          <td className="py-2 text-gray-700 font-bold">
                             Famille :
                           </td>
-                          <td className="px-4 py-2 text-gray-400 font-bold">
+                          <td className="px-4 py-2">
                             <div>
                               <span>{product[0].GA_LIBREART1}</span>
                               {product[0].family && (
@@ -142,10 +138,10 @@ export default function SingleProductPage() {
                         </tr>
                         {product[0].GA_LIBREART2 && (
                           <tr>
-                            <td className="px-4 py-2 text-gray-700 font-bold">
+                            <td className="py-2 font-bold">
                               Sous-famille :
                             </td>
-                            <td className="px-4 py-2 text-gray-400 font-bold">
+                            <td className="px-4 py-2">
                               <div>
                                 <span>{product[0].GA_LIBREART2}</span>
                                 {product[0].subFamily && (
@@ -161,10 +157,10 @@ export default function SingleProductPage() {
                           </tr>
                         )}
                         <tr>
-                          <td className="px-4 py-2 text-gray-700 font-bold">
+                          <td className="py-2 font-bold">
                             Tailles :
                           </td>
-                          <td className="px-4 py-2 text-gray-400 font-bold">
+                          <td className="px-4 py-2 text-teal-600 font-bold">
                             <div className="flex items-center gap-2">
                               {product[0].uvcs.map((uvc, i) => (
                                 <div className="border px-2 py-1 rounded-xs">
@@ -175,10 +171,10 @@ export default function SingleProductPage() {
                           </td>
                         </tr>
                         <tr>
-                          <td className="px-4 py-2 text-gray-700 font-bold">
+                          <td className="py-2 font-bold">
                             Couleurs :
                           </td>
-                          <td className="px-4 py-2 text-gray-400 font-bold">
+                          <td className="px-4 py-2 text-teal-600 font-bold">
                             <div className="flex items-center gap-2">
                               {product[0].uvcs.map((uvc, i) => (
                                 <div className="border px-2 py-1 rounded-xs">
@@ -200,8 +196,8 @@ export default function SingleProductPage() {
         {/* Product diemnsions */}
         {product && page === "uvcs" && (
           <div className="overflow-x-auto bg-white">
-            <div className="flex items-center gap-2 justify-center mb-6">
-              <h4 className="text-2xl font-bold text-gray-800">UVCS</h4>
+            <div className="flex items-center gap-2 mb-6">
+              <h4 className="text-3xl font-bold text-gray-800 w-[90%] mx-auto">UVCS</h4>
             </div>
             <table className="w-[90%] mx-auto">
               <thead className="bg-gray-100 text-md text-gray-400 border">
