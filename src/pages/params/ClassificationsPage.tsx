@@ -10,6 +10,7 @@ import { setFamily } from "../../store/familySlice";
 import { useDispatch } from "react-redux";
 import Spinner from "../../components/Shared/Spinner";
 import { Tooltip } from "@mui/material";
+import ScrollToTop from '../../components/ScrollToTop';
 
 type DataType = "LA1" | "LA2" | "LA3";
 
@@ -250,13 +251,8 @@ function ClassificationsPage() {
           </table>
         </div>
       </Card>
-      {totalItem !== null && totalItem > 15 && (
-        <a
-          href="#top"
-          className="absolute bottom-0 right-[-60px] bg-orange-500 p-3 rounded-full text-white hover:bg-orange-400"
-        >
-          <ChevronUp />
-        </a>
+      {totalItem !== null && totalItem > 10 && (
+        <ScrollToTop scrollThreshold={300} />
       )}
     </div>
   );
