@@ -175,23 +175,18 @@ export default function DimensionPage() {
             )}
           </div>
           <table className="w-full text-left">
-            <thead className="bg-blue-50 text-md text-gray-500 border">
+            <thead className="bg-blue-50 text-md text-gray-500 border ">
               <tr>
-                {isModify && (
-                  <th scope="col" className="px-6 py-4">
-                    #
-                  </th>
-                )}
-                <th scope="col" className="px-6 py-4 w-[270px]">
+                <th scope="col" className="px-6 py-4 w-1/4">
                   Code
                 </th>
-                <th scope="col" className="px-6 py-4 w-[350px]">
+                <th scope="col" className="px-6 py-4 w-1/4">
                   Libellé
                 </th>
-                <th scope="col" className="px-6 py-4 w-[350px]">
+                <th scope="col" className="px-6 py-4 w-1/4">
                   Type
                 </th>
-                <th scope="col" className="px-6 py-4 text-center">
+                <th scope="col" className="px-6 py-4 text-center w-1/4">
                   Modifier
                 </th>
               </tr>
@@ -203,16 +198,6 @@ export default function DimensionPage() {
                     key={dimension._id}
                     className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
                   >
-                    {isModify && (
-                      <td className="px-6 py-4">
-                        <input
-                          id="default-checkbox"
-                          type="checkbox"
-                          value=""
-                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                      </td>
-                    )}
                     <td className="px-6 py-4">{dimension.GDI_DIMORLI}</td>
                     <td className="px-6 py-4">{dimension.GDI_LIBELLE}</td>
                     <td className="px-6 py-4">
@@ -223,7 +208,7 @@ export default function DimensionPage() {
                     <td className="px-6 py-4">
                       <Tooltip title="Modifier">
                         <Link to={`/`}>
-                          <div className="flex justify-center text-red-400">
+                          <div className="flex justify-center text-orange-400">
                             <SquarePen />
                           </div>
                         </Link>

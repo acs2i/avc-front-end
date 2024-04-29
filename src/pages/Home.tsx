@@ -175,19 +175,19 @@ export default function Home() {
           <table className="w-full text-left">
             <thead className="bg-blue-50 text-md text-gray-500 border">
               <tr>
-                <th scope="col" className="px-6 py-4 w-[270px]">
+                <th scope="col" className="px-6 py-4 w-1/5">
                   Code
                 </th>
-                <th scope="col" className="px-6 py-4 w-[350px]">
+                <th scope="col" className="px-6 py-4 w-1/5">
                   Libellé
                 </th>
-                <th scope="col" className="px-6 py-4 w-[350px]">
+                <th scope="col" className="px-6 py-4 w-1/5">
                   Famille
                 </th>
-                <th scope="col" className="px-6 py-4 w-[350px]">
+                <th scope="col" className="px-6 py-4 w-1/5">
                   Sous-famille
                 </th>
-                <th scope="col" className="px-6 py-4 w-[250px]">
+                <th scope="col" className="px-6 py-4 w-1/5">
                   Marque
                 </th>
               </tr>

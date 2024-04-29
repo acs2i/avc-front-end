@@ -88,7 +88,7 @@ function ClassificationsPage() {
       );
 
       const data = await response.json();
-      setFamilies(data);
+      setFamilies(data.data);
       setTotalItem(data.length);
       setPrevSearchValue(searchValue);
       setIsLoading(false);
@@ -182,21 +182,16 @@ function ClassificationsPage() {
           <table className="w-full text-left">
             <thead className="bg-blue-50 text-md text-gray-500 border">
               <tr>
-                {isModify && (
-                  <th scope="col" className="px-6 py-4">
-                    #
-                  </th>
-                )}
-                <th scope="col" className="px-6 py-4 w-[350px]">
+                <th scope="col" className="px-6 py-4 w-1/4">
                   Niveau
                 </th>
-                <th scope="col" className="px-6 py-4 w-[270px]">
+                <th scope="col" className="px-6 py-4 w-1/4">
                   Code
                 </th>
-                <th scope="col" className="px-6 py-4">
+                <th scope="col" className="px-6 py-4 w-1/4">
                   Libellé
                 </th>
-                <th scope="col" className="px-6 py-4 text-center">
+                <th scope="col" className="px-6 py-4 text-center w-1/4">
                   Modifier
                 </th>
               </tr>
@@ -208,16 +203,6 @@ function ClassificationsPage() {
                     key={family._id}
                     className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
                   >
-                    {isModify && (
-                      <td className="px-6 py-4">
-                        <input
-                          id="default-checkbox"
-                          type="checkbox"
-                          value=""
-                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                      </td>
-                    )}
                     <td className="px-6 py-4 flex items-center gap-2">
                       {typeLabels[family.YX_TYPE]}
                     </td>

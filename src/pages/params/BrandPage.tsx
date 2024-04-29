@@ -168,13 +168,13 @@ export default function BrandPage() {
           <table className="w-full text-left">
             <thead className="bg-blue-50 text-md text-gray-500 border">
               <tr>
-                <th scope="col" className="px-6 py-4 w-[270px]">
+                <th scope="col" className="px-6 py-4 w-1/3">
                   Code
                 </th>
-                <th scope="col" className="px-6 py-4 w-[350px]">
+                <th scope="col" className="px-6 py-4 w-1/3">
                   Libellé
                 </th>
-                <th scope="col" className="px-6 py-4 text-center">
+                <th scope="col" className="px-6 py-4 w-1/3 text-center">
                   Modifier
                 </th>
               </tr>
@@ -186,21 +186,11 @@ export default function BrandPage() {
                     key={brand._id}
                     className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
                   >
-                    {isModify && (
-                      <td className="px-6 py-4">
-                        <input
-                          id="default-checkbox"
-                          type="checkbox"
-                          value=""
-                          className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                        />
-                      </td>
-                    )}
                     <td className="px-6 py-4">{brand.YX_CODE}</td>
                     <td className="px-6 py-4">{brand.YX_LIBELLE}</td>
                     <td className="px-6 py-4">
                       <Tooltip title="Modifier">
-                        <div className="flex justify-center text-red-400">
+                        <div className="flex justify-center text-orange-400">
                           <SquarePen />
                         </div>
                       </Tooltip>

@@ -135,7 +135,6 @@ export default function SingleProductPage() {
                                     <span>
                                       {product[0].family.YX_LIBELLE}
                                     </span>
-                                    F
                                   </>
                                 )}
                             </div>
@@ -155,7 +154,6 @@ export default function SingleProductPage() {
                                     <span>
                                       {product[0].subFamily.YX_LIBELLE}
                                     </span>
-                                    F
                                   </>
                                 )}
                               </div>
