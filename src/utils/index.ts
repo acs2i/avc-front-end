@@ -33,7 +33,7 @@ export const LINKS: Link[] = [
     showInSidebar: false,
   },
   {
-    name: "Modifier une classifications",
+    name: "Modifier une classification",
     link: "/parameters/classification/:id",
     icon: Settings,
     showInSidebar: false,
@@ -167,19 +167,10 @@ export const LINKCARD_PRODUCT: LinkCard[] = [
     page: "details"
   },
   {
-    name: "Les tailles",
-    page: "sizes"
-  },
-  {
-    name: "Les Couleurs",
-    page: "colors"
-  },
-  {
-    name: "Les prix",
-    page: "prices"
+    name: "Uvcs",
+    page: "uvcs"
   },
  
-
 ];
 
 export const FILTERS_1: Filters_1[] = [

@@ -193,7 +193,7 @@ function ClassificationsPage() {
                   Code
                 </th>
                 <th scope="col" className="px-6 py-4">
-                  Libéllé
+                  Libellé
                 </th>
                 <th scope="col" className="px-6 py-4 text-center">
                   Modifier
@@ -225,7 +225,7 @@ function ClassificationsPage() {
                     <td className="px-6 py-4">
                       <Tooltip title="Modifier">
                         <Link to={`/parameters/classification/${family._id}`}>
-                          <div className="flex justify-center text-red-400">
+                          <div className="flex justify-center text-orange-400">
                             <SquarePen />
                           </div>
                         </Link>

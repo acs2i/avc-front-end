@@ -105,13 +105,6 @@ export default function Home() {
 
   return (
     <div className="relative">
-      <div
-        className="flex items-center gap-2 mb-3 cursor-pointer"
-        onClick={() => navigate("/parameters")}
-      >
-        <ArrowLeft />
-        <span>retour</span>
-      </div>
       <Card title="Tous les produits">
         <div className="flex items-center gap-4 p-7">
           <div className="relative shadow-md flex-1">
@@ -169,7 +162,7 @@ export default function Home() {
             </Stack>
           </div>
         )}
-        <div className="overflow-x-auto bg-white shadow-md">
+        <div className="overflow-x-auto bg-white">
           <div className="px-3 mb-2 flex items-center gap-2">
             <h4 className="text-xl">
               <span className="font-bold">{totalItem}</span> Produits
