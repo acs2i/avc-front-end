@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { LinkCard } from "@/type";
 import { Divider } from "@mui/material";
+import Button from "../../components/FormElements/Button";
 import useFetch from "../../utils/hooks/usefetch";
 import { Check, X } from "lucide-react";
 
@@ -32,25 +33,30 @@ export default function SingleProductPage() {
     `${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`
   );
 
-  console.log(product);
+
   return (
     <section className="mt-7">
       <Card title={`Article n°${product && product[0]?.GA_CODEARTICLE}`}>
         <div className="mt-4 mb-[30px] px-4">
-          <div className="flex items-center gap-7">
-            {LINKCARD_PRODUCT.map((link: LinkCard, i) => (
-              <React.Fragment key={i}>
-                <button
-                  className={`font-bold text-gray-600 ${
-                    page === link.page ? "text-green-700" : ""
-                  }`}
-                  onClick={() => setPage(link.page)}
-                >
-                  {link.name}
-                </button>
-                <div className="w-[1px] h-[20px] bg-gray-300"></div>
-              </React.Fragment>
-            ))}
+          <div className="flex justify-between">
+            <div className="flex items-center gap-7">
+              {LINKCARD_PRODUCT.map((link: LinkCard, i) => (
+                <React.Fragment key={i}>
+                  <button
+                    className={`font-bold text-gray-600 ${
+                      page === link.page ? "text-green-700" : ""
+                    }`}
+                    onClick={() => setPage(link.page)}
+                  >
+                    {link.name}
+                  </button>
+                  <div className="w-[1px] h-[20px] bg-gray-300"></div>
+                </React.Fragment>
+              ))}
+            </div>
+            <div>
+              <Button size="small" blue>Editer la fiche</Button>
+            </div>
           </div>
           <div className="mt-6">
             <Divider />
@@ -85,25 +91,19 @@ export default function SingleProductPage() {
                     <table className="table-auto">
                       <tbody className="capitalize text-sm text-gray-700">
                         <tr>
-                          <td className="py-2 font-bold">
-                            Code article :
-                          </td>
+                          <td className="py-2 font-bold">Code article :</td>
                           <td className="px-4 py-2">
                             {product[0].GA_CODEARTICLE}
                           </td>
                         </tr>
                         <tr>
-                          <td className="py-2 font-bold">
-                            Libellé complet :
-                          </td>
+                          <td className="py-2 font-bold">Libellé complet :</td>
                           <td className="px-4 py-2">
                             {product[0].GA_LIBCOMPL}
                           </td>
                         </tr>
                         <tr>
-                          <td className="py-2 font-bold">
-                            Libellé :
-                          </td>
+                          <td className="py-2 font-bold">Libellé :</td>
                           {product && (
                             <td className="px-4 py-2">
                               {product[0].GA_LIBELLE}
@@ -126,21 +126,17 @@ export default function SingleProductPage() {
                             <div>
                               <span>{product[0].GA_LIBREART1}</span>
                               {product[0].family && (
-                                  <>
-                                    <span className="mx-1">-</span>
-                                    <span>
-                                      {product[0].family.YX_LIBELLE}
-                                    </span>
-                                  </>
-                                )}
+                                <>
+                                  <span className="mx-1">-</span>
+                                  <span>{product[0].family.YX_LIBELLE}</span>
+                                </>
+                              )}
                             </div>
                           </td>
                         </tr>
                         {product[0].GA_LIBREART2 && (
                           <tr>
-                            <td className="py-2 font-bold">
-                              Sous-famille :
-                            </td>
+                            <td className="py-2 font-bold">Sous-famille :</td>
                             <td className="px-4 py-2">
                               <div>
                                 <span>{product[0].GA_LIBREART2}</span>
@@ -157,9 +153,7 @@ export default function SingleProductPage() {
                           </tr>
                         )}
                         <tr>
-                          <td className="py-2 font-bold">
-                            Tailles :
-                          </td>
+                          <td className="py-2 font-bold">Tailles :</td>
                           <td className="px-4 py-2 text-teal-600 font-bold">
                             <div className="flex items-center gap-2">
                               {product[0].uvcs.map((uvc, i) => (
@@ -171,9 +165,7 @@ export default function SingleProductPage() {
                           </td>
                         </tr>
                         <tr>
-                          <td className="py-2 font-bold">
-                            Couleurs :
-                          </td>
+                          <td className="py-2 font-bold">Couleurs :</td>
                           <td className="px-4 py-2 text-teal-600 font-bold">
                             <div className="flex items-center gap-2">
                               {product[0].uvcs.map((uvc, i) => (
@@ -197,7 +189,9 @@ export default function SingleProductPage() {
         {product && page === "uvcs" && (
           <div className="overflow-x-auto bg-white">
             <div className="flex items-center gap-2 mb-6">
-              <h4 className="text-3xl font-bold text-gray-800 w-[90%] mx-auto">UVCS</h4>
+              <h4 className="text-3xl font-bold text-gray-800 w-[90%] mx-auto">
+                UVCS
+              </h4>
             </div>
             <table className="w-[90%] mx-auto">
               <thead className="bg-gray-100 text-md text-gray-400 border">

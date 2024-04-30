@@ -89,7 +89,7 @@ export default function Home() {
       );
 
       const data = await response.json();
-      setProducts(data);
+      setProducts(data.data);
       setTotalItem(data.length);
       setPrevSearchValue(searchValue);
       setIsLoading(false);

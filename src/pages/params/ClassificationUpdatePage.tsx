@@ -155,9 +155,14 @@ export default function ClassificationUpdatePage() {
             </div>
             <div className="w-full mt-2">
               {!isLoading ? (
-                <Button size="small" blue type="submit">
-                  Valider
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button size="medium" blue type="submit">
+                    Valider
+                  </Button>
+                  <Button size="medium" danger>
+                    Annuler
+                  </Button>
+                </div>
               ) : (
                 <CircularProgress />
               )}
