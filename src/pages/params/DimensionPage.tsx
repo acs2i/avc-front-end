@@ -175,17 +175,14 @@ export default function DimensionPage() {
           <table className="w-full text-left">
             <thead className="bg-blue-50 text-md text-gray-500 border ">
               <tr>
-                <th scope="col" className="px-6 py-4 w-1/4">
+                <th scope="col" className="px-6 py-4 w-1/3">
                   Code
                 </th>
-                <th scope="col" className="px-6 py-4 w-1/4">
+                <th scope="col" className="px-6 py-4 w-1/3">
                   Libellé
                 </th>
-                <th scope="col" className="px-6 py-4 w-1/4">
+                <th scope="col" className="px-6 py-4 w-1/3">
                   Type
-                </th>
-                <th scope="col" className="px-6 py-4 text-center w-1/4">
-                  Modifier
                 </th>
               </tr>
             </thead>
@@ -195,6 +192,7 @@ export default function DimensionPage() {
                   <tr
                     key={dimension._id}
                     className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
+                    onClick={() => navigate(`/parameters/dimension/${dimension._id}`)}
                   >
                     <td className="px-6 py-4">{dimension.GDI_DIMORLI}</td>
                     <td className="px-6 py-4">{dimension.GDI_LIBELLE}</td>
@@ -202,15 +200,6 @@ export default function DimensionPage() {
                       {dimension.GDI_TYPEDIM in typeLabels
                         ? typeLabels[dimension.GDI_TYPEDIM]
                         : "Type inconnu"}
-                    </td>
-                    <td className="px-6 py-4">
-                      <Tooltip title="Modifier">
-                        <Link to={`/`}>
-                          <div className="flex justify-center text-orange-400">
-                            <SquarePen />
-                          </div>
-                        </Link>
-                      </Tooltip>
                     </td>
                   </tr>
                 ))

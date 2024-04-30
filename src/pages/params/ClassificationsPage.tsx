@@ -177,17 +177,14 @@ function ClassificationsPage() {
           <table className="w-full text-left">
             <thead className="bg-blue-50 text-md text-gray-500 border">
               <tr>
-                <th scope="col" className="px-6 py-4 w-1/4">
+                <th scope="col" className="px-6 py-4 w-1/3">
                   Niveau
                 </th>
-                <th scope="col" className="px-6 py-4 w-1/4">
+                <th scope="col" className="px-6 py-4 w-1/3">
                   Code
                 </th>
-                <th scope="col" className="px-6 py-4 w-1/4">
+                <th scope="col" className="px-6 py-4 w-1/3">
                   Libellé
-                </th>
-                <th scope="col" className="px-6 py-4 text-center w-1/4">
-                  Modifier
                 </th>
               </tr>
             </thead>
@@ -197,21 +194,13 @@ function ClassificationsPage() {
                   <tr
                     key={family._id}
                     className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
+                    onClick={() => navigate(`/parameters/classification/${family._id}`)}
                   >
                     <td className="px-6 py-4 flex items-center gap-2">
                       {typeLabels[family.YX_TYPE]}
                     </td>
                     <td className="px-6 py-4">{family.YX_CODE}</td>
                     <td className="px-6 py-4">{family.YX_LIBELLE}</td>
-                    <td className="px-6 py-4">
-                      <Tooltip title="Modifier">
-                        <Link to={`/parameters/classification/${family._id}`}>
-                          <div className="flex justify-center text-orange-400">
-                            <SquarePen />
-                          </div>
-                        </Link>
-                      </Tooltip>
-                    </td>
                   </tr>
                 ))
               ) : (

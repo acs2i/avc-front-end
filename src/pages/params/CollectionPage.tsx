@@ -167,14 +167,11 @@ export default function CollectionPage() {
           <table className="w-full text-left">
             <thead className="bg-blue-50 text-md text-gray-500 border">
               <tr>
-                <th scope="col" className="px-6 py-4 w-1/3">
+                <th scope="col" className="px-6 py-4 w-1/2">
                   Code
                 </th>
-                <th scope="col" className="px-6 py-4 w-1/3">
+                <th scope="col" className="px-6 py-4 w-1/2">
                   Libellé
-                </th>
-                <th scope="col" className="px-6 py-4 text-center w-1/3">
-                  Modifier
                 </th>
               </tr>
             </thead>
@@ -184,18 +181,10 @@ export default function CollectionPage() {
                   <tr
                     key={collection._id}
                     className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
+                    onClick={() => navigate(`/parameters/collection/${collection._id}`)}
                   >
                     <td className="px-6 py-4">{collection.CODE}</td>
                     <td className="px-6 py-4">{collection.LIBELLE}</td>
-                    <td className="px-6 py-4">
-                    <Tooltip title="Modifier">
-                        <Link to={`/parameters/collection/${collection._id}`}>
-                          <div className="flex justify-center text-orange-400">
-                            <SquarePen />
-                          </div>
-                        </Link>
-                      </Tooltip>
-                    </td>
                   </tr>
                 ))
               ) : (

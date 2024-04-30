@@ -20,6 +20,7 @@ import DimensionPage from "./pages/params/DimensionPage";
 import BrandPage from "./pages/params/BrandPage";
 import ClassificationUpdatePage from "./pages/params/ClassificationUpdatePage";
 import CollectionUpdatePage from "./pages/params/CollectionUpdatePage";
+import DimensionUpdatePage from "./pages/params/DimensionUpdatePage";
 
 function App() {
   const location = useLocation();
@@ -85,6 +86,10 @@ function App() {
                 element={<CollectionUpdatePage />}
               />
               <Route path="/parameters/dimension" element={<DimensionPage />} />
+              <Route
+                path="/parameters/dimension/:id"
+                element={<DimensionUpdatePage />}
+              />
               <Route path="/parameters/brand" element={<BrandPage />} />
               <Route path="/product/:id" element={<SingleProductPage />} />
               <Route

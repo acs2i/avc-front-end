@@ -57,6 +57,12 @@ export const LINKS: Link[] = [
     showInSidebar: false,
   },
   {
+    name: "Modifier une dimension",
+    link: "/parameters/dimension/:id",
+    icon: Settings,
+    showInSidebar: false,
+  },
+  {
     name: "Marques",
     link: "/parameters/brand",
     icon: Settings,
