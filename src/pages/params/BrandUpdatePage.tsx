@@ -10,13 +10,13 @@ import Modal from "../../components/Shared/Modal";
 
 interface Branch {
   _id: string;
-  CODE: any;
-  LIBELLE: any;
+  YX_CODE: any;
+  YX_LIBELLE: any;
 }
 
 interface FormData {
-  CODE: string;
-  LIBELLE: string;
+  YX_CODE: string;
+  YX_LIBELLE: string;
 }
 
 export default function BranchUpdatePage() {
@@ -27,29 +27,31 @@ export default function BranchUpdatePage() {
   const { data: brand } = useFetch<Branch>(
     `${process.env.REACT_APP_URL_DEV}/api/v1/brand/${id}`
   );
+
+  console.log(brand);
   const [libelle, setLibelle] = useState("");
   const [code, setCode] = useState();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
-    CODE: "",
-    LIBELLE: "",
+    YX_CODE: "",
+    YX_LIBELLE: "",
   });
 
   const handleLibelleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLibelle(e.target.value);
     setFormData((prevFormData) => ({
       ...prevFormData,
-      LIBELLE: e.target.value,
+      YX_LIBELLE: e.target.value,
     }));
   };
 
   useEffect(() => {
     if (brand) {
-      setLibelle(brand.LIBELLE);
-      setCode(brand.CODE);
+      setLibelle(brand.YX_LIBELLE);
+      setCode(brand.YX_CODE);
       setFormData({
-        LIBELLE: brand.LIBELLE,
-        CODE: brand.CODE,
+        YX_LIBELLE: brand.YX_LIBELLE,
+        YX_CODE: brand.YX_CODE,
       });
     }
   }, [brand]);
@@ -121,7 +123,7 @@ export default function BranchUpdatePage() {
         >
           <h1 className="text-2xl">
             {" "}
-            {brand?.LIBELLE} - {brand?.CODE}
+            {brand?.YX_LIBELLE} - {brand?.YX_CODE}
           </h1>
           <div className="mt-5 flex flex-col justify-between">
             <div className="flex flex-col">
