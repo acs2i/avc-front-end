@@ -36,3 +36,27 @@ code {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+
+
+.slide-enter {
+  transform: scale(0%);
+  opacity: 0;
+}
+
+.slide-enter-active {
+  transform: scale(100%);
+  opacity: 1;
+  transition: all 200ms;
+}
+
+.slide-exit {
+  transform: scale(100%);
+  opacity: 1;
+}
+
+.slide-exit-active {
+  transform: scale(0%);
+  opacity: 0;
+  transition: all 200ms;
+}

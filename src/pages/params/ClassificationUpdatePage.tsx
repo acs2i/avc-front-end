@@ -6,6 +6,7 @@ import Input from "../../components/FormElements/Input";
 import Button from "../../components/FormElements/Button";
 import { CircularProgress } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
+import Modal from "../../components/Shared/Modal";
 
 interface Family {
   _id: string;
@@ -23,6 +24,7 @@ interface FormData {
 export default function ClassificationUpdatePage() {
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
 
   const { data: family } = useFetch<Family>(
@@ -117,11 +119,37 @@ export default function ClassificationUpdatePage() {
 
   return (
     <div>
+      <Modal
+        show={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        header="Confirmation"
+        onSubmit={handleSubmit}
+      >
+        <p className="font-bold text-gray-800">
+          Voulez-vous vraiment appliquer ces modifications ?
+        </p>
+        {!isLoading ? (
+          <div className="flex justify-center gap-2 mt-4">
+            <Button size="medium" blue type="submit">
+              Oui
+            </Button>
+            <Button
+              size="medium"
+              danger
+              type="button"
+              onClick={() => setIsModalOpen(false)}
+            >
+              Non
+            </Button>
+          </div>
+        ) : (
+          <div className="mt-4">
+            <CircularProgress />
+          </div>
+        )}
+      </Modal>
       <Card title={`Mettre à jour la classification`}>
-        <form
-          className="w-[70%] h-[400px] mx-auto mt-[50px] mb-[50px]"
-          onSubmit={handleSubmit}
-        >
+        <form className="w-[70%] h-[400px] mx-auto mt-[50px] mb-[50px]">
           <h1 className="text-2xl">
             {" "}
             {family?.YX_LIBELLE} - {family?.YX_CODE}
@@ -153,19 +181,20 @@ export default function ClassificationUpdatePage() {
                 />
               </div>
             </div>
-            <div className="w-full mt-2">
-              {!isLoading ? (
-                <div className="flex items-center gap-2">
-                  <Button size="medium" blue type="submit">
-                    Valider
-                  </Button>
-                  <Button size="medium" danger>
-                    Annuler
-                  </Button>
-                </div>
-              ) : (
-                <CircularProgress />
-              )}
+          </div>
+          <div className="w-full mt-2">
+            <div className="flex items-center gap-2">
+              <Button
+                size="medium"
+                blue
+                onClick={() => setIsModalOpen(true)}
+                type="button"
+              >
+                Valider
+              </Button>
+              <Button size="medium" danger type="button" onClick={() => navigate(-1)}>
+                Annuler
+              </Button>
             </div>
           </div>
         </form>
