@@ -173,9 +173,6 @@ export default function BrandPage() {
                 <th scope="col" className="px-6 py-4 w-1/3">
                   Libellé
                 </th>
-                <th scope="col" className="px-6 py-4 w-1/3 text-center">
-                  Modifier
-                </th>
               </tr>
             </thead>
             <tbody>
@@ -187,13 +184,6 @@ export default function BrandPage() {
                   >
                     <td className="px-6 py-4">{brand.YX_CODE}</td>
                     <td className="px-6 py-4">{brand.YX_LIBELLE}</td>
-                    <td className="px-6 py-4">
-                      <Tooltip title="Modifier">
-                        <div className="flex justify-center text-orange-400">
-                          <SquarePen />
-                        </div>
-                      </Tooltip>
-                    </td>
                   </tr>
                 ))
               ) : (
