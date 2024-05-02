@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { CircularProgress } from "@mui/material";
 import { MoveLeft, Plus, Save, X } from "lucide-react";
 import Input from "../../components/FormElements/Input";
@@ -17,11 +17,8 @@ import useNotify from "../../utils/hooks/useToast";
 import "react-toastify/dist/ReactToastify.css";
 import useFetch from "../../utils/hooks/usefetch";
 
-import { ActionMeta, SingleValue } from 'react-select';
+import { ActionMeta, SingleValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
-
-
-
 
 import { colourOptions } from "../../data";
 
@@ -87,8 +84,15 @@ const customStyles = {
 };
 
 type BrandOption = {
-  value: string;
-  label: string;
+  _id: string;
+  YX_LIBELLE: string;
+  YX_CODE: string;
+};
+
+type CollectionOption = {
+  _id: string;
+  LIBELLE: string;
+  CODE: string;
 };
 
 export default function CreateProductPage() {
@@ -174,6 +178,137 @@ export default function CreateProductPage() {
     }
   };
 
+  const [selectedOptionBrand, setSelectedOptionBrand] =
+    useState<SingleValue<BrandOption> | null>(null);
+    const [selectedOptionCollection, setSelectedOptionCollection] =
+    useState<SingleValue<CollectionOption> | null>(null);
+  const [inputValueBrand, setInputValueBrand] = useState("");
+  const [inputValueCollection, setInputValueCollection] = useState("");
+  const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
+  const [optionsCollection, setOptionsCollection] = useState<CollectionOption[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 20;
+
+  // Fonction pour gérer le changement de la valeur sélectionnée
+  const handleChangeBrand = (newValue: SingleValue<BrandOption>) => {
+    setSelectedOptionBrand(newValue);
+  };
+
+  // Fonction pour gérer la saisie de l'utilisateur
+  const handleInputChangeBrand = async (inputValueBrand: string) => {
+    setInputValueBrand(inputValueBrand);
+
+    // console.log(inputValue);
+    if (inputValueBrand === '') {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/brand`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+  
+  
+        const optionsBrand = data.data?.map((brand: BrandOption) => ({
+          value: brand.YX_LIBELLE,
+          label: brand.YX_LIBELLE,
+        }));
+  
+        setOptionsBrand(optionsBrand);
+      } catch (error) {
+        console.error("Erreur lors de la requête", error);
+      }
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/brand/search?value=${inputValueBrand}&page=${currentPage}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+
+
+      const optionsBrand = data.data?.map((brand: BrandOption) => ({
+        value: brand.YX_LIBELLE,
+        label: brand.YX_LIBELLE,
+      }));
+
+      setOptionsBrand(optionsBrand);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
+  // Fonction pour gérer le changement de la valeur sélectionnée
+  const handleChangeCollection = (newValue: SingleValue<CollectionOption>) => {
+    setSelectedOptionCollection(newValue);
+  };
+
+  // Fonction pour gérer la saisie de l'utilisateur
+  const handleInputChangeCollection = async (inputValueBrand: string) => {
+    setInputValueCollection(inputValueBrand);
+
+    // console.log(inputValue);
+    if (inputValueBrand === '') {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/collection`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+  
+  
+        const optionsCollection = data.data?.map((collection: CollectionOption) => ({
+          value: collection.LIBELLE,
+          label: collection.LIBELLE,
+        }));
+  
+        setOptionsCollection(optionsCollection);
+      } catch (error) {
+        console.error("Erreur lors de la requête", error);
+      }
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/collection/search?value=${inputValueBrand}&page=${currentPage}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+
+
+      const optionsCollection = data.data?.map((collection: CollectionOption) => ({
+        value: collection.LIBELLE,
+        label: collection.LIBELLE,
+      }));
+
+      setOptionsCollection(optionsCollection);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
   // const handleChangeBrand = async (
   //   newValue: SingleValue<BrandOption>,
   //   actionMeta: ActionMeta<BrandOption>
@@ -185,53 +320,51 @@ export default function CreateProductPage() {
   //   }));
   // };
 
-  const handleChangeBrand = (newValue: SingleValue<BrandOption>, actionMeta: ActionMeta<BrandOption>) => {
-    if (typeof newValue === 'string') {
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        brand: { value: newValue, label: newValue },
-      }));
-    } else {
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        brand: newValue,
-      }));
-    }
-  };
+  // const handleChangeBrand = (newValue: SingleValue<BrandOption>, actionMeta: ActionMeta<BrandOption>) => {
+  //   if (typeof newValue === 'string') {
+  //     setFormData((prevFormData) => ({
+  //       ...prevFormData,
+  //       brand: { value: newValue, label: newValue },
+  //     }));
+  //   } else {
+  //     setFormData((prevFormData) => ({
+  //       ...prevFormData,
+  //       brand: newValue,
+  //     }));
+  //   }
+  // };
 
-  const handleInputChangeBrand = async (inputValue: string) => {
-    console.log("passed");
-  
-    // Effectuer la requête fetch ici
-    try {
-      const response = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/brand?search=${inputValue}`);
-      const data = await response.json();
-  
-      // Utiliser les données récupérées pour mettre à jour les options de react-select
-      const options = data.data.map((brand: Brand) => ({
-        value: brand.YX_CODE,
-        label: brand.YX_LIBELLE,
-      }));
-  
-      setFormData( {...formData, brand:  {value: "hi", label: "hi"}});
-    } catch (error) {
-      console.error("Erreur lors de la récupération des marques :", error);
-    }
-  };
+  // const handleInputChangeBrand = async (inputValue: string) => {
+  //   console.log("passed");
+
+  //   // Effectuer la requête fetch ici
+  //   try {
+  //     const response = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/brand?search=${inputValue}`);
+  //     const data = await response.json();
+
+  //     // Utiliser les données récupérées pour mettre à jour les options de react-select
+  //     const options = data.data.map((brand: Brand) => ({
+  //       value: brand.YX_CODE,
+  //       label: brand.YX_LIBELLE,
+  //     }));
+
+  //     setFormData( {...formData, brand:  {value: "hi", label: "hi"}});
+  //   } catch (error) {
+  //     console.error("Erreur lors de la récupération des marques :", error);
+  //   }
+  // };
 
   const { data: familiesData } = useFetch<{ data: Family[] }>(
     `${process.env.REACT_APP_URL_DEV}/api/v1/family`
-  );
-
-  const { data: brandsData } = useFetch<{ data: Brand[] }>(
-    `${process.env.REACT_APP_URL_DEV}/api/v1/brand`
   );
 
   const { data: collectionsData } = useFetch<{ data: Collection[] }>(
     `${process.env.REACT_APP_URL_DEV}/api/v1/collection`
   );
 
-  console.log(brandsData);
+  
+
+  // console.log(brandsData);
 
   const familyOptions =
     familiesData?.data.map(({ _id, YX_LIBELLE }) => ({
@@ -283,6 +416,59 @@ export default function CreateProductPage() {
       notifyError("Erreur lors de la création du produit");
     }
   };
+
+  useEffect(() => {
+    const fetchInitialDataBrand = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/brand`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+  
+        const optionsBrand = data.data?.map((brand: Brand) => ({
+          value: brand.YX_LIBELLE,
+          label: brand.YX_LIBELLE,
+        }));
+  
+        setOptionsBrand(optionsBrand);
+      } catch (error) {
+        console.error("Erreur lors de la requête", error);
+      }
+    };
+
+    const fetchInitialDataCollection = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/collection`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+  
+        const optionsCollection = data.data?.map((collection: Collection) => ({
+          value: collection.LIBELLE,
+          label: collection.LIBELLE,
+        }));
+  
+        setOptionsCollection(optionsCollection);
+      } catch (error) {
+        console.error("Erreur lors de la requête", error);
+      }
+    };
+  
+    fetchInitialDataBrand();
+    fetchInitialDataCollection();
+  }, []);
 
   return (
     <div className="mt-7">
@@ -399,7 +585,7 @@ export default function CreateProductPage() {
                             </span>
                           </label>
                         </div>
-                        <CreatableSelect<BrandOption>
+                        {/* <CreatableSelect<BrandOption>
                           placeholder="Selectionner une marque"
                           styles={customStyles}
                           value={formData.brand}
@@ -413,6 +599,18 @@ export default function CreateProductPage() {
                               label: YX_LIBELLE,
                             })) ?? []
                           }
+                        /> */}
+                        <CreatableSelect<BrandOption>
+                          value={selectedOptionBrand}
+                          onChange={handleChangeBrand}
+                          onInputChange={handleInputChangeBrand}
+                          inputValue={inputValueBrand}
+                          options={optionsBrand}
+                          placeholder="Selectionner une marque"
+                          styles={customStyles}
+                          className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                          // isMulti
+                          required
                         />
                       </div>
 
@@ -425,12 +623,16 @@ export default function CreateProductPage() {
                             </span>
                           </label>
                         </div>
-                        <CreatableSelect
+                        <CreatableSelect<CollectionOption>
+                          value={selectedOptionCollection}
+                          onChange={handleChangeCollection}
+                          onInputChange={handleInputChangeCollection}
+                          inputValue={inputValueCollection}
+                          options={optionsCollection}
                           placeholder="Selectionner une collection"
                           styles={customStyles}
-                          value={formData.productCollection}
-                          // onChange={handleChange}
                           className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                          // isMulti
                           required
                         />
                       </div>
