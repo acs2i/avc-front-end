@@ -100,13 +100,6 @@ function ClassificationsPage() {
 
   return (
     <div className="relative">
-      <div
-        className="flex items-center gap-2 mb-3 cursor-pointer"
-        onClick={() => navigate("/parameters")}
-      >
-        <ArrowLeft />
-        <span>retour</span>
-      </div>
       <Card title="Paramétrer les classifications">
         <div className="flex items-center gap-4 p-7">
           <div className="relative shadow-md flex-1">
@@ -148,7 +141,7 @@ function ClassificationsPage() {
             )}
           </div>
           <div className="flex items-center gap-3">
-            <Button size="small" blue>
+            <Button size="small" blue to="/parameters/classification/create">
               Créer une classification
             </Button>
           </div>

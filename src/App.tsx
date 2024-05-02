@@ -21,6 +21,8 @@ import BrandPage from "./pages/params/BrandPage";
 import ClassificationUpdatePage from "./pages/params/ClassificationUpdatePage";
 import CollectionUpdatePage from "./pages/params/CollectionUpdatePage";
 import DimensionUpdatePage from "./pages/params/DimensionUpdatePage";
+import ClassificationCreatePage from './pages/params/ClassificationCreatePage';
+import CollectionCreatePage from './pages/params/CollectionCreatePage';
 
 function App() {
   const location = useLocation();
@@ -51,7 +53,7 @@ function App() {
         return currentPath === link.link;
       }
     });
-    return link ? link.name : "caca boom";
+    return link ? link.name : "non trouvé";
   };
 
   return (
@@ -78,12 +80,20 @@ function App() {
                 element={<ClassificationUpdatePage />}
               />
               <Route
+                path="/parameters/classification/create"
+                element={<ClassificationCreatePage />}
+              />
+              <Route
                 path="/parameters/collection"
                 element={<CollectionPage />}
               />
               <Route
                 path="/parameters/collection/:id"
                 element={<CollectionUpdatePage />}
+              />
+                <Route
+                path="/parameters/collection/create"
+                element={<CollectionCreatePage />}
               />
               <Route path="/parameters/dimension" element={<DimensionPage />} />
               <Route

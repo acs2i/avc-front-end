@@ -99,13 +99,6 @@ export default function DimensionPage() {
 
   return (
     <div className="relative">
-      <div
-        className="flex items-center gap-2 mb-3 cursor-pointer"
-        onClick={() => navigate("/parameters")}
-      >
-        <ArrowLeft />
-        <span>retour</span>
-      </div>
       <Card title="Paramétrer les collections">
         <div className="flex items-center gap-4 p-7">
           <div className="relative shadow-md flex-1">
@@ -148,7 +141,7 @@ export default function DimensionPage() {
           </div>
           <div className="flex items-center gap-3">
             <Button size="small" blue>
-              Créer une collection
+              Créer une dimension
             </Button>
           </div>
         </div>

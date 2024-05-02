@@ -102,7 +102,7 @@ export default function ClassificationUpdatePage() {
       );
       if (response.ok) {
         setTimeout(() => {
-          notifySuccess("Classification modifié avec succés !");
+          notifySuccess("Dimension modifiée avec succés !");
           setIsLoading(false);
           navigate(-1);
         }, 1000);

@@ -33,7 +33,13 @@ export const LINKS: Link[] = [
     showInSidebar: false,
   },
   {
-    name: "Modifier une classification",
+    name: "Créer une class",
+    link: "/parameters/classification/create",
+    icon: Settings,
+    showInSidebar: false,
+  },
+  {
+    name: "Modifier une class",
     link: "/parameters/classification/:id",
     icon: Settings,
     showInSidebar: false,
@@ -41,6 +47,12 @@ export const LINKS: Link[] = [
   {
     name: "Collections",
     link: "/parameters/collection",
+    icon: Settings,
+    showInSidebar: false,
+  },
+  {
+    name: "Créer une collection",
+    link: "/parameters/collection/create",
     icon: Settings,
     showInSidebar: false,
   },
