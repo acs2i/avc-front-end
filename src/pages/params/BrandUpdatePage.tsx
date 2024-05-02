@@ -116,7 +116,7 @@ export default function BranchUpdatePage() {
           </div>
         )}
       </Modal>
-      <Card title={`Mettre à jour la brand`}>
+      <Card title={`Mettre à jour la marque`}>
         <form
           className="w-[70%] h-[400px] mx-auto mt-[50px] mb-[50px]"
           onSubmit={handleSubmit}

@@ -61,7 +61,6 @@ export default function DimensionPage() {
       const data = await response.json();
       setDimensions(data.data);
       setTotalItem(data.total);
-      console.log(data);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     } finally {
@@ -126,9 +125,9 @@ export default function DimensionPage() {
                 >
                   <path
                     stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
                     d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
                   />
                 </svg>
@@ -142,6 +141,9 @@ export default function DimensionPage() {
           <div className="flex items-center gap-3">
             <Button size="small" blue>
               Créer une dimension
+            </Button>
+            <Button size="small" blue to="/parameters/dimension/create/item">
+              Créer une couleur / une taille
             </Button>
           </div>
         </div>
