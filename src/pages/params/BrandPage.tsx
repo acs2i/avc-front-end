@@ -173,9 +173,6 @@ export default function BrandPage() {
                 <th scope="col" className="px-6 py-4 w-1/3">
                   Libellé
                 </th>
-                <th scope="col" className="px-6 py-4 w-1/3 text-center">
-                  Modifier
-                </th>
               </tr>
             </thead>
             <tbody>
@@ -184,16 +181,10 @@ export default function BrandPage() {
                   <tr
                     key={brand._id}
                     className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
+                    onClick={() => navigate(`/parameters/brand/${brand._id}`)}
                   >
                     <td className="px-6 py-4">{brand.YX_CODE}</td>
                     <td className="px-6 py-4">{brand.YX_LIBELLE}</td>
-                    <td className="px-6 py-4">
-                      <Tooltip title="Modifier">
-                        <div className="flex justify-center text-orange-400">
-                          <SquarePen />
-                        </div>
-                      </Tooltip>
-                    </td>
                   </tr>
                 ))
               ) : (

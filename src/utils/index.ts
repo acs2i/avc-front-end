@@ -81,6 +81,12 @@ export const LINKS: Link[] = [
     showInSidebar: false,
   },
   {
+    name: "Modifier une brand",
+    link: "/parameters/brand/:id",
+    icon: Settings,
+    showInSidebar: false,
+  },
+  {
     name: "Liste des fournisseurs",
     link: "/suppliers/suppliers-list",
     icon: Truck,
