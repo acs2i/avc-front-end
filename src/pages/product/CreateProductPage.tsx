@@ -17,37 +17,40 @@ import useNotify from "../../utils/hooks/useToast";
 import "react-toastify/dist/ReactToastify.css";
 import useFetch from "../../utils/hooks/usefetch";
 
+import { ActionMeta, SingleValue } from 'react-select';
 import CreatableSelect from "react-select/creatable";
+
+
+
 
 import { colourOptions } from "../../data";
 
 interface Family {
   _id: string;
-  name: string;
+  YX_TYPE: string;
+  YX_CODE: string;
+  YX_LIBELLE: string;
 }
 
 interface Collection {
   _id: string;
-  name: string;
-}
-
-interface SubFamily {
-  _id: string;
-  name: string;
+  CODE: string;
+  LIBELLE: string;
 }
 
 interface Brand {
   _id: string;
-  name: string;
+  YX_CODE: string;
+  YX_LIBELLE: string;
 }
 
 interface FormData {
   reference: string;
   name: string;
-  family: any;
+  family: Family | null;
   subFamily: any;
-  brand: string;
-  productCollection: string;
+  brand: BrandOption | null;
+  productCollection: Collection | null;
   uvc: {
     code: string;
     color: any;
@@ -83,6 +86,11 @@ const customStyles = {
   }),
 };
 
+type BrandOption = {
+  value: string;
+  label: string;
+};
+
 export default function CreateProductPage() {
   const user = useSelector((state: any) => state.auth.user);
   const [page, setPage] = useState("addProduct");
@@ -91,13 +99,14 @@ export default function CreateProductPage() {
   const [createProductIsOpen, setCreateProductcIsOpen] = useState(true);
   const [familyId, setFamilyId] = useState<string>("");
   const { notifySuccess, notifyError } = useNotify();
+  const [brandOptions, setBrandOptions] = useState<BrandOption[]>([]);
   const [formData, setFormData] = useState<FormData>({
     reference: "",
     name: "",
-    family: [],
+    family: null,
     subFamily: [],
-    brand: "",
-    productCollection: "",
+    brand: null,
+    productCollection: null,
     uvc: {
       code: "",
       color: [],
@@ -107,14 +116,15 @@ export default function CreateProductPage() {
     status: 0,
     creatorId: user._id,
   });
+
   const resetForm = () => {
     setFormData({
       reference: "",
       name: "",
-      family: [],
+      family: null,
       subFamily: [],
-      brand: "",
-      productCollection: "",
+      brand: null,
+      productCollection: null,
       uvc: {
         code: "",
         color: [],
@@ -126,7 +136,6 @@ export default function CreateProductPage() {
     });
   };
 
-  // Récupération données
   const handleChange = async (
     e:
       | React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -135,13 +144,13 @@ export default function CreateProductPage() {
     const { id, value } = e.target || e;
 
     if (id === "family") {
-      const selectedFamilyObject = famillies?.find(
-        (family: any) => family._id === value
+      const selectedFamilyObject = families?.find(
+        (family: Family) => family._id === value
       );
       if (selectedFamilyObject) {
         setFormData((prevFormData) => ({
           ...prevFormData,
-          family: selectedFamilyObject.name,
+          family: selectedFamilyObject,
         }));
         setFamilyId(value);
       }
@@ -165,37 +174,86 @@ export default function CreateProductPage() {
     }
   };
 
-  // Fonctions récupération des données (famille, sous-famille, marques, collection)
-  const { data: famillies } = useFetch<Family[]>(
+  // const handleChangeBrand = async (
+  //   newValue: SingleValue<BrandOption>,
+  //   actionMeta: ActionMeta<BrandOption>
+  // ) => {
+  //   console.log("passed")
+  //   setFormData((prevFormData) => ({
+  //     ...prevFormData,
+  //     brand: newValue,
+  //   }));
+  // };
+
+  const handleChangeBrand = (newValue: SingleValue<BrandOption>, actionMeta: ActionMeta<BrandOption>) => {
+    if (typeof newValue === 'string') {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        brand: { value: newValue, label: newValue },
+      }));
+    } else {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        brand: newValue,
+      }));
+    }
+  };
+
+  const handleInputChangeBrand = async (inputValue: string) => {
+    console.log("passed");
+  
+    // Effectuer la requête fetch ici
+    try {
+      const response = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/brand?search=${inputValue}`);
+      const data = await response.json();
+  
+      // Utiliser les données récupérées pour mettre à jour les options de react-select
+      const options = data.data.map((brand: Brand) => ({
+        value: brand.YX_CODE,
+        label: brand.YX_LIBELLE,
+      }));
+  
+      setFormData( {...formData, brand:  {value: "hi", label: "hi"}});
+    } catch (error) {
+      console.error("Erreur lors de la récupération des marques :", error);
+    }
+  };
+
+  const { data: familiesData } = useFetch<{ data: Family[] }>(
     `${process.env.REACT_APP_URL_DEV}/api/v1/family`
   );
 
-  const { data: subFamillies } = useFetch(
-    familyId &&
-      `${process.env.REACT_APP_URL_DEV}/api/v1/family/subFamily/${familyId}`
-  );
-
-  const { data: brands } = useFetch<Brand[]>(
+  const { data: brandsData } = useFetch<{ data: Brand[] }>(
     `${process.env.REACT_APP_URL_DEV}/api/v1/brand`
   );
 
-  const { data: collections } = useFetch<Collection[]>(
+  const { data: collectionsData } = useFetch<{ data: Collection[] }>(
     `${process.env.REACT_APP_URL_DEV}/api/v1/collection`
   );
 
-  // Mapping des données pour crée les options des input select
-  const options =
-    famillies?.map(({ _id, name }) => ({ value: _id, label: name, name })) ??
-    [];
-  const selectedFamilyName = famillies?.find(
-    (family: Family) => family._id === formData.family
-  )?.name;
-  const collectionOptions =
-    collections?.map(({ name }) => ({ value: name, label: name, name })) ?? [];
-  const brandOptions: { value: string; label: string }[] =
-    brands?.map(({ name }) => ({ value: name, label: name })) ?? [];
+  console.log(brandsData);
 
-  // Envoi du formulaire de création de produit
+  const familyOptions =
+    familiesData?.data.map(({ _id, YX_LIBELLE }) => ({
+      value: _id,
+      label: YX_LIBELLE,
+      name: YX_LIBELLE,
+    })) ?? [];
+
+  const selectedFamilyName = formData.family?.YX_LIBELLE;
+
+  const collectionOptions =
+    collectionsData?.data.map(({ LIBELLE }) => ({
+      value: LIBELLE,
+      label: LIBELLE,
+    })) ?? [];
+
+  // const brandOptions =
+  //   brandsData?.data.map(({ YX_LIBELLE }) => ({
+  //     value: YX_LIBELLE,
+  //     label: YX_LIBELLE,
+  //   })) ?? [];
+
   const handleCreateProduct = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -213,7 +271,7 @@ export default function CreateProductPage() {
 
       if (response.ok) {
         const data = await response.json();
-        notifySuccess("Produit créée avec succès!");
+        notifySuccess("Produit créé avec succès!");
         setIsLoading(false);
         resetForm();
       } else {
@@ -341,13 +399,20 @@ export default function CreateProductPage() {
                             </span>
                           </label>
                         </div>
-                        <CreatableSelect
+                        <CreatableSelect<BrandOption>
                           placeholder="Selectionner une marque"
                           styles={customStyles}
                           value={formData.brand}
-                          // onChange={handleChange}
+                          onChange={handleChangeBrand}
+                          onInputChange={handleInputChangeBrand}
                           className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
                           required
+                          options={
+                            brandsData?.data.map(({ YX_CODE, YX_LIBELLE }) => ({
+                              value: YX_CODE,
+                              label: YX_LIBELLE,
+                            })) ?? []
+                          }
                         />
                       </div>
 
@@ -403,7 +468,7 @@ export default function CreateProductPage() {
                             Sous-famille :{" "}
                           </label>
                         </div>
-                        <CreatableSelect
+                        {/* <CreatableSelect
                           placeholder="Selectionner une sous-famille"
                           styles={customStyles}
                           value={formData.subFamily}
@@ -416,7 +481,7 @@ export default function CreateProductPage() {
                                 : []
                               : []
                           }
-                        />
+                        /> */}
                       </div>
                     </div>
                   </div>
