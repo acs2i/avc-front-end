@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, SquarePen } from "lucide-react";
 import Spinner from "../../components/Shared/Spinner";
 import { Tooltip } from "@mui/material";
-import ScrollToTop from '../../components/ScrollToTop';
+import ScrollToTop from "../../components/ScrollToTop";
 
 interface Collection {
   _id: string;
@@ -92,44 +92,24 @@ export default function BrandPage() {
   return (
     <div className="relative">
       <Card title="Paramétrer les marques">
-        <div className="flex items-center gap-4 p-7">
-          <div className="relative shadow-md flex-1">
+        <div className="flex items-center justify-center gap-4 p-7">
+          <div className="flex items-center gap-4">
+            <label className="w-[60px] text-sm font-bold">Code :</label>
             <input
               type="text"
-              id="search"
-              className="block p-2.5 w-full text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Rechercher une classification"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onKeyDown={handleKeyDown}
+              id="code"
+              className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
+              placeholder="Rechercher par code"
             />
-            {!isLoading ? (
-              <button
-                type="submit"
-                className="absolute top-0 end-0 p-2.5 text-sm font-medium h-full text-white bg-green-800 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
-                onClick={handleSearch}
-              >
-                <svg
-                  className="w-4 h-4"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                  />
-                </svg>
-              </button>
-            ) : (
-              <div className="absolute top-0 end-0 h-full rounded-e-lg">
-                <CircularProgress />
-              </div>
-            )}
+          </div>
+          <div className="flex items-center gap-4">
+            <label className="w-[60px] text-sm font-bold">Libellé :</label>
+            <input
+              type="text"
+              id="code"
+              className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
+              placeholder="Rechercher par libellé"
+            />
           </div>
           <div className="flex items-center gap-3">
             <Button size="small" blue to="/parameters/brand/create">
@@ -158,7 +138,7 @@ export default function BrandPage() {
             )}
           </div>
           <table className="w-full text-left">
-            <thead className="bg-blue-50 text-md text-gray-500 border">
+            <thead className="bg-blue-50 text-md text-gray-500">
               <tr>
                 <th scope="col" className="px-6 py-4 w-1/3">
                   Code
@@ -173,7 +153,7 @@ export default function BrandPage() {
                 brands.map((brand) => (
                   <tr
                     key={brand._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
+                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
                     onClick={() => navigate(`/parameters/brand/${brand._id}`)}
                   >
                     <td className="px-6 py-4">{brand.YX_CODE}</td>

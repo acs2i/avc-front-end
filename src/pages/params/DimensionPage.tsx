@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Card from "../../components/Shared/Card";
 import Button from "../../components/FormElements/Button";
-import CircularProgress from "@mui/material/CircularProgress";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
-import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, SquarePen } from "lucide-react";
-import { Tooltip } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import Spinner from "../../components/Shared/Spinner";
-import ScrollToTop from '../../components/ScrollToTop';
-
+import ScrollToTop from "../../components/ScrollToTop";
 
 type DataType = "DI1" | "DI2";
 interface Dimension {
@@ -90,60 +86,41 @@ export default function DimensionPage() {
     }
   };
 
-  const handleKeyDown = (event: any) => {
-    if (event.key === "Enter") {
-      handleSearch();
-    }
-  };
 
   return (
     <div className="relative">
-      <Card title="Paramétrer les collections">
-        <div className="flex items-center gap-4 p-7">
-          <div className="relative shadow-md flex-1">
+      <Card title="Paramétrer les dimensions">
+        <div className="flex items-center justify-center gap-4 p-7">
+          <div className="flex items-center gap-4">
+            <label className="w-[60px] text-sm font-bold">Libellé :</label>
             <input
               type="text"
-              id="search"
-              className="block p-2.5 w-full text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Rechercher une classification"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onKeyDown={handleKeyDown}
+              id="label"
+              className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
+              placeholder="Rechercher par libellé"
             />
-            {!isLoading ? (
-              <button
-                type="submit"
-                className="absolute top-0 end-0 p-2.5 text-sm font-medium h-full text-white bg-green-800 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
-                onClick={handleSearch}
-              >
-                <svg
-                  className="w-4 h-4"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                  />
-                </svg>
-              </button>
-            ) : (
-              <div className="absolute top-0 end-0 h-full rounded-e-lg">
-                <CircularProgress />
-              </div>
-            )}
+          </div>
+          <div className="flex items-center gap-4">
+            <label className="w-[60px] text-sm font-bold">Code :</label>
+            <input
+              type="text"
+              id="code"
+              className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
+              placeholder="Rechercher par code"
+            />
+          </div>
+          <div className="flex items-center gap-4">
+            <label className="w-[60px] text-sm font-bold">Type :</label>
+            <input
+              type="text"
+              id="type"
+              className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
+              placeholder="Rechercher par type"
+            />
           </div>
           <div className="flex items-center gap-3">
-            <Button size="small" blue>
-              Créer une dimension
-            </Button>
             <Button size="small" blue to="/parameters/dimension/create/item">
-              Créer une couleur / une taille
+              Créer une dimension
             </Button>
           </div>
         </div>
@@ -158,7 +135,7 @@ export default function DimensionPage() {
             </Stack>
           </div>
         )}
-        <div className="overflow-x-auto bg-white">
+        <div className="relative overflow-x-auto bg-white">
           <div className="px-3 mb-2 flex items-center gap-2">
             <h4 className="text-xl">
               <span className="font-bold">{totalItem}</span> Dimensions
@@ -168,13 +145,13 @@ export default function DimensionPage() {
             )}
           </div>
           <table className="w-full text-left">
-            <thead className="bg-blue-50 text-md text-gray-500 border ">
+            <thead className="bg-blue-50 text-md text-gray-500">
               <tr>
                 <th scope="col" className="px-6 py-4 w-1/3">
-                  Code
+                  Libellé
                 </th>
                 <th scope="col" className="px-6 py-4 w-1/3">
-                  Libellé
+                  Code
                 </th>
                 <th scope="col" className="px-6 py-4 w-1/3">
                   Type
@@ -186,11 +163,13 @@ export default function DimensionPage() {
                 dimensions.map((dimension) => (
                   <tr
                     key={dimension._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
-                    onClick={() => navigate(`/parameters/dimension/${dimension._id}`)}
+                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
+                    onClick={() =>
+                      navigate(`/parameters/dimension/${dimension._id}`)
+                    }
                   >
-                    <td className="px-6 py-4">{dimension.GDI_DIMORLI}</td>
                     <td className="px-6 py-4">{dimension.GDI_LIBELLE}</td>
+                    <td className="px-6 py-4">{dimension.GDI_DIMORLI}</td>
                     <td className="px-6 py-4">
                       {dimension.GDI_TYPEDIM in typeLabels
                         ? typeLabels[dimension.GDI_TYPEDIM]

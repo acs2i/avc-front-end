@@ -8,7 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, SquarePen } from "lucide-react";
 import Spinner from "../../components/Shared/Spinner";
 import { Tooltip } from "@mui/material";
-import ScrollToTop from '../../components/ScrollToTop';
+import ScrollToTop from "../../components/ScrollToTop";
 
 type DataType = "LA1" | "LA2" | "LA3";
 
@@ -20,7 +20,9 @@ interface Family {
 }
 
 function ClassificationsPage() {
-  const [searchValue, setSearchValue] = useState("");
+  const [typeValue, setTypeValue] = useState("");
+  const [codeValue, setCodeValue] = useState("");
+  const [labelValue, setLabelValue] = useState("");
   const [prevSearchValue, setPrevSearchValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -43,9 +45,21 @@ function ClassificationsPage() {
     setCurrentPage(value);
   };
 
+  const resetSearch = () => {
+    setTypeValue("");
+    setCodeValue("");
+    setLabelValue("");
+    setPrevSearchValue("");
+    setCurrentPage(1);
+  };
+
   useEffect(() => {
-    fetchFamily();
-  }, [currentPage]);
+    if (!typeValue && !codeValue && !labelValue) {
+      fetchFamily();
+    }else{
+      handleSearch();
+    }
+  }, [typeValue, codeValue, labelValue, currentPage]);
 
   const fetchFamily = async () => {
     try {
@@ -73,7 +87,7 @@ function ClassificationsPage() {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/family/search?value=${searchValue}&page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/family/search?YX_TYPE=${typeValue}&YX_CODE=${codeValue}&YX_LIBELLE=${labelValue}&page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -84,65 +98,58 @@ function ClassificationsPage() {
 
       const data = await response.json();
       setFamilies(data.data);
-      setTotalItem(data.length);
-      setPrevSearchValue(searchValue);
+      setTotalItem(data.total);
+      setPrevSearchValue(typeValue);
       setIsLoading(false);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     }
   };
 
-  const handleKeyDown = (event: any) => {
-    if (event.key === "Enter") {
-      handleSearch();
-    }
-  };
-
   return (
     <div className="relative">
       <Card title="Paramétrer les classifications">
-        <div className="flex items-center gap-4 p-7">
-          <div className="relative shadow-md flex-1">
-            <input
-              type="search"
-              id="search-dropdown"
-              className="block p-2.5 w-full text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Rechercher une classification"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onKeyDown={handleKeyDown}
-            />
-            {!isLoading ? (
-              <button
-                type="submit"
-                className="absolute top-0 end-0 p-2.5 text-sm font-medium h-full text-white bg-green-800 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
-                onClick={handleSearch}
-              >
-                <svg
-                  className="w-4 h-4"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                  />
-                </svg>
-              </button>
-            ) : (
-              <div className="absolute top-0 end-0 h-full rounded-e-lg">
-                <CircularProgress />
-              </div>
-            )}
+        <div className="flex items-center justify-center gap-4 p-7">
+          <div className="flex items-center gap-4">
+            <label className="w-[90px] text-sm font-bold">Niveau :</label>
+            <select
+              name="pets"
+              id="level"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-1.5"
+              onChange={(e) => setTypeValue(e.target.value)}
+            >
+              <option value="">Choisir un niveau</option>
+              <option value="LA1">Famille</option>
+              <option value="LA2">Sous-famille</option>
+              <option value="LA3">Sous-sous-famille</option>
+            </select>
           </div>
+          <div className="flex items-center gap-4">
+            <label className="w-[60px] text-sm font-bold">Code :</label>
+            <input
+              type="text"
+              id="code"
+              className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
+              placeholder="Rechercher par code"
+              value={codeValue}
+              onChange={(e) => setCodeValue(e.target.value)}
+            />
+          </div>
+          <div className="flex items-center gap-4">
+            <label className="w-[60px] text-sm font-bold">Libellé :</label>
+            <input
+              type="text"
+              id="label"
+              className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
+              placeholder="Rechercher par libellé"
+              value={labelValue}
+              onChange={(e) => setLabelValue(e.target.value)}
+            />
+          </div>
+
           <div className="flex items-center gap-3">
             <Button size="small" blue to="/parameters/classification/create">
-              Créer une classification
+              Créer une classe
             </Button>
           </div>
         </div>
@@ -161,14 +168,11 @@ function ClassificationsPage() {
         <div className="overflow-x-auto bg-white">
           <div className="px-3 mb-2 flex items-center gap-2">
             <h4 className="text-xl">
-              <span className="font-bold">{totalItem}</span> Classifications
+              <span className="font-bold">{totalItem}</span> Resultats
             </h4>
-            {prevSearchValue && (
-              <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
-            )}
           </div>
           <table className="w-full text-left">
-            <thead className="bg-blue-50 text-md text-gray-500 border">
+            <thead className="bg-blue-50 text-md text-gray-500">
               <tr>
                 <th scope="col" className="px-6 py-4 w-1/3">
                   Niveau
@@ -186,8 +190,10 @@ function ClassificationsPage() {
                 families.map((family) => (
                   <tr
                     key={family._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
-                    onClick={() => navigate(`/parameters/classification/${family._id}`)}
+                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
+                    onClick={() =>
+                      navigate(`/parameters/classification/${family._id}`)
+                    }
                   >
                     <td className="px-6 py-4 flex items-center gap-2">
                       {typeLabels[family.YX_TYPE]}

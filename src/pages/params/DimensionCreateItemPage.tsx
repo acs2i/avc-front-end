@@ -72,7 +72,7 @@ export default function DimensionCreateItemPage() {
           onSubmit={handleSubmit}
         >
           <h1 className="text-2xl text-center">
-            Créer une couleur / une taille
+            Créer une dimension
           </h1>
           <div className="mt-5 flex flex-col justify-between">
             <div className="flex flex-col">

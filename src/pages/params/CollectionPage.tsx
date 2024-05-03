@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Card from "../../components/Shared/Card";
 import Button from "../../components/FormElements/Button";
-import CircularProgress from "@mui/material/CircularProgress";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
-import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, SquarePen } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import Spinner from "../../components/Shared/Spinner";
-import { Tooltip } from "@mui/material";
-import ScrollToTop from '../../components/ScrollToTop';
+import ScrollToTop from "../../components/ScrollToTop";
 
 interface Collection {
   _id: string;
@@ -83,53 +80,27 @@ export default function CollectionPage() {
     }
   };
 
-  const handleKeyDown = (event: any) => {
-    if (event.key === "Enter") {
-      handleSearch();
-    }
-  };
-
   return (
     <div className="relative">
       <Card title="Paramétrer les collections">
-        <div className="flex items-center gap-4 p-7">
-          <div className="relative shadow-md flex-1">
+        <div className="flex items-center justify-center gap-4 p-7">
+          <div className="flex items-center gap-4">
+            <label className="w-[60px] text-sm font-bold">Code :</label>
             <input
               type="text"
-              id="search"
-              className="block p-2.5 w-full text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Rechercher une classification"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onKeyDown={handleKeyDown}
+              id="code"
+              className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
+              placeholder="Rechercher par code"
             />
-            {!isLoading ? (
-              <button
-                type="submit"
-                className="absolute top-0 end-0 p-2.5 text-sm font-medium h-full text-white bg-green-800 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
-                onClick={handleSearch}
-              >
-                <svg
-                  className="w-4 h-4"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                  />
-                </svg>
-              </button>
-            ) : (
-              <div className="absolute top-0 end-0 h-full rounded-e-lg">
-                <CircularProgress />
-              </div>
-            )}
+          </div>
+          <div className="flex items-center gap-4">
+            <label className="w-[60px] text-sm font-bold">Libellé :</label>
+            <input
+              type="text"
+              id="label"
+              className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
+              placeholder="Rechercher par libellé"
+            />
           </div>
           <div className="flex items-center gap-3">
             <Button size="small" blue to="/parameters/collection/create">
@@ -148,7 +119,7 @@ export default function CollectionPage() {
             </Stack>
           </div>
         )}
-        <div className="overflow-x-auto bg-white">
+        <div className="relative overflow-x-auto">
           <div className="px-3 mb-2 flex items-center gap-2">
             <h4 className="text-xl">
               <span className="font-bold">{totalItem}</span> Collections
@@ -158,7 +129,7 @@ export default function CollectionPage() {
             )}
           </div>
           <table className="w-full text-left">
-            <thead className="bg-blue-50 text-md text-gray-500 border">
+            <thead className="bg-blue-50 text-md text-gray-500">
               <tr>
                 <th scope="col" className="px-6 py-4 w-1/2">
                   Code
@@ -173,8 +144,10 @@ export default function CollectionPage() {
                 collections.map((collection) => (
                   <tr
                     key={collection._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold"
-                    onClick={() => navigate(`/parameters/collection/${collection._id}`)}
+                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
+                    onClick={() =>
+                      navigate(`/parameters/collection/${collection._id}`)
+                    }
                   >
                     <td className="px-6 py-4">{collection.CODE}</td>
                     <td className="px-6 py-4">{collection.LIBELLE}</td>

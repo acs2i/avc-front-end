@@ -179,7 +179,7 @@ function ClassificationCreatePage() {
           className="w-[70%] mx-auto mt-[50px] mb-[50px]"
           onSubmit={handleSubmit}
         >
-          <h1 className="text-2xl text-center">Création de la class</h1>
+          <h1 className="text-2xl text-center">Création de la classe</h1>
           <div className="mt-5 flex flex-col justify-between">
             <div className="flex flex-col">
               <Input
@@ -236,7 +236,7 @@ function ClassificationCreatePage() {
                       {families.map((family) => (
                         <ul>
                           <li
-                            className="cursor-pointer py-1 hover:bg-gray-200 text-lg px-4"
+                            className="cursor-pointer py-1 hover:bg-gray-200 text-lg px-4 py-2 border-b"
                             onClick={() => handleDropdownClose(family)}
                           >
                             {family.YX_LIBELLE}

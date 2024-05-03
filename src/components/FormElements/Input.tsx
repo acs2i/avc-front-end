@@ -1,7 +1,6 @@
 import React, { useReducer } from "react";
 import { validate } from "../../utils/validator";
 
-
 type Validator = {
   type: string;
   val?: number | undefined;
@@ -80,10 +79,15 @@ const Input: React.FC<InputProps> = (props) => {
       props.orange ? "border-b-2 border-orange-400" : ""
     }
     ${props.gray ? "border-b-[1px] border-gray-300" : ""}
-    ${props.disabled ? " bg-gray-200 rounded-md border border-white text-gray-500 italic px-3 cursor-not-allowed" : ""}
+    ${
+      props.disabled
+        ? " bg-gray-200 rounded-md border border-white text-gray-500 italic px-3 cursor-not-allowed"
+        : ""
+    }
     ${
       !inputState.isValid &&
-      inputState.isTouched && props.required &&
+      inputState.isTouched &&
+      props.required &&
       "border-b-[1px] border-red-300"
     }
   `;
@@ -118,28 +122,32 @@ const Input: React.FC<InputProps> = (props) => {
         onBlur={props.onBlur}
         required={props.required}
         value={props.value}
-        className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+        className="bg-gray-50 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2"
       >
         <option value="" selected>
           {props.placeholder}
         </option>
         {props.options?.map((option, i) => (
-          <option key={i} value={option.value} className="px-4 py-2">
+          <option key={i} value={option.value} >
             {option.name}
           </option>
         ))}
       </select>
-    ) :  null;
+    ) : null;
 
   return (
     <div className={`flex flex-col mt-3`}>
       <div>
         <label
           htmlFor={props.id}
-          className="relative text-[15px] font-bold text-gray-500"
+          className="relative mb-2 text-md font-medium text-gray-800 dark:text-white"
         >
           {props.label}
-        {props.required && <span className="absolute top-[-5px] right-[-10px] text-red-400">*</span>}
+          {props.required && (
+            <span className="absolute top-[-5px] right-[-10px] text-red-400">
+              *
+            </span>
+          )}
         </label>
       </div>
       {element}
