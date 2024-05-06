@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import SingleProductPage from "./pages/product/SingleProductPage";
@@ -21,20 +21,20 @@ import BrandPage from "./pages/params/BrandPage";
 import ClassificationUpdatePage from "./pages/params/ClassificationUpdatePage";
 import CollectionUpdatePage from "./pages/params/CollectionUpdatePage";
 import DimensionUpdatePage from "./pages/params/DimensionUpdatePage";
-import ClassificationCreatePage from './pages/params/ClassificationCreatePage';
-import CollectionCreatePage from './pages/params/CollectionCreatePage';
+import ClassificationCreatePage from "./pages/params/ClassificationCreatePage";
+import CollectionCreatePage from "./pages/params/CollectionCreatePage";
 import BrandUpdatePage from "./pages/params/BrandUpdatePage";
-import BrandCreatePage from './pages/params/BrandCreatePage';
-import DimensionCreateItemPage from './pages/params/DimensionCreateItemPage';
+import BrandCreatePage from "./pages/params/BrandCreatePage";
+import DimensionCreateItemPage from "./pages/params/DimensionCreateItemPage";
+import DraftPage from "./pages/draft/DraftPage";
 
 function App() {
   const location = useLocation();
   const excludedPaths = ["/login"];
 
-
   useEffect(() => {
     window.scrollTo({
-      top: 0
+      top: 0,
       // behavior: 'smooth'
     });
   }, [location.pathname]);
@@ -94,7 +94,7 @@ function App() {
                 path="/parameters/collection/:id"
                 element={<CollectionUpdatePage />}
               />
-                <Route
+              <Route
                 path="/parameters/collection/create"
                 element={<CollectionCreatePage />}
               />
@@ -103,18 +103,25 @@ function App() {
                 path="/parameters/dimension/:id"
                 element={<DimensionUpdatePage />}
               />
-              <Route path="/parameters/dimension/create/item" element={<DimensionCreateItemPage />} />
+              <Route
+                path="/parameters/dimension/create/item"
+                element={<DimensionCreateItemPage />}
+              />
               <Route path="/parameters/brand" element={<BrandPage />} />
               <Route
                 path="/parameters/brand/:id"
                 element={<BrandUpdatePage />}
               />
-              <Route path="/parameters/brand/create" element={<BrandCreatePage/>} />
+              <Route
+                path="/parameters/brand/create"
+                element={<BrandCreatePage />}
+              />
               <Route path="/product/:id" element={<SingleProductPage />} />
               <Route
                 path="/suppliers/suppliers-list"
                 element={<SuppliersListPage />}
               />
+              <Route path="/draft" element={<DraftPage />} />
               <Route path="/login" element={<LoginPage />} />
             </Routes>
           </PageContainer>

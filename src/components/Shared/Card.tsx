@@ -15,7 +15,7 @@ export default function Card({ title, children }: InFosCard) {
 
   return (
     <section className="bg-white shadow-md rounded-lg flex flex-col gap-1 rounded-md">
-      <div className="bg-green-900 py-3 px-5 rounded-t-md flex items-center gap-2">
+      <div className="bg-green-900 py-3 px-5 rounded-t-md flex items-center gap-4">
         {!shouldHideBackButton && <div
           className="text-white bg-orange-500 h-[30px] w-[30px] flex items-center justify-center cursor-pointer rounded-full hover:bg-orange-400"
           onClick={() => navigate(-1)}

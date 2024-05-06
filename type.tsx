@@ -3,6 +3,7 @@ export type Link = {
   link: string;
   icon: any;
   showInSidebar: boolean;
+  showInBottom: boolean;
 };
 
 export type Params = {
