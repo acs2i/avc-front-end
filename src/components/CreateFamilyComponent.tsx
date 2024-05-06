@@ -17,7 +17,7 @@ export default function CreateFamilyComponent() {
   const [familyId, setfamilyId] = useState<string | null>(null);
   const [famillyValue, setFamillyValue] = useState<string>("");
   const [subFamillyValue, setSubFamillyValue] = useState<string>("");
-  const [families, setFamillies] = useState([]);
+  const [families, setFamillies] = useState<{ _id: string; YX_LIBELLE: string }[]>([]);
   const { notifySuccess, notifyError } = useNotify();
   const resetForm = () => {
     setFamillyValue("");
@@ -32,17 +32,19 @@ export default function CreateFamilyComponent() {
     setOpenSubFamily(!openSubFamily);
   };
 
-  const options = families?.map((family: any) => ({
-    value: family._id,
-    label: family.name,
-    name: family.name,
-  }));
+  const options = Array.isArray(families)
+    ? families.map(({ _id, YX_LIBELLE }) => ({
+        value: _id,
+        label: YX_LIBELLE,
+        name: YX_LIBELLE,
+      }))
+    : [];
 
   // Fonction qui récupère l'id de la famille
   const handleFamilyId = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
     const selectedFamilyObject =
-      families?.find((family: any) => family._id === value) ?? null;
+      families?.find((family) => family._id === value) ?? null;
     setfamilyId(value);
   };
 
@@ -66,7 +68,7 @@ export default function CreateFamilyComponent() {
     setIsFamilyLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/family/create`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/family`,
         {
           method: "POST",
           headers: {
