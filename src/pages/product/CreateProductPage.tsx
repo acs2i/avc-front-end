@@ -227,7 +227,7 @@ export default function CreateProductPage() {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/brand/search?value=${inputValueBrand}&page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/brand/search?YX_LIBELLE=${inputValueBrand}&page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -255,11 +255,11 @@ export default function CreateProductPage() {
   };
 
   // Fonction pour gérer la saisie de l'utilisateur
-  const handleInputChangeCollection = async (inputValueBrand: string) => {
-    setInputValueCollection(inputValueBrand);
+  const handleInputChangeCollection = async (inputValueCollection: string) => {
+    setInputValueCollection(inputValueCollection);
 
     // console.log(inputValue);
-    if (inputValueBrand === '') {
+    if (inputValueCollection === '') {
       try {
         const response = await fetch(
           `${process.env.REACT_APP_URL_DEV}/api/v1/collection`,
@@ -287,7 +287,7 @@ export default function CreateProductPage() {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/collection/search?value=${inputValueBrand}&page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/collection/search?LIBELLE=${inputValueCollection}&page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -846,6 +846,14 @@ export default function CreateProductPage() {
 
               {!isLoading ? (
                 <div className="flex gap-2 mt-5">
+                  <Button size="small" cancel>
+                    <X size={15} />
+                    Annuler
+                  </Button>
+                  <Button size="small" inverse type="submit">
+                    <Save size={15} />
+                    Sauvegarder
+                  </Button>
                   <Button
                     size="small"
                     green
@@ -854,14 +862,6 @@ export default function CreateProductPage() {
                   >
                     <Plus size={15} />
                     Créer
-                  </Button>
-                  <Button size="small" inverse type="submit">
-                    <Save size={15} />
-                    Sauvegarder
-                  </Button>
-                  <Button size="small" cancel>
-                    <X size={15} />
-                    Annuler
                   </Button>
                 </div>
               ) : (
