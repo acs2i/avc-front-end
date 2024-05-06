@@ -68,11 +68,7 @@ function App() {
             {shouldShowNavbar && <Header titlePage={getPageTitle()} />}
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/edit" element={<CreatedProductPage />} />
-              <Route
-                path="/edit/edit-product"
-                element={<CreateProductPage />}
-              />
+              <Route path="/edit" element={<CreateProductPage />} />
               <Route path="/parameters" element={<ParamsMenuPage />} />
               <Route
                 path="/parameters/classification"

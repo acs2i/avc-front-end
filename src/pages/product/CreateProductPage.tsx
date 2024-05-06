@@ -472,13 +472,6 @@ export default function CreateProductPage() {
 
   return (
     <div className="mt-7">
-      <Link
-        to="/edit"
-        className="flex items-center justify-start gap-3 mb-5 font-bold text-gray-600"
-      >
-        <MoveLeft />
-        <span>Retour</span>
-      </Link>
       <Card title="Panel d'ajout">
         <div className="mt-4 mb-[50px] px-4">
           <div className="flex items-center gap-7">
