@@ -148,7 +148,7 @@ function ClassificationsPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Button size="small" blue to="/parameters/classification/create">
+            <Button size="small" green to="/parameters/classification/create">
               Créer une classe
             </Button>
           </div>

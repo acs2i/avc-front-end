@@ -16,7 +16,7 @@ export default function Sidebar() {
         </Link>
         <div className="w-full h-[1px] bg-gray-200 mt-5"></div>
       </div>
-      <ul className="flex flex-col gap-6">
+      <ul className="flex flex-col items-center gap-6">
         {visibleLinks.map((link, i) => (
           <Tooltip key={i} title={link.name} placement="right-start">
             <Link

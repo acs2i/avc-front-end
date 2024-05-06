@@ -103,7 +103,7 @@ export default function CollectionPage() {
             />
           </div>
           <div className="flex items-center gap-3">
-            <Button size="small" blue to="/parameters/collection/create">
+            <Button size="small" green to="/parameters/collection/create">
               Créer une collection
             </Button>
           </div>

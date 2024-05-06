@@ -112,7 +112,7 @@ export default function BrandPage() {
             />
           </div>
           <div className="flex items-center gap-3">
-            <Button size="small" blue to="/parameters/brand/create">
+            <Button size="small" green to="/parameters/brand/create">
               Créer une marque
             </Button>
           </div>

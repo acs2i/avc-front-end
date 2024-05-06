@@ -119,7 +119,7 @@ export default function DimensionPage() {
             />
           </div>
           <div className="flex items-center gap-3">
-            <Button size="small" blue to="/parameters/dimension/create/item">
+            <Button size="small" green to="/parameters/dimension/create/item">
               Créer une dimension
             </Button>
           </div>

@@ -368,7 +368,7 @@ export default function Home() {
             </div>
 
             <div>
-              <Button to="/edit" size="small" blue>
+              <Button to="/edit" size="small" green>
                 Créer un produit
               </Button>
             </div>

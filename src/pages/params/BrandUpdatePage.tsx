@@ -7,6 +7,7 @@ import Button from "../../components/FormElements/Button";
 import { CircularProgress } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
 import Modal from "../../components/Shared/Modal";
+import { RotateCcw, X } from "lucide-react";
 
 interface Branch {
   _id: string;
@@ -28,7 +29,6 @@ export default function BranchUpdatePage() {
   const { data: brand } = useFetch<Branch>(
     `${process.env.REACT_APP_URL_DEV}/api/v1/brand/${id}`
   );
-
 
   const [libelle, setLibelle] = useState("");
   const [code, setCode] = useState();
@@ -56,7 +56,6 @@ export default function BranchUpdatePage() {
       });
     }
   }, [brand]);
-
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -119,13 +118,12 @@ export default function BranchUpdatePage() {
         )}
       </Modal>
       <Card title={`Mettre à jour la marque`}>
-        <form
-          className="w-[70%] h-[400px] mx-auto mt-[50px] mb-[50px]"
-        >
+        <form className="w-[70%] h-[400px] mx-auto mt-[50px] mb-[50px]">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl">Collection n° {brand?.YX_CODE}</h1>
             {!isModify && (
               <Button size="small" green onClick={() => setIsModify(true)}>
+                <RotateCcw size={15} />
                 Modifier la marque
               </Button>
             )}
@@ -157,26 +155,30 @@ export default function BranchUpdatePage() {
                 </div>
               )}
             </div>
-            {isModify && <div className="w-full mt-2">
-              <div className="flex items-center gap-2">
-                <Button
-                  size="small"
-                  cancel
-                  type="button"
-                  onClick={() => setIsModify(false)}
-                >
-                  Annuler
-                </Button>
-                <Button
-                  size="small"
-                  green
-                  onClick={() => setIsModalOpen(true)}
-                  type="button"
-                >
-                  Modifier
-                </Button>
+            {isModify && (
+              <div className="w-full mt-2">
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="small"
+                    cancel
+                    type="button"
+                    onClick={() => setIsModify(false)}
+                  >
+                    <X size={15} />
+                    Annuler
+                  </Button>
+                  <Button
+                    size="small"
+                    green
+                    onClick={() => setIsModalOpen(true)}
+                    type="button"
+                  >
+                    <RotateCcw size={15} />
+                    Modifier
+                  </Button>
+                </div>
               </div>
-            </div>}
+            )}
           </div>
         </form>
       </Card>

@@ -7,6 +7,7 @@ import Button from "../../components/FormElements/Button";
 import { CircularProgress } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
 import Modal from "../../components/Shared/Modal";
+import { RotateCcw, X } from "lucide-react";
 
 interface Collection {
   _id: string;
@@ -124,7 +125,8 @@ export default function CollectionUpdatePage() {
             <h1 className="text-2xl">Collection n° {collection?.CODE}</h1>
             {!isModify && (
               <Button size="small" green onClick={() => setIsModify(true)}>
-                Modifier la marque
+                <RotateCcw size={15} />
+                Modifier la collection
               </Button>
             )}
           </div>
@@ -155,26 +157,30 @@ export default function CollectionUpdatePage() {
                 </div>
               )}
             </div>
-            {isModify && <div className="w-full mt-2">
-              <div className="flex items-center gap-2">
-              <Button
-                  size="small"
-                  cancel
-                  type="button"
-                  onClick={() => setIsModify(false)}
-                >
-                  Annuler
-                </Button>
-                <Button
-                  size="small"
-                  green
-                  onClick={() => setIsModalOpen(true)}
-                  type="button"
-                >
-                  Modifier
-                </Button>
+            {isModify && (
+              <div className="w-full mt-2">
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="small"
+                    cancel
+                    type="button"
+                    onClick={() => setIsModify(false)}
+                  >
+                    <X size={15}/>
+                    Annuler
+                  </Button>
+                  <Button
+                    size="small"
+                    green
+                    onClick={() => setIsModalOpen(true)}
+                    type="button"
+                  >
+                     <RotateCcw size={15} />
+                    Modifier
+                  </Button>
+                </div>
               </div>
-            </div>}
+            )}
           </div>
         </form>
       </Card>

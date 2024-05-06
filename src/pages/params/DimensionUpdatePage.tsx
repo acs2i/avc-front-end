@@ -7,6 +7,7 @@ import Button from "../../components/FormElements/Button";
 import { CircularProgress } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
 import Modal from "../../components/Shared/Modal";
+import { RotateCcw, X } from "lucide-react";
 
 interface Dimension {
   _id: string;
@@ -147,7 +148,12 @@ export default function ClassificationUpdatePage() {
             <h1 className="text-2xl">
               {type} n° {dimension?.GDI_DIMORLI}
             </h1>
-            {!isModify && <Button size="small" green onClick={() => setIsModify(true)}>Modifier la dimension</Button>}
+            {!isModify && (
+              <Button size="small" green onClick={() => setIsModify(true)}>
+                <RotateCcw size={15}/>
+                Modifier la dimension
+              </Button>
+            )}
           </div>
           <div className="mt-5 flex flex-col justify-between">
             <div className="flex flex-col">
@@ -176,26 +182,30 @@ export default function ClassificationUpdatePage() {
                 </div>
               )}
             </div>
-            {isModify && <div className="w-full mt-2">
-              <div className="flex items-center gap-2">
-              <Button
-                  size="small"
-                  cancel
-                  type="button"
-                  onClick={() => setIsModify(false)}
-                >
-                  Annuler
-                </Button>
-                <Button
-                  size="small"
-                  green
-                  onClick={() => setIsModalOpen(true)}
-                  type="button"
-                >
-                  Valider
-                </Button>
+            {isModify && (
+              <div className="w-full mt-2">
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="small"
+                    cancel
+                    type="button"
+                    onClick={() => setIsModify(false)}
+                  >
+                    <X size={15} />
+                    Annuler
+                  </Button>
+                  <Button
+                    size="small"
+                    green
+                    onClick={() => setIsModalOpen(true)}
+                    type="button"
+                  >
+                    <RotateCcw size={15} />
+                    Modiifer
+                  </Button>
+                </div>
               </div>
-            </div>}
+            )}
           </div>
         </form>
       </Card>

@@ -7,6 +7,7 @@ import Button from "../../components/FormElements/Button";
 import { CircularProgress } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
 import Modal from "../../components/Shared/Modal";
+import { RotateCcw, X } from "lucide-react";
 
 interface Family {
   _id: string;
@@ -157,6 +158,7 @@ export default function ClassificationUpdatePage() {
             </h1>
             {!isModify && (
               <Button size="small" green onClick={() => setIsModify(true)}>
+                <RotateCcw size={15} />
                 Modifier la classe
               </Button>
             )}
@@ -215,7 +217,8 @@ export default function ClassificationUpdatePage() {
                   type="button"
                   onClick={() => setIsModify(false)}
                 >
-                  Annuler
+                  <X size={15} />
+                    Annuler
                 </Button>
                 <Button
                   size="small"
@@ -223,6 +226,7 @@ export default function ClassificationUpdatePage() {
                   onClick={() => setIsModalOpen(true)}
                   type="button"
                 >
+                  <RotateCcw size={15} />
                   Modifier
                 </Button>
               </div>

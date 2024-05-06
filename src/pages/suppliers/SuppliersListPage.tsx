@@ -5,27 +5,8 @@ import React from "react";
 export default function SuppliersListPage() {
   return (
     <div className="flex flex-col gap-7 mt-7">
-        
-      <Card title="Rechercher un fournisseur">
-        <div className="flex flex-col">
-          <div className="flex items-center mb-4 md:mb-0">
-            <div className="w-[70%] mx-auto">
-              <div className="flex flex-col gap-3 mb-5">
-                <label className="text-sm font-medium text-gray-900 whitespace-nowrap">
-                  Nom du fournisseur :
-                </label>
-                <input
-                  type="text"
-                  placeholder="Entrez le nom du fournsseur"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:border-green-500 focus:outline-none p-2.5"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </Card>
 
-      <Card title="Résultats">
+      <Card title="La liste des fournisseurs">
         <div className="overflow-x-auto">
         <table className="w-full text-left">
               <thead className="uppercase bg-blue-50">
