@@ -24,6 +24,8 @@ import DimensionUpdatePage from "./pages/params/DimensionUpdatePage";
 import ClassificationCreatePage from './pages/params/ClassificationCreatePage';
 import CollectionCreatePage from './pages/params/CollectionCreatePage';
 import BrandUpdatePage from "./pages/params/BrandUpdatePage";
+import BrandCreatePage from './pages/params/BrandCreatePage';
+import DimensionCreateItemPage from './pages/params/DimensionCreateItemPage';
 
 function App() {
   const location = useLocation();
@@ -101,11 +103,13 @@ function App() {
                 path="/parameters/dimension/:id"
                 element={<DimensionUpdatePage />}
               />
+              <Route path="/parameters/dimension/create/item" element={<DimensionCreateItemPage />} />
               <Route path="/parameters/brand" element={<BrandPage />} />
               <Route
                 path="/parameters/brand/:id"
                 element={<BrandUpdatePage />}
               />
+              <Route path="/parameters/brand/create" element={<BrandCreatePage/>} />
               <Route path="/product/:id" element={<SingleProductPage />} />
               <Route
                 path="/suppliers/suppliers-list"

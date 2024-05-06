@@ -91,13 +91,6 @@ export default function BrandPage() {
 
   return (
     <div className="relative">
-      <div
-        className="flex items-center gap-2 mb-3 cursor-pointer"
-        onClick={() => navigate("/parameters")}
-      >
-        <ArrowLeft />
-        <span>retour</span>
-      </div>
       <Card title="Paramétrer les marques">
         <div className="flex items-center gap-4 p-7">
           <div className="relative shadow-md flex-1">
@@ -139,7 +132,7 @@ export default function BrandPage() {
             )}
           </div>
           <div className="flex items-center gap-3">
-            <Button size="small" blue>
+            <Button size="small" blue to="/parameters/brand/create">
               Créer une marque
             </Button>
           </div>
