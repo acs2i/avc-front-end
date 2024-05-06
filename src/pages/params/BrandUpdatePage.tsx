@@ -22,13 +22,14 @@ interface FormData {
 export default function BranchUpdatePage() {
   const { id } = useParams();
   const { notifySuccess, notifyError } = useNotify();
+  const [isModify, setIsModify] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { data: brand } = useFetch<Branch>(
     `${process.env.REACT_APP_URL_DEV}/api/v1/brand/${id}`
   );
 
-  console.log(brand);
+
   const [libelle, setLibelle] = useState("");
   const [code, setCode] = useState();
   const navigate = useNavigate();
@@ -55,6 +56,7 @@ export default function BranchUpdatePage() {
       });
     }
   }, [brand]);
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -119,43 +121,62 @@ export default function BranchUpdatePage() {
       <Card title={`Mettre à jour la marque`}>
         <form
           className="w-[70%] h-[400px] mx-auto mt-[50px] mb-[50px]"
-          onSubmit={handleSubmit}
         >
-          <h1 className="text-2xl">
-            {" "}
-            {brand?.YX_LIBELLE} - {brand?.YX_CODE}
-          </h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl">Collection n° {brand?.YX_CODE}</h1>
+            {!isModify && (
+              <Button size="small" green onClick={() => setIsModify(true)}>
+                Modifier la marque
+              </Button>
+            )}
+          </div>
           <div className="mt-5 flex flex-col justify-between">
             <div className="flex flex-col">
-              <div>
-                <Input
-                  element="input"
-                  id="label"
-                  type="text"
-                  placeholder="Modifier le libellé"
-                  value={libelle}
-                  label="Libellé"
-                  validators={[]}
-                  onChange={handleLibelleChange}
-                  gray
-                />
+              {isModify ? (
+                <div>
+                  <Input
+                    element="input"
+                    id="label"
+                    type="text"
+                    placeholder="Modifier le libellé"
+                    value={libelle}
+                    label="Libellé"
+                    validators={[]}
+                    onChange={handleLibelleChange}
+                    gray
+                  />
+                </div>
+              ) : (
+                <div>
+                  <div className="py-2">
+                    <h3 className="mb-1 text-md text-gray-800 font-bold">
+                      Libellé
+                    </h3>
+                    <p className="text-md">{brand?.YX_LIBELLE}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+            {isModify && <div className="w-full mt-2">
+              <div className="flex items-center gap-2">
+                <Button
+                  size="small"
+                  cancel
+                  type="button"
+                  onClick={() => setIsModify(false)}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  size="small"
+                  green
+                  onClick={() => setIsModalOpen(true)}
+                  type="button"
+                >
+                  Modifier
+                </Button>
               </div>
-            </div>
-            <div className="w-full mt-2">
-            <div className="flex items-center gap-2">
-              <Button
-                size="medium"
-                blue
-                onClick={() => setIsModalOpen(true)}
-                type="button"
-              >
-                Valider
-              </Button>
-              <Button size="medium" danger type="button" onClick={() => navigate(-1)}>
-                Annuler
-              </Button>
-            </div>
-          </div>
+            </div>}
           </div>
         </form>
       </Card>

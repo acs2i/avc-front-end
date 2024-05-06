@@ -140,7 +140,7 @@ const Input: React.FC<InputProps> = (props) => {
       <div>
         <label
           htmlFor={props.id}
-          className="relative mb-2 text-md font-medium text-gray-800 dark:text-white"
+          className="relative mb-2 text-md font-medium text-gray-800"
         >
           {props.label}
           {props.required && (

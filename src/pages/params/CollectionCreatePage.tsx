@@ -95,12 +95,12 @@ export default function CollectionCreatePage() {
               />
               {!isLoading ? (
                 <div className="flex items-center gap-2 mt-5">
-                  <Button size="medium" blue type="submit">
+                  <Button size="small" green blue type="submit">
                     Créer
                   </Button>
                   <Button
-                    size="medium"
-                    danger
+                    size="small"
+                    cancel
                     type="button"
                     onClick={() => navigate(-1)}
                   >

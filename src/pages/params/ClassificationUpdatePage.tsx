@@ -24,6 +24,7 @@ interface FormData {
 export default function ClassificationUpdatePage() {
   const { id } = useParams();
   const [isLoading, setIsLoading] = useState(false);
+  const [isModify, setIsModify] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
 
@@ -148,55 +149,85 @@ export default function ClassificationUpdatePage() {
           </div>
         )}
       </Modal>
-      <Card title={`Mettre à jour la classification`}>
+      <Card title={`Mettre à jour la classe`}>
         <form className="w-[70%] h-[400px] mx-auto mt-[50px] mb-[50px]">
-          <h1 className="text-2xl">
-            {" "}
-            {family?.YX_LIBELLE} - {family?.YX_CODE}
-          </h1>
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl">
+              {type} n°{family?.YX_CODE}
+            </h1>
+            {!isModify && (
+              <Button size="small" green onClick={() => setIsModify(true)}>
+                Modifier la classe
+              </Button>
+            )}
+          </div>
           <div className="mt-5 flex flex-col justify-between">
             <div className="flex flex-col">
-              <div>
-                <Input
-                  element="input"
-                  id="level"
-                  label="Niveau"
-                  value={type}
-                  placeholder={type}
-                  disabled
-                  validators={[]}
-                  gray
-                  onChange={handleTypeChange}
-                />
-                <Input
-                  element="input"
-                  id="label"
-                  type="text"
-                  placeholder="Modifier le libellé"
-                  value={libelle}
-                  label="Libellé"
-                  validators={[]}
-                  onChange={handleLibelleChange}
-                  gray
-                />
+              {isModify ? (
+                <div>
+                  <Input
+                    element="input"
+                    id="level"
+                    label="Niveau"
+                    value={type}
+                    placeholder={type}
+                    disabled
+                    validators={[]}
+                    gray
+                    onChange={handleTypeChange}
+                  />
+                  <Input
+                    element="input"
+                    id="label"
+                    type="text"
+                    placeholder="Modifier le libellé"
+                    value={libelle}
+                    label="Libellé"
+                    validators={[]}
+                    onChange={handleLibelleChange}
+                    gray
+                  />
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3 mb-4">
+                  <div className="py-2">
+                    <h3 className="mb-1 text-md text-gray-800 font-bold">
+                      Niveau
+                    </h3>
+                    <p className="text-md">{type}</p>
+                  </div>
+                  <div className="py-2">
+                    <h3 className="mb-1 text-md text-gray-800 font-bold">
+                      Libellé
+                    </h3>
+                    <p className="text-md">{family?.YX_LIBELLE}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          {isModify && (
+            <div className="w-full mt-2">
+              <div className="flex items-center gap-2">
+                <Button
+                  size="small"
+                  cancel
+                  type="button"
+                  onClick={() => setIsModify(false)}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  size="small"
+                  green
+                  onClick={() => setIsModalOpen(true)}
+                  type="button"
+                >
+                  Modifier
+                </Button>
               </div>
             </div>
-          </div>
-          <div className="w-full mt-2">
-            <div className="flex items-center gap-2">
-              <Button
-                size="medium"
-                blue
-                onClick={() => setIsModalOpen(true)}
-                type="button"
-              >
-                Valider
-              </Button>
-              <Button size="medium" danger type="button" onClick={() => navigate(-1)}>
-                Annuler
-              </Button>
-            </div>
-          </div>
+          )}
         </form>
       </Card>
     </div>

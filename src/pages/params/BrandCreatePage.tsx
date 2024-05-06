@@ -97,16 +97,16 @@ export default function BrandCreatePage() {
               />
               {!isLoading ? (
                 <div className="flex items-center gap-2 mt-5">
-                  <Button size="medium" blue type="submit">
-                    Créer
-                  </Button>
-                  <Button
-                    size="medium"
-                    danger
+                   <Button
+                    size="small"
+                    cancel
                     type="button"
                     onClick={() => navigate(-1)}
                   >
                     Annuler
+                  </Button>
+                  <Button size="small" green type="submit">
+                    Créer
                   </Button>
                 </div>
               ) : (

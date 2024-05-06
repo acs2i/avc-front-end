@@ -33,13 +33,13 @@ export const LINKS: Link[] = [
     showInSidebar: false,
   },
   {
-    name: "Créer une class",
+    name: "Créer une classe",
     link: "/parameters/classification/create",
     icon: Settings,
     showInSidebar: false,
   },
   {
-    name: "Modifier une class",
+    name: "Modifier une classe",
     link: "/parameters/classification/:id",
     icon: Settings,
     showInSidebar: false,
