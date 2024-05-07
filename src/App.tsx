@@ -27,6 +27,8 @@ import BrandUpdatePage from "./pages/params/BrandUpdatePage";
 import BrandCreatePage from "./pages/params/BrandCreatePage";
 import DimensionCreateItemPage from "./pages/params/DimensionCreateItemPage";
 import DraftPage from "./pages/draft/DraftPage";
+import GridPage from "./pages/params/GridPage";
+import GridCreatePage from "./pages/params/GridCreatePage";
 
 function App() {
   const location = useLocation();
@@ -103,6 +105,8 @@ function App() {
                 path="/parameters/dimension/create/item"
                 element={<DimensionCreateItemPage />}
               />
+              <Route path="/parameters/grid" element={<GridPage />} />
+              <Route path="/parameters/grid/create" element={<GridCreatePage />} />
               <Route path="/parameters/brand" element={<BrandPage />} />
               <Route
                 path="/parameters/brand/:id"

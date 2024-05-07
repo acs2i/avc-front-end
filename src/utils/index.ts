@@ -87,6 +87,20 @@ export const LINKS: Link[] = [
     showInBottom: false,
   },
   {
+    name: "Les grilles de dimensions",
+    link: "/parameters/grid",
+    icon: Settings,
+    showInSidebar: false,
+    showInBottom: false,
+  },
+  {
+    name: "Créer une grille de dimensions",
+    link: "/parameters/grid/create",
+    icon: Settings,
+    showInSidebar: false,
+    showInBottom: false,
+  },
+  {
     name: "Marques",
     link: "/parameters/brand",
     icon: Settings,
@@ -143,7 +157,7 @@ export const LINKS_Params: Params[] = [
   },
   {
     name: "Grilles de dimensions",
-    link: "/",
+    link: "/parameters/grid",
     icon: Grid3X3,
   },
   {
@@ -227,56 +241,3 @@ export const LINKCARD_PRODUCT: LinkCard[] = [
  
 ];
 
-export const FILTERS_1: Filters_1[] = [
-  {
-    title: "Mon filtre",
-  },
-  {
-    title: "Mon filtre",
-  },
-  {
-    title: "Mon filtre",
-  },
-  {
-    title: "Mon filtre",
-  },
-  {
-    title: "Mon filtre",
-  },
-  {
-    title: "Mon filtre",
-  },
-]
-
-export const Sizes: Size[] = [
-  {
-    value: "XS",
-    label: "XS",
-    name: "XS"
-  },
-  {
-    value: "S",
-    label: "S",
-    name: "S"
-  },
-  {
-    value: "M",
-    label: "M",
-    name: "M"
-  },
-  {
-    value: "L",
-    label: "L",
-    name: "L"
-  },
-  {
-    value: "XL",
-    label: "XL",
-    name: "XL"
-  },
-  {
-    value: "XXL",
-    label: "XXL",
-    name: "XXL"
-  },
-]

@@ -16,7 +16,6 @@ interface Dimension {
 }
 
 export default function DimensionPage() {
-  const [searchValue, setSearchValue] = useState("");
   const [prevSearchValue, setPrevSearchValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -64,27 +63,6 @@ export default function DimensionPage() {
     }
   };
 
-  const handleSearch = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/dimension/search?value=${searchValue}&page=${currentPage}&limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = await response.json();
-      setDimensions(data);
-      setTotalItem(data.length);
-      setPrevSearchValue(searchValue);
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-    }
-  };
 
 
   return (
@@ -95,7 +73,7 @@ export default function DimensionPage() {
             <label className="w-[60px] text-sm font-bold">Libellé :</label>
             <input
               type="text"
-              id="label"
+              id="GDI_LIBELLE"
               className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
               placeholder="Rechercher par libellé"
             />
@@ -104,7 +82,7 @@ export default function DimensionPage() {
             <label className="w-[60px] text-sm font-bold">Code :</label>
             <input
               type="text"
-              id="code"
+              id="GDI_DIMORLI"
               className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
               placeholder="Rechercher par code"
             />
@@ -113,7 +91,7 @@ export default function DimensionPage() {
             <label className="w-[60px] text-sm font-bold">Type :</label>
             <input
               type="text"
-              id="type"
+              id="GDI_TYPEDIM"
               className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
               placeholder="Rechercher par type"
             />
