@@ -40,7 +40,7 @@ export default function GridCreatePage() {
     TYPE: "",
     DIMENSIONS: [],
   });
-  
+
   const levelOptions = [
     { value: "DI1", label: "Couleur", name: "Couleur" },
     { value: "DI2", label: "Taille", name: "Taille" },
@@ -130,7 +130,7 @@ export default function GridCreatePage() {
       });
     }
   };
-  
+
   const handleDragAndDrop = (result: any) => {
     if (!result.destination) return;
 
@@ -189,13 +189,13 @@ export default function GridCreatePage() {
             </div>
 
             <div className="flex mt-3 gap-2">
-              <div className="w-[50%] border rounded-md p-3">
+              <div className="w-[50%] border rounded-sm p-1">
                 {selectedDimensions && (
                   <DragDropContext onDragEnd={handleDragAndDrop}>
                     <Droppable droppableId="selectedDimensions">
                       {(provided) => (
                         <ul
-                          className="flex flex-col gap-2"
+                          className="flex flex-col gap-1"
                           {...provided.droppableProps}
                           ref={provided.innerRef}
                         >
@@ -211,7 +211,7 @@ export default function GridCreatePage() {
                                   {...provided.draggableProps}
                                   {...provided.dragHandleProps}
                                 >
-                                  <div className="relative bg-green-700 text-white p-3 rounded-md font-bold cursor-pointer">
+                                  <div className="relative bg-green-700 text-white p-3 rounded-sm font-bold cursor-pointer">
                                     {dimension.GDI_LIBELLE}
                                     <div
                                       className="absolute top-0 right-0 bg-orange-500 rounded-bl-md cursor-pointer hover:bg-red-500"
@@ -242,6 +242,7 @@ export default function GridCreatePage() {
                   validators={[]}
                   gray
                   onChange={handleDropdownOpen}
+                  onClick={() => setDropdownIsOpen(true)}
                 />
                 {choiceValue && (
                   <div className="absolute bottom-[3px] bg-orange-400 py-2 px-4 rounded-md">
@@ -259,10 +260,12 @@ export default function GridCreatePage() {
                 {dropdownIsOpen && dimensions && searchValue && (
                   <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md">
                     <div
-                      className="h-[30px] flex justify-end cursor-pointer"
+                      className="h-[30px] flex justify-end cursor-pointer px-3"
                       onClick={() => setDropdownIsOpen(false)}
                     >
-                      <span className="text-xl px-4">X</span>
+                      <div className="h-[30px] w-[30px] flex justify-center items-center bg-orange-500 rounded-full text-white hover:bg-orange-400">
+                        <X />
+                      </div>
                     </div>
                     {dimensions.map((dimension, i) => (
                       <ul key={i}>
@@ -280,7 +283,7 @@ export default function GridCreatePage() {
                     ))}
                   </div>
                 )}
-                <Tooltip title="Créer une dimension">
+                {/* <Tooltip title="Créer une dimension">
                   <Link
                     to="/parameters/dimension/create/item"
                     className="absolute top-5 right-0"
@@ -289,18 +292,24 @@ export default function GridCreatePage() {
                       <Plus size={20} />
                     </div>
                   </Link>
-                </Tooltip>
+                </Tooltip> */}
               </div>
             </div>
           </div>
-          {!isLoading ? <div className="mt-4 flex items-center gap-2">
-            <Button size="small" cancel type="button">
-              Annuler
-            </Button>
-            <Button size="small" green type="submit">
-              Enregister ma grille
-            </Button>
-          </div> : <div className="mt-3"><CircularProgress/></div>}
+          {!isLoading ? (
+            <div className="mt-4 flex items-center gap-2">
+              <Button size="small" cancel type="button">
+                Annuler
+              </Button>
+              <Button size="small" green type="submit">
+                Enregister ma grille
+              </Button>
+            </div>
+          ) : (
+            <div className="mt-3">
+              <CircularProgress />
+            </div>
+          )}
         </form>
       </Card>
     </div>

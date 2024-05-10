@@ -10,7 +10,7 @@ import { useLocation } from "react-router-dom";
 import CreatedProductPage from "./pages/product/CreatedProductPage";
 import Header from "./components/Shared/Header";
 import { LINKS } from "./utils";
-import SuppliersListPage from "./pages/suppliers/SuppliersListPage";
+import SuppliersPage from "./pages/suppliers/SuppliersPage";
 import CreateProductPage from "./pages/product/CreateProductPage";
 import ParamsMenuPage from "./pages/params/ParamsMenuPage";
 import ClassicationsPage from "./pages/params/ClassificationsPage";
@@ -119,7 +119,7 @@ function App() {
               <Route path="/product/:id" element={<SingleProductPage />} />
               <Route
                 path="/suppliers/suppliers-list"
-                element={<SuppliersListPage />}
+                element={<SuppliersPage />}
               />
               <Route path="/draft" element={<DraftPage />} />
               <Route path="/login" element={<LoginPage />} />

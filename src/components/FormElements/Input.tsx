@@ -22,6 +22,7 @@ type InputProps = {
   onChange?: React.ChangeEventHandler<
     HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
   >;
+  onClick?: any;
   onBlur?: React.FocusEventHandler<
     HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
   >;
@@ -100,6 +101,7 @@ const Input: React.FC<InputProps> = (props) => {
         placeholder={props.placeholder}
         onChange={changeHandler}
         onBlur={touchHandler}
+        onClick={props.onClick}
         value={props.value}
         required={props.required}
         onKeyDown={props.onKeyDown}

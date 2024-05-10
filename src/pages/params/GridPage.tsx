@@ -134,11 +134,11 @@ export default function GridPage() {
                       <td className="px-6 py-4">{grid.TYPE}</td>
                       <td className="px-6 py-4">{grid.LIBELLE}</td>
                       <td className="px-6 py-4">
-                        <div className="grid grid-cols-3 gap-2">
+                        <div className="grid grid-cols-3 gap-1">
                           {grid.DIMENSIONS.slice(0, N).map((item, index) => (
                             <span
                               key={index}
-                              className="bg-orange-500 text-white p-2 rounded-md text-center"
+                              className="bg-gray-400 text-white p-2 text-center"
                             >
                               {item}
                             </span>
@@ -153,13 +153,13 @@ export default function GridPage() {
                               Voir plus
                             </button>}
                             <Collapse in={expandedGrid === grid}>
-                              <div className="mt-2">
-                                <div className="grid grid-cols-3 gap-2">
+                              <div className="mt-1">
+                                <div className="grid grid-cols-3 gap-1">
                                   {grid.DIMENSIONS.slice(N).map(
                                     (item, index) => (
                                       <span
                                         key={index}
-                                        className="bg-orange-500 text-white p-2 rounded-md text-center"
+                                        className="bg-gray-400 text-white p-2 text-center"
                                       >
                                         {item}
                                       </span>
