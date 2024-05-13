@@ -6,6 +6,9 @@ import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../components/Shared/Spinner";
 import ScrollToTop from "../../components/ScrollToTop";
+import Modal from "../../components/Shared/Modal";
+import { Divider } from "@mui/material";
+import { Info } from "lucide-react";
 
 type DataType = "DI1" | "DI2";
 interface Dimension {
@@ -23,6 +26,7 @@ export default function DimensionPage() {
   const limit = 20;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const [dimensions, setDimensions] = useState<Dimension[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const typeLabels: { [key in DataType]: string } = {
@@ -67,6 +71,27 @@ export default function DimensionPage() {
 
   return (
     <div className="relative">
+       <Modal
+        show={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        onClose={() => setIsModalOpen(false)}
+        header="Informations"
+        icon="i"
+      >
+        <div className="px-7 mb-5">
+          <p className="text-gray-800 text-xl">
+            Ici vous trouverez la liste de toutes les
+            dimensions enregistrées. Cliquez sur la dimension que vous souhaitez modifier pour
+            ouvrir le panneau de modification.
+          </p>
+        </div>
+        <Divider />
+        <div className="flex justify-end mt-7 px-7">
+          <Button blue size="small" onClick={() => setIsModalOpen(false)}>
+            J'ai compris
+          </Button>
+        </div>
+      </Modal>
       <Card title="Paramétrer les dimensions">
         <div className="flex items-center justify-center gap-4 p-7">
           <div className="flex items-center gap-4">
@@ -100,6 +125,12 @@ export default function DimensionPage() {
             <Button size="small" green to="/parameters/dimension/create/item">
               Créer une dimension
             </Button>
+          </div>
+          <div
+            className="cursor-pointer text-gray-500"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <Info size={22} />
           </div>
         </div>
         {dimensions && dimensions.length > 0 && (

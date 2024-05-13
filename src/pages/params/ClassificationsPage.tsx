@@ -5,10 +5,11 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, SquarePen } from "lucide-react";
+import { ArrowLeft, Info, SquarePen } from "lucide-react";
 import Spinner from "../../components/Shared/Spinner";
-import { Tooltip } from "@mui/material";
+import { Divider, Tooltip } from "@mui/material";
 import ScrollToTop from "../../components/ScrollToTop";
+import Modal from "../../components/Shared/Modal";
 
 type DataType = "LA1" | "LA2" | "LA3";
 
@@ -30,6 +31,7 @@ function ClassificationsPage() {
   const limit = 20;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const [families, setFamilies] = useState<Family[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const typeLabels: { [key in DataType]: string } = {
@@ -56,7 +58,7 @@ function ClassificationsPage() {
   useEffect(() => {
     if (!typeValue && !codeValue && !labelValue) {
       fetchFamily();
-    }else{
+    } else {
       handleSearch();
     }
   }, [typeValue, codeValue, labelValue, currentPage]);
@@ -108,6 +110,27 @@ function ClassificationsPage() {
 
   return (
     <div className="relative">
+      <Modal
+        show={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        onClose={() => setIsModalOpen(false)}
+        header="Informations"
+        icon="i"
+      >
+        <div className="px-7 mb-5">
+          <p className="text-gray-800 text-xl">
+            Ici vous trouverez la liste de toutes les
+            classes enregistrées. Cliquez sur la classe que vous souhaitez modifier pour
+            ouvrir le panneau de modification.
+          </p>
+        </div>
+        <Divider />
+        <div className="flex justify-end mt-7 px-7">
+          <Button blue size="small" onClick={() => setIsModalOpen(false)}>
+            J'ai compris
+          </Button>
+        </div>
+      </Modal>
       <Card title="Paramétrer les classifications">
         <div className="flex items-center justify-center gap-4 p-7">
           <div className="flex items-center gap-4">
@@ -151,6 +174,12 @@ function ClassificationsPage() {
             <Button size="small" green to="/parameters/classification/create">
               Créer une classe
             </Button>
+          </div>
+          <div
+            className="cursor-pointer text-gray-500"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <Info size={22} />
           </div>
         </div>
 

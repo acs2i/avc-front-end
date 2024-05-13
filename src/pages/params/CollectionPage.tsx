@@ -6,6 +6,9 @@ import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../components/Shared/Spinner";
 import ScrollToTop from "../../components/ScrollToTop";
+import { Info } from "lucide-react";
+import Modal from "../../components/Shared/Modal";
+import { Divider } from "@mui/material";
 
 interface Collection {
   _id: string;
@@ -22,6 +25,7 @@ export default function CollectionPage() {
   const limit = 20;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const [collections, setCollections] = useState<Collection[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const handlePageChange = (
@@ -82,6 +86,27 @@ export default function CollectionPage() {
 
   return (
     <div className="relative">
+      <Modal
+        show={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        onClose={() => setIsModalOpen(false)}
+        header="Informations"
+        icon="i"
+      >
+        <div className="px-7 mb-5">
+          <p className="text-gray-800 text-xl">
+            Ici vous trouverez la liste de toutes les collections enregistrées.
+            Cliquez sur la collection que vous souhaitez modifier pour ouvrir le
+            panneau de modification.
+          </p>
+        </div>
+        <Divider />
+        <div className="flex justify-end mt-7 px-7">
+          <Button blue size="small" onClick={() => setIsModalOpen(false)}>
+            J'ai compris
+          </Button>
+        </div>
+      </Modal>
       <Card title="Paramétrer les collections">
         <div className="flex items-center justify-center gap-4 p-7">
           <div className="flex items-center gap-4">
@@ -106,6 +131,12 @@ export default function CollectionPage() {
             <Button size="small" green to="/parameters/collection/create">
               Créer une collection
             </Button>
+          </div>
+          <div
+            className="cursor-pointer text-gray-500"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <Info size={22} />
           </div>
         </div>
         {collections && collections.length > 0 && (

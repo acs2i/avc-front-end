@@ -5,10 +5,11 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, SquarePen } from "lucide-react";
+import { ArrowLeft, Info, SquarePen } from "lucide-react";
 import Spinner from "../../components/Shared/Spinner";
-import { Tooltip } from "@mui/material";
+import { Divider, Tooltip } from "@mui/material";
 import ScrollToTop from "../../components/ScrollToTop";
+import Modal from "../../components/Shared/Modal";
 
 interface Collection {
   _id: string;
@@ -25,6 +26,7 @@ export default function BrandPage() {
   const limit = 20;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const [brands, setBrands] = useState<Collection[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const handlePageChange = (
@@ -83,14 +85,30 @@ export default function BrandPage() {
     }
   };
 
-  const handleKeyDown = (event: any) => {
-    if (event.key === "Enter") {
-      handleSearch();
-    }
-  };
 
   return (
     <div className="relative">
+       <Modal
+        show={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        onClose={() => setIsModalOpen(false)}
+        header="Informations"
+        icon="i"
+      >
+        <div className="px-7 mb-5">
+          <p className="text-gray-800 text-xl">
+            Ici vous trouverez la liste de toutes les marques enregistrées.
+            Cliquez sur la marque que vous souhaitez modifier pour ouvrir le
+            panneau de modification.
+          </p>
+        </div>
+        <Divider />
+        <div className="flex justify-end mt-7 px-7">
+          <Button blue size="small" onClick={() => setIsModalOpen(false)}>
+            J'ai compris
+          </Button>
+        </div>
+      </Modal>
       <Card title="Paramétrer les marques">
         <div className="flex items-center justify-center gap-4 p-7">
           <div className="flex items-center gap-4">
@@ -115,6 +133,12 @@ export default function BrandPage() {
             <Button size="small" green to="/parameters/brand/create">
               Créer une marque
             </Button>
+          </div>
+          <div
+            className="cursor-pointer text-gray-500"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <Info size={22} />
           </div>
         </div>
         {brands && brands.length > 0 && (

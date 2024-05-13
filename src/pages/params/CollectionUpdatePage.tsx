@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import useFetch from "../../utils/hooks/usefetch";
 import Input from "../../components/FormElements/Input";
 import Button from "../../components/FormElements/Button";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Divider } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
 import Modal from "../../components/Shared/Modal";
 import { RotateCcw, X } from "lucide-react";
@@ -87,31 +87,36 @@ export default function CollectionUpdatePage() {
 
   return (
     <div>
-      <Modal
+       <Modal
         show={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
-        header="Confirmation"
+        onClose={() => setIsModalOpen(false)}
+        header="Confirmation de modification de la collection"
         onSubmit={handleSubmit}
+        icon="?"
       >
-        <p className="font-bold text-gray-800">
-          Voulez-vous vraiment appliquer ces modifications ?
-        </p>
+        <div className="px-7 mb-5">
+          <p className="text-gray-800 text-xl">
+            Voulez-vous vraiment appliquer ces modifications ?
+          </p>
+        </div>
+        <Divider />
         {!isLoading ? (
-          <div className="flex justify-center gap-2 mt-4">
-            <Button size="medium" blue type="submit">
-              Oui
-            </Button>
-            <Button
-              size="medium"
+          <div className="flex justify-end mt-7 px-7 gap-2">
+             <Button
+              size="small"
               danger
               type="button"
               onClick={() => setIsModalOpen(false)}
             >
               Non
             </Button>
+            <Button size="small" blue type="submit">
+             Oui
+            </Button>
           </div>
         ) : (
-          <div className="mt-4">
+          <div className="flex justify-end mt-7 px-7 gap-2">
             <CircularProgress />
           </div>
         )}

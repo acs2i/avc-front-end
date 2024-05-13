@@ -82,7 +82,7 @@ export default function SuppliersPage() {
         </div>
         <div className="flex items-center gap-3">
           <Button size="small" green to="/parameters/dimension/create/item">
-            Créer une dimension
+            Créer un fournisseur
           </Button>
         </div>
       </div>
