@@ -92,7 +92,7 @@ export default function DimensionPage() {
           </Button>
         </div>
       </Modal>
-      <Card title="Paramétrer les dimensions">
+      <Card title="Paramétrer les dimensions" createTitle="Créer une Dimension" link="/parameters/dimension/create/item">
         <div className="flex items-center justify-center gap-4 p-7">
           <div className="flex items-center gap-4">
             <label className="w-[60px] text-sm font-bold">Libellé :</label>
@@ -121,11 +121,6 @@ export default function DimensionPage() {
               placeholder="Rechercher par type"
             />
           </div>
-          <div className="flex items-center gap-3">
-            <Button size="small" green to="/parameters/dimension/create/item">
-              Créer une dimension
-            </Button>
-          </div>
           <div
             className="cursor-pointer text-gray-500"
             onClick={() => setIsModalOpen(true)}
@@ -146,7 +141,7 @@ export default function DimensionPage() {
         )}
         <div className="relative overflow-x-auto bg-white">
           <div className="px-3 mb-2 flex items-center gap-2">
-            <h4 className="text-xl">
+            <h4 className="text-md">
               <span className="font-bold">{totalItem}</span> Dimensions
             </h4>
             {prevSearchValue && (
@@ -154,7 +149,7 @@ export default function DimensionPage() {
             )}
           </div>
           <table className="w-full text-left">
-            <thead className="bg-blue-50 text-md text-gray-500">
+            <thead className="bg-gray-200 text-sm text-gray-500">
               <tr>
                 <th scope="col" className="px-6 py-4 w-1/3">
                   Libellé
@@ -172,7 +167,7 @@ export default function DimensionPage() {
                 dimensions.map((dimension) => (
                   <tr
                     key={dimension._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
+                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
                     onClick={() =>
                       navigate(`/parameters/dimension/${dimension._id}`)
                     }

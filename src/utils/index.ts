@@ -241,3 +241,24 @@ export const LINKCARD_PRODUCT: LinkCard[] = [
  
 ];
 
+export const LINKCARD_SEARCH: LinkCard[] = [
+  {
+    name: "Standards",
+    page: "standard"
+  },
+  {
+    name: "Compléments",
+    page: "complement"
+  },
+  {
+    name: "Caractéristiques",
+    page: "caracteristiques"
+  },
+  {
+    name: "Dimensions",
+    page: "dimension"
+  },
+  
+
+];
+

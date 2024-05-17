@@ -36,7 +36,7 @@ export default function SingleProductPage() {
 
   return (
     <section className="mt-7">
-      <Card title={`Article n°${product && product[0]?.GA_CODEARTICLE}`}>
+      <Card title={`Article n°${product && product[0]?.GA_CODEARTICLE}`} createTitle="Editer La Fiche" link="">
         <div className="mt-4 mb-[30px] px-4">
           <div className="flex justify-between">
             <div className="flex items-center gap-7">
@@ -54,9 +54,6 @@ export default function SingleProductPage() {
                 </React.Fragment>
               ))}
             </div>
-            <div>
-              <Button size="small" blue>Editer la fiche</Button>
-            </div>
           </div>
           <div className="mt-6">
             <Divider />
@@ -67,7 +64,7 @@ export default function SingleProductPage() {
         {product && product.length > 0 && page === "details" && (
           <div className="flex grid-rows-3 grid-flow-col gap-4 mt-5 px-4">
             <div className="flex gap-[25px]">
-              <div className="h-[400px] w-[400px] overflow-hidden">
+              <div className="h-[400px] w-[400px] overflow-hidden flex items-center justify-center">
                 {product[0].imgPath ? (
                   <img
                     src={product[0].imgPath}
@@ -78,12 +75,12 @@ export default function SingleProductPage() {
                   <img
                     src="/img/logo.png"
                     alt="logo"
-                    className="w-full h-full object-cover rounded-lg shadow-none hover:shadow-lg"
+                    className="w-1/2 h-1/2 object-cover rounded-lg shadow-none"
                   />
                 )}
               </div>
               <div className="flex-col col-span-2 justify-center">
-                <h2 className="text-3xl text-teal-600 font-bold font-montserrat capitalize">
+                <h2 className="text-3xl text-[#3B3B3C] font-bold font-montserrat capitalize">
                   {product[0].GA_LIBELLE}
                 </h2>
                 <div className="grid grid-cols-1 gap-4 mt-5">

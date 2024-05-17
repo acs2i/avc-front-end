@@ -13,6 +13,9 @@ import { useProducts } from "../utils/hooks/useProducts";
 import { useBrands } from "../utils/hooks/useBrands";
 import { useSuppliers } from "../utils/hooks/useSuppliers";
 import { useSubFamilies } from "../utils/hooks/useSubFamilies";
+import {LINKCARD_SEARCH } from "../utils";
+import { Divider } from "@mui/material";
+import { LinkCard } from "@/type";
 
 interface Product {
   _id: string;
@@ -59,8 +62,8 @@ interface SearchParams {
   subFamilyChoiceValue?: string;
 }
 
-
 export default function Home() {
+  const [page, setPage] = useState("standard");
   const [brandDropDownIsOpen, setBrandDropDownIsOpen] = useState(false);
   const [supplierDropDownIsOpen, setSupplierDropDownIsOpen] = useState(false);
   const [familyDropDownIsOpen, setFamilyDropDownIsOpen] = useState(false);
@@ -87,17 +90,38 @@ export default function Home() {
     brandChoiceValue,
     supplierChoiceValue,
     familyChoiceValue,
-    subFamilyChoiceValue
+    subFamilyChoiceValue,
   };
-  const [submittedSearchParams, setSubmittedSearchParams] = useState<SearchParams>({});
-  const { data: products, refetch: refetchProducts } = useProducts(limit, currentPage, submittedSearchParams);
-  const { data: families, refetch: refecthFamilies } = useFamilies(familyValue, limit, currentPage);
-  const { data: subFamilies, refetch: refecthSubFamilies } = useSubFamilies(subFamilyValue, currentPage);
-  const { data: brands, refetch: refecthBrands } = useBrands(brandValue, currentPage);
-  const { data: suppliers, refetch: refecthSuppliers } = useSuppliers(supplierValue, currentPage);
+  const [submittedSearchParams, setSubmittedSearchParams] =
+    useState<SearchParams>({});
+  const { data: products, refetch: refetchProducts } = useProducts(
+    limit,
+    currentPage,
+    submittedSearchParams
+  );
+  const { data: families, refetch: refecthFamilies } = useFamilies(
+    familyValue,
+    limit,
+    currentPage
+  );
+  const { data: subFamilies, refetch: refecthSubFamilies } = useSubFamilies(
+    subFamilyValue,
+    currentPage
+  );
+  const { data: brands, refetch: refecthBrands } = useBrands(
+    brandValue,
+    currentPage
+  );
+  const { data: suppliers, refetch: refecthSuppliers } = useSuppliers(
+    supplierValue,
+    currentPage
+  );
   const navigate = useNavigate();
-  
-  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    value: number
+  ) => {
     setCurrentPage(value);
   };
 
@@ -106,6 +130,26 @@ export default function Home() {
       setTotalItem(products.total);
     }
   }, [products?.products]);
+
+  const handleBrandChange = (e: any) => {
+    setBrandValue(e.target.value);
+    setBrandChoiceValue("");
+  };
+
+  const handleSupplierChange = (e: any) => {
+    setSupplierValue(e.target.value);
+    setSupplierChoiceValue("");
+  };
+
+  const handleFamilyChange = (e: any) => {
+    setFamilyValue(e.target.value);
+    setFamilyChoiceValue("");
+  };
+
+  const handleSubFamilyChange = (e: any) => {
+    setSubFamilyValue(e.target.value);
+    setSubFamilyChoiceValue("");
+  };
 
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -117,17 +161,17 @@ export default function Home() {
       brandChoiceValue,
       supplierChoiceValue,
       familyChoiceValue,
-      subFamilyChoiceValue
+      subFamilyChoiceValue,
     });
-    refetchProducts().then(() => {
-      setIsLoading(false);
-    }).catch((error) => {
-      console.error("Erreur lors de la requête", error);
-      setIsLoading(false);
-    });
+    refetchProducts()
+      .then(() => {
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la requête", error);
+        setIsLoading(false);
+      });
   };
-
-  
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -140,15 +184,51 @@ export default function Home() {
     return () => {
       clearTimeout(handler);
     };
-  }, [familyValue, refecthFamilies, brandValue, refecthBrands, supplierValue, refecthSuppliers, subFamilyValue, refecthSubFamilies]);
+  }, [
+    familyValue,
+    refecthFamilies,
+    brandValue,
+    refecthBrands,
+    supplierValue,
+    refecthSuppliers,
+    subFamilyValue,
+    refecthSubFamilies,
+  ]);
 
- 
   return (
     <div className="relative">
-      <Card title="Tous les produits">
-        <form className="p-7" onSubmit={handleSearch}>
+      <Card
+        title="Tous les produits"
+        createTitle="Créer Un Produit"
+        link="/edit"
+      >
+        <div className="mt-4 mb-[30px] px-4">
+          <div className="flex justify-between">
+            <div className="flex items-center gap-7">
+              {LINKCARD_SEARCH.map((link: LinkCard, i) => (
+                <React.Fragment key={i}>
+                  <button
+                    className={`text-gray-600 text-sm ${
+                      page === link.page ? "text-green-700 font-bold" : ""
+                    }`}
+                    onClick={() => setPage(link.page)}
+                  >
+                    {link.name}
+                  </button>
+                  <div className="w-[1px] h-[20px] bg-gray-300"></div>
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+          <div className="mt-6">
+            <Divider />
+          </div>
+        </div>
+
+        <form className="px-7" onSubmit={handleSearch}>
           <div className="relative flex flex-wrap items-center gap-5 text-gray-600">
-            <div className="flex items-center gap-4">
+            {page === "standard" && <>
+              <div className="flex items-center gap-4">
               <label className="w-[60px] text-sm font-bold">Code :</label>
               <input
                 type="text"
@@ -160,14 +240,13 @@ export default function Home() {
                 autoComplete="off"
               />
             </div>
-
             <div className="flex items-center gap-4">
               <label className="w-[100px] text-sm font-bold">Libellé :</label>
               <input
                 type="text"
                 id="label"
                 className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
-                placeholder="Rechercher un code"
+                placeholder="Rechercher par libellé"
                 value={labelValue}
                 onChange={(e) => setLabelValue(e.target.value)}
                 autoComplete="off"
@@ -180,13 +259,13 @@ export default function Home() {
                   type="text"
                   id="brand"
                   className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
-                  placeholder="Rechercher un code"
+                  placeholder="Rechercher par marque"
                   value={brandValue}
-                  onChange={(e) => setBrandValue(e.target.value)}
+                  onChange={(e) => handleBrandChange(e)}
                   onFocus={() => setBrandDropDownIsOpen(true)}
                   autoComplete="off"
                 />
-                {brands?.brands && brandDropDownIsOpen && (
+                {brands?.brands && brandDropDownIsOpen && brandValue && (
                   <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md top-[40px]">
                     <div className="h-[30px] flex justify-end cursor-pointer">
                       <span
@@ -196,7 +275,7 @@ export default function Home() {
                         X
                       </span>
                     </div>
-                    {brands?.brands.map((brand : Brand) => (
+                    {brands?.brands.map((brand: Brand) => (
                       <ul key={brand._id}>
                         <li
                           className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
@@ -224,39 +303,41 @@ export default function Home() {
                   type="text"
                   id="brand"
                   className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
-                  placeholder="Rechercher un code"
+                  placeholder="Rechercher par fournisseur"
                   value={supplierValue}
-                  onChange={(e) => setSupplierValue(e.target.value)}
+                  onChange={(e) => handleSupplierChange(e)}
                   onFocus={() => setSupplierDropDownIsOpen(true)}
                   autoComplete="off"
                 />
-                {suppliers?.suppliers && supplierDropDownIsOpen && (
-                  <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md top-[40px]">
-                    <div className="h-[30px] flex justify-end cursor-pointer">
-                      <span
-                        className="text-md px-4"
-                        onClick={() => setSupplierDropDownIsOpen(false)}
-                      >
-                        X
-                      </span>
-                    </div>
-                    {suppliers?.suppliers.map((supplier: Supplier) => (
-                      <ul key={supplier._id}>
-                        <li
-                          className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
-                          onClick={() => {
-                            setSupplierChoiceValue(supplier.T_TIERS);
-                            setSupplierValue(supplier.T_LIBELLE);
-                            setSupplierDropDownIsOpen(false);
-                            setCurrentPage(1);
-                          }}
+                {suppliers?.suppliers &&
+                  supplierDropDownIsOpen &&
+                  supplierValue && (
+                    <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md top-[40px]">
+                      <div className="h-[30px] flex justify-end cursor-pointer">
+                        <span
+                          className="text-md px-4"
+                          onClick={() => setSupplierDropDownIsOpen(false)}
                         >
-                          {supplier.T_LIBELLE}
-                        </li>
-                      </ul>
-                    ))}
-                  </div>
-                )}
+                          X
+                        </span>
+                      </div>
+                      {suppliers?.suppliers.map((supplier: Supplier) => (
+                        <ul key={supplier._id}>
+                          <li
+                            className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
+                            onClick={() => {
+                              setSupplierChoiceValue(supplier.T_TIERS);
+                              setSupplierValue(supplier.T_LIBELLE);
+                              setSupplierDropDownIsOpen(false);
+                              setCurrentPage(1);
+                            }}
+                          >
+                            {supplier.T_LIBELLE}
+                          </li>
+                        </ul>
+                      ))}
+                    </div>
+                  )}
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -266,9 +347,9 @@ export default function Home() {
                   type="text"
                   id="brand"
                   className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
-                  placeholder="Rechercher un code"
+                  placeholder="Rechercher par famille"
                   value={familyValue}
-                  onChange={(e) => setFamilyValue(e.target.value)}
+                  onChange={(e) => handleFamilyChange(e)}
                   onFocus={() => setFamilyDropDownIsOpen(true)}
                   autoComplete="off"
                 />
@@ -282,7 +363,7 @@ export default function Home() {
                         X
                       </span>
                     </div>
-                    {families.families.map((family : Family) => (
+                    {families.families.map((family: Family) => (
                       <ul key={family._id}>
                         <li
                           className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
@@ -310,9 +391,9 @@ export default function Home() {
                   type="text"
                   id="brand"
                   className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
-                  placeholder="Rechercher un code"
+                  placeholder="Rechercher par sous-famille"
                   value={subFamilyValue}
-                  onChange={(e) => setSubFamilyValue(e.target.value)}
+                  onChange={(e) => handleSubFamilyChange(e)}
                   onFocus={() => setSubFamilyDropDownIsOpen(true)}
                   autoComplete="off"
                 />
@@ -345,16 +426,22 @@ export default function Home() {
                 )}
               </div>
             </div>
+            </>}
 
             {!isLoading ? (
               <div>
-                <Button type="submit" size="small" green>
-                  Rechercher
+                <Button type="submit" size="small" gray>
+                  Lancer la Recherche
                 </Button>
               </div>
             ) : (
               <div>
-                <Spinner width="50px" height="40px" logoSize="90%" progressSize={50} />
+                <Spinner
+                  width="50px"
+                  height="40px"
+                  logoSize="90%"
+                  progressSize={50}
+                />
               </div>
             )}
           </div>
@@ -372,7 +459,7 @@ export default function Home() {
         )}
         <div className="relative overflow-x-auto bg-white">
           <div className="px-3 mb-2 flex items-center gap-2">
-            <h4 className="text-xl">
+            <h4 className="text-md">
               <span className="font-bold">{totalItem}</span> Produits
             </h4>
             {prevSearchValue && (
@@ -380,7 +467,7 @@ export default function Home() {
             )}
           </div>
           <table className="w-full text-left">
-            <thead className="bg-blue-50 text-md text-gray-500">
+            <thead className="bg-gray-200 text-sm text-gray-500">
               <tr>
                 <th scope="col" className="px-6 py-4 w-1/6">
                   Code
@@ -404,15 +491,15 @@ export default function Home() {
             </thead>
             <tbody>
               {products?.products && products.products.length > 0 ? (
-                products.products.map((product : Product) => (
+                products.products.map((product: Product) => (
                   <tr
                     key={product._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
+                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
                     onClick={() => navigate(`/product/${product._id}`)}
                   >
                     <td className="px-6 py-4">{product.GA_CODEARTICLE}</td>
                     <td className="px-6 py-4">
-                      {truncateText(product.GA_LIBELLE, 20)}
+                      {truncateText(product.GA_LIBELLE, 15)}
                     </td>
                     <td className="px-6 py-4">
                       {product.brand ? (
@@ -425,9 +512,7 @@ export default function Home() {
                         <span>-</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-center">
-                      {product.GA_FOURNPRINC}
-                    </td>
+                    <td className="px-6 py-4">{product.GA_FOURNPRINC}</td>
                     <td className="px-6 py-4">
                       {product.family ? (
                         <div>

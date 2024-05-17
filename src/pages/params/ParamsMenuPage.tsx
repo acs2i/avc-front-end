@@ -38,7 +38,7 @@ function ParamsMenuPage() {
         <div className=" w-[80%] xl:w-[70%] mx-auto mt-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3 h-[70px]">
-              <div className="h-2/3 w-[8px] bg-emerald-700"></div>
+              <div className="h-2/3 w-[8px] bg-[#3B3B3C]"></div>
               <h4 className="text-3xl text-gray-600">
                 <span className="font-bold text-gray-700">Paramétrer</span> les
                 données

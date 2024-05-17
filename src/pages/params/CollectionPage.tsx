@@ -107,7 +107,7 @@ export default function CollectionPage() {
           </Button>
         </div>
       </Modal>
-      <Card title="Paramétrer les collections">
+      <Card title="Paramétrer les collections" createTitle="Créer Une Collection" link="/parameters/collection/create">
         <div className="flex items-center justify-center gap-4 p-7">
           <div className="flex items-center gap-4">
             <label className="w-[60px] text-sm font-bold">Code :</label>
@@ -127,11 +127,8 @@ export default function CollectionPage() {
               placeholder="Rechercher par libellé"
             />
           </div>
-          <div className="flex items-center gap-3">
-            <Button size="small" green to="/parameters/collection/create">
-              Créer une collection
-            </Button>
-          </div>
+         
+    
           <div
             className="cursor-pointer text-gray-500"
             onClick={() => setIsModalOpen(true)}
@@ -152,7 +149,7 @@ export default function CollectionPage() {
         )}
         <div className="relative overflow-x-auto">
           <div className="px-3 mb-2 flex items-center gap-2">
-            <h4 className="text-xl">
+            <h4 className="text-md">
               <span className="font-bold">{totalItem}</span> Collections
             </h4>
             {prevSearchValue && (
@@ -160,7 +157,7 @@ export default function CollectionPage() {
             )}
           </div>
           <table className="w-full text-left">
-            <thead className="bg-blue-50 text-md text-gray-500">
+            <thead className="bg-gray-200 text-sm text-gray-500">
               <tr>
                 <th scope="col" className="px-6 py-4 w-1/2">
                   Code
@@ -175,7 +172,7 @@ export default function CollectionPage() {
                 collections.map((collection) => (
                   <tr
                     key={collection._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
+                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
                     onClick={() =>
                       navigate(`/parameters/collection/${collection._id}`)
                     }

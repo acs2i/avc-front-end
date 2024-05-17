@@ -61,7 +61,7 @@ export default function GridPage() {
 
   return (
     <div>
-      <Card title="Toutes les grilles de dimensions">
+      <Card title="Toutes les grilles de dimensions" createTitle="Créer Une Grille de Dimension" link="/parameters/grid/create">
         <div className="p-7">
           <div className="relative flex flex-wrap items-center justify-center gap-5 text-gray-600">
             <div className="flex items-center gap-4">
@@ -83,11 +83,6 @@ export default function GridPage() {
                 placeholder="Rechercher un code"
               />
             </div>
-            <div>
-              <Button to="/parameters/grid/create" size="small" green>
-                Créer une grille de dimension
-              </Button>
-            </div>
           </div>
         </div>
         {grids && grids.length > 0 && (
@@ -103,7 +98,7 @@ export default function GridPage() {
         )}
         <div className="relative overflow-x-auto bg-white">
           <div className="px-3 mb-2 flex items-center gap-2">
-            <h4 className="text-xl">
+            <h4 className="text-md">
               <span className="font-bold">{totalItem}</span> Grilles
             </h4>
             {prevSearchValue && (
@@ -111,7 +106,7 @@ export default function GridPage() {
             )}
           </div>
           <table className="w-full text-left">
-            <thead className="bg-blue-50 text-md text-gray-500">
+            <thead className="bg-gray-200 text-sm text-gray-500">
               <tr>
                 <th scope="col" className="px-6 py-4 w-1/3">
                   Type
@@ -129,7 +124,7 @@ export default function GridPage() {
                 ? grids.map((grid) => (
                     <tr
                       key={grid._id}
-                      className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
+                      className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
                     >
                       <td className="px-6 py-4">{grid.TYPE}</td>
                       <td className="px-6 py-4">{grid.LIBELLE}</td>

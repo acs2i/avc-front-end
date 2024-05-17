@@ -131,7 +131,7 @@ function ClassificationsPage() {
           </Button>
         </div>
       </Modal>
-      <Card title="Paramétrer les classifications">
+      <Card title="Paramétrer les classifications" createTitle="Créer une classe" link="/parameters/classification/create">
         <div className="flex items-center justify-center gap-4 p-7">
           <div className="flex items-center gap-4">
             <label className="w-[90px] text-sm font-bold">Niveau :</label>
@@ -169,12 +169,6 @@ function ClassificationsPage() {
               onChange={(e) => setLabelValue(e.target.value)}
             />
           </div>
-
-          <div className="flex items-center gap-3">
-            <Button size="small" green to="/parameters/classification/create">
-              Créer une classe
-            </Button>
-          </div>
           <div
             className="cursor-pointer text-gray-500"
             onClick={() => setIsModalOpen(true)}
@@ -196,12 +190,12 @@ function ClassificationsPage() {
         )}
         <div className="overflow-x-auto bg-white">
           <div className="px-3 mb-2 flex items-center gap-2">
-            <h4 className="text-xl">
+            <h4 className="text-md">
               <span className="font-bold">{totalItem}</span> Resultats
             </h4>
           </div>
           <table className="w-full text-left">
-            <thead className="bg-blue-50 text-md text-gray-500">
+            <thead className="bg-gray-200 text-sm text-gray-500">
               <tr>
                 <th scope="col" className="px-6 py-4 w-1/3">
                   Niveau
@@ -219,7 +213,7 @@ function ClassificationsPage() {
                 families.map((family) => (
                   <tr
                     key={family._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
+                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
                     onClick={() =>
                       navigate(`/parameters/classification/${family._id}`)
                     }

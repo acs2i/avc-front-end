@@ -471,8 +471,8 @@ export default function CreateProductPage() {
   }, []);
 
   return (
-    <div className="mt-7">
-      <Card title="Panel d'ajout">
+    <div >
+      <Card title="Panel d'ajout" createTitle="" link="">
         <div className="mt-4 mb-[50px] px-4">
           <div className="flex items-center gap-7">
             {LINKCARD_EDIT.map((link: LinkCard, i) => (
