@@ -100,7 +100,7 @@ export default function SuppliersPage() {
       <div className="relative overflow-x-auto bg-white">
         <div className="px-3 mb-2 flex items-center gap-2">
           <h4 className="text-xl">
-            <span className="font-bold">{totalItem}</span> Dimensions
+            <span className="font-bold">{totalItem}</span> Fournisseurs
           </h4>
           {prevSearchValue && (
             <span className="text-xl italic">{`"${prevSearchValue}"`}</span>

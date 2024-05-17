@@ -1,6 +1,9 @@
-import { ChevronLeft, GripHorizontal } from "lucide-react";
+import { ChevronLeft, Download, GripHorizontal } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import React from "react";
+import Button from "@mui/material/Button";
+import Menu from "@mui/material/Menu";
+import React, { useState } from "react";
+import { MenuItem } from "@mui/material";
 
 type InFosCard = {
   title: any;
@@ -10,10 +13,19 @@ type InFosCard = {
 export default function Card({ title, children }: InFosCard) {
   const navigate = useNavigate();
   const location = useLocation();
-
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
   const shouldHideBackButton = location.pathname === "/";
   const pathsToHideDots = ["/parameters", "/edit"];
   const shouldHideDots = pathsToHideDots.includes(location.pathname);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
     <section className="bg-white shadow-md rounded-lg flex flex-col gap-1 rounded-md">
@@ -30,9 +42,38 @@ export default function Card({ title, children }: InFosCard) {
           <h2 className="text-white font-bold text-lg">{title}</h2>
         </div>
         {!shouldHideDots && (
-          <div className="text-white cursor-pointer hover:text-gray-300">
-            <GripHorizontal />
-          </div>
+          <>
+            <Button
+              id="basic-button"
+              aria-controls={open ? "basic-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? "true" : undefined}
+              onClick={handleClick}
+            >
+              <div className="text-white cursor-pointer hover:text-gray-300">
+                <GripHorizontal />
+              </div>
+            </Button>
+            <Menu
+              id="basic-menu"
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              MenuListProps={{
+                "aria-labelledby": "basic-button",
+              }}
+              className="mt-3"
+            >
+              <MenuItem onClick={handleClose}>
+                <div className="flex items-center justify-center gap-3 w-full">
+                  <div className="text-orange-500">
+                    <Download />
+                  </div>
+                  <p className="text-sm">Exporter en CSV</p>
+                </div>
+              </MenuItem>
+            </Menu>
+          </>
         )}
       </div>
       <div className="py-2">{children}</div>

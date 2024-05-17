@@ -5,7 +5,6 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-
 import { setLogout } from "../../store/authSlice";
 import { LogOut } from "lucide-react";
 import Divider from "@mui/material/Divider";

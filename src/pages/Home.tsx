@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
 import Card from "../components/Shared/Card";
 import Button from "../components/FormElements/Button";
-import CircularProgress from "@mui/material/CircularProgress";
+import useFetch from "../utils/hooks/usefetch";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ChevronUp, SquarePen } from "lucide-react";
 import Spinner from "../components/Shared/Spinner";
-import { Tooltip } from "@mui/material";
 import truncateText from "../utils/func/Formattext";
-import { spawn } from "child_process";
 import ScrollToTop from "../components/ScrollToTop";
+import { useFamilies } from "../utils/hooks/useFamilies";
+import { useProducts } from "../utils/hooks/useProducts";
+import { useBrands } from "../utils/hooks/useBrands";
+import { useSuppliers } from "../utils/hooks/useSuppliers";
+import { useSubFamilies } from "../utils/hooks/useSubFamilies";
 
 interface Product {
   _id: string;
@@ -39,7 +41,6 @@ interface Supplier {
   T_TIERS: string;
   T_LIBELLE: string;
   T_JURIDIQUE: string;
- 
 }
 
 interface Family {
@@ -47,184 +48,105 @@ interface Family {
   YX_TYPE: string;
   YX_CODE: string;
   YX_LIBELLE: string;
- 
 }
 
+interface SearchParams {
+  codeValue?: string;
+  labelValue?: string;
+  brandChoiceValue?: string;
+  supplierChoiceValue?: string;
+  familyChoiceValue?: string;
+  subFamilyChoiceValue?: string;
+}
+
+
 export default function Home() {
-  const [brandDropDownIsOpen, setBrandDropDownIsOpen] = useState(false)
-  const [supplierDropDownIsOpen, setSupplierDropDownIsOpen] = useState(false)
-  const [familyDropDownIsOpen, setFamilyDropDownIsOpen] = useState(false)
+  const [brandDropDownIsOpen, setBrandDropDownIsOpen] = useState(false);
+  const [supplierDropDownIsOpen, setSupplierDropDownIsOpen] = useState(false);
+  const [familyDropDownIsOpen, setFamilyDropDownIsOpen] = useState(false);
+  const [subFamilyDropDownIsOpen, setSubFamilyDropDownIsOpen] = useState(false);
   const [codeValue, setCodeValue] = useState("");
   const [labelValue, setLabelValue] = useState("");
   const [brandValue, setBrandValue] = useState("");
   const [familyValue, setFamilyValue] = useState("");
+  const [subFamilyValue, setSubFamilyValue] = useState("");
   const [supplierValue, setSupplierValue] = useState("");
   const [brandChoiceValue, setBrandChoiceValue] = useState("");
   const [supplierChoiceValue, setSupplierChoiceValue] = useState("");
   const [familyChoiceValue, setFamilyChoiceValue] = useState("");
+  const [subFamilyChoiceValue, setSubFamilyChoiceValue] = useState("");
   const [prevSearchValue, setPrevSearchValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItem, setTotalItem] = useState(null);
   const limit = 20;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [brands, setBrands] = useState<Brand[]>([]);
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
-  const [families, setFamilies] = useState<Family[]>([]);
+  const searchParams: SearchParams = {
+    codeValue,
+    labelValue,
+    brandChoiceValue,
+    supplierChoiceValue,
+    familyChoiceValue,
+    subFamilyChoiceValue
+  };
+  const [submittedSearchParams, setSubmittedSearchParams] = useState<SearchParams>({});
+  const { data: products, refetch: refetchProducts } = useProducts(limit, currentPage, submittedSearchParams);
+  const { data: families, refetch: refecthFamilies } = useFamilies(familyValue, limit, currentPage);
+  const { data: subFamilies, refetch: refecthSubFamilies } = useSubFamilies(subFamilyValue, currentPage);
+  const { data: brands, refetch: refecthBrands } = useBrands(brandValue, currentPage);
+  const { data: suppliers, refetch: refecthSuppliers } = useSuppliers(supplierValue, currentPage);
   const navigate = useNavigate();
-  const colors = ["text-gray-700", "text-gray-500", "text-gray-400"];
-
-  const handlePageChange = (
-    event: React.ChangeEvent<unknown>,
-    value: number
-  ) => {
+  
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setCurrentPage(value);
   };
 
   useEffect(() => {
-    fetchProducts();
-  }, [currentPage]);
-
-  const fetchProducts = async () => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/product?page=${currentPage}&limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const data = await response.json();
-      setProducts(data.data);
-      setTotalItem(data.total);
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-    } finally {
-      setIsLoading(false);
+    if (products?.products) {
+      setTotalItem(products.total);
     }
-  };
+  }, [products?.products]);
 
-  const fetchBrands = async () => {
-    setBrandDropDownIsOpen(true)
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/brand/search?YX_LIBELLE=${brandValue}&page=${currentPage}&limit=10`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const data = await response.json();
-      setBrands(data.data);
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchSuppliers = async () => {
-    setSupplierDropDownIsOpen(true)
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/supplier/search?T_LIBELLE=${supplierValue}&page=${currentPage}&limit=10`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const data = await response.json();
-      console.log(data)
-      setSuppliers(data.data);
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchFamilies = async () => {
-    setFamilyDropDownIsOpen(true)
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/family/search?YX_LIBELLE=${familyValue}&page=${currentPage}&limit=10`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const data = await response.json();
-      setFamilies(data.data);
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSearch = async () => {
+  const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setIsLoading(true);
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/product/search?GA_CODEARTICLE=${codeValue}&GA_LIBELLE=${labelValue}&GA_LIBREART4=${brandChoiceValue}&GA_FOURNPRINC=${supplierChoiceValue}&GA_LIBREART1=${familyChoiceValue}&page=${currentPage}&limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const data = await response.json();
-      setProducts(data.data);
-      setTotalItem(data.total);
+    setCurrentPage(1);
+    setSubmittedSearchParams({
+      codeValue,
+      labelValue,
+      brandChoiceValue,
+      supplierChoiceValue,
+      familyChoiceValue,
+      subFamilyChoiceValue
+    });
+    refetchProducts().then(() => {
       setIsLoading(false);
-    } catch (error) {
+    }).catch((error) => {
       console.error("Erreur lors de la requête", error);
-    }
+      setIsLoading(false);
+    });
   };
 
-  useEffect(() => {
-    if(brandValue){
-      fetchBrands();
-    }
-  }, [brandValue]);
+  
 
   useEffect(() => {
-    if(supplierValue){
-      fetchSuppliers();
-    }
-  }, [supplierValue]);
+    const handler = setTimeout(() => {
+      refecthFamilies();
+      refecthSubFamilies();
+      refecthBrands();
+      refecthSuppliers();
+    }, 100);
 
-  useEffect(() => {
-    if(familyValue){
-      fetchFamilies();
-    }
-  }, [familyValue]);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [familyValue, refecthFamilies, brandValue, refecthBrands, supplierValue, refecthSuppliers, subFamilyValue, refecthSubFamilies]);
 
-  useEffect(() => {
-    if(codeValue || labelValue || brandChoiceValue|| supplierChoiceValue || familyChoiceValue){
-      handleSearch();
-    }
-  }, [codeValue, labelValue, brandChoiceValue, supplierChoiceValue, familyChoiceValue]);
-
+ 
   return (
     <div className="relative">
       <Card title="Tous les produits">
-        <div className="p-7">
+        <form className="p-7" onSubmit={handleSearch}>
           <div className="relative flex flex-wrap items-center gap-5 text-gray-600">
             <div className="flex items-center gap-4">
               <label className="w-[60px] text-sm font-bold">Code :</label>
@@ -235,6 +157,7 @@ export default function Home() {
                 placeholder="Rechercher un code"
                 value={codeValue}
                 onChange={(e) => setCodeValue(e.target.value)}
+                autoComplete="off"
               />
             </div>
 
@@ -247,6 +170,7 @@ export default function Home() {
                 placeholder="Rechercher un code"
                 value={labelValue}
                 onChange={(e) => setLabelValue(e.target.value)}
+                autoComplete="off"
               />
             </div>
             <div className="relative flex items-center gap-4">
@@ -259,20 +183,28 @@ export default function Home() {
                   placeholder="Rechercher un code"
                   value={brandValue}
                   onChange={(e) => setBrandValue(e.target.value)}
+                  onFocus={() => setBrandDropDownIsOpen(true)}
+                  autoComplete="off"
                 />
-                {brands && brandDropDownIsOpen && (
+                {brands?.brands && brandDropDownIsOpen && (
                   <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md top-[40px]">
                     <div className="h-[30px] flex justify-end cursor-pointer">
-                      <span className="text-md px-4" onClick={()=>setBrandDropDownIsOpen(false)}>X</span>
+                      <span
+                        className="text-md px-4"
+                        onClick={() => setBrandDropDownIsOpen(false)}
+                      >
+                        X
+                      </span>
                     </div>
-                    {brands.map((brand) => (
-                      <ul>
+                    {brands?.brands.map((brand : Brand) => (
+                      <ul key={brand._id}>
                         <li
                           className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
                           onClick={() => {
                             setBrandChoiceValue(brand.YX_CODE);
-                            setBrandValue(brand.YX_LIBELLE)
+                            setBrandValue(brand.YX_LIBELLE);
                             setBrandDropDownIsOpen(false);
+                            setCurrentPage(1);
                           }}
                         >
                           {brand.YX_LIBELLE}
@@ -295,20 +227,28 @@ export default function Home() {
                   placeholder="Rechercher un code"
                   value={supplierValue}
                   onChange={(e) => setSupplierValue(e.target.value)}
+                  onFocus={() => setSupplierDropDownIsOpen(true)}
+                  autoComplete="off"
                 />
-                {suppliers && supplierDropDownIsOpen && (
+                {suppliers?.suppliers && supplierDropDownIsOpen && (
                   <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md top-[40px]">
                     <div className="h-[30px] flex justify-end cursor-pointer">
-                      <span className="text-md px-4" onClick={()=>setSupplierDropDownIsOpen(false)}>X</span>
+                      <span
+                        className="text-md px-4"
+                        onClick={() => setSupplierDropDownIsOpen(false)}
+                      >
+                        X
+                      </span>
                     </div>
-                    {suppliers.map((supplier) => (
-                      <ul>
+                    {suppliers?.suppliers.map((supplier: Supplier) => (
+                      <ul key={supplier._id}>
                         <li
                           className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
                           onClick={() => {
                             setSupplierChoiceValue(supplier.T_TIERS);
-                            setSupplierValue(supplier.T_LIBELLE)
+                            setSupplierValue(supplier.T_LIBELLE);
                             setSupplierDropDownIsOpen(false);
+                            setCurrentPage(1);
                           }}
                         >
                           {supplier.T_LIBELLE}
@@ -329,20 +269,28 @@ export default function Home() {
                   placeholder="Rechercher un code"
                   value={familyValue}
                   onChange={(e) => setFamilyValue(e.target.value)}
+                  onFocus={() => setFamilyDropDownIsOpen(true)}
+                  autoComplete="off"
                 />
                 {families && familyDropDownIsOpen && (
                   <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md top-[40px]">
                     <div className="h-[30px] flex justify-end cursor-pointer">
-                      <span className="text-md px-4" onClick={()=>setFamilyDropDownIsOpen(false)}>X</span>
+                      <span
+                        className="text-md px-4"
+                        onClick={() => setFamilyDropDownIsOpen(false)}
+                      >
+                        X
+                      </span>
                     </div>
-                    {families.map((family) => (
-                      <ul>
+                    {families.families.map((family : Family) => (
+                      <ul key={family._id}>
                         <li
                           className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
                           onClick={() => {
                             setFamilyChoiceValue(family.YX_CODE);
-                            setFamilyValue(family.YX_LIBELLE)
+                            setFamilyValue(family.YX_LIBELLE);
                             setFamilyDropDownIsOpen(false);
+                            setCurrentPage(1);
                           }}
                         >
                           {family.YX_LIBELLE}
@@ -357,24 +305,61 @@ export default function Home() {
               <label className="w-[100px] text-sm font-bold">
                 Sous-famille :
               </label>
-              <input
-                type="text"
-                id="search"
-                className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
-                placeholder="Rechercher un code"
-                value={codeValue}
-                onChange={(e) => setCodeValue(e.target.value)}
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  id="brand"
+                  className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
+                  placeholder="Rechercher un code"
+                  value={subFamilyValue}
+                  onChange={(e) => setSubFamilyValue(e.target.value)}
+                  onFocus={() => setSubFamilyDropDownIsOpen(true)}
+                  autoComplete="off"
+                />
+                {subFamilies?.subFamilies && subFamilyDropDownIsOpen && (
+                  <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md top-[40px]">
+                    <div className="h-[30px] flex justify-end cursor-pointer">
+                      <span
+                        className="text-md px-4"
+                        onClick={() => setSubFamilyDropDownIsOpen(false)}
+                      >
+                        X
+                      </span>
+                    </div>
+                    {subFamilies?.subFamilies.map((subFamily: Family) => (
+                      <ul key={subFamily._id}>
+                        <li
+                          className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
+                          onClick={() => {
+                            setSubFamilyChoiceValue(subFamily.YX_CODE);
+                            setSubFamilyValue(subFamily.YX_LIBELLE);
+                            setSubFamilyDropDownIsOpen(false);
+                            setCurrentPage(1);
+                          }}
+                        >
+                          {subFamily.YX_LIBELLE}
+                        </li>
+                      </ul>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div>
-              <Button to="/edit" size="small" green>
-                Créer un produit
-              </Button>
-            </div>
+            {!isLoading ? (
+              <div>
+                <Button type="submit" size="small" green>
+                  Rechercher
+                </Button>
+              </div>
+            ) : (
+              <div>
+                <Spinner width="50px" height="40px" logoSize="90%" progressSize={50} />
+              </div>
+            )}
           </div>
-        </div>
-        {products && products.length > 0 && (
+        </form>
+        {products?.products && products.products.length > 0 && (
           <div className="flex justify-center p-7">
             <Stack spacing={2}>
               <Pagination
@@ -418,8 +403,8 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {products && products.length > 0 ? (
-                products.map((product) => (
+              {products?.products && products.products.length > 0 ? (
+                products.products.map((product : Product) => (
                   <tr
                     key={product._id}
                     className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
