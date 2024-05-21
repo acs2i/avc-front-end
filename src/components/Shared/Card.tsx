@@ -19,8 +19,17 @@ export default function Card({ title, children, createTitle, link }: InFosCard) 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const shouldHideBackButton = location.pathname === "/";
-  const pathsToHideDots = ["/parameters", "/edit"];
-  const shouldHideDots = pathsToHideDots.includes(location.pathname);
+  const pathsToHideDots = ["/parameters", "/edit", "/draft", "/in-progress", "/done", "/admin/create-user"];
+  const pathsToHideCSV = ["/admin"];
+  const regexPathsToHideDots = [
+    /^\/parameters\/classification\/[^\/]+$/,
+    /^\/parameters\/dimension\/[^\/]+$/,
+    /^\/parameters\/grid\/[^\/]+$/,
+    /^\/parameters\/collection\/[^\/]+$/,
+    /^\/parameters\/brand\/[^\/]+$/,
+  ];
+  const shouldHideDots = pathsToHideDots.includes(location.pathname) || regexPathsToHideDots.some((regex) => regex.test(location.pathname));
+  const shouldHideCSV = pathsToHideCSV.includes(location.pathname)
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -77,14 +86,14 @@ export default function Card({ title, children, createTitle, link }: InFosCard) 
                   </div>
                 </Link>
               </MenuItem>
-              <MenuItem onClick={handleClose}>
+              {!shouldHideCSV  && <MenuItem onClick={handleClose}>
                 <div className="flex items-center gap-3 w-full">
                   <div className="text-orange-500">
                     <Download />
                   </div>
                   <p className="text-sm">Exporter en CSV</p>
                 </div>
-              </MenuItem>
+              </MenuItem>}
             </Menu>
           </>
         )}

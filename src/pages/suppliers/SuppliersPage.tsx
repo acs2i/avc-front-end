@@ -60,7 +60,7 @@ export default function SuppliersPage() {
 
   return (
     <div className="relative">
-    <Card title="Paramétrer les dimensions">
+    <Card title="Paramétrer les dimensions" createTitle="Créer un founisseur" link="">
       <div className="flex items-center justify-center gap-4 p-7">
         <div className="flex items-center gap-4">
           <label className="w-[60px] text-sm font-bold">Libellé :</label>
@@ -79,11 +79,6 @@ export default function SuppliersPage() {
             className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
             placeholder="Rechercher par code"
           />
-        </div>
-        <div className="flex items-center gap-3">
-          <Button size="small" green to="/parameters/dimension/create/item">
-            Créer un fournisseur
-          </Button>
         </div>
       </div>
       {suppliers && suppliers.length > 0 && (

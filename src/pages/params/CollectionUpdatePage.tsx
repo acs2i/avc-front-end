@@ -121,7 +121,7 @@ export default function CollectionUpdatePage() {
           </div>
         )}
       </Modal>
-      <Card title={`Mettre à jour la classification`}>
+      <Card title={`Mettre à jour la classification`} createTitle="" link="">
         <form
           className="w-[70%] h-[400px] mx-auto mt-[50px] mb-[50px]"
           onSubmit={handleSubmit}

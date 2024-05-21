@@ -131,7 +131,7 @@ function ClassificationsPage() {
           </Button>
         </div>
       </Modal>
-      <Card title="Paramétrer les classifications" createTitle="Créer une classe" link="/parameters/classification/create">
+      <Card title="Paramétrer les classifications" createTitle="Créer une Classe" link="/parameters/classification/create">
         <div className="flex items-center justify-center gap-4 p-7">
           <div className="flex items-center gap-4">
             <label className="w-[90px] text-sm font-bold">Niveau :</label>

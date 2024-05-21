@@ -501,7 +501,7 @@ export default function CreateProductPage() {
               onSubmit={handleCreateProduct}
             >
               <div className="flex items-center gap-3 h-[70px]">
-                <div className="h-2/3 w-[8px] bg-emerald-700"></div>
+                <div className="h-2/3 w-[8px] bg-[#01972B]"></div>
                 <h4 className="text-3xl text-gray-600">
                   <span className="font-bold text-gray-700">Création</span>{" "}
                   d'une fiche produit

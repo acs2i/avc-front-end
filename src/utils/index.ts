@@ -1,5 +1,5 @@
-import { Filters_1, Link, LinkCard, Size, Suppliers, Params } from "@/type";
-import { Home, Pen, Truck, ShoppingCart, Barcode, Settings, Grid3X3, Ruler, ListOrdered, Shirt, Captions, File } from "lucide-react";
+import { Filters_1, Link, LinkCard, Size, Suppliers, Params, Notifications } from "@/type";
+import { Home, Pen, Truck, ShoppingCart, Barcode, Settings, Grid3X3, Ruler, ListOrdered, Shirt, Captions, File, FileClock, FileCheck2, UserCog } from "lucide-react";
 
 export const LINKS: Link[] = [
   {
@@ -136,9 +136,37 @@ export const LINKS: Link[] = [
     showInBottom: false,
   },
   {
+    name: "Panel administrateur",
+    link: "/admin",
+    icon: UserCog,
+    showInSidebar: false,
+    showInBottom: true,
+  },
+  {
+    name: "Créer utilisateur",
+    link: "/admin/create-user",
+    icon: Settings,
+    showInSidebar: false,
+    showInBottom: false,
+  },
+  {
     name: "Brouillons",
     link: "/draft",
     icon: File,
+    showInSidebar: false,
+    showInBottom: true,
+  },
+  {
+    name: "En cours de validation",
+    link: "/in-progress",
+    icon: FileClock,
+    showInSidebar: false,
+    showInBottom: true,
+  },
+  {
+    name: "Validé",
+    link: "/done",
+    icon: FileCheck2,
     showInSidebar: false,
     showInBottom: true,
   },
@@ -260,5 +288,56 @@ export const LINKCARD_SEARCH: LinkCard[] = [
   },
   
 
+];
+
+export const NOTIF: Notifications[] = [
+  {
+    user: "John Doe",
+    message: "La création de produit a été validée",
+    date: "21/05/2024"
+  },
+  {
+    user: "Jane Da",
+    message: "La création de produit a été validée",
+    date: "21/05/2024"
+  },
+  {
+    user: "Michel Jambon",
+    message: "La création de produit a été validée",
+    date: "21/05/2024"
+  },
+  {
+    user: "Pré-ref",
+    message: "Vous avez des produits en cours de création",
+    date: "21/05/2024"
+  },
+];
+
+export const MESSAGES: Notifications[] = [
+  {
+    user: "John Doe",
+    message: "Il y a un probleme dans le produit que vous avez enregistrée",
+    date: "21/05/2024"
+  },
+  {
+    user: "Jane Da",
+    message: "njehfjehdefefffff",
+    date: "21/05/2024"
+  },
+  {
+    user: "Michel Jambon",
+    message: "fjehfefhjehieuieui",
+    date: "21/05/2024"
+  },
+  {
+    user: "Pré-ref",
+    message: "jhhghttrtrdrrs",
+    date: "21/05/2024"
+  },
+  {
+    user: "Pré-ref",
+    message: "jhhghttrtrdrrs",
+    date: "21/05/2024"
+  },
 ];
 

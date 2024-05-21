@@ -33,3 +33,9 @@ export type Size = {
 export type Filters_1 = {
   title: string;
 };
+
+export type Notifications = {
+  user: string;
+  message: string;
+  date: string;
+};
