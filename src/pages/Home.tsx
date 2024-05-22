@@ -494,7 +494,7 @@ export default function Home() {
                 products.products.map((product: Product) => (
                   <tr
                     key={product._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
+                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
                     onClick={() => navigate(`/product/${product._id}`)}
                   >
                     <td className="px-6 py-4">{product.GA_CODEARTICLE}</td>

@@ -177,26 +177,31 @@ export const LINKS_Params: Params[] = [
     name: "Classifications",
     link: "/parameters/classification",
     icon: ListOrdered,
+    bg: "/img/bg_params_1.png"
   },
   {
     name: "Dimensions",
     link: "/parameters/dimension",
     icon: Ruler,
+    bg: "/img/bg_params_2.jpg"
   },
   {
     name: "Grilles de dimensions",
     link: "/parameters/grid",
     icon: Grid3X3,
+    bg: "/img/bg_params_3.png"
   },
   {
     name: "Collections",
     link: "/parameters/collection",
     icon: Shirt,
+    bg: "/img/bg_params_4.png"
   },
   {
     name: "Marques",
     link: "/parameters/brand",
     icon: Captions,
+    bg: "/img/bg_params_5.png"
   },
  
  

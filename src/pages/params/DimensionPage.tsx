@@ -167,7 +167,7 @@ export default function DimensionPage() {
                 dimensions.map((dimension) => (
                   <tr
                     key={dimension._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
+                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
                     onClick={() =>
                       navigate(`/parameters/dimension/${dimension._id}`)
                     }

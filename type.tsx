@@ -10,6 +10,7 @@ export type Params = {
   name: string;
   link: string;
   icon: any;
+  bg: string;
 };
 
 

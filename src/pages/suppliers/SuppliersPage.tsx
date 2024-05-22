@@ -94,7 +94,7 @@ export default function SuppliersPage() {
       )}
       <div className="relative overflow-x-auto bg-white">
         <div className="px-3 mb-2 flex items-center gap-2">
-          <h4 className="text-xl">
+          <h4 className="text-md">
             <span className="font-bold">{totalItem}</span> Fournisseurs
           </h4>
           {prevSearchValue && (
@@ -102,7 +102,7 @@ export default function SuppliersPage() {
           )}
         </div>
         <table className="w-full text-left">
-          <thead className="bg-blue-50 text-md text-gray-500">
+          <thead className="bg-gray-200 text-sm text-gray-500">
             <tr>
               <th scope="col" className="px-6 py-4 w-1/3">
                 Code
@@ -117,7 +117,7 @@ export default function SuppliersPage() {
               suppliers.map((supplier) => (
                 <tr
                   key={supplier._id}
-                  className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
+                  className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
                   onClick={() =>
                     navigate(`/parameters/dimension/${supplier._id}`)
                   }

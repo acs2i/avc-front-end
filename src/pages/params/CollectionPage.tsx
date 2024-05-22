@@ -172,7 +172,7 @@ export default function CollectionPage() {
                 collections.map((collection) => (
                   <tr
                     key={collection._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
+                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
                     onClick={() =>
                       navigate(`/parameters/collection/${collection._id}`)
                     }

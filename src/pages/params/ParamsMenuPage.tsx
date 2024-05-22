@@ -56,12 +56,18 @@ function ParamsMenuPage() {
               <Link
                 to={link.link}
                 key={i}
-                className={`w-[250px] h-[250px] bg-orange-500 border-2 border-orange-300 hover:bg-orange-400 hover:scale-110 text-white rounded-xl shadow-lg transition-all`}
+                className={`w-[250px] h-[250px] border-2 border-gray-300 hover:scale-110 text-white rounded-xl shadow-lg transition-all`}
+                style={{
+                  backgroundImage: `url(${link.bg})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
               >
                 <div
-                  className={`flex flex-col items-center justify-center h-full gap-3`}
+                  className={`flex flex-col items-center justify-center h-full bg-black bg-opacity-20 p-2 rounded gap-3`}
                 >
-                  <span className="text-xl font-bold">{link.name}</span>
+                    <span className="text-xl font-bold">{link.name}</span>
+             
                   {React.createElement(link.icon, {
                     size: new RegExp(`^${link.link}(/.*)?$`).test(
                       location.pathname

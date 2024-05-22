@@ -147,10 +147,7 @@ export default function AdminPage() {
                 users.map((user) => (
                   <tr
                     key={user._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 text-xs text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
-                    onClick={() =>
-                      navigate(`/parameters/collection/${user._id}`)
-                    }
+                    className="bg-white cursor-pointer hover:bg-slate-200 text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
                   >
                     <td className="px-6 py-4">{user.username}</td>
                     <td className="px-6 py-4">{user.email}</td>

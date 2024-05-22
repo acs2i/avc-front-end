@@ -53,10 +53,6 @@ export default function Sidebar() {
                   !new RegExp(`^${link.link}(/.*)?$`).test(location.pathname)
                     ? "hover:text-orange-300"
                     : ""
-                } ${
-                  new RegExp(`^${link.link}(/.*)?$`).test(location.pathname)
-                    ? "animate-bounce"
-                    : ""
                 }`}
               >
                 {React.createElement(link.icon, {
@@ -114,7 +110,7 @@ export default function Sidebar() {
           aria-expanded={open ? "true" : undefined}
           onClick={handleClick}
         >
-          <Avatar src="/img/user_img.png" alt="Non user" />
+          <Avatar src="/img/avatar_1.png" alt="avatar utilisateur" sx={{ width: 56, height: 56 }} />
         </Button>
         <Menu
           id="basic-menu"
@@ -130,16 +126,9 @@ export default function Sidebar() {
           }}
         >
           <MenuItem onClick={handleClose} className="flex flex-col">
-            <div className="mb-3 text-center">
+            <div className="mb-3 text-center p-4">
               <p className="text-xl font-bold capitalize text-gray-700">{user ? user.username : "test"}</p>
               <p className="text-xs font-bold text-gray-500">{user ? user.email : "test"}</p>
-            </div>
-            <Divider />
-            <div className="flex items-center gap-3">
-              <Avatar src="/img/logo.png" alt="Lien portail fournisseur" />
-              <span className="font-bold text-gray-700 text-sm">
-                Portail Fournisseurs
-              </span>
             </div>
           </MenuItem>
           <Divider />

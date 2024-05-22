@@ -124,7 +124,7 @@ export default function GridPage() {
                 ? grids.map((grid) => (
                     <tr
                       key={grid._id}
-                      className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
+                      className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
                     >
                       <td className="px-6 py-4">{grid.TYPE}</td>
                       <td className="px-6 py-4">{grid.LIBELLE}</td>
