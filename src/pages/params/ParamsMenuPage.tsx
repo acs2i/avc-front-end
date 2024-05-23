@@ -51,7 +51,7 @@ function ParamsMenuPage() {
               <Info size={22} />
             </div>
           </div>
-          <div className="mt-2 flex flex-wrap gap-2  py-5">
+          <div className="mt-2 flex flex-wrap gap-2 py-5">
             {LINKS_Params.map((link, i) => (
               <Link
                 to={link.link}
