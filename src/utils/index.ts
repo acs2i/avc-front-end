@@ -1,18 +1,18 @@
 import { Filters_1, Link, LinkCard, Size, Suppliers, Params, Notifications } from "@/type";
-import { Home, Pen, Truck, ShoppingCart, Barcode, Settings, Grid3X3, Ruler, ListOrdered, Shirt, Captions, File, FileClock, FileCheck2, UserCog } from "lucide-react";
+import { Home, Pen, Truck, ShoppingCart, Barcode, Settings, Grid3X3, Ruler, ListOrdered, Shirt, Captions, File, FileClock, FileCheck2, UserCog, AreaChart, LineChart, Settings2, Factory } from "lucide-react";
 
 export const LINKS: Link[] = [
   {
-    name: "Accueil",
+    name: "Dashboard",
     link: "/",
-    icon: Home,
+    icon: LineChart,
     showInSidebar: true,
     showInBottom: false,
   },
   {
-    name: "Paramètres",
+    name: "Codification",
     link: "/parameters",
-    icon: Settings,
+    icon: Settings2,
     showInSidebar: true,
     showInBottom: false,
   },
@@ -138,7 +138,14 @@ export const LINKS: Link[] = [
   {
     name: "Liste des fournisseurs",
     link: "/suppliers/suppliers-list",
-    icon: Truck,
+    icon: Factory,
+    showInSidebar: true,
+    showInBottom: false,
+  },
+  {
+    name: "Liste article",
+    link: "/product",
+    icon: Shirt,
     showInSidebar: true,
     showInBottom: false,
   },

@@ -95,6 +95,13 @@ type CollectionOption = {
   CODE: string;
 };
 
+type FamilyOption = {
+  _id: string;
+  YX_TYPE: string;
+  YX_CODE: string;
+  YX_LIBELLE: string;
+};
+
 export default function CreateProductPage() {
   const user = useSelector((state: any) => state.auth.user);
   const [page, setPage] = useState("addProduct");
@@ -180,12 +187,16 @@ export default function CreateProductPage() {
 
   const [selectedOptionBrand, setSelectedOptionBrand] =
     useState<SingleValue<BrandOption> | null>(null);
-    const [selectedOptionCollection, setSelectedOptionCollection] =
+  const [selectedOptionCollection, setSelectedOptionCollection] =
     useState<SingleValue<CollectionOption> | null>(null);
+  const [selectedOptionFamily, setSelectedOptionFamily] =
+    useState<SingleValue<FamilyOption> | null>(null);
   const [inputValueBrand, setInputValueBrand] = useState("");
   const [inputValueCollection, setInputValueCollection] = useState("");
+  const [inputValueFamily, setInputValueFamily] = useState("");
   const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
   const [optionsCollection, setOptionsCollection] = useState<CollectionOption[]>([]);
+  const [optionsFamily, setOptionsFamily] = useState<FamilyOption[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 20;
 
@@ -304,6 +315,66 @@ export default function CreateProductPage() {
       }));
 
       setOptionsCollection(optionsCollection);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
+  // Fonction pour gérer le changement de la valeur sélectionnée
+  const handleChangeFamily = (newValue: SingleValue<FamilyOption>) => {
+    setSelectedOptionFamily(newValue);
+  };
+
+  // Fonction pour gérer la saisie de l'utilisateur
+  const handleInputChangeFamily = async (inputValueFamily: string) => {
+    setInputValueFamily(inputValueFamily);
+
+    // console.log(inputValue);
+    if (inputValueFamily === '') {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/family`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+  
+  
+        const optionsFamily = data.data?.map((family: FamilyOption) => ({
+          value: family.YX_LIBELLE,
+          label: family.YX_LIBELLE,
+        }));
+  
+        setOptionsFamily(optionsFamily);
+      } catch (error) {
+        console.error("Erreur lors de la requête", error);
+      }
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/family/search?YX_LIBELLE=${inputValueFamily}&page=${currentPage}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+
+
+      const optionsFamily = data.data?.map((family: FamilyOption) => ({
+        value: family.YX_LIBELLE,
+        label: family.YX_LIBELLE,
+      }));
+
+      setOptionsFamily(optionsFamily);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     }
@@ -431,7 +502,7 @@ export default function CreateProductPage() {
         );
         const data = await response.json();
   
-        const optionsBrand = data.data?.map((brand: Brand) => ({
+        const optionsBrand = data.data?.map((brand: BrandOption) => ({
           value: brand.YX_LIBELLE,
           label: brand.YX_LIBELLE,
         }));
@@ -455,7 +526,7 @@ export default function CreateProductPage() {
         );
         const data = await response.json();
   
-        const optionsCollection = data.data?.map((collection: Collection) => ({
+        const optionsCollection = data.data?.map((collection: CollectionOption) => ({
           value: collection.LIBELLE,
           label: collection.LIBELLE,
         }));
@@ -465,9 +536,34 @@ export default function CreateProductPage() {
         console.error("Erreur lors de la requête", error);
       }
     };
+
+    const fetchInitialDataFamily = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/family`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+  
+        const optionsFamily = data.data?.map((family: FamilyOption) => ({
+          value: family.YX_LIBELLE,
+          label: family.YX_LIBELLE,
+        }));
+  
+        setOptionsFamily(optionsFamily);
+      } catch (error) {
+        console.error("Erreur lors de la requête", error);
+      }
+    };
   
     fetchInitialDataBrand();
     fetchInitialDataCollection();
+    fetchInitialDataFamily();
   }, []);
 
   return (
@@ -475,7 +571,7 @@ export default function CreateProductPage() {
       <Card title="Panel d'ajout" createTitle="" link="">
         <div className="mt-4 mb-[50px] px-4">
           <div className="flex items-center gap-7">
-            {LINKCARD_EDIT.map((link: LinkCard, i) => (
+            {/* {LINKCARD_EDIT.map((link: LinkCard, i) => (
               <React.Fragment key={i}>
                 <button
                   className={`font-bold text-gray-600 ${
@@ -487,7 +583,7 @@ export default function CreateProductPage() {
                 </button>
                 <div className="w-[1px] h-[20px] bg-gray-300"></div>
               </React.Fragment>
-            ))}
+            ))} */}
           </div>
           <div className="mt-6">
             <Divider />
@@ -646,14 +742,18 @@ export default function CreateProductPage() {
                             </span>
                           </label>
                         </div>
-                        <CreatableSelect
+                        
+                        <CreatableSelect<FamilyOption>
+                          value={selectedOptionFamily}
+                          onChange={handleChangeFamily}
+                          onInputChange={handleInputChangeFamily}
+                          inputValue={inputValueFamily}
+                          options={optionsFamily}
                           placeholder="Selectionner une famille"
                           styles={customStyles}
-                          value={selectedFamilyName}
-                          //onChange={handleChange}
                           className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                          // isMulti
                           required
-                          isMulti
                         />
                       </div>
 
@@ -663,6 +763,18 @@ export default function CreateProductPage() {
                             Sous-famille :{" "}
                           </label>
                         </div>
+                        <CreatableSelect<FamilyOption>
+                          value={selectedOptionFamily}
+                          onChange={handleChangeFamily}
+                          onInputChange={handleInputChangeFamily}
+                          inputValue={inputValueFamily}
+                          options={optionsFamily}
+                          placeholder="Selectionner une sous-famille"
+                          styles={customStyles}
+                          className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                          // isMulti
+                          required
+                        />
                         {/* <CreatableSelect
                           placeholder="Selectionner une sous-famille"
                           styles={customStyles}
