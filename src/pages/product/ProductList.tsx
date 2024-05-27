@@ -12,7 +12,7 @@ import { useProducts } from "../../utils/hooks/useProducts";
 import { useBrands } from "../../utils/hooks/useBrands";
 import { useSuppliers } from "../../utils/hooks/useSuppliers";
 import { useSubFamilies } from "../../utils/hooks/useSubFamilies";
-import {LINKCARD_SEARCH } from "../../utils/index";
+import { LINKCARD_SEARCH } from "../../utils/index";
 import { Divider } from "@mui/material";
 import { LinkCard } from "@/type";
 
@@ -226,206 +226,212 @@ export default function ProductList() {
 
         <form className="px-7" onSubmit={handleSearch}>
           <div className="relative flex flex-wrap items-center gap-5 text-gray-600">
-            {page === "standard" && <>
-              <div className="flex items-center gap-4">
-              <label className="w-[60px] text-sm font-bold">Code :</label>
-              <input
-                type="text"
-                id="code"
-                className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
-                placeholder="Rechercher un code"
-                value={codeValue}
-                onChange={(e) => setCodeValue(e.target.value)}
-                autoComplete="off"
-              />
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="w-[100px] text-sm font-bold">Libellé :</label>
-              <input
-                type="text"
-                id="label"
-                className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
-                placeholder="Rechercher par libellé"
-                value={labelValue}
-                onChange={(e) => setLabelValue(e.target.value)}
-                autoComplete="off"
-              />
-            </div>
-            <div className="relative flex items-center gap-4">
-              <label className="w-[70px] text-sm font-bold">Marque :</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  id="brand"
-                  className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
-                  placeholder="Rechercher par marque"
-                  value={brandValue}
-                  onChange={(e) => handleBrandChange(e)}
-                  onFocus={() => setBrandDropDownIsOpen(true)}
-                  autoComplete="off"
-                />
-                {brands?.brands && brandDropDownIsOpen && brandValue && (
-                  <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md top-[40px]">
-                    <div className="h-[30px] flex justify-end cursor-pointer">
-                      <span
-                        className="text-md px-4"
-                        onClick={() => setBrandDropDownIsOpen(false)}
-                      >
-                        X
-                      </span>
-                    </div>
-                    {brands?.brands.map((brand: Brand) => (
-                      <ul key={brand._id}>
-                        <li
-                          className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
-                          onClick={() => {
-                            setBrandChoiceValue(brand.YX_CODE);
-                            setBrandValue(brand.YX_LIBELLE);
-                            setBrandDropDownIsOpen(false);
-                            setCurrentPage(1);
-                          }}
-                        >
-                          {brand.YX_LIBELLE}
-                        </li>
-                      </ul>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="w-[90px] text-sm font-bold">
-                Fournisseur :
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  id="brand"
-                  className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
-                  placeholder="Rechercher par fournisseur"
-                  value={supplierValue}
-                  onChange={(e) => handleSupplierChange(e)}
-                  onFocus={() => setSupplierDropDownIsOpen(true)}
-                  autoComplete="off"
-                />
-                {suppliers?.suppliers &&
-                  supplierDropDownIsOpen &&
-                  supplierValue && (
-                    <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md top-[40px]">
-                      <div className="h-[30px] flex justify-end cursor-pointer">
-                        <span
-                          className="text-md px-4"
-                          onClick={() => setSupplierDropDownIsOpen(false)}
-                        >
-                          X
-                        </span>
-                      </div>
-                      {suppliers?.suppliers.map((supplier: Supplier) => (
-                        <ul key={supplier._id}>
-                          <li
-                            className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
-                            onClick={() => {
-                              setSupplierChoiceValue(supplier.T_TIERS);
-                              setSupplierValue(supplier.T_LIBELLE);
-                              setSupplierDropDownIsOpen(false);
-                              setCurrentPage(1);
-                            }}
+            {page === "standard" && (
+              <>
+                <div className="flex items-center gap-4">
+                  <label className="w-[60px] text-sm font-bold">Code :</label>
+                  <input
+                    type="text"
+                    id="code"
+                    className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
+                    placeholder="Rechercher un code"
+                    value={codeValue}
+                    onChange={(e) => setCodeValue(e.target.value)}
+                    autoComplete="off"
+                  />
+                </div>
+                <div className="flex items-center gap-4">
+                  <label className="w-[100px] text-sm font-bold">
+                    Libellé :
+                  </label>
+                  <input
+                    type="text"
+                    id="label"
+                    className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
+                    placeholder="Rechercher par libellé"
+                    value={labelValue}
+                    onChange={(e) => setLabelValue(e.target.value)}
+                    autoComplete="off"
+                  />
+                </div>
+                <div className="relative flex items-center gap-4">
+                  <label className="w-[70px] text-sm font-bold">Marque :</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      id="brand"
+                      className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
+                      placeholder="Rechercher par marque"
+                      value={brandValue}
+                      onChange={(e) => handleBrandChange(e)}
+                      onFocus={() => setBrandDropDownIsOpen(true)}
+                      autoComplete="off"
+                    />
+                    {brands?.brands && brandDropDownIsOpen && brandValue && (
+                      <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md top-[40px]">
+                        <div className="h-[30px] flex justify-end cursor-pointer">
+                          <span
+                            className="text-md px-4"
+                            onClick={() => setBrandDropDownIsOpen(false)}
                           >
-                            {supplier.T_LIBELLE}
-                          </li>
-                        </ul>
-                      ))}
-                    </div>
-                  )}
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="w-[60px] text-sm font-bold">Famille :</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  id="brand"
-                  className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
-                  placeholder="Rechercher par famille"
-                  value={familyValue}
-                  onChange={(e) => handleFamilyChange(e)}
-                  onFocus={() => setFamilyDropDownIsOpen(true)}
-                  autoComplete="off"
-                />
-                {families && familyDropDownIsOpen && (
-                  <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md top-[40px]">
-                    <div className="h-[30px] flex justify-end cursor-pointer">
-                      <span
-                        className="text-md px-4"
-                        onClick={() => setFamilyDropDownIsOpen(false)}
-                      >
-                        X
-                      </span>
-                    </div>
-                    {families.families.map((family: Family) => (
-                      <ul key={family._id}>
-                        <li
-                          className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
-                          onClick={() => {
-                            setFamilyChoiceValue(family.YX_CODE);
-                            setFamilyValue(family.YX_LIBELLE);
-                            setFamilyDropDownIsOpen(false);
-                            setCurrentPage(1);
-                          }}
-                        >
-                          {family.YX_LIBELLE}
-                        </li>
-                      </ul>
-                    ))}
+                            X
+                          </span>
+                        </div>
+                        {brands?.brands.map((brand: Brand) => (
+                          <ul key={brand._id}>
+                            <li
+                              className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
+                              onClick={() => {
+                                setBrandChoiceValue(brand.YX_CODE);
+                                setBrandValue(brand.YX_LIBELLE);
+                                setBrandDropDownIsOpen(false);
+                                setCurrentPage(1);
+                              }}
+                            >
+                              {brand.YX_LIBELLE}
+                            </li>
+                          </ul>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <label className="w-[100px] text-sm font-bold">
-                Sous-famille :
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  id="brand"
-                  className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
-                  placeholder="Rechercher par sous-famille"
-                  value={subFamilyValue}
-                  onChange={(e) => handleSubFamilyChange(e)}
-                  onFocus={() => setSubFamilyDropDownIsOpen(true)}
-                  autoComplete="off"
-                />
-                {subFamilies?.subFamilies && subFamilyDropDownIsOpen && (
-                  <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md top-[40px]">
-                    <div className="h-[30px] flex justify-end cursor-pointer">
-                      <span
-                        className="text-md px-4"
-                        onClick={() => setSubFamilyDropDownIsOpen(false)}
-                      >
-                        X
-                      </span>
-                    </div>
-                    {subFamilies?.subFamilies.map((subFamily: Family) => (
-                      <ul key={subFamily._id}>
-                        <li
-                          className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
-                          onClick={() => {
-                            setSubFamilyChoiceValue(subFamily.YX_CODE);
-                            setSubFamilyValue(subFamily.YX_LIBELLE);
-                            setSubFamilyDropDownIsOpen(false);
-                            setCurrentPage(1);
-                          }}
-                        >
-                          {subFamily.YX_LIBELLE}
-                        </li>
-                      </ul>
-                    ))}
+                </div>
+                <div className="flex items-center gap-4">
+                  <label className="w-[90px] text-sm font-bold">
+                    Fournisseur :
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      id="brand"
+                      className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
+                      placeholder="Rechercher par fournisseur"
+                      value={supplierValue}
+                      onChange={(e) => handleSupplierChange(e)}
+                      onFocus={() => setSupplierDropDownIsOpen(true)}
+                      autoComplete="off"
+                    />
+                    {suppliers?.suppliers &&
+                      supplierDropDownIsOpen &&
+                      supplierValue && (
+                        <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md top-[40px]">
+                          <div className="h-[30px] flex justify-end cursor-pointer">
+                            <span
+                              className="text-md px-4"
+                              onClick={() => setSupplierDropDownIsOpen(false)}
+                            >
+                              X
+                            </span>
+                          </div>
+                          {suppliers?.suppliers.map((supplier: Supplier) => (
+                            <ul key={supplier._id}>
+                              <li
+                                className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
+                                onClick={() => {
+                                  setSupplierChoiceValue(supplier.T_TIERS);
+                                  setSupplierValue(supplier.T_LIBELLE);
+                                  setSupplierDropDownIsOpen(false);
+                                  setCurrentPage(1);
+                                }}
+                              >
+                                {supplier.T_LIBELLE}
+                              </li>
+                            </ul>
+                          ))}
+                        </div>
+                      )}
                   </div>
-                )}
-              </div>
-            </div>
-            </>}
+                </div>
+                <div className="flex items-center gap-4">
+                  <label className="w-[60px] text-sm font-bold">
+                    Famille :
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      id="brand"
+                      className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
+                      placeholder="Rechercher par famille"
+                      value={familyValue}
+                      onChange={(e) => handleFamilyChange(e)}
+                      onFocus={() => setFamilyDropDownIsOpen(true)}
+                      autoComplete="off"
+                    />
+                    {families && familyDropDownIsOpen && (
+                      <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md top-[40px]">
+                        <div className="h-[30px] flex justify-end cursor-pointer">
+                          <span
+                            className="text-md px-4"
+                            onClick={() => setFamilyDropDownIsOpen(false)}
+                          >
+                            X
+                          </span>
+                        </div>
+                        {families.families.map((family: Family) => (
+                          <ul key={family._id}>
+                            <li
+                              className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
+                              onClick={() => {
+                                setFamilyChoiceValue(family.YX_CODE);
+                                setFamilyValue(family.YX_LIBELLE);
+                                setFamilyDropDownIsOpen(false);
+                                setCurrentPage(1);
+                              }}
+                            >
+                              {family.YX_LIBELLE}
+                            </li>
+                          </ul>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <label className="w-[100px] text-sm font-bold">
+                    Sous-famille :
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      id="brand"
+                      className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
+                      placeholder="Rechercher par sous-famille"
+                      value={subFamilyValue}
+                      onChange={(e) => handleSubFamilyChange(e)}
+                      onFocus={() => setSubFamilyDropDownIsOpen(true)}
+                      autoComplete="off"
+                    />
+                    {subFamilies?.subFamilies && subFamilyDropDownIsOpen && (
+                      <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md top-[40px]">
+                        <div className="h-[30px] flex justify-end cursor-pointer">
+                          <span
+                            className="text-md px-4"
+                            onClick={() => setSubFamilyDropDownIsOpen(false)}
+                          >
+                            X
+                          </span>
+                        </div>
+                        {subFamilies?.subFamilies.map((subFamily: Family) => (
+                          <ul key={subFamily._id}>
+                            <li
+                              className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
+                              onClick={() => {
+                                setSubFamilyChoiceValue(subFamily.YX_CODE);
+                                setSubFamilyValue(subFamily.YX_LIBELLE);
+                                setSubFamilyDropDownIsOpen(false);
+                                setCurrentPage(1);
+                              }}
+                            >
+                              {subFamily.YX_LIBELLE}
+                            </li>
+                          </ul>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
 
             {!isLoading ? (
               <div>
@@ -457,13 +463,18 @@ export default function ProductList() {
           </div>
         )}
         <div className="relative overflow-x-auto bg-white">
-          <div className="px-3 mb-2 flex items-center gap-2">
-            <h4 className="text-md">
-              <span className="font-bold">{totalItem}</span> Produits
-            </h4>
-            {prevSearchValue && (
-              <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
-            )}
+          <div className="px-3 mb-2 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <h4 className="text-md">
+                <span className="font-bold">{totalItem}</span> Produits
+              </h4>
+              {prevSearchValue && (
+                <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
+              )}
+            </div>
+            <Button type="submit" size="small" to="/product/edit" green>
+              Créer un produit
+            </Button>
           </div>
           <table className="w-full text-left">
             <thead className="bg-gray-200 text-sm text-gray-500">
