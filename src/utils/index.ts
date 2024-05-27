@@ -10,6 +10,13 @@ export const LINKS: Link[] = [
     showInBottom: false,
   },
   {
+    name: "Liste Articles",
+    link: "/product",
+    icon: Shirt,
+    showInSidebar: true,
+    showInBottom: false,
+  },
+  {
     name: "Codification",
     link: "/parameters",
     icon: Settings2,
@@ -101,13 +108,6 @@ export const LINKS: Link[] = [
     showInBottom: false,
   },
   {
-    name: "Liste Produit",
-    link: "/product",
-    icon: Shirt,
-    showInSidebar: true,
-    showInBottom: false,
-  },
-  {
     name: "Page Produit",
     link: "/product/:id",
     icon: ShoppingCart,
@@ -139,13 +139,6 @@ export const LINKS: Link[] = [
     name: "Liste des fournisseurs",
     link: "/suppliers/suppliers-list",
     icon: Factory,
-    showInSidebar: true,
-    showInBottom: false,
-  },
-  {
-    name: "Liste article",
-    link: "/product",
-    icon: Shirt,
     showInSidebar: true,
     showInBottom: false,
   },
