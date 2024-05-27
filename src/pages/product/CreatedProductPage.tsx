@@ -54,7 +54,7 @@ export default function CreatedProductPage() {
 
   return (
     <div className="mt-7 mb-[100px]">
-      <Card title="Les produits créés">
+      <Card title="Les produits créés" createTitle="" link="">
         <div className="mt-4 mb-[30px] px-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-7">
