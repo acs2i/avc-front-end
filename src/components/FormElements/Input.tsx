@@ -13,15 +13,18 @@ type InputProps = {
   placeholder?: string;
   placeholderColor?: string;
   orange?: boolean;
+  create?: boolean;
   gray?: boolean;
   required?: boolean;
   disabled?: boolean;
   rows?: number;
   options?: { value: string; label: string; name: string }[];
+  maxLength?: number;
   label?: string;
   onChange?: React.ChangeEventHandler<
     HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
   >;
+  onClick?: any;
   onBlur?: React.FocusEventHandler<
     HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
   >;
@@ -79,6 +82,7 @@ const Input: React.FC<InputProps> = (props) => {
       props.orange ? "border-b-2 border-orange-400" : ""
     }
     ${props.gray ? "border-b-[1px] border-gray-300" : ""}
+    ${props.create ? "border border-gray-300 rounded-lg px-2 focus:ring-blue-500 focus:border-blue-500" : ""}
     ${
       props.disabled
         ? " bg-gray-200 rounded-md border border-white text-gray-500 italic px-3 cursor-not-allowed"
@@ -100,6 +104,7 @@ const Input: React.FC<InputProps> = (props) => {
         placeholder={props.placeholder}
         onChange={changeHandler}
         onBlur={touchHandler}
+        onClick={props.onClick}
         value={props.value}
         required={props.required}
         onKeyDown={props.onKeyDown}
@@ -114,6 +119,8 @@ const Input: React.FC<InputProps> = (props) => {
         onChange={props.onChange}
         onBlur={props.onBlur}
         value={props.value}
+        maxLength={props.maxLength}
+        className="border p-2 resize-none focus:outline-none focus:ring-blue-500 focus:border-blue-500"
       />
     ) : props.element === "select" ? (
       <select
@@ -122,7 +129,7 @@ const Input: React.FC<InputProps> = (props) => {
         onBlur={props.onBlur}
         required={props.required}
         value={props.value}
-        className="bg-gray-50 border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2"
+        className="bg-gray-50 border border-gray-300 text-gray-900 text-md rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2"
       >
         <option value="" selected>
           {props.placeholder}

@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import useNotify from "../../utils/hooks/useToast";
 import { VALIDATOR_REQUIRE } from "../../utils/validator";
 import { CircularProgress } from "@mui/material";
+import { Plus, X } from "lucide-react";
 
 interface FormData {
   GDI_TYPEDIM: string;
@@ -110,16 +111,18 @@ export default function DimensionCreateItemPage() {
               />
               {!isLoading ? (
                 <div className="flex items-center gap-2 mt-5">
-                  <Button size="small" green blue type="submit">
-                    Créer
-                  </Button>
-                  <Button
+                   <Button
                     size="small"
                     cancel
                     type="button"
                     onClick={() => navigate(-1)}
                   >
+                    <X size={15}/>
                     Annuler
+                  </Button>
+                  <Button size="small" green blue type="submit">
+                    <Plus size={15}/>
+                    Créer
                   </Button>
                 </div>
               ) : (

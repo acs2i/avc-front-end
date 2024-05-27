@@ -6,6 +6,9 @@ import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../components/Shared/Spinner";
 import ScrollToTop from "../../components/ScrollToTop";
+import Modal from "../../components/Shared/Modal";
+import { Divider } from "@mui/material";
+import { Info } from "lucide-react";
 
 type DataType = "DI1" | "DI2";
 interface Dimension {
@@ -16,7 +19,6 @@ interface Dimension {
 }
 
 export default function DimensionPage() {
-  const [searchValue, setSearchValue] = useState("");
   const [prevSearchValue, setPrevSearchValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,6 +26,7 @@ export default function DimensionPage() {
   const limit = 20;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const [dimensions, setDimensions] = useState<Dimension[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const typeLabels: { [key in DataType]: string } = {
@@ -64,38 +67,38 @@ export default function DimensionPage() {
     }
   };
 
-  const handleSearch = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/dimension/search?value=${searchValue}&page=${currentPage}&limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = await response.json();
-      setDimensions(data);
-      setTotalItem(data.length);
-      setPrevSearchValue(searchValue);
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-    }
-  };
 
 
   return (
     <div className="relative">
-      <Card title="Paramétrer les dimensions">
+       <Modal
+        show={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        onClose={() => setIsModalOpen(false)}
+        header="Informations"
+        icon="i"
+      >
+        <div className="px-7 mb-5">
+          <p className="text-gray-800 text-xl">
+            Ici vous trouverez la liste de toutes les
+            dimensions enregistrées. Cliquez sur la dimension que vous souhaitez modifier pour
+            ouvrir le panneau de modification.
+          </p>
+        </div>
+        <Divider />
+        <div className="flex justify-end mt-7 px-7">
+          <Button blue size="small" onClick={() => setIsModalOpen(false)}>
+            J'ai compris
+          </Button>
+        </div>
+      </Modal>
+      <Card title="Paramétrer les dimensions" createTitle="Créer une Dimension" link="/parameters/dimension/create/item">
         <div className="flex items-center justify-center gap-4 p-7">
           <div className="flex items-center gap-4">
             <label className="w-[60px] text-sm font-bold">Libellé :</label>
             <input
               type="text"
-              id="label"
+              id="GDI_LIBELLE"
               className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
               placeholder="Rechercher par libellé"
             />
@@ -104,7 +107,7 @@ export default function DimensionPage() {
             <label className="w-[60px] text-sm font-bold">Code :</label>
             <input
               type="text"
-              id="code"
+              id="GDI_DIMORLI"
               className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
               placeholder="Rechercher par code"
             />
@@ -113,15 +116,16 @@ export default function DimensionPage() {
             <label className="w-[60px] text-sm font-bold">Type :</label>
             <input
               type="text"
-              id="type"
+              id="GDI_TYPEDIM"
               className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
               placeholder="Rechercher par type"
             />
           </div>
-          <div className="flex items-center gap-3">
-            <Button size="small" blue to="/parameters/dimension/create/item">
-              Créer une dimension
-            </Button>
+          <div
+            className="cursor-pointer text-gray-500"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <Info size={22} />
           </div>
         </div>
         {dimensions && dimensions.length > 0 && (
@@ -137,7 +141,7 @@ export default function DimensionPage() {
         )}
         <div className="relative overflow-x-auto bg-white">
           <div className="px-3 mb-2 flex items-center gap-2">
-            <h4 className="text-xl">
+            <h4 className="text-md">
               <span className="font-bold">{totalItem}</span> Dimensions
             </h4>
             {prevSearchValue && (
@@ -145,7 +149,7 @@ export default function DimensionPage() {
             )}
           </div>
           <table className="w-full text-left">
-            <thead className="bg-blue-50 text-md text-gray-500">
+            <thead className="bg-gray-200 text-sm text-gray-500">
               <tr>
                 <th scope="col" className="px-6 py-4 w-1/3">
                   Libellé
@@ -163,7 +167,7 @@ export default function DimensionPage() {
                 dimensions.map((dimension) => (
                   <tr
                     key={dimension._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
+                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
                     onClick={() =>
                       navigate(`/parameters/dimension/${dimension._id}`)
                     }

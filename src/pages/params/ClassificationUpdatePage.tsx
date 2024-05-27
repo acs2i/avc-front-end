@@ -4,9 +4,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import useFetch from "../../utils/hooks/usefetch";
 import Input from "../../components/FormElements/Input";
 import Button from "../../components/FormElements/Button";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Divider } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
 import Modal from "../../components/Shared/Modal";
+import { RotateCcw, X } from "lucide-react";
 
 interface Family {
   _id: string;
@@ -123,28 +124,33 @@ export default function ClassificationUpdatePage() {
       <Modal
         show={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
-        header="Confirmation"
+        onClose={() => setIsModalOpen(false)}
+        header="Confirmation de modification de la classe"
         onSubmit={handleSubmit}
+        icon="?"
       >
-        <p className="font-bold text-gray-800">
-          Voulez-vous vraiment appliquer ces modifications ?
-        </p>
+        <div className="px-7 mb-5">
+          <p className="text-gray-800 text-xl">
+            Voulez-vous vraiment appliquer ces modifications ?
+          </p>
+        </div>
+        <Divider />
         {!isLoading ? (
-          <div className="flex justify-center gap-2 mt-4">
-            <Button size="medium" blue type="submit">
-              Oui
-            </Button>
-            <Button
-              size="medium"
+          <div className="flex justify-end mt-7 px-7 gap-2">
+             <Button
+              size="small"
               danger
               type="button"
               onClick={() => setIsModalOpen(false)}
             >
               Non
             </Button>
+            <Button size="small" blue type="submit">
+             Oui
+            </Button>
           </div>
         ) : (
-          <div className="mt-4">
+          <div className="flex justify-end mt-7 px-7 gap-2">
             <CircularProgress />
           </div>
         )}
@@ -157,6 +163,7 @@ export default function ClassificationUpdatePage() {
             </h1>
             {!isModify && (
               <Button size="small" green onClick={() => setIsModify(true)}>
+                <RotateCcw size={15} />
                 Modifier la classe
               </Button>
             )}
@@ -215,6 +222,7 @@ export default function ClassificationUpdatePage() {
                   type="button"
                   onClick={() => setIsModify(false)}
                 >
+                  <X size={15} />
                   Annuler
                 </Button>
                 <Button
@@ -223,6 +231,7 @@ export default function ClassificationUpdatePage() {
                   onClick={() => setIsModalOpen(true)}
                   type="button"
                 >
+                  <RotateCcw size={15} />
                   Modifier
                 </Button>
               </div>

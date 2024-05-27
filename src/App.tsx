@@ -10,10 +10,9 @@ import { useLocation } from "react-router-dom";
 import CreatedProductPage from "./pages/product/CreatedProductPage";
 import Header from "./components/Shared/Header";
 import { LINKS } from "./utils";
-import SuppliersListPage from "./pages/suppliers/SuppliersListPage";
+import SuppliersPage from "./pages/suppliers/SuppliersPage";
 import CreateProductPage from "./pages/product/CreateProductPage";
 import ParamsMenuPage from "./pages/params/ParamsMenuPage";
-import ClassicationsPage from "./pages/params/ClassificationsPage";
 import CollectionPage from "./pages/params/CollectionPage";
 import ClassificationsPage from "./pages/params/ClassificationsPage";
 import DimensionPage from "./pages/params/DimensionPage";
@@ -27,6 +26,12 @@ import BrandUpdatePage from "./pages/params/BrandUpdatePage";
 import BrandCreatePage from "./pages/params/BrandCreatePage";
 import DimensionCreateItemPage from "./pages/params/DimensionCreateItemPage";
 import DraftPage from "./pages/draft/DraftPage";
+import InProgressPage from "./pages/draft/InProgressPage";
+import GridPage from "./pages/params/GridPage";
+import GridCreatePage from "./pages/params/GridCreatePage";
+import DonePage from "./pages/draft/DonePage";
+import AdminPage from "./pages/panel-admin/AdminPage";
+import CreateUserPage from "./pages/panel-admin/CreateUser";
 
 function App() {
   const location = useLocation();
@@ -103,6 +108,8 @@ function App() {
                 path="/parameters/dimension/create/item"
                 element={<DimensionCreateItemPage />}
               />
+              <Route path="/parameters/grid" element={<GridPage />} />
+              <Route path="/parameters/grid/create" element={<GridCreatePage />} />
               <Route path="/parameters/brand" element={<BrandPage />} />
               <Route
                 path="/parameters/brand/:id"
@@ -115,10 +122,14 @@ function App() {
               <Route path="/product/:id" element={<SingleProductPage />} />
               <Route
                 path="/suppliers/suppliers-list"
-                element={<SuppliersListPage />}
+                element={<SuppliersPage />}
               />
               <Route path="/draft" element={<DraftPage />} />
+              <Route path="/in-progress" element={<InProgressPage />} />
+              <Route path="/done" element={<DonePage />} />
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/admin" element={<AdminPage />} />
+              <Route path="/admin/create-user" element={<CreateUserPage />} />
             </Routes>
           </PageContainer>
         </SectionContainer>

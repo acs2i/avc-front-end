@@ -1,9 +1,19 @@
 import React from 'react';
-import Box from '@mui/material/Box';
-import CircularProgress from '@mui/material/CircularProgress';
-import logo from '/img/logo.png';
+import { Box, CircularProgress } from '@mui/material';
 
-function Spinner() {
+interface SpinnerProps {
+  width?: string | number;
+  height?: string | number;
+  logoSize?: string | number;
+  progressSize?: number;
+}
+
+const Spinner: React.FC<SpinnerProps> = ({
+  width = '110px',
+  height = '80px',
+  logoSize = '100%',
+  progressSize = 110
+}) => {
   return (
     <Box
       sx={{
@@ -11,11 +21,11 @@ function Spinner() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        width: '110px',
-        height: '80px',
+        width: width,
+        height: height,
       }}
     >
-      <img src="/img/logo.png" alt="" style={{ width: '100%', height: '100%' }} className='animate-pulse' />
+      <img src="/img/logo.png" alt="" style={{ width: logoSize, height: logoSize }} className="animate-pulse" />
       <Box
         sx={{
           position: 'absolute',
@@ -25,7 +35,7 @@ function Spinner() {
           zIndex: 1,
         }}
       >
-        <CircularProgress size={110} color="success"/>
+        <CircularProgress size={progressSize} color="success" />
       </Box>
     </Box>
   );

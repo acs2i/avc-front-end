@@ -4,9 +4,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import useFetch from "../../utils/hooks/usefetch";
 import Input from "../../components/FormElements/Input";
 import Button from "../../components/FormElements/Button";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Divider } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
 import Modal from "../../components/Shared/Modal";
+import { RotateCcw, X } from "lucide-react";
 
 interface Collection {
   _id: string;
@@ -86,36 +87,41 @@ export default function CollectionUpdatePage() {
 
   return (
     <div>
-      <Modal
+       <Modal
         show={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
-        header="Confirmation"
+        onClose={() => setIsModalOpen(false)}
+        header="Confirmation de modification de la collection"
         onSubmit={handleSubmit}
+        icon="?"
       >
-        <p className="font-bold text-gray-800">
-          Voulez-vous vraiment appliquer ces modifications ?
-        </p>
+        <div className="px-7 mb-5">
+          <p className="text-gray-800 text-xl">
+            Voulez-vous vraiment appliquer ces modifications ?
+          </p>
+        </div>
+        <Divider />
         {!isLoading ? (
-          <div className="flex justify-center gap-2 mt-4">
-            <Button size="medium" blue type="submit">
-              Oui
-            </Button>
-            <Button
-              size="medium"
+          <div className="flex justify-end mt-7 px-7 gap-2">
+             <Button
+              size="small"
               danger
               type="button"
               onClick={() => setIsModalOpen(false)}
             >
               Non
             </Button>
+            <Button size="small" blue type="submit">
+             Oui
+            </Button>
           </div>
         ) : (
-          <div className="mt-4">
+          <div className="flex justify-end mt-7 px-7 gap-2">
             <CircularProgress />
           </div>
         )}
       </Modal>
-      <Card title={`Mettre à jour la classification`}>
+      <Card title={`Mettre à jour la classification`} createTitle="" link="">
         <form
           className="w-[70%] h-[400px] mx-auto mt-[50px] mb-[50px]"
           onSubmit={handleSubmit}
@@ -124,7 +130,8 @@ export default function CollectionUpdatePage() {
             <h1 className="text-2xl">Collection n° {collection?.CODE}</h1>
             {!isModify && (
               <Button size="small" green onClick={() => setIsModify(true)}>
-                Modifier la marque
+                <RotateCcw size={15} />
+                Modifier la collection
               </Button>
             )}
           </div>
@@ -155,26 +162,30 @@ export default function CollectionUpdatePage() {
                 </div>
               )}
             </div>
-            {isModify && <div className="w-full mt-2">
-              <div className="flex items-center gap-2">
-              <Button
-                  size="small"
-                  cancel
-                  type="button"
-                  onClick={() => setIsModify(false)}
-                >
-                  Annuler
-                </Button>
-                <Button
-                  size="small"
-                  green
-                  onClick={() => setIsModalOpen(true)}
-                  type="button"
-                >
-                  Modifier
-                </Button>
+            {isModify && (
+              <div className="w-full mt-2">
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="small"
+                    cancel
+                    type="button"
+                    onClick={() => setIsModify(false)}
+                  >
+                    <X size={15}/>
+                    Annuler
+                  </Button>
+                  <Button
+                    size="small"
+                    green
+                    onClick={() => setIsModalOpen(true)}
+                    type="button"
+                  >
+                     <RotateCcw size={15} />
+                    Modifier
+                  </Button>
+                </div>
               </div>
-            </div>}
+            )}
           </div>
         </form>
       </Card>

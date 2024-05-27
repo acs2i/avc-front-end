@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Card from "../../components/Shared/Card";
 import Input from "../../components/FormElements/Input";
-import { X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import useNotify from "../../utils/hooks/useToast";
@@ -67,7 +67,6 @@ function ClassificationCreatePage() {
     });
   };
 
-  console.log(type)
 
 
   const handleSearch = async () => {
@@ -165,7 +164,6 @@ function ClassificationCreatePage() {
     }
   };
 
-  console.log(formData);
   useEffect(() => {
     if (searchValue) {
       handleSearch();
@@ -265,9 +263,11 @@ function ClassificationCreatePage() {
                     type="button"
                     onClick={() => navigate(-1)}
                   >
+                     <X size={15} />
                     Annuler
                   </Button>
                   <Button size="small" green blue type="submit">
+                    <Plus size={15}/>
                     Créer
                   </Button>
                 </div>

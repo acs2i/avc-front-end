@@ -1,5 +1,5 @@
-import { Filters_1, Link, LinkCard, Size, Suppliers, Params } from "@/type";
-import { Home, Pen, Truck, ShoppingCart, Barcode, Settings, Grid3X3, Ruler, ListOrdered, Shirt, Captions, File } from "lucide-react";
+import { Filters_1, Link, LinkCard, Size, Suppliers, Params, Notifications } from "@/type";
+import { Home, Pen, Truck, ShoppingCart, Barcode, Settings, Grid3X3, Ruler, ListOrdered, Shirt, Captions, File, FileClock, FileCheck2, UserCog } from "lucide-react";
 
 export const LINKS: Link[] = [
   {
@@ -10,23 +10,16 @@ export const LINKS: Link[] = [
     showInBottom: false,
   },
   {
-    name: "Création",
-    link: "/edit",
-    icon: Barcode,
+    name: "Paramètres",
+    link: "/parameters",
+    icon: Settings,
     showInSidebar: true,
     showInBottom: false,
   },
   {
-    name: "Ajouter produit",
-    link: "/edit/edit-product",
-    icon: Pen,
-    showInSidebar: false,
-    showInBottom: false,
-  },
-  {
-    name: "Paramètres",
-    link: "/parameters",
-    icon: Settings,
+    name: "Ajouter un produit",
+    link: "/edit",
+    icon: Shirt,
     showInSidebar: true,
     showInBottom: false,
   },
@@ -94,6 +87,20 @@ export const LINKS: Link[] = [
     showInBottom: false,
   },
   {
+    name: "Les grilles de dimensions",
+    link: "/parameters/grid",
+    icon: Settings,
+    showInSidebar: false,
+    showInBottom: false,
+  },
+  {
+    name: "Créer une grille de dimensions",
+    link: "/parameters/grid/create",
+    icon: Settings,
+    showInSidebar: false,
+    showInBottom: false,
+  },
+  {
     name: "Marques",
     link: "/parameters/brand",
     icon: Settings,
@@ -129,6 +136,20 @@ export const LINKS: Link[] = [
     showInBottom: false,
   },
   {
+    name: "Panel administrateur",
+    link: "/admin",
+    icon: UserCog,
+    showInSidebar: false,
+    showInBottom: true,
+  },
+  {
+    name: "Créer utilisateur",
+    link: "/admin/create-user",
+    icon: Settings,
+    showInSidebar: false,
+    showInBottom: false,
+  },
+  {
     name: "Brouillons",
     link: "/draft",
     icon: File,
@@ -142,26 +163,31 @@ export const LINKS_Params: Params[] = [
     name: "Classifications",
     link: "/parameters/classification",
     icon: ListOrdered,
+    bg: "/img/bg_params_1.png"
   },
   {
     name: "Dimensions",
     link: "/parameters/dimension",
     icon: Ruler,
+    bg: "/img/bg_params_2.jpg"
   },
   {
     name: "Grilles de dimensions",
-    link: "/",
+    link: "/parameters/grid",
     icon: Grid3X3,
+    bg: "/img/bg_params_3.png"
   },
   {
     name: "Collections",
     link: "/parameters/collection",
     icon: Shirt,
+    bg: "/img/bg_params_4.png"
   },
   {
     name: "Marques",
     link: "/parameters/brand",
     icon: Captions,
+    bg: "/img/bg_params_5.png"
   },
  
  
@@ -234,56 +260,75 @@ export const LINKCARD_PRODUCT: LinkCard[] = [
  
 ];
 
-export const FILTERS_1: Filters_1[] = [
+export const LINKCARD_SEARCH: LinkCard[] = [
   {
-    title: "Mon filtre",
+    name: "Standards",
+    page: "standard"
   },
   {
-    title: "Mon filtre",
+    name: "Compléments",
+    page: "complement"
   },
   {
-    title: "Mon filtre",
+    name: "Caractéristiques",
+    page: "caracteristiques"
   },
   {
-    title: "Mon filtre",
+    name: "Dimensions",
+    page: "dimension"
   },
-  {
-    title: "Mon filtre",
-  },
-  {
-    title: "Mon filtre",
-  },
-]
+  
 
-export const Sizes: Size[] = [
+];
+
+export const NOTIF: Notifications[] = [
   {
-    value: "XS",
-    label: "XS",
-    name: "XS"
+    user: "John Doe",
+    message: "La création de produit a été validée",
+    date: "21/05/2024"
   },
   {
-    value: "S",
-    label: "S",
-    name: "S"
+    user: "Jane Da",
+    message: "La création de produit a été validée",
+    date: "21/05/2024"
   },
   {
-    value: "M",
-    label: "M",
-    name: "M"
+    user: "Michel Jambon",
+    message: "La création de produit a été validée",
+    date: "21/05/2024"
   },
   {
-    value: "L",
-    label: "L",
-    name: "L"
+    user: "Pré-ref",
+    message: "Vous avez des produits en cours de création",
+    date: "21/05/2024"
+  },
+];
+
+export const MESSAGES: Notifications[] = [
+  {
+    user: "John Doe",
+    message: "Il y a un probleme dans le produit que vous avez enregistrée",
+    date: "21/05/2024"
   },
   {
-    value: "XL",
-    label: "XL",
-    name: "XL"
+    user: "Jane Da",
+    message: "njehfjehdefefffff",
+    date: "21/05/2024"
   },
   {
-    value: "XXL",
-    label: "XXL",
-    name: "XXL"
+    user: "Michel Jambon",
+    message: "fjehfefhjehieuieui",
+    date: "21/05/2024"
   },
-]
+  {
+    user: "Pré-ref",
+    message: "jhhghttrtrdrrs",
+    date: "21/05/2024"
+  },
+  {
+    user: "Pré-ref",
+    message: "jhhghttrtrdrrs",
+    date: "21/05/2024"
+  },
+];
+

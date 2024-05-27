@@ -5,10 +5,11 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, SquarePen } from "lucide-react";
+import { ArrowLeft, Info, SquarePen } from "lucide-react";
 import Spinner from "../../components/Shared/Spinner";
-import { Tooltip } from "@mui/material";
+import { Divider, Tooltip } from "@mui/material";
 import ScrollToTop from "../../components/ScrollToTop";
+import Modal from "../../components/Shared/Modal";
 
 interface Collection {
   _id: string;
@@ -25,6 +26,7 @@ export default function BrandPage() {
   const limit = 20;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const [brands, setBrands] = useState<Collection[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const handlePageChange = (
@@ -83,15 +85,31 @@ export default function BrandPage() {
     }
   };
 
-  const handleKeyDown = (event: any) => {
-    if (event.key === "Enter") {
-      handleSearch();
-    }
-  };
 
   return (
     <div className="relative">
-      <Card title="Paramétrer les marques">
+       <Modal
+        show={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        onClose={() => setIsModalOpen(false)}
+        header="Informations"
+        icon="i"
+      >
+        <div className="px-7 mb-5">
+          <p className="text-gray-800 text-xl">
+            Ici vous trouverez la liste de toutes les marques enregistrées.
+            Cliquez sur la marque que vous souhaitez modifier pour ouvrir le
+            panneau de modification.
+          </p>
+        </div>
+        <Divider />
+        <div className="flex justify-end mt-7 px-7">
+          <Button blue size="small" onClick={() => setIsModalOpen(false)}>
+            J'ai compris
+          </Button>
+        </div>
+      </Modal>
+      <Card title="Paramétrer les marques" createTitle="Créer Un Marque" link="/parameters/brand/create">
         <div className="flex items-center justify-center gap-4 p-7">
           <div className="flex items-center gap-4">
             <label className="w-[60px] text-sm font-bold">Code :</label>
@@ -111,10 +129,11 @@ export default function BrandPage() {
               placeholder="Rechercher par libellé"
             />
           </div>
-          <div className="flex items-center gap-3">
-            <Button size="small" blue to="/parameters/brand/create">
-              Créer une marque
-            </Button>
+          <div
+            className="cursor-pointer text-gray-500"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <Info size={22} />
           </div>
         </div>
         {brands && brands.length > 0 && (
@@ -130,7 +149,7 @@ export default function BrandPage() {
         )}
         <div className="overflow-x-auto bg-white">
           <div className="px-3 mb-2 flex items-center gap-2">
-            <h4 className="text-xl">
+            <h4 className="text-md">
               <span className="font-bold">{totalItem}</span> Marques
             </h4>
             {prevSearchValue && (
@@ -138,7 +157,7 @@ export default function BrandPage() {
             )}
           </div>
           <table className="w-full text-left">
-            <thead className="bg-blue-50 text-md text-gray-500">
+            <thead className="bg-gray-200 text-sm text-gray-500">
               <tr>
                 <th scope="col" className="px-6 py-4 w-1/3">
                   Code
@@ -153,7 +172,7 @@ export default function BrandPage() {
                 brands.map((brand) => (
                   <tr
                     key={brand._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
+                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
                     onClick={() => navigate(`/parameters/brand/${brand._id}`)}
                   >
                     <td className="px-6 py-4">{brand.YX_CODE}</td>

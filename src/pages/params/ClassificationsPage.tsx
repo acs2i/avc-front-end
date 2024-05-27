@@ -5,10 +5,11 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, SquarePen } from "lucide-react";
+import { ArrowLeft, Info, SquarePen } from "lucide-react";
 import Spinner from "../../components/Shared/Spinner";
-import { Tooltip } from "@mui/material";
+import { Divider, Tooltip } from "@mui/material";
 import ScrollToTop from "../../components/ScrollToTop";
+import Modal from "../../components/Shared/Modal";
 
 type DataType = "LA1" | "LA2" | "LA3";
 
@@ -30,6 +31,7 @@ function ClassificationsPage() {
   const limit = 20;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const [families, setFamilies] = useState<Family[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const typeLabels: { [key in DataType]: string } = {
@@ -56,7 +58,7 @@ function ClassificationsPage() {
   useEffect(() => {
     if (!typeValue && !codeValue && !labelValue) {
       fetchFamily();
-    }else{
+    } else {
       handleSearch();
     }
   }, [typeValue, codeValue, labelValue, currentPage]);
@@ -108,7 +110,28 @@ function ClassificationsPage() {
 
   return (
     <div className="relative">
-      <Card title="Paramétrer les classifications">
+      <Modal
+        show={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        onClose={() => setIsModalOpen(false)}
+        header="Informations"
+        icon="i"
+      >
+        <div className="px-7 mb-5">
+          <p className="text-gray-800 text-xl">
+            Ici vous trouverez la liste de toutes les
+            classes enregistrées. Cliquez sur la classe que vous souhaitez modifier pour
+            ouvrir le panneau de modification.
+          </p>
+        </div>
+        <Divider />
+        <div className="flex justify-end mt-7 px-7">
+          <Button blue size="small" onClick={() => setIsModalOpen(false)}>
+            J'ai compris
+          </Button>
+        </div>
+      </Modal>
+      <Card title="Paramétrer les classifications" createTitle="Créer une Classe" link="/parameters/classification/create">
         <div className="flex items-center justify-center gap-4 p-7">
           <div className="flex items-center gap-4">
             <label className="w-[90px] text-sm font-bold">Niveau :</label>
@@ -146,11 +169,11 @@ function ClassificationsPage() {
               onChange={(e) => setLabelValue(e.target.value)}
             />
           </div>
-
-          <div className="flex items-center gap-3">
-            <Button size="small" blue to="/parameters/classification/create">
-              Créer une classe
-            </Button>
+          <div
+            className="cursor-pointer text-gray-500"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <Info size={22} />
           </div>
         </div>
 
@@ -167,12 +190,12 @@ function ClassificationsPage() {
         )}
         <div className="overflow-x-auto bg-white">
           <div className="px-3 mb-2 flex items-center gap-2">
-            <h4 className="text-xl">
+            <h4 className="text-md">
               <span className="font-bold">{totalItem}</span> Resultats
             </h4>
           </div>
           <table className="w-full text-left">
-            <thead className="bg-blue-50 text-md text-gray-500">
+            <thead className="bg-gray-200 text-sm text-gray-500">
               <tr>
                 <th scope="col" className="px-6 py-4 w-1/3">
                   Niveau
@@ -190,7 +213,7 @@ function ClassificationsPage() {
                 families.map((family) => (
                   <tr
                     key={family._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-sm text-gray-400 even:bg-slate-50 whitespace-nowrap font-bold border"
+                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
                     onClick={() =>
                       navigate(`/parameters/classification/${family._id}`)
                     }

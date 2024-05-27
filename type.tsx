@@ -10,6 +10,7 @@ export type Params = {
   name: string;
   link: string;
   icon: any;
+  bg: string;
 };
 
 
@@ -32,4 +33,10 @@ export type Size = {
 
 export type Filters_1 = {
   title: string;
+};
+
+export type Notifications = {
+  user: string;
+  message: string;
+  date: string;
 };
