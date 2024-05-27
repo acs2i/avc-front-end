@@ -75,3 +75,40 @@ code {
   opacity: 0;
   transition: all 200ms;
 }
+
+.leaflet-container {
+  height: 600px;
+  border-radius: 20px;
+ 
+}
+
+
+
+.small-cluster {
+  border-radius: 50%;
+  background-color: #007dcb;
+  box-shadow: 0 0 0px 5px #c0d1ee;
+}
+
+.medium-cluster {
+  border-radius: 50%;
+  background-color:#FF8300;
+  box-shadow: 0 0 0px 5px #FDB750;
+}
+
+.large-cluster {
+  border-radius: 50%;
+  background-color: #109010;
+  box-shadow: 0 0 0px 5px #b7d5ac;
+}
+
+.cluster-icon {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 13px;
+  font-weight: bold;
+}

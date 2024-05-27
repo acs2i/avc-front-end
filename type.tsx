@@ -40,3 +40,15 @@ export type Notifications = {
   message: string;
   date: string;
 };
+
+export type Graph = {
+  title: string;
+  data1: number[];
+  data2: number[];
+  chart: string;
+};
+
+export type MarkerInfo = {
+  geocode: [number, number];
+  name: string;
+}
