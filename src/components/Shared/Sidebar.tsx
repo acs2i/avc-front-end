@@ -119,7 +119,7 @@ export default function Sidebar() {
           <Avatar
             src="/img/avatar_1.png"
             alt="avatar utilisateur"
-            sx={{ width: 56, height: 56 }}
+            sx={{ width: 40, height: 40 }}
           />
         </Button>
         <Menu
