@@ -32,6 +32,7 @@ import GridCreatePage from "./pages/params/GridCreatePage";
 import DonePage from "./pages/draft/DonePage";
 import AdminPage from "./pages/panel-admin/AdminPage";
 import CreateUserPage from "./pages/panel-admin/CreateUser";
+import ProductList from "./pages/product/ProductList";
 
 function App() {
   const location = useLocation();
@@ -119,6 +120,7 @@ function App() {
                 path="/parameters/brand/create"
                 element={<BrandCreatePage />}
               />
+               <Route path="/product" element={<ProductList />} />
               <Route path="/product/:id" element={<SingleProductPage />} />
               <Route
                 path="/suppliers/suppliers-list"

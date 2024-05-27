@@ -20,7 +20,7 @@ export const LINKS: Link[] = [
     name: "Ajouter un produit",
     link: "/edit",
     icon: Shirt,
-    showInSidebar: true,
+    showInSidebar: false,
     showInBottom: false,
   },
   {
@@ -101,6 +101,20 @@ export const LINKS: Link[] = [
     showInBottom: false,
   },
   {
+    name: "Liste Produit",
+    link: "/product",
+    icon: Shirt,
+    showInSidebar: true,
+    showInBottom: false,
+  },
+  {
+    name: "Page Produit",
+    link: "/product/:id",
+    icon: ShoppingCart,
+    showInSidebar: false,
+    showInBottom: false,
+  },
+  {
     name: "Marques",
     link: "/parameters/brand",
     icon: Settings,
@@ -126,13 +140,6 @@ export const LINKS: Link[] = [
     link: "/suppliers/suppliers-list",
     icon: Truck,
     showInSidebar: true,
-    showInBottom: false,
-  },
-  {
-    name: "Page Produit",
-    link: "/product/:id",
-    icon: ShoppingCart,
-    showInSidebar: false,
     showInBottom: false,
   },
   {
