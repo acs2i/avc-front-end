@@ -52,3 +52,18 @@ export type MarkerInfo = {
   geocode: [number, number];
   name: string;
 }
+
+
+export type Product = {
+  code: string;
+  name: string;
+  brand: string;
+  supplier: string;
+  family: string;
+  subFamily: string;
+  productImg: string;
+  creatorName: string;
+  creatorImg: string;
+  comment: string;
+  status: number;
+};
