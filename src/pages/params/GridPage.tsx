@@ -1,6 +1,6 @@
 import Card from "../../components/Shared/Card";
 import React, { useEffect, useState } from "react";
-import { Collapse, Pagination, Stack} from "@mui/material";
+import { Collapse, Pagination, Stack } from "@mui/material";
 import Button from "../../components/FormElements/Button";
 import Spinner from "@/src/components/Shared/Spinner";
 
@@ -13,7 +13,7 @@ interface Grid {
 
 export default function GridPage() {
   const [isLoading, setIsLoading] = useState(false);
-  const [grids, setGrids] = useState<Grid[]>([]);;
+  const [grids, setGrids] = useState<Grid[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 20;
   const [totalItem, setTotalItem] = useState(null);
@@ -61,7 +61,11 @@ export default function GridPage() {
 
   return (
     <div>
-      <Card title="Toutes les grilles de dimensions" createTitle="Créer Une Grille de Dimension" link="/parameters/grid/create">
+      <Card
+        title="Toutes les grilles de dimensions"
+        createTitle="Créer Une Grille de Dimension"
+        link="/parameters/grid/create"
+      >
         <div className="p-7">
           <div className="relative flex flex-wrap items-center justify-center gap-5 text-gray-600">
             <div className="flex items-center gap-4">
@@ -97,13 +101,23 @@ export default function GridPage() {
           </div>
         )}
         <div className="relative overflow-x-auto bg-white">
-          <div className="px-3 mb-2 flex items-center gap-2">
-            <h4 className="text-md">
-              <span className="font-bold">{totalItem}</span> Grilles
-            </h4>
-            {prevSearchValue && (
-              <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
-            )}
+          <div className="px-3 mb-2 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <h4 className="text-md">
+                <span className="font-bold">{totalItem}</span> Grilles
+              </h4>
+              {prevSearchValue && (
+                <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
+              )}
+            </div>
+            <Button
+              type="submit"
+              size="small"
+              to="/parameters/grid/create"
+              green
+            >
+              Créer Une Grille de Dimension
+            </Button>
           </div>
           <table className="w-full text-left">
             <thead className="bg-gray-200 text-sm text-gray-500">
@@ -141,12 +155,14 @@ export default function GridPage() {
                         </div>
                         {grid.DIMENSIONS.length > N && (
                           <>
-                            {expandedGrid != grid && <button
-                              onClick={() => handleViewMore(grid)}
-                              className="text-blue-600 text-xs"
-                            >
-                              Voir plus
-                            </button>}
+                            {expandedGrid != grid && (
+                              <button
+                                onClick={() => handleViewMore(grid)}
+                                className="text-blue-600 text-xs"
+                              >
+                                Voir plus
+                              </button>
+                            )}
                             <Collapse in={expandedGrid === grid}>
                               <div className="mt-1">
                                 <div className="grid grid-cols-3 gap-1">

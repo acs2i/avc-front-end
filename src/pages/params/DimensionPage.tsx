@@ -67,11 +67,9 @@ export default function DimensionPage() {
     }
   };
 
-
-
   return (
     <div className="relative">
-       <Modal
+      <Modal
         show={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         onClose={() => setIsModalOpen(false)}
@@ -80,9 +78,9 @@ export default function DimensionPage() {
       >
         <div className="px-7 mb-5">
           <p className="text-gray-800 text-xl">
-            Ici vous trouverez la liste de toutes les
-            dimensions enregistrées. Cliquez sur la dimension que vous souhaitez modifier pour
-            ouvrir le panneau de modification.
+            Ici vous trouverez la liste de toutes les dimensions enregistrées.
+            Cliquez sur la dimension que vous souhaitez modifier pour ouvrir le
+            panneau de modification.
           </p>
         </div>
         <Divider />
@@ -92,7 +90,11 @@ export default function DimensionPage() {
           </Button>
         </div>
       </Modal>
-      <Card title="Paramétrer les dimensions" createTitle="Créer une Dimension" link="/parameters/dimension/create/item">
+      <Card
+        title="Paramétrer les dimensions"
+        createTitle="Créer une Dimension"
+        link="/parameters/dimension/create/item"
+      >
         <div className="flex items-center justify-center gap-4 p-7">
           <div className="flex items-center gap-4">
             <label className="w-[60px] text-sm font-bold">Libellé :</label>
@@ -140,13 +142,23 @@ export default function DimensionPage() {
           </div>
         )}
         <div className="relative overflow-x-auto bg-white">
-          <div className="px-3 mb-2 flex items-center gap-2">
-            <h4 className="text-md">
-              <span className="font-bold">{totalItem}</span> Dimensions
-            </h4>
-            {prevSearchValue && (
-              <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
-            )}
+          <div className="px-3 mb-2 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <h4 className="text-md">
+                <span className="font-bold">{totalItem}</span> Dimensions
+              </h4>
+              {prevSearchValue && (
+                <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
+              )}
+            </div>
+            <Button
+              type="submit"
+              size="small"
+              to="/parameters/dimension/create/item"
+              green
+            >
+              Créer une Dimension
+            </Button>
           </div>
           <table className="w-full text-left">
             <thead className="bg-gray-200 text-sm text-gray-500">

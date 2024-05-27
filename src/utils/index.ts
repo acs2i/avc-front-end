@@ -25,7 +25,7 @@ export const LINKS: Link[] = [
   },
   {
     name: "Ajouter un produit",
-    link: "/edit",
+    link: "/product/edit",
     icon: Shirt,
     showInSidebar: false,
     showInBottom: false,

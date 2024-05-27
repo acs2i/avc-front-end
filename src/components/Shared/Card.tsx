@@ -76,7 +76,7 @@ export default function Card({ title, children, createTitle, link }: InFosCard) 
               }}
               className="mt-3"
             >
-              <MenuItem onClick={handleClose}>
+              {/* <MenuItem onClick={handleClose}>
                 <Link to={link}>
                   <div className="flex items-center gap-3 w-full">
                     <div className="text-orange-500">
@@ -85,7 +85,7 @@ export default function Card({ title, children, createTitle, link }: InFosCard) 
                     <p className="text-sm">{createTitle}</p>
                   </div>
                 </Link>
-              </MenuItem>
+              </MenuItem> */}
               {!shouldHideCSV  && <MenuItem onClick={handleClose}>
                 <div className="flex items-center gap-3 w-full">
                   <div className="text-orange-500">

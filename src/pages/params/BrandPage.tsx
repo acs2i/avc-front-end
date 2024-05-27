@@ -85,10 +85,9 @@ export default function BrandPage() {
     }
   };
 
-
   return (
     <div className="relative">
-       <Modal
+      <Modal
         show={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         onClose={() => setIsModalOpen(false)}
@@ -109,7 +108,11 @@ export default function BrandPage() {
           </Button>
         </div>
       </Modal>
-      <Card title="Paramétrer les marques" createTitle="Créer Un Marque" link="/parameters/brand/create">
+      <Card
+        title="Paramétrer les marques"
+        createTitle="Créer Un Marque"
+        link="/parameters/brand/create"
+      >
         <div className="flex items-center justify-center gap-4 p-7">
           <div className="flex items-center gap-4">
             <label className="w-[60px] text-sm font-bold">Code :</label>
@@ -148,13 +151,23 @@ export default function BrandPage() {
           </div>
         )}
         <div className="overflow-x-auto bg-white">
-          <div className="px-3 mb-2 flex items-center gap-2">
-            <h4 className="text-md">
-              <span className="font-bold">{totalItem}</span> Marques
-            </h4>
-            {prevSearchValue && (
-              <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
-            )}
+          <div className="px-3 mb-2 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <h4 className="text-md">
+                <span className="font-bold">{totalItem}</span> Marques
+              </h4>
+              {prevSearchValue && (
+                <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
+              )}
+            </div>
+            <Button
+              type="submit"
+              size="small"
+              to="/parameters/brand/create"
+              green
+            >
+              Créer Une Marque
+            </Button>
           </div>
           <table className="w-full text-left">
             <thead className="bg-gray-200 text-sm text-gray-500">
