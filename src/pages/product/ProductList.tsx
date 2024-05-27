@@ -224,7 +224,7 @@ export default function ProductList() {
           </div>
         </div>
 
-        <form className="px-7" onSubmit={handleSearch}>
+        <form className="px-7 py-3" onSubmit={handleSearch}>
           <div className="relative flex flex-wrap items-center gap-5 text-gray-600">
             {page === "standard" && (
               <>
@@ -476,8 +476,8 @@ export default function ProductList() {
               Créer un produit
             </Button>
           </div>
-          <table className="w-full text-left">
-            <thead className="bg-gray-200 text-sm text-gray-500">
+          <table className="w-full text-left mt-7">
+            <thead className="border-t text-sm text-gray-500">
               <tr>
                 <th scope="col" className="px-6 py-4 w-1/6">
                   Code
@@ -507,11 +507,11 @@ export default function ProductList() {
                     className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
                     onClick={() => navigate(`/product/${product._id}`)}
                   >
-                    <td className="px-6 py-4">{product.GA_CODEARTICLE}</td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-7">{product.GA_CODEARTICLE}</td>
+                    <td className="px-6 py-7">
                       {truncateText(product.GA_LIBELLE, 15)}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-7">
                       {product.brand ? (
                         <div>
                           <span>{product?.brand?.YX_CODE}</span>
@@ -522,8 +522,8 @@ export default function ProductList() {
                         <span>-</span>
                       )}
                     </td>
-                    <td className="px-6 py-4">{product.GA_FOURNPRINC}</td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-7">{product.GA_FOURNPRINC}</td>
+                    <td className="px-6 py-7">
                       {product.family ? (
                         <div>
                           <span>{product.family?.YX_CODE}</span>
@@ -534,7 +534,7 @@ export default function ProductList() {
                         <span>-</span>
                       )}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-7">
                       {product.subFamily ? (
                         <div>
                           <span>{product?.subFamily?.YX_CODE}</span>

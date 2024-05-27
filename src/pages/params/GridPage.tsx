@@ -119,8 +119,8 @@ export default function GridPage() {
               Créer Une Grille de Dimension
             </Button>
           </div>
-          <table className="w-full text-left">
-            <thead className="bg-gray-200 text-sm text-gray-500">
+          <table className="w-full text-left mt-7">
+            <thead className="border-t text-sm text-gray-500">
               <tr>
                 <th scope="col" className="px-6 py-4 w-1/3">
                   Type
