@@ -20,7 +20,7 @@ export default function GridPage() {
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const [prevSearchValue, setPrevSearchValue] = useState("");
   const [expandedGrid, setExpandedGrid] = useState<Grid | null>(null);
-  const N = 3;
+  const N = 5;
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -143,11 +143,11 @@ export default function GridPage() {
                       <td className="px-6 py-4">{grid.TYPE}</td>
                       <td className="px-6 py-4">{grid.LIBELLE}</td>
                       <td className="px-6 py-4">
-                        <div className="grid grid-cols-3 gap-1">
+                        <div className="grid grid-cols-5 gap-1">
                           {grid.DIMENSIONS.slice(0, N).map((item, index) => (
                             <span
                               key={index}
-                              className="bg-gray-400 text-white p-2 text-center"
+                              className="bg-orange-200 text-orange-500 border border-orange-500 p-1 text-center text-[10px] rounded-[5px]"
                             >
                               {item}
                             </span>
@@ -165,12 +165,12 @@ export default function GridPage() {
                             )}
                             <Collapse in={expandedGrid === grid}>
                               <div className="mt-1">
-                                <div className="grid grid-cols-3 gap-1">
+                                <div className="grid grid-cols-5 gap-1">
                                   {grid.DIMENSIONS.slice(N).map(
                                     (item, index) => (
                                       <span
                                         key={index}
-                                        className="bg-gray-400 text-white p-2 text-center"
+                                        className="bg-orange-200 text-orange-500 border border-orange-500 p-1 text-center text-[10px] rounded-[5px]"
                                       >
                                         {item}
                                       </span>
