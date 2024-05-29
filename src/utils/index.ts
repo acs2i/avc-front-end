@@ -275,12 +275,16 @@ export const LINKCARD_EDIT: LinkCard[] = [
 
 export const LINKCARD_PRODUCT: LinkCard[] = [
   {
-    name: "Details du produit",
+    name: "Identification",
+    page: "general",
+  },
+  {
+    name: "Caractéristiques du produit",
     page: "details",
   },
   {
-    name: "Uvcs",
-    page: "uvcs",
+    name: "Unité de vente consommateur",
+    page: "unit",
   },
 ];
 
