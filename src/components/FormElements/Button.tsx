@@ -7,6 +7,7 @@ interface ButtonProps {
   exact?: boolean;
   size?: "xs" | "small" | "medium" | "big";
   inverse?: boolean;
+  inverseBlue?: boolean;
   danger?: boolean;
   green?: boolean;
   blue?: boolean;
@@ -32,6 +33,7 @@ const Button: React.FC<ButtonProps> = (props) => {
     ${props.orange ? "bg-gradient-to-r from-orange-600 to-orange-400 border border-orange-500 text-white hover:brightness-125" : ""}
     ${props.green ? "bg-gradient-to-r from-emerald-800 to-emerald-700 border border-emerald-500 text-white hover:brightness-125" : ""}
     ${props.blue ? "bg-sky-600 border border-sky-600 text-white hover:brightness-125" : ""}
+    ${props.inverseBlue ? "bg-transparent border border-sky-600 text-gray-700 hover:bg-sky-700 hover:text-white" : ""}
     ${props.inverse ? "bg-transparent border border-emerald-500 text-gray-700 hover:brightness-125" : ""}
     ${props.cancel ? "bg-gray-300 border border-gray-500 text-gray-700 hover:brightness-125" : ""}
     ${props.warning ? "bg-yellow-500 text-white hover:bg-yellow-400" : ""}

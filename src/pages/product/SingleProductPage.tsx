@@ -75,6 +75,10 @@ export default function SingleProductPage() {
                 </React.Fragment>
               ))}
             </div>
+            <div className="flex items-center gap-2">
+              <Button size="small" blue>Modifier</Button>
+              <Button size="small" inverseBlue>Dupliquer</Button>
+            </div>
           </div>
           <div className="mt-3">
             <Divider />
@@ -83,7 +87,7 @@ export default function SingleProductPage() {
 
         {/* Paramètres généraux */}
         {product && page === "general" && (
-          <div className="flex grid-rows-3 grid-flow-col gap-4 mt-5 mb-5 px-4">
+          <div className="flex grid-rows-2 grid-flow-col gap-4 mt-5 mb-5 px-4">
             <div className="flex gap-[25px]">
               <div className="h-[400px] w-[400px] overflow-hidden flex items-center justify-center">
                 {product[0].imgPath ? (
@@ -372,18 +376,18 @@ export default function SingleProductPage() {
           </div>
         )}
 
-        {/* Caractéristiques du produit */}
+        {/* UVCS */}
         {product && page === "unit" && (
           <div className="overflow-x-auto bg-white">
             <div className="flex items-center gap-2 mb-6">
-              <div className="w-[90%] mx-auto flex gap-4">
-                <div className="flex flex-col gap-2"> 
+              <div className="w-[90%] mx-auto flex gap-7">
+                <div className="flex flex-col gap-1"> 
                   <p className="text-sm font-bold text-gray-800">
                     Réference produit :
                   </p>
-                  <input type="text" className="border focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
+                  <p className="text-sm text-blue-500">{product[0].GA_CODEARTICLE}</p>
                 </div>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1">
                   <p className="text-sm font-bold text-gray-800">Dimension :</p>
                   <select name="pets" className="w-[200px] border focus:outline-none focus:ring-blue-500 focus:border-blue-500">
                     <option value="">--Toutes--</option>
@@ -462,6 +466,7 @@ export default function SingleProductPage() {
             )}
           </div>
         )}
+        
       </Card>
     </section>
   );
