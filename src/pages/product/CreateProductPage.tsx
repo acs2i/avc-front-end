@@ -5,9 +5,6 @@ import Input from "../../components/FormElements/Input";
 import { Link } from "react-router-dom";
 import Card from "../../components/Shared/Card";
 import Button from "../../components/FormElements/Button";
-import { LINKCARD_EDIT } from "../../utils/index";
-import { LinkCard } from "@/type";
-import { Divider } from "@mui/material";
 import { useSelector } from "react-redux";
 import CreateFamilyComponent from "../../components/CreateFamilyComponent";
 import CreateBrandComponent from "../../components/CreateBrandComponent";
@@ -16,10 +13,8 @@ import { VALIDATOR_REQUIRE } from "../../utils/validator";
 import useNotify from "../../utils/hooks/useToast";
 import "react-toastify/dist/ReactToastify.css";
 import useFetch from "../../utils/hooks/usefetch";
-
 import { ActionMeta, SingleValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
-
 import { colourOptions } from "../../data";
 
 interface Family {
@@ -44,10 +39,13 @@ interface Brand {
 interface FormData {
   reference: string;
   name: string;
+  desLong: string;
+  desShort: string;
   family: Family | null;
   subFamily: any;
-  brand: BrandOption | null;
-  productCollection: Collection | null;
+  brand: string;
+  productCollection: string;
+  supplier: string;
   uvc: {
     code: string;
     color: any;
@@ -84,14 +82,14 @@ const customStyles = {
 };
 
 type BrandOption = {
-  _id: string;
-  YX_LIBELLE: string;
+  value: string;
+  label: string;
   YX_CODE: string;
 };
 
 type CollectionOption = {
-  _id: string;
-  LIBELLE: string;
+  value: string;
+  label: string;
   CODE: string;
 };
 
@@ -114,10 +112,13 @@ export default function CreateProductPage() {
   const [formData, setFormData] = useState<FormData>({
     reference: "",
     name: "",
+    desLong: "",
+    desShort: "",
     family: null,
     subFamily: [],
-    brand: null,
-    productCollection: null,
+    brand: "",
+    productCollection: "",
+    supplier: "",
     uvc: {
       code: "",
       color: [],
@@ -128,14 +129,34 @@ export default function CreateProductPage() {
     creatorId: user._id,
   });
 
+  const [selectedOptionBrand, setSelectedOptionBrand] =
+    useState<SingleValue<BrandOption> | null>(null);
+  const [selectedOptionCollection, setSelectedOptionCollection] =
+    useState<SingleValue<CollectionOption> | null>(null);
+  const [selectedOptionFamily, setSelectedOptionFamily] =
+    useState<SingleValue<FamilyOption> | null>(null);
+  const [inputValueBrand, setInputValueBrand] = useState("");
+  const [inputValueCollection, setInputValueCollection] = useState("");
+  const [inputValueFamily, setInputValueFamily] = useState("");
+  const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
+  const [optionsCollection, setOptionsCollection] = useState<
+    CollectionOption[]
+  >([]);
+  const [optionsFamily, setOptionsFamily] = useState<FamilyOption[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 20;
+
   const resetForm = () => {
     setFormData({
       reference: "",
       name: "",
+      desLong: "",
+      desShort: "",
       family: null,
       subFamily: [],
-      brand: null,
+      brand: "",
       productCollection: null,
+      supplier: "",
       uvc: {
         code: "",
         color: [],
@@ -177,40 +198,27 @@ export default function CreateProductPage() {
       setFormData((prevFormData) => ({
         ...prevFormData,
         [id]: value,
-        uvc: {
-          ...prevFormData.uvc,
-          [id]: value,
-        },
+        desLong: id === "name" ? value : prevFormData.desLong,
+        desShort: id === "name" ? value : prevFormData.desShort,
       }));
     }
   };
 
-  const [selectedOptionBrand, setSelectedOptionBrand] =
-    useState<SingleValue<BrandOption> | null>(null);
-  const [selectedOptionCollection, setSelectedOptionCollection] =
-    useState<SingleValue<CollectionOption> | null>(null);
-  const [selectedOptionFamily, setSelectedOptionFamily] =
-    useState<SingleValue<FamilyOption> | null>(null);
-  const [inputValueBrand, setInputValueBrand] = useState("");
-  const [inputValueCollection, setInputValueCollection] = useState("");
-  const [inputValueFamily, setInputValueFamily] = useState("");
-  const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
-  const [optionsCollection, setOptionsCollection] = useState<CollectionOption[]>([]);
-  const [optionsFamily, setOptionsFamily] = useState<FamilyOption[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const limit = 20;
-
   // Fonction pour gérer le changement de la valeur sélectionnée
-  const handleChangeBrand = (newValue: SingleValue<BrandOption>) => {
-    setSelectedOptionBrand(newValue);
+  const handleChangeBrand = (selectedOption: SingleValue<BrandOption>) => {
+    const brandLabel = selectedOption ? selectedOption.label : "";
+    setSelectedOptionBrand(selectedOption);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      brand: brandLabel,
+    }));
   };
 
   // Fonction pour gérer la saisie de l'utilisateur
   const handleInputChangeBrand = async (inputValueBrand: string) => {
     setInputValueBrand(inputValueBrand);
 
-    // console.log(inputValue);
-    if (inputValueBrand === '') {
+    if (inputValueBrand === "") {
       try {
         const response = await fetch(
           `${process.env.REACT_APP_URL_DEV}/api/v1/brand`,
@@ -222,13 +230,12 @@ export default function CreateProductPage() {
           }
         );
         const data = await response.json();
-  
-  
+
         const optionsBrand = data.data?.map((brand: BrandOption) => ({
           value: brand.YX_LIBELLE,
           label: brand.YX_LIBELLE,
         }));
-  
+
         setOptionsBrand(optionsBrand);
       } catch (error) {
         console.error("Erreur lors de la requête", error);
@@ -248,7 +255,6 @@ export default function CreateProductPage() {
       );
       const data = await response.json();
 
-
       const optionsBrand = data.data?.map((brand: BrandOption) => ({
         value: brand.YX_LIBELLE,
         label: brand.YX_LIBELLE,
@@ -261,8 +267,13 @@ export default function CreateProductPage() {
   };
 
   // Fonction pour gérer le changement de la valeur sélectionnée
-  const handleChangeCollection = (newValue: SingleValue<CollectionOption>) => {
-    setSelectedOptionCollection(newValue);
+  const handleChangeCollection = (selectedOption: SingleValue<CollectionOption>) => {
+    const collectionLabel = selectedOption ? selectedOption.label : "";
+    setSelectedOptionCollection(selectedOption);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      productCollection: collectionLabel,
+    }));
   };
 
   // Fonction pour gérer la saisie de l'utilisateur
@@ -270,7 +281,7 @@ export default function CreateProductPage() {
     setInputValueCollection(inputValueCollection);
 
     // console.log(inputValue);
-    if (inputValueCollection === '') {
+    if (inputValueCollection === "") {
       try {
         const response = await fetch(
           `${process.env.REACT_APP_URL_DEV}/api/v1/collection`,
@@ -282,13 +293,14 @@ export default function CreateProductPage() {
           }
         );
         const data = await response.json();
-  
-  
-        const optionsCollection = data.data?.map((collection: CollectionOption) => ({
-          value: collection.LIBELLE,
-          label: collection.LIBELLE,
-        }));
-  
+
+        const optionsCollection = data.data?.map(
+          (collection: CollectionOption) => ({
+            value: collection.LIBELLE,
+            label: collection.LIBELLE,
+          })
+        );
+
         setOptionsCollection(optionsCollection);
       } catch (error) {
         console.error("Erreur lors de la requête", error);
@@ -308,11 +320,12 @@ export default function CreateProductPage() {
       );
       const data = await response.json();
 
-
-      const optionsCollection = data.data?.map((collection: CollectionOption) => ({
-        value: collection.LIBELLE,
-        label: collection.LIBELLE,
-      }));
+      const optionsCollection = data.data?.map(
+        (collection: CollectionOption) => ({
+          value: collection.LIBELLE,
+          label: collection.LIBELLE,
+        })
+      );
 
       setOptionsCollection(optionsCollection);
     } catch (error) {
@@ -330,7 +343,7 @@ export default function CreateProductPage() {
     setInputValueFamily(inputValueFamily);
 
     // console.log(inputValue);
-    if (inputValueFamily === '') {
+    if (inputValueFamily === "") {
       try {
         const response = await fetch(
           `${process.env.REACT_APP_URL_DEV}/api/v1/family`,
@@ -342,13 +355,12 @@ export default function CreateProductPage() {
           }
         );
         const data = await response.json();
-  
-  
+
         const optionsFamily = data.data?.map((family: FamilyOption) => ({
           value: family.YX_LIBELLE,
           label: family.YX_LIBELLE,
         }));
-  
+
         setOptionsFamily(optionsFamily);
       } catch (error) {
         console.error("Erreur lors de la requête", error);
@@ -368,7 +380,6 @@ export default function CreateProductPage() {
       );
       const data = await response.json();
 
-
       const optionsFamily = data.data?.map((family: FamilyOption) => ({
         value: family.YX_LIBELLE,
         label: family.YX_LIBELLE,
@@ -380,51 +391,6 @@ export default function CreateProductPage() {
     }
   };
 
-  // const handleChangeBrand = async (
-  //   newValue: SingleValue<BrandOption>,
-  //   actionMeta: ActionMeta<BrandOption>
-  // ) => {
-  //   console.log("passed")
-  //   setFormData((prevFormData) => ({
-  //     ...prevFormData,
-  //     brand: newValue,
-  //   }));
-  // };
-
-  // const handleChangeBrand = (newValue: SingleValue<BrandOption>, actionMeta: ActionMeta<BrandOption>) => {
-  //   if (typeof newValue === 'string') {
-  //     setFormData((prevFormData) => ({
-  //       ...prevFormData,
-  //       brand: { value: newValue, label: newValue },
-  //     }));
-  //   } else {
-  //     setFormData((prevFormData) => ({
-  //       ...prevFormData,
-  //       brand: newValue,
-  //     }));
-  //   }
-  // };
-
-  // const handleInputChangeBrand = async (inputValue: string) => {
-  //   console.log("passed");
-
-  //   // Effectuer la requête fetch ici
-  //   try {
-  //     const response = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/brand?search=${inputValue}`);
-  //     const data = await response.json();
-
-  //     // Utiliser les données récupérées pour mettre à jour les options de react-select
-  //     const options = data.data.map((brand: Brand) => ({
-  //       value: brand.YX_CODE,
-  //       label: brand.YX_LIBELLE,
-  //     }));
-
-  //     setFormData( {...formData, brand:  {value: "hi", label: "hi"}});
-  //   } catch (error) {
-  //     console.error("Erreur lors de la récupération des marques :", error);
-  //   }
-  // };
-
   const { data: familiesData } = useFetch<{ data: Family[] }>(
     `${process.env.REACT_APP_URL_DEV}/api/v1/family`
   );
@@ -432,10 +398,6 @@ export default function CreateProductPage() {
   const { data: collectionsData } = useFetch<{ data: Collection[] }>(
     `${process.env.REACT_APP_URL_DEV}/api/v1/collection`
   );
-
-  
-
-  // console.log(brandsData);
 
   const familyOptions =
     familiesData?.data.map(({ _id, YX_LIBELLE }) => ({
@@ -451,12 +413,6 @@ export default function CreateProductPage() {
       value: LIBELLE,
       label: LIBELLE,
     })) ?? [];
-
-  // const brandOptions =
-  //   brandsData?.data.map(({ YX_LIBELLE }) => ({
-  //     value: YX_LIBELLE,
-  //     label: YX_LIBELLE,
-  //   })) ?? [];
 
   const handleCreateProduct = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -488,6 +444,8 @@ export default function CreateProductPage() {
     }
   };
 
+  console.log(formData);
+
   useEffect(() => {
     const fetchInitialDataBrand = async () => {
       try {
@@ -501,12 +459,12 @@ export default function CreateProductPage() {
           }
         );
         const data = await response.json();
-  
+
         const optionsBrand = data.data?.map((brand: BrandOption) => ({
           value: brand.YX_LIBELLE,
           label: brand.YX_LIBELLE,
         }));
-  
+
         setOptionsBrand(optionsBrand);
       } catch (error) {
         console.error("Erreur lors de la requête", error);
@@ -525,12 +483,14 @@ export default function CreateProductPage() {
           }
         );
         const data = await response.json();
-  
-        const optionsCollection = data.data?.map((collection: CollectionOption) => ({
-          value: collection.LIBELLE,
-          label: collection.LIBELLE,
-        }));
-  
+
+        const optionsCollection = data.data?.map(
+          (collection: CollectionOption) => ({
+            value: collection.LIBELLE,
+            label: collection.LIBELLE,
+          })
+        );
+
         setOptionsCollection(optionsCollection);
       } catch (error) {
         console.error("Erreur lors de la requête", error);
@@ -549,47 +509,26 @@ export default function CreateProductPage() {
           }
         );
         const data = await response.json();
-  
+
         const optionsFamily = data.data?.map((family: FamilyOption) => ({
           value: family.YX_LIBELLE,
           label: family.YX_LIBELLE,
         }));
-  
+
         setOptionsFamily(optionsFamily);
       } catch (error) {
         console.error("Erreur lors de la requête", error);
       }
     };
-  
+
     fetchInitialDataBrand();
     fetchInitialDataCollection();
     fetchInitialDataFamily();
   }, []);
 
   return (
-    <div >
+    <div>
       <Card title="Panel d'ajout" createTitle="" link="">
-        <div className="mt-4 mb-[50px] px-4">
-          <div className="flex items-center gap-7">
-            {/* {LINKCARD_EDIT.map((link: LinkCard, i) => (
-              <React.Fragment key={i}>
-                <button
-                  className={`font-bold text-gray-600 ${
-                    page === link.page ? "text-green-700" : ""
-                  } ${page === link.page ? "animate-bounce" : ""}`}
-                  onClick={() => setPage(link.page)}
-                >
-                  {link.name}
-                </button>
-                <div className="w-[1px] h-[20px] bg-gray-300"></div>
-              </React.Fragment>
-            ))} */}
-          </div>
-          <div className="mt-6">
-            <Divider />
-          </div>
-        </div>
-
         {page === "addProduct" && (
           <div className="mt-7 mb-7">
             <form
@@ -643,9 +582,9 @@ export default function CreateProductPage() {
                     <div className="gap-5 grid grid-cols-2 grid-template-columns: [label] 1fr [select] 2fr;">
                       <Input
                         element="input"
-                        id="reference"
+                        id="name"
                         label="Désignation longue :"
-                        value={formData.reference}
+                        value={formData.desLong}
                         onChange={handleChange}
                         validators={[VALIDATOR_REQUIRE()]}
                         placeholder="Ajouter la référence du produit"
@@ -656,7 +595,7 @@ export default function CreateProductPage() {
                         element="input"
                         id="name"
                         label="Désignation courte :"
-                        value={formData.name}
+                        value={formData.desShort}
                         onChange={handleChange}
                         validators={[VALIDATOR_REQUIRE()]}
                         placeholder=""
@@ -674,21 +613,6 @@ export default function CreateProductPage() {
                             </span>
                           </label>
                         </div>
-                        {/* <CreatableSelect<BrandOption>
-                          placeholder="Selectionner une marque"
-                          styles={customStyles}
-                          value={formData.brand}
-                          onChange={handleChangeBrand}
-                          onInputChange={handleInputChangeBrand}
-                          className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                          required
-                          options={
-                            brandsData?.data.map(({ YX_CODE, YX_LIBELLE }) => ({
-                              value: YX_CODE,
-                              label: YX_LIBELLE,
-                            })) ?? []
-                          }
-                        /> */}
                         <CreatableSelect<BrandOption>
                           value={selectedOptionBrand}
                           onChange={handleChangeBrand}
@@ -698,7 +622,6 @@ export default function CreateProductPage() {
                           placeholder="Selectionner une marque"
                           styles={customStyles}
                           className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                          // isMulti
                           required
                         />
                       </div>
@@ -721,7 +644,6 @@ export default function CreateProductPage() {
                           placeholder="Selectionner une collection"
                           styles={customStyles}
                           className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                          // isMulti
                           required
                         />
                       </div>
@@ -742,7 +664,7 @@ export default function CreateProductPage() {
                             </span>
                           </label>
                         </div>
-                        
+
                         <CreatableSelect<FamilyOption>
                           value={selectedOptionFamily}
                           onChange={handleChangeFamily}
@@ -752,7 +674,6 @@ export default function CreateProductPage() {
                           placeholder="Selectionner une famille"
                           styles={customStyles}
                           className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                          // isMulti
                           required
                         />
                       </div>
@@ -772,23 +693,8 @@ export default function CreateProductPage() {
                           placeholder="Selectionner une sous-famille"
                           styles={customStyles}
                           className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                          // isMulti
                           required
                         />
-                        {/* <CreatableSelect
-                          placeholder="Selectionner une sous-famille"
-                          styles={customStyles}
-                          value={formData.subFamily}
-                          onChange={handleChange}
-                          className="block text-sm py-2.5 w-full text-gray-500 bg-transparent border-0 border-b-2 border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                          options={
-                            familyId
-                              ? Array.isArray(subFamillies)
-                                ? subFamillies
-                                : []
-                              : []
-                          }
-                        /> */}
                       </div>
                     </div>
                   </div>
@@ -802,9 +708,9 @@ export default function CreateProductPage() {
                     <div className="gap-5 grid grid-cols-1 grid-template-columns: [label] 1fr [select] 2fr;">
                       <Input
                         element="input"
-                        id="name"
+                        id="supplier"
                         label="Nom :"
-                        value={formData.reference}
+                        value={formData.supplier}
                         onChange={handleChange}
                         validators={[VALIDATOR_REQUIRE()]}
                         placeholder="Ajouter la référence du produit"
@@ -813,9 +719,9 @@ export default function CreateProductPage() {
                       />
                       <Input
                         element="input"
-                        id="name"
+                        id="reference"
                         label="Reférence produit :"
-                        value={formData.name}
+                        value={formData.reference}
                         onChange={handleChange}
                         validators={[VALIDATOR_REQUIRE()]}
                         placeholder="Ajouter le libellé du produit"
@@ -878,76 +784,6 @@ export default function CreateProductPage() {
                   </div>
                 </div>
               </div>
-
-              {/* <div>
-                <div
-                  className="flex items-center gap-3 h-[70px]"
-                  onClick={handleOpenUvcCollapse}
-                >
-                  <h5 className="text-2xl text-gray-600">
-                    <span className="font-bold text-gray-700">Création</span> de
-                    l'uvc du produit
-                  </h5>
-                  <button className="focus:outline-none text-gray-500">
-                    {!uvcIsOpen && <ChevronDown size={25} />}
-                    {uvcIsOpen && <ChevronUp size={25} />}
-                  </button>
-                </div>
-                <Collapse in={uvcIsOpen}>
-                  <h6>Uvc 1</h6>
-                  <div className="gap-5 grid grid-cols-2 grid-template-columns: [label] 1fr [select] 2fr; mb-[50px]">
-                    <div className="flex flex-col gap-1">
-                      <Input
-                        element="input"
-                        id="code"
-                        label="Code fournisseur :"
-                        value={formData.uvc.code}
-                        onChange={handleChange}
-                        validators={[]}
-                        placeholder="Veuillez saisir le code fournisseur"
-                        gray
-                      />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <MultiSelect
-                        id="size"
-                        label="Tailles :"
-                        options={Sizes}
-                        value={formData.uvc.size}
-                        onChange={(selectedOptions) =>
-                          handleChange({
-                            target: { id: "size", value: selectedOptions },
-                          })
-                        }
-                      />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <Input
-                        element="input"
-                        id="color"
-                        label="Couleurs :"
-                        value={formData.uvc.color}
-                        onChange={handleChange}
-                        validators={[]}
-                        placeholder="Veuillez saisir le ou les couleurs"
-                        gray
-                      />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <Input
-                        element="input"
-                        id="price"
-                        label="Prix :"
-                        value={formData.uvc.price}
-                        onChange={handleChange}
-                        validators={[]}
-                        placeholder="Veuillez saisir le prix"
-                        gray
-                      />
-                    </div>
-                  </div>
-                </Collapse>
-              </div> */}
 
               {!isLoading ? (
                 <div className="flex gap-2 mt-5">
