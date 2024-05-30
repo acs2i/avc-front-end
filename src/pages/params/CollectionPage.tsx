@@ -6,7 +6,7 @@ import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../components/Shared/Spinner";
 import ScrollToTop from "../../components/ScrollToTop";
-import { Info } from "lucide-react";
+import { Info, Plus } from "lucide-react";
 import Modal from "../../components/Shared/Modal";
 import { Divider } from "@mui/material";
 
@@ -165,6 +165,7 @@ export default function CollectionPage() {
               to="/parameters/collection/create"
               blue
             >
+              <Plus size={15}/>
               Créer Une Collection
             </Button>
           </div>

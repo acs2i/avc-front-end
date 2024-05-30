@@ -110,7 +110,7 @@ export default function ClassificationUpdatePage() {
 
   return (
     <div>
-     <Modal
+      <Modal
         show={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         onClose={() => setIsModalOpen(false)}
@@ -126,7 +126,7 @@ export default function ClassificationUpdatePage() {
         <Divider />
         {!isLoading ? (
           <div className="flex justify-end mt-7 px-7 gap-2">
-             <Button
+            <Button
               size="small"
               danger
               type="button"
@@ -135,7 +135,7 @@ export default function ClassificationUpdatePage() {
               Non
             </Button>
             <Button size="small" blue type="submit">
-             Oui
+              Oui
             </Button>
           </div>
         ) : (
@@ -144,18 +144,19 @@ export default function ClassificationUpdatePage() {
           </div>
         )}
       </Modal>
-      <Card title={`Mettre à jour la dimension`}>
+      <Card title={`Mettre à jour la dimension`} link="" createTitle="">
         <form
           className="w-[70%] h-[400px] mx-auto mt-[50px] mb-[50px]"
           onSubmit={handleSubmit}
         >
           <div className="flex items-center justify-between">
             <h1 className="text-2xl">
-              {type} n° {dimension?.GDI_DIMORLI}
+              Code de la <span className="font-bold">{type} :</span>{" "}
+              {dimension?.GDI_DIMORLI}
             </h1>
             {!isModify && (
-              <Button size="small" green onClick={() => setIsModify(true)}>
-                <RotateCcw size={15}/>
+              <Button size="small" blue onClick={() => setIsModify(true)}>
+                <RotateCcw size={15} />
                 Modifier la dimension
               </Button>
             )}
@@ -178,12 +179,18 @@ export default function ClassificationUpdatePage() {
                 </div>
               ) : (
                 <div>
-                  <div className="py-2">
-                    <h3 className="mb-1 text-md text-gray-800 font-bold">
-                      Libellé
-                    </h3>
-                    <p className="text-md">{dimension?.GDI_LIBELLE}</p>
-                  </div>
+                  <Input
+                    element="input"
+                    id="label"
+                    type="text"
+                    placeholder="Modifier le libellé"
+                    value={libelle}
+                    label="Libellé"
+                    validators={[]}
+                    disabled
+                    onChange={handleLibelleChange}
+                    gray
+                  />
                 </div>
               )}
             </div>

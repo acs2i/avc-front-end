@@ -103,7 +103,7 @@ export default function BranchUpdatePage() {
         <Divider />
         {!isLoading ? (
           <div className="flex justify-end mt-7 px-7 gap-2">
-             <Button
+            <Button
               size="small"
               danger
               type="button"
@@ -112,7 +112,7 @@ export default function BranchUpdatePage() {
               Non
             </Button>
             <Button size="small" blue type="submit">
-             Oui
+              Oui
             </Button>
           </div>
         ) : (
@@ -121,12 +121,15 @@ export default function BranchUpdatePage() {
           </div>
         )}
       </Modal>
-      <Card title={`Mettre à jour la marque`}>
+      <Card title={`Mettre à jour la marque`} link="" createTitle="">
         <form className="w-[70%] h-[400px] mx-auto mt-[50px] mb-[50px]">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl">Collection n° {brand?.YX_CODE}</h1>
+            <h1 className="text-2xl">
+              Code de la <span className="font-bold">marque :</span>{" "}
+              {brand?.YX_CODE}
+            </h1>
             {!isModify && (
-              <Button size="small" green onClick={() => setIsModify(true)}>
+              <Button size="small" blue onClick={() => setIsModify(true)}>
                 <RotateCcw size={15} />
                 Modifier la marque
               </Button>
@@ -150,12 +153,18 @@ export default function BranchUpdatePage() {
                 </div>
               ) : (
                 <div>
-                  <div className="py-2">
-                    <h3 className="mb-1 text-md text-gray-800 font-bold">
-                      Libellé
-                    </h3>
-                    <p className="text-md">{brand?.YX_LIBELLE}</p>
-                  </div>
+                  <Input
+                    element="input"
+                    id="label"
+                    type="text"
+                    placeholder="Modifier le libellé"
+                    value={libelle}
+                    label="Libellé"
+                    validators={[]}
+                    disabled
+                    onChange={handleLibelleChange}
+                    gray
+                  />
                 </div>
               )}
             </div>

@@ -5,7 +5,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Info, SquarePen } from "lucide-react";
+import { ArrowLeft, Info, Plus, SquarePen } from "lucide-react";
 import Spinner from "../../components/Shared/Spinner";
 import { Divider, Tooltip } from "@mui/material";
 import ScrollToTop from "../../components/ScrollToTop";
@@ -204,6 +204,7 @@ function ClassificationsPage() {
               to="/parameters/classification/create"
               blue
             >
+              <Plus size={15}/>
               Créer une Classe
             </Button>
           </div>

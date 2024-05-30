@@ -155,11 +155,11 @@ export default function ClassificationUpdatePage() {
           </div>
         )}
       </Modal>
-      <Card title={`Mettre à jour la classe`}>
+      <Card title={`Mettre à jour la classe`} createTitle="" link="">
         <form className="w-[70%] h-[400px] mx-auto mt-[50px] mb-[50px]">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl">
-              {type} n°{family?.YX_CODE}
+              Code de la <span className="font-bold">{type} :</span> {family?.YX_CODE}
             </h1>
             {!isModify && (
               <Button size="small" green onClick={() => setIsModify(true)}>
@@ -196,19 +196,30 @@ export default function ClassificationUpdatePage() {
                   />
                 </div>
               ) : (
-                <div className="flex flex-col gap-3 mb-4">
-                  <div className="py-2">
-                    <h3 className="mb-1 text-md text-gray-800 font-bold">
-                      Niveau
-                    </h3>
-                    <p className="text-md">{type}</p>
-                  </div>
-                  <div className="py-2">
-                    <h3 className="mb-1 text-md text-gray-800 font-bold">
-                      Libellé
-                    </h3>
-                    <p className="text-md">{family?.YX_LIBELLE}</p>
-                  </div>
+                <div>
+                  <Input
+                    element="input"
+                    id="level"
+                    label="Niveau"
+                    value={type}
+                    placeholder={type}
+                    disabled
+                    validators={[]}
+                    gray
+                    onChange={handleTypeChange}
+                  />
+                  <Input
+                    element="input"
+                    id="label"
+                    type="text"
+                    placeholder="Modifier le libellé"
+                    value={libelle}
+                    label="Libellé"
+                    disabled
+                    validators={[]}
+                    onChange={handleLibelleChange}
+                    gray
+                  />
                 </div>
               )}
             </div>

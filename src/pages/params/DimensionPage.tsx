@@ -8,7 +8,7 @@ import Spinner from "../../components/Shared/Spinner";
 import ScrollToTop from "../../components/ScrollToTop";
 import Modal from "../../components/Shared/Modal";
 import { Divider } from "@mui/material";
-import { Info } from "lucide-react";
+import { Info, Plus } from "lucide-react";
 
 type DataType = "DI1" | "DI2";
 interface Dimension {
@@ -156,6 +156,7 @@ export default function DimensionPage() {
               to="/parameters/dimension/create/item"
               blue
             >
+              <Plus size={15}/>
               Créer une Dimension
             </Button>
           </div>

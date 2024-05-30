@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Collapse, Pagination, Stack } from "@mui/material";
 import Button from "../../components/FormElements/Button";
 import Spinner from "@/src/components/Shared/Spinner";
+import { Plus } from "lucide-react";
 
 interface Grid {
   _id: string;
@@ -115,6 +116,7 @@ export default function GridPage() {
               to="/parameters/grid/create"
               blue
             >
+              <Plus size={15}/>
               Créer Une Grille de Dimension
             </Button>
           </div>
@@ -146,7 +148,7 @@ export default function GridPage() {
                           {grid.DIMENSIONS.slice(0, N).map((item, index) => (
                             <span
                               key={index}
-                              className="bg-orange-200 text-orange-500 border border-orange-500 p-1 text-center text-[10px] rounded-[5px]"
+                              className="bg-orange-100 text-orange-500 border border-orange-500 p-1 text-center text-[10px] rounded-[5px]"
                             >
                               {item}
                             </span>
@@ -169,7 +171,7 @@ export default function GridPage() {
                                     (item, index) => (
                                       <span
                                         key={index}
-                                        className="bg-orange-200 text-orange-500 border border-orange-500 p-1 text-center text-[10px] rounded-[5px]"
+                                        className="bg-orange-100 text-orange-500 border border-orange-500 p-1 text-center text-[10px] rounded-[5px]"
                                       >
                                         {item}
                                       </span>

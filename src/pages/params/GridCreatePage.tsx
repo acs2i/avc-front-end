@@ -1,7 +1,7 @@
 import Card from "../../components/Shared/Card";
 import Input from "../../components/FormElements/Input";
 import React, { useEffect, useState } from "react";
-import { Plus, X } from "lucide-react";
+import { MoveVertical, Plus, X } from "lucide-react";
 import { CircularProgress, Tooltip } from "@mui/material";
 import { Link } from "react-router-dom";
 import useNotify from "../../utils/hooks/useToast";
@@ -155,7 +155,7 @@ export default function GridCreatePage() {
 
   return (
     <div>
-      <Card title="Création d'une grille de dimension">
+      <Card title="Création d'une grille de dimension" link="" createTitle="">
         <form
           className="w-[70%] mx-auto mt-[50px] mb-[50px]"
           onSubmit={handleSubmit}
@@ -188,7 +188,12 @@ export default function GridCreatePage() {
               />
             </div>
 
-            <div className="flex mt-3 gap-2">
+            <div className="relative flex mt-3 gap-2">
+              {selectedDimensions.length > 1 && (
+                <div className="absolute left-[-50px] top-[50%] translate-y-[-50%] text-orange-400">
+                  <MoveVertical size={40} />
+                </div>
+              )}
               <div className="w-[50%] border rounded-sm p-1">
                 {selectedDimensions && (
                   <DragDropContext onDragEnd={handleDragAndDrop}>

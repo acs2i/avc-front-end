@@ -127,9 +127,9 @@ export default function CollectionUpdatePage() {
           onSubmit={handleSubmit}
         >
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl">Collection n° {collection?.CODE}</h1>
+            <h1 className="text-2xl">Code de la<span className="font-bold"> collection :</span> {collection?.CODE}</h1>
             {!isModify && (
-              <Button size="small" green onClick={() => setIsModify(true)}>
+              <Button size="small" blue onClick={() => setIsModify(true)}>
                 <RotateCcw size={15} />
                 Modifier la collection
               </Button>
@@ -153,13 +153,19 @@ export default function CollectionUpdatePage() {
                 </div>
               ) : (
                 <div>
-                  <div className="py-2">
-                    <h3 className="mb-1 text-md text-gray-800 font-bold">
-                      Libellé
-                    </h3>
-                    <p className="text-md">{collection?.LIBELLE}</p>
-                  </div>
-                </div>
+                <Input
+                  element="input"
+                  id="label"
+                  type="text"
+                  placeholder="Modifier le libellé"
+                  value={libelle}
+                  label="Libellé"
+                  disabled
+                  validators={[]}
+                  onChange={handleLibelleChange}
+                  gray
+                />
+              </div>
               )}
             </div>
             {isModify && (
