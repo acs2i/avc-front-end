@@ -200,10 +200,9 @@ function ClassificationsPage() {
               </h4>
             </div>
             <Button
-              type="submit"
               size="small"
               to="/parameters/classification/create"
-              green
+              blue
             >
               Créer une Classe
             </Button>

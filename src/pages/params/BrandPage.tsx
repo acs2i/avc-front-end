@@ -161,10 +161,9 @@ export default function BrandPage() {
               )}
             </div>
             <Button
-              type="submit"
               size="small"
               to="/parameters/brand/create"
-              green
+              blue
             >
               Créer Une Marque
             </Button>

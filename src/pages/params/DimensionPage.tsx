@@ -152,10 +152,9 @@ export default function DimensionPage() {
               )}
             </div>
             <Button
-              type="submit"
               size="small"
               to="/parameters/dimension/create/item"
-              green
+              blue
             >
               Créer une Dimension
             </Button>

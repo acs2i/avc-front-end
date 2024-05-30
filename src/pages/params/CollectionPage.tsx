@@ -161,10 +161,9 @@ export default function CollectionPage() {
               )}
             </div>
             <Button
-              type="submit"
               size="small"
               to="/parameters/collection/create"
-              green
+              blue
             >
               Créer Une Collection
             </Button>

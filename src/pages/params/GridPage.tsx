@@ -111,10 +111,9 @@ export default function GridPage() {
               )}
             </div>
             <Button
-              type="submit"
               size="small"
               to="/parameters/grid/create"
-              green
+              blue
             >
               Créer Une Grille de Dimension
             </Button>

@@ -143,14 +143,17 @@ export default function SingleProductPage() {
                           <td className="px-4 py-2">
                             <div className="flex items-center justify-between">
                               <span>{product[0].GA_FOURNPRINC}</span>
-                              <span className="text-blue-500 cursor-pointer hover:text-blue-400">
-                                Définir
-                              </span>
                             </div>
                           </td>
                         </tr>
                         <tr>
                           <td className="py-2 font-bold">Marque :</td>
+                          <td className="px-4 py-2">
+                            {product[0].brand.YX_LIBELLE}
+                          </td>
+                        </tr>
+                        <tr>
+                          <td className="py-2 font-bold">Collection :</td>
                           <td className="px-4 py-2">
                             {product[0].brand.YX_LIBELLE}
                           </td>
@@ -196,11 +199,6 @@ export default function SingleProductPage() {
                               <span>CT</span>
                               <span>-</span>
                               <span>Couleur/Taille</span>
-                            </div>
-                            <div>
-                              <span className="text-blue-500 cursor-pointer hover:text-blue-400">
-                                Définir
-                              </span>
                             </div>
                           </td>
                         </tr>
@@ -443,7 +441,7 @@ export default function SingleProductPage() {
                     className="border cursor-pointer bg-sky-800 text-white font-bold"
                     onClick={() => setSelectedRowData(null)}
                   >
-                    <td className="py-2">{selectedRowData.GA_CHARLIBRE1}</td>
+                    <td className="py-4">{selectedRowData.GA_CHARLIBRE1}</td>
                     <td>
                       {selectedRowData.COULEUR}, {selectedRowData.TAILLE}
                     </td>
@@ -466,7 +464,7 @@ export default function SingleProductPage() {
             )}
           </div>
         )}
-        
+
       </Card>
     </section>
   );

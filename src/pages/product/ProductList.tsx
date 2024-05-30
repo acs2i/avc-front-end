@@ -15,6 +15,7 @@ import { useSubFamilies } from "../../utils/hooks/useSubFamilies";
 import { LINKCARD_SEARCH } from "../../utils/index";
 import { Divider } from "@mui/material";
 import { LinkCard } from "@/type";
+import { Plus } from "lucide-react";
 
 interface Product {
   _id: string;
@@ -472,7 +473,8 @@ export default function ProductList() {
                 <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
               )}
             </div>
-            <Button type="submit" size="small" to="/product/edit" green>
+            <Button type="submit" size="small" to="/product/edit" blue>
+              <Plus size={15}/>
               Créer un produit
             </Button>
           </div>

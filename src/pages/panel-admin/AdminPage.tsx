@@ -5,7 +5,7 @@ import truncateText from "../../utils/func/Formattext";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../components/Shared/Spinner";
 import ScrollToTop from "../../components/ScrollToTop";
-import { Info } from "lucide-react";
+import { Info, Plus } from "lucide-react";
 import Modal from "../../components/Shared/Modal";
 import { Divider, Tooltip } from "@mui/material";
 
@@ -117,13 +117,19 @@ export default function AdminPage() {
           </div>
         </div>
         <div className="relative overflow-x-auto">
-          <div className="px-3 mb-2 flex items-center gap-2">
+          <div className="px-3 mb-2 flex items-center justify-between gap-2">
             <h4 className="text-md">
               <span className="font-bold">{users.length}</span> Utilisateurs
             </h4>
             {prevSearchValue && (
               <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
             )}
+            <div>
+              <Button size="small" blue to="/admin/create-user">
+                <Plus size={15}/>
+                Créer un utilisateur
+              </Button>
+            </div>
           </div>
           <table className="w-full text-left">
             <thead className="bg-gray-200 text-sm text-gray-500">
@@ -154,9 +160,13 @@ export default function AdminPage() {
                     <td className="px-6 py-4">
                       {user.authorization ? user.authorization : "NC"}
                     </td>
-                    <Tooltip title={user.comment ? user.comment : "Pas de commentaire"}>
+                    <Tooltip
+                      title={user.comment ? user.comment : "Pas de commentaire"}
+                    >
                       <td className="px-6 py-4">
-                        {user.comment ? truncateText(user.comment, 50) : "Pas de commentaire"}
+                        {user.comment
+                          ? truncateText(user.comment, 50)
+                          : "Pas de commentaire"}
                       </td>
                     </Tooltip>
                   </tr>

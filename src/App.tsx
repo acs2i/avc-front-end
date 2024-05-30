@@ -10,6 +10,7 @@ import { useLocation } from "react-router-dom";
 import CreatedProductPage from "./pages/product/CreatedProductPage";
 import Header from "./components/Shared/Header";
 import { LINKS } from "./utils";
+import { useSelector } from "react-redux";
 import SuppliersPage from "./pages/suppliers/SuppliersPage";
 import CreateProductPage from "./pages/product/CreateProductPage";
 import ParamsMenuPage from "./pages/params/ParamsMenuPage";
@@ -33,10 +34,14 @@ import DonePage from "./pages/draft/DonePage";
 import AdminPage from "./pages/panel-admin/AdminPage";
 import CreateUserPage from "./pages/panel-admin/CreateUser";
 import ProductList from "./pages/product/ProductList";
+import { Navigate, Outlet } from "react-router-dom";
 
 function App() {
   const location = useLocation();
   const excludedPaths = ["/login"];
+  const isAuth = Boolean(useSelector((state: any) => state.auth.token));
+
+  console.log(isAuth);
 
   useEffect(() => {
     window.scrollTo({
@@ -65,6 +70,12 @@ function App() {
     return link ? link.name : "non trouvé";
   };
 
+  const PrivateRoute = () => {
+    const isAuth = Boolean(useSelector((state: any) => state.auth.token));
+
+    return isAuth ? <Outlet /> : <Navigate to="/login" />;
+  };
+
   return (
     <>
       <div className="flex realtive">
@@ -73,65 +84,76 @@ function App() {
           <PageContainer>
             {shouldShowNavbar && <Header titlePage={getPageTitle()} />}
             <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/product/edit" element={<CreateProductPage />} />
-              <Route path="/parameters" element={<ParamsMenuPage />} />
-              <Route
-                path="/parameters/classification"
-                element={<ClassificationsPage />}
-              />
-              <Route
-                path="/parameters/classification/:id"
-                element={<ClassificationUpdatePage />}
-              />
-              <Route
-                path="/parameters/classification/create"
-                element={<ClassificationCreatePage />}
-              />
-              <Route
-                path="/parameters/collection"
-                element={<CollectionPage />}
-              />
-              <Route
-                path="/parameters/collection/:id"
-                element={<CollectionUpdatePage />}
-              />
-              <Route
-                path="/parameters/collection/create"
-                element={<CollectionCreatePage />}
-              />
-              <Route path="/parameters/dimension" element={<DimensionPage />} />
-              <Route
-                path="/parameters/dimension/:id"
-                element={<DimensionUpdatePage />}
-              />
-              <Route
-                path="/parameters/dimension/create/item"
-                element={<DimensionCreateItemPage />}
-              />
-              <Route path="/parameters/grid" element={<GridPage />} />
-              <Route path="/parameters/grid/create" element={<GridCreatePage />} />
-              <Route path="/parameters/brand" element={<BrandPage />} />
-              <Route
-                path="/parameters/brand/:id"
-                element={<BrandUpdatePage />}
-              />
-              <Route
-                path="/parameters/brand/create"
-                element={<BrandCreatePage />}
-              />
-               <Route path="/product" element={<ProductList />} />
-              <Route path="/product/:id" element={<SingleProductPage />} />
-              <Route
-                path="/suppliers/suppliers-list"
-                element={<SuppliersPage />}
-              />
-              <Route path="/draft" element={<DraftPage />} />
-              <Route path="/in-progress" element={<InProgressPage />} />
-              <Route path="/done" element={<DonePage />} />
               <Route path="/login" element={<LoginPage />} />
-              <Route path="/admin" element={<AdminPage />} />
-              <Route path="/admin/create-user" element={<CreateUserPage />} />
+              <Route element={<PrivateRoute />}>
+                <Route
+                  path="/"
+                  element={isAuth ? <Home /> : <Navigate to="/login" />}
+                />
+                <Route path="/product/edit" element={<CreateProductPage />} />
+                <Route path="/parameters" element={<ParamsMenuPage />} />
+                <Route
+                  path="/parameters/classification"
+                  element={<ClassificationsPage />}
+                />
+                <Route
+                  path="/parameters/classification/:id"
+                  element={<ClassificationUpdatePage />}
+                />
+                <Route
+                  path="/parameters/classification/create"
+                  element={<ClassificationCreatePage />}
+                />
+                <Route
+                  path="/parameters/collection"
+                  element={<CollectionPage />}
+                />
+                <Route
+                  path="/parameters/collection/:id"
+                  element={<CollectionUpdatePage />}
+                />
+                <Route
+                  path="/parameters/collection/create"
+                  element={<CollectionCreatePage />}
+                />
+                <Route
+                  path="/parameters/dimension"
+                  element={<DimensionPage />}
+                />
+                <Route
+                  path="/parameters/dimension/:id"
+                  element={<DimensionUpdatePage />}
+                />
+                <Route
+                  path="/parameters/dimension/create/item"
+                  element={<DimensionCreateItemPage />}
+                />
+                <Route path="/parameters/grid" element={<GridPage />} />
+                <Route
+                  path="/parameters/grid/create"
+                  element={<GridCreatePage />}
+                />
+                <Route path="/parameters/brand" element={<BrandPage />} />
+                <Route
+                  path="/parameters/brand/:id"
+                  element={<BrandUpdatePage />}
+                />
+                <Route
+                  path="/parameters/brand/create"
+                  element={<BrandCreatePage />}
+                />
+                <Route path="/product" element={<ProductList />} />
+                <Route path="/product/:id" element={<SingleProductPage />} />
+                <Route
+                  path="/suppliers/suppliers-list"
+                  element={<SuppliersPage />}
+                />
+                <Route path="/draft" element={<DraftPage />} />
+                <Route path="/in-progress" element={<InProgressPage />} />
+                <Route path="/done" element={<DonePage />} />
+                <Route path="/admin" element={<AdminPage />} />
+                <Route path="/admin/create-user" element={<CreateUserPage />} />
+              </Route>
             </Routes>
           </PageContainer>
         </SectionContainer>
