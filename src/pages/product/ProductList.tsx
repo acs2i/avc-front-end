@@ -16,6 +16,7 @@ import { LINKCARD_SEARCH } from "../../utils/index";
 import { Divider } from "@mui/material";
 import { LinkCard } from "@/type";
 import { Plus } from "lucide-react";
+import Header from "../../components/Navigation/Header";
 
 interface Product {
   _id: string;
@@ -196,36 +197,13 @@ export default function ProductList() {
   ]);
 
   return (
-    <div className="relative">
-      <Card
-        title="Tous les produits"
-        createTitle="Créer Un Produit"
-        link="/edit"
+    <section className="w-full">
+      <Header
+        title="Liste des articles"
+        link="/product/edit"
+        btnTitle="Créer un produit"
       >
-        <div className="mt-4 mb-[30px] px-4">
-          <div className="flex justify-between">
-            <div className="flex items-center gap-7">
-              {LINKCARD_SEARCH.map((link: LinkCard, i) => (
-                <React.Fragment key={i}>
-                  <button
-                    className={`text-gray-600 text-sm ${
-                      page === link.page ? "text-green-700 font-bold" : ""
-                    }`}
-                    onClick={() => setPage(link.page)}
-                  >
-                    {link.name}
-                  </button>
-                  <div className="w-[1px] h-[20px] bg-gray-300"></div>
-                </React.Fragment>
-              ))}
-            </div>
-          </div>
-          <div className="mt-6">
-            <Divider />
-          </div>
-        </div>
-
-        <form className="px-7 py-3" onSubmit={handleSearch}>
+        <form className="py-3" onSubmit={handleSearch}>
           <div className="relative flex flex-wrap items-center gap-5 text-gray-600">
             {page === "standard" && (
               <>
@@ -452,127 +430,128 @@ export default function ProductList() {
             )}
           </div>
         </form>
-        {products?.products && products.products.length > 0 && (
-          <div className="flex justify-center p-7">
-            <Stack spacing={2}>
-              <Pagination
-                count={totalPages}
-                page={currentPage}
-                onChange={handlePageChange}
-              />
-            </Stack>
-          </div>
-        )}
-        <div className="relative overflow-x-auto bg-white">
-          <div className="px-3 mb-2 flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <h4 className="text-md">
+      </Header>
+
+      <div className="relative overflow-x-auto bg-white">
+        <div className="px-3 py-7 flex flex-col gap-2">
+          <div className="w-full flex justify-between items-center">
+            <div className="flex items-center">
+              <h4 className="text-md whitespace-nowrap">
                 <span className="font-bold">{totalItem}</span> Produits
               </h4>
               {prevSearchValue && (
-                <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
+                <span className="text-xl italic ml-2">{`"${prevSearchValue}"`}</span>
               )}
             </div>
-            <Button type="submit" size="small" to="/product/edit" blue>
-              <Plus size={15}/>
-              Créer un produit
-            </Button>
+            <div className="flex justify-center w-full">
+              {products?.products && products.products.length > 0 && (
+                <div className="flex justify-center">
+                  <Stack spacing={2}>
+                    <Pagination
+                      count={totalPages}
+                      page={currentPage}
+                      onChange={handlePageChange}
+                    />
+                  </Stack>
+                </div>
+              )}
+            </div>
           </div>
-          <table className="w-full text-left mt-7">
-            <thead className="border-t text-sm text-gray-500">
-              <tr>
-                <th scope="col" className="px-6 py-4 w-1/6">
-                  Code
-                </th>
-                <th scope="col" className="px-6 py-4 w-1/6">
-                  Libellé
-                </th>
-                <th scope="col" className="px-6 py-4 w-1/6">
-                  Marque
-                </th>
-                <th scope="col" className="px-6 py-4 w-1/6">
-                  Founisseur
-                </th>
-                <th scope="col" className="px-6 py-4 w-1/6">
-                  Famille
-                </th>
-                <th scope="col" className="px-6 py-4 w-1/6">
-                  Sous-famille
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {products?.products && products.products.length > 0 ? (
-                products.products.map((product: Product) => (
-                  <tr
-                    key={product._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
-                    onClick={() => navigate(`/product/${product._id}`)}
-                  >
-                    <td className="px-6 py-7">{product.GA_CODEARTICLE}</td>
-                    <td className="px-6 py-7">
-                      {truncateText(product.GA_LIBELLE, 15)}
-                    </td>
-                    <td className="px-6 py-7">
-                      {product.brand ? (
-                        <div>
-                          <span>{product?.brand?.YX_CODE}</span>
-                          <span className="mx-1">-</span>
-                          <span>{product?.brand?.YX_LIBELLE}</span>
-                        </div>
-                      ) : (
-                        <span>-</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-7">{product.GA_FOURNPRINC}</td>
-                    <td className="px-6 py-7">
-                      {product.family ? (
-                        <div>
-                          <span>{product.family?.YX_CODE}</span>
-                          <span className="mx-1">-</span>
-                          <span>{product.family?.YX_LIBELLE}</span>
-                        </div>
-                      ) : (
-                        <span>-</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-7">
-                      {product.subFamily ? (
-                        <div>
-                          <span>{product?.subFamily?.YX_CODE}</span>
-                          <span className="mx-1">-</span>
-                          {product?.subFamily.YX_LIBELLE && (
-                            <span>
-                              {truncateText(product?.subFamily?.YX_LIBELLE, 15)}
-                            </span>
-                          )}
-                        </div>
-                      ) : (
-                        <span>-</span>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6} className="px-6 py-7 text-center">
-                    {totalItem === null ? (
-                      <div className="flex justify-center overflow-hidden p-[30px]">
-                        <Spinner />
+        </div>
+        <table className="w-full text-left mt-7">
+          <thead className="border-t text-sm text-gray-500">
+            <tr>
+              <th scope="col" className="px-6 py-4 w-[10%]">
+                Code
+              </th>
+              <th scope="col" className="px-6 py-4 w-1/6">
+                Libellé
+              </th>
+              <th scope="col" className="px-6 py-4 w-1/6">
+                Marque
+              </th>
+              <th scope="col" className="px-6 py-4 w-[10%]">
+                Founisseur
+              </th>
+              <th scope="col" className="px-6 py-4 w-1/6">
+                Famille
+              </th>
+              <th scope="col" className="px-6 py-4 w-1/6">
+                Sous-famille
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {products?.products && products.products.length > 0 ? (
+              products.products.map((product: Product) => (
+                <tr
+                  key={product._id}
+                  className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-[11px] text-gray-800 even:bg-slate-50 whitespace-nowrap border"
+                  onClick={() => navigate(`/product/${product._id}`)}
+                >
+                  <td className="px-6 py-7">{product.GA_CODEARTICLE}</td>
+                  <td className="px-6 py-7 text-blue-600">
+                    {truncateText(product.GA_LIBELLE, 50)}
+                  </td>
+                  <td className="px-6 py-7">
+                    {product.brand ? (
+                      <div>
+                        <span>{product?.brand?.YX_CODE}</span>
+                        <span className="mx-1">-</span>
+                        <span>{product?.brand?.YX_LIBELLE}</span>
                       </div>
                     ) : (
-                      "Aucun Résultat"
+                      <span>-</span>
+                    )}
+                  </td>
+                  <td className="px-6 py-7">{product.GA_FOURNPRINC}</td>
+                  <td className="px-6 py-7">
+                    {product.family ? (
+                      <div className="inline-block bg-gray-300 px-3 py-1 rounded-md font-bold">
+                        <span>{product.family?.YX_CODE}</span>
+                        <span className="mx-1">-</span>
+                        <span>{product.family?.YX_LIBELLE}</span>
+                      </div>
+                    ) : (
+                      <span>-</span>
+                    )}
+                  </td>
+                  <td className="px-6 py-7">
+                    {product.subFamily ? (
+                      <div className="inline-block bg-gray-200 px-3 py-1 rounded-md font-bold">
+                        <span>{product?.subFamily?.YX_CODE}</span>
+                        <span className="mx-1">-</span>
+                        {product?.subFamily.YX_LIBELLE && (
+                          <span>
+                            {product?.subFamily?.YX_LIBELLE}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <span>-</span>
                     )}
                   </td>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={6} className="px-6 py-7 text-center">
+                  {totalItem === null ? (
+                    <div className="flex justify-center overflow-hidden p-[30px]">
+                      <Spinner />
+                    </div>
+                  ) : (
+                    "Aucun Résultat"
+                  )}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
       {totalItem !== null && totalItem > 10 && (
         <ScrollToTop scrollThreshold={300} />
       )}
-    </div>
+    </section>
   );
 }

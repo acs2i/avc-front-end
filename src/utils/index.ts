@@ -7,186 +7,464 @@ import {
   Graph,
   MarkerInfo,
   Product,
+  Card
 } from "@/type";
 import {
+  Phone,
   ShoppingCart,
-  Settings,
-  Grid3X3,
-  Ruler,
+  Clipboard,
+  MessageSquare,
+  Mail,
+  Bookmark,
+  BarChart,
+  Share2,
+  CalendarDays,
+  Compass,
+  CircleHelp,
+  Globe,
+  Tag,
+  Bell,
+  UsersRound,
+  Clock,
+  Hourglass,
+  TriangleAlert,
+  Lock,
+  PanelsTopLeft,
   ListOrdered,
+  Ruler,
+  Grid3X3,
   Shirt,
   Captions,
-  File,
-  UserCog,
-  LineChart,
-  Settings2,
-  Factory,
+  BarChart2,
+  Settings2
 } from "lucide-react";
 
 export const LINKS: Link[] = [
   {
-    name: "Tableau de bord",
-    link: "/",
-    icon: LineChart,
-    showInSidebar: true,
-    showInBottom: false,
-  },
-  {
-    name: "Liste Articles",
-    link: "/product",
-    icon: Shirt,
-    showInSidebar: true,
-    showInBottom: false,
-  },
-  {
-    name: "Codification",
-    link: "/parameters",
-    icon: Settings2,
-    showInSidebar: true,
-    showInBottom: false,
-  },
-  {
-    name: "Ajouter un produit",
-    link: "/product/edit",
-    icon: Shirt,
-    showInSidebar: false,
-    showInBottom: false,
-  },
-  {
-    name: "Classifications",
-    link: "/parameters/classification",
-    icon: Settings,
-    showInSidebar: false,
-    showInBottom: false,
-  },
-  {
-    name: "Créer une classe",
-    link: "/parameters/classification/create",
-    icon: Settings,
-    showInSidebar: false,
-    showInBottom: false,
-  },
-  {
-    name: "Modifier une classe",
-    link: "/parameters/classification/:id",
-    icon: Settings,
-    showInSidebar: false,
-    showInBottom: false,
-  },
-  {
-    name: "Collections",
-    link: "/parameters/collection",
-    icon: Settings,
-    showInSidebar: false,
-    showInBottom: false,
-  },
-  {
-    name: "Créer une collection",
-    link: "/parameters/collection/create",
-    icon: Settings,
-    showInSidebar: false,
-    showInBottom: false,
-  },
-  {
-    name: "Modifier une collection",
-    link: "/parameters/collection/:id",
-    icon: Settings,
-    showInSidebar: false,
-    showInBottom: false,
-  },
-  {
-    name: "Dimensions",
-    link: "/parameters/dimension",
-    icon: Settings,
-    showInSidebar: false,
-    showInBottom: false,
-  },
-  {
-    name: "Créer une nouvelle dimension",
-    link: "/parameters/dimension/create/item",
-    icon: Settings,
-    showInSidebar: false,
-    showInBottom: false,
-  },
-  {
-    name: "Modifier une dimension",
-    link: "/parameters/dimension/:id",
-    icon: Settings,
-    showInSidebar: false,
-    showInBottom: false,
-  },
-  {
-    name: "Les grilles de dimensions",
-    link: "/parameters/grid",
-    icon: Settings,
-    showInSidebar: false,
-    showInBottom: false,
-  },
-  {
-    name: "Créer une grille de dimensions",
-    link: "/parameters/grid/create",
-    icon: Settings,
-    showInSidebar: false,
-    showInBottom: false,
-  },
-  {
-    name: "Page Produit",
-    link: "/product/:id",
-    icon: ShoppingCart,
-    showInSidebar: false,
-    showInBottom: false,
-  },
-  {
-    name: "Marques",
-    link: "/parameters/brand",
-    icon: Settings,
-    showInSidebar: false,
-    showInBottom: false,
-  },
-  {
-    name: "Créer une marque",
-    link: "/parameters/brand/create",
-    icon: Settings,
-    showInSidebar: false,
-    showInBottom: false,
-  },
-  {
-    name: "Modifier une marque",
-    link: "/parameters/brand/:id",
-    icon: Settings,
-    showInSidebar: false,
-    showInBottom: false,
-  },
-  {
-    name: "Liste des fournisseurs",
-    link: "/suppliers/suppliers-list",
-    icon: Factory,
-    showInSidebar: true,
-    showInBottom: false,
-  },
-  {
-    name: "Panel administrateur",
-    link: "/admin",
-    icon: UserCog,
-    showInSidebar: false,
-    showInBottom: true,
-  },
-  {
-    name: "Créer utilisateur",
-    link: "/admin/create-user",
-    icon: Settings,
-    showInSidebar: false,
-    showInBottom: false,
-  },
-  {
-    name: "Produits créés",
-    link: "/draft",
-    icon: File,
-    showInSidebar: false,
-    showInBottom: true,
+    linkCategory: [
+      {
+        name: "Apps",
+        linksGroup: [
+          {
+            name: "Tableau de bord",
+            group: [
+              {
+                name: "Admin",
+                linksGroup: [
+                  {
+                    name: "Add product",
+                    link: "/apps/add-product",
+                  },
+                  {
+                    name: "Products",
+                    link: "/apps/products",
+                  },
+                  {
+                    name: "Customers",
+                    link: "/",
+                  },
+                  {
+                    name: "Customers details",
+                    link: "/",
+                  },
+                  {
+                    name: "Refund",
+                    link: "/",
+                  },
+                ],
+              },
+              {
+                name: "Customer",
+                linksGroup: [
+                  {
+                    name: "Homepage",
+                    link: "/",
+                  },
+                  {
+                    name: "Product details",
+                    link: "/",
+                  },
+                  {
+                    name: "Product filter",
+                    link: "/",
+                  },
+                  {
+                    name: "Checkout",
+                    link: "/",
+                  },
+                  {
+                    name: "Shipping info",
+                    link: "/",
+                  },
+                ],
+              },
+            ],
+            icon: BarChart2,
+          },
+          {
+            name: "Articles",
+            linksGroup: [
+              {
+                name: "Liste des articles",
+                link: "/product",
+              },
+              {
+                name: "Créer un article",
+                link: "/product/edit",
+              },
+            ],
+            icon: Shirt,
+          },
+          {
+            name: "Codifications",
+            linksGroup: [
+              {
+                name: "Create new",
+                link: "/",
+              },
+              {
+                name: "Project list view",
+                link: "/",
+              },
+              {
+                name: "Project card view",
+                link: "/",
+              },
+              {
+                name: "Project biard view",
+                link: "/",
+              },
+              {
+                name: "Todo list",
+                link: "/",
+              },
+              {
+                name: "Project details",
+                link: "/",
+              },
+            ],
+            icon: Settings2,
+          },
+          {
+            name: "Chat",
+            linksGroup: [],
+            icon: MessageSquare,
+          },
+          {
+            name: "Email",
+            linksGroup: [
+              {
+                name: "Inbox",
+                link: "/",
+              },
+              {
+                name: "Email details",
+                link: "/",
+              },
+              {
+                name: "Compose",
+                link: "/",
+              },
+            ],
+            icon: Mail,
+          },
+          {
+            name: "Events",
+            linksGroup: [
+              {
+                name: "Create an event",
+                link: "/",
+              },
+              {
+                name: "Event detail",
+                link: "/",
+              },
+            ],
+            icon: Bookmark,
+          },
+          {
+            name: "Kanban",
+            linksGroup: [
+              {
+                name: "Kanban",
+                link: "/",
+              },
+              {
+                name: "Boards",
+                link: "/",
+              },
+              {
+                name: "Create Board",
+                link: "/",
+              },
+            ],
+            icon: BarChart,
+          },
+          {
+            name: "Social",
+            linksGroup: [
+              {
+                name: "Profil",
+                link: "/",
+              },
+              {
+                name: "Settings",
+                link: "/",
+              },
+            ],
+            icon: Share2,
+          },
+          {
+            name: "Calendar",
+            linksGroup: [],
+            icon: CalendarDays,
+          },
+        ],
+      },
+      {
+        name: "Pages",
+        linksGroup: [
+          {
+            name: "Starter",
+            group: [],
+            icon: Compass,
+          },
+          {
+            name: "Faq",
+            linksGroup: [
+              {
+                name: "Faq accordion",
+                link: "/",
+              },
+              {
+                name: "Faq tab",
+                link: "/",
+              },
+            ],
+            icon: CircleHelp,
+          },
+          {
+            name: "Landing",
+            linksGroup: [
+              {
+                name: "Default",
+                link: "/",
+              },
+              {
+                name: "Alternate",
+                link: "/",
+              },
+            ],
+            icon: Globe,
+          },
+          {
+            name: "Pricing",
+            linksGroup: [
+              {
+                name: "Pricing column",
+                link: "/",
+              },
+              {
+                name: "Pricing grid",
+                link: "/",
+              },
+            ],
+            icon: Tag,
+          },
+          {
+            name: "Notifications",
+            linksGroup: [],
+            icon: Bell,
+          },
+          {
+            name: "Members",
+            linksGroup: [],
+            icon: UsersRound,
+          },
+          {
+            name: "Timeline",
+            linksGroup: [],
+            icon: Clock,
+          },
+          {
+            name: "Comming soon",
+            linksGroup: [],
+            icon: Hourglass,
+          },
+          {
+            name: "Errors",
+            linksGroup: [
+              {
+                name: "403",
+                link: "/",
+              },
+              {
+                name: "404",
+                link: "/",
+              },
+              {
+                name: "500",
+                link: "/",
+              },
+            ],
+            icon: TriangleAlert,
+          },
+          {
+            name: "Authentication",
+            group: [
+              {
+                name: "Simple",
+                linksGroup: [
+                  {
+                    name: "Sign in",
+                    link: "/",
+                  },
+                  {
+                    name: "Sign up",
+                    link: "/",
+                  },
+                  {
+                    name: "Sign out",
+                    link: "/",
+                  },
+                  {
+                    name: "Forgot password",
+                    link: "/",
+                  },
+                  {
+                    name: "Reset password",
+                    link: "/",
+                  },
+                  {
+                    name: "Lock screen",
+                    link: "/",
+                  },
+                  {
+                    name: "2FA",
+                    link: "/",
+                  },
+                ],
+              },
+              {
+                name: "Split",
+                linksGroup: [
+                  {
+                    name: "Sign in",
+                    link: "/",
+                  },
+                  {
+                    name: "Sign up",
+                    link: "/",
+                  },
+                  {
+                    name: "Sign out",
+                    link: "/",
+                  },
+                  {
+                    name: "Forgot password",
+                    link: "/",
+                  },
+                  {
+                    name: "Reset password",
+                    link: "/",
+                  },
+                  {
+                    name: "Lock screen",
+                    link: "/",
+                  },
+                  {
+                    name: "2FA",
+                    link: "/",
+                  },
+                ],
+              },
+              {
+                name: "Card",
+                linksGroup: [
+                  {
+                    name: "Sign in",
+                    link: "/",
+                  },
+                  {
+                    name: "Sign up",
+                    link: "/",
+                  },
+                  {
+                    name: "Sign out",
+                    link: "/",
+                  },
+                  {
+                    name: "Forgot password",
+                    link: "/",
+                  },
+                  {
+                    name: "Reset password",
+                    link: "/",
+                  },
+                  {
+                    name: "Lock screen",
+                    link: "/",
+                  },
+                  {
+                    name: "2FA",
+                    link: "/",
+                  },
+                ],
+              },
+            ],
+            icon: Lock,
+          },
+          {
+            name: "Layout",
+            linksGroup: [
+              {
+                name: "Vertical sidenav",
+                link: "/",
+              },
+              {
+                name: "Dark mode",
+                link: "/",
+              },
+              {
+                name: "Sidenav collapse",
+                link: "/",
+              },
+              {
+                name: "Darknav",
+                link: "/",
+              },
+              {
+                name: "Topnav slim",
+                link: "/",
+              },
+              {
+                name: "Navbar top slim",
+                link: "/",
+              },
+              {
+                name: "Navbar top",
+                link: "/",
+              },
+              {
+                name: "Navbar slim",
+                link: "/",
+              },
+              {
+                name: "Combo nav slim",
+                link: "/",
+              },
+              {
+                name: "Dual nav",
+                link: "/",
+              },
+            ],
+            icon: PanelsTopLeft,
+          },
+        ],
+      },
+    ],
   },
 ];
-
 export const LINKS_Params: Params[] = [
   {
     name: "Classifications",
@@ -776,5 +1054,41 @@ export const LINKCARD_DRAFT: LinkCard[] = [
   {
     name: "Validée",
     page: "done",
+  },
+];
+
+
+export const CARD: Card[] = [
+  {
+    title: "Total orders",
+    subtitle: "Last 7 days",
+    data1: [300, 500, 900, 350, 650],
+    data2: [300, 450, 1000, 300, 650],
+    labels: ["Janvier", "Février", "Mars", "Avril", "Juin"],
+    chartType: "bar",
+  },
+  {
+    title: "New customers",
+    subtitle: "Last 7 days",
+    data1: [300, 500, 500, 800, 1000],
+    data2: [200, 600, 450, 400, 200],
+    labels: ["Janvier", "Février", "Mars", "Avril", "Juin"],
+    chartType: "line",
+  },
+  {
+    title: "UVC",
+    subtitle: "Avec vs. sans code barre",
+    data1: [1200, 500],
+    data2: [],
+    labels: ["Avec code barre", "Sans code barre"],
+    chartType: "pie",
+  },
+  {
+    title: "Paying vs non paying",
+    subtitle: "Last 7 days",
+    data1: [300, 500, 1000, 300, 650],
+    data2: [200, 600, 450, 400, 500],
+    labels: ["Janvier", "Février", "Mars", "Avril", "Juin"],
+    chartType: "point",
   },
 ];

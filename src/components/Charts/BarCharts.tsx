@@ -1,4 +1,3 @@
-// BarChart.tsx
 import React from 'react';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
@@ -8,12 +7,15 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 interface BarChartProps {
   data1: number[];
   data2: number[];
-  labels: string[];
+  labels?: string[]; // labels are now optional
 }
 
 const BarChart: React.FC<BarChartProps> = ({ data1, data2, labels }) => {
+  const defaultLabels = data1.map((_, index) => `Label ${index + 1}`);
+  const chartLabels = labels || defaultLabels;
+
   const data = {
-    labels,
+    labels: chartLabels,
     datasets: [
       {
         label: 'Projection',
@@ -35,7 +37,7 @@ const BarChart: React.FC<BarChartProps> = ({ data1, data2, labels }) => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top' as const,
+        position: 'bottom' as const, // Position the legend at the bottom
       },
     },
     scales: {

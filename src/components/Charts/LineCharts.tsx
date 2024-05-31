@@ -7,7 +7,7 @@ ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, T
 interface SparkLineChartProps {
   data1: number[];
   data2: number[];
-  labels: string[];
+  labels?: string[]; // labels are now optional
   height?: number;
   width?: number;
   color1?: string;
@@ -23,8 +23,12 @@ const SparkLineChart: React.FC<SparkLineChartProps> = ({
   color1 = '#5a80d8',
   color2 = '#87CEEB',
 }) => {
+  // Use default labels or an empty array if labels are not provided
+  const defaultLabels = data1.map((_, index) => `Label ${index + 1}`);
+  const chartLabels = labels || defaultLabels;
+
   const chartData = {
-    labels,
+    labels: chartLabels,
     datasets: [
       {
         label: 'Dataset 1',

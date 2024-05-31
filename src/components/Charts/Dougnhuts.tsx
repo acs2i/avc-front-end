@@ -1,4 +1,3 @@
-// DoughnutChart.tsx
 import React from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
@@ -6,23 +5,23 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface DoughnutChartProps {
-  data: number[];
-  labels: string[];
-  colors?: string[];
+  data: number[][];
+  labels?: string[];
+  colors?: string[][];
   cutout?: string | number;
   showLabels?: boolean;
 }
 
 const DoughnutChart: React.FC<DoughnutChartProps> = ({ data, labels, colors, cutout = '70%', showLabels = true }) => {
+  const datasets = data.map((dataset, index) => ({
+    data: dataset,
+    backgroundColor: colors ? colors[index] : ['#FF6384', '#36A2EB', '#FFCE56'],
+    hoverBackgroundColor: colors ? colors[index] : ['#FF6384', '#36A2EB', '#FFCE56'],
+  }));
+
   const chartData = {
     labels: showLabels ? labels : [],
-    datasets: [
-      {
-        data,
-        backgroundColor: colors || ['#FF6384', '#36A2EB', '#FFCE56'],
-        hoverBackgroundColor: colors || ['#FF6384', '#36A2EB', '#FFCE56'],
-      },
-    ],
+    datasets,
   };
 
   const options = {
@@ -32,7 +31,7 @@ const DoughnutChart: React.FC<DoughnutChartProps> = ({ data, labels, colors, cut
     plugins: {
       legend: {
         display: showLabels,
-        position: 'top' as const,
+        position: 'bottom' as const, // Position the legend at the bottom
       },
       tooltip: {
         enabled: true,
@@ -40,7 +39,11 @@ const DoughnutChart: React.FC<DoughnutChartProps> = ({ data, labels, colors, cut
     },
   };
 
-  return <Doughnut data={chartData} options={options} />;
+  return (
+    <div style={{ position: 'relative', height: '100%' }}>
+      <Doughnut data={chartData} options={options} />
+    </div>
+  );
 };
 
 export default DoughnutChart;

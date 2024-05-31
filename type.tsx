@@ -1,9 +1,43 @@
-export type Link = {
+export type Card = {
+  title: string;
+  subtitle: string;
+  data1: number[];
+  data2: number[];
+  labels: string[];
+  chartType: string;
+};
+
+
+
+// Type pour un lien individuel
+export type IndividualLink = {
   name: string;
   link: string;
+};
+
+// Type pour un groupe de liens
+export type LinksGroup = {
+  name: string;
+  linksGroup: IndividualLink[];
+};
+
+// Type pour un groupe de liens dans une catégorie
+export type GroupedLink = {
+  name: string;
+  group?: LinksGroup[];
+  linksGroup?: IndividualLink[];
   icon: any;
-  showInSidebar: boolean;
-  showInBottom: boolean;
+};
+
+// Type pour une catégorie de liens
+export type LinkCategory = {
+  name: string;
+  linksGroup: GroupedLink[];
+};
+
+// Type global pour le tableau de liens
+export type Link = {
+  linkCategory: LinkCategory[];
 };
 
 export type Params = {
