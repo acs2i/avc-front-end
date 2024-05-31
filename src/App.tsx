@@ -63,7 +63,6 @@ function App() {
 
   return (
     <>
-  
         {shouldShowNavbar && <Sidebar />}
         {shouldShowNavbar && <Navbar />}
         <div className="ml-[250px] mt-[60px]">

@@ -4,6 +4,7 @@ import { Avatar } from "@mui/material";
 import { Link } from "react-router-dom";
 import { setLogout } from "../../store/authSlice";
 import { useDispatch, useSelector } from "react-redux";
+import AccountMenu from "./AccountMenu";
 
 export default function Navbar() {
   const user = useSelector((state: any) => state.auth.user);
@@ -50,7 +51,7 @@ export default function Navbar() {
           </div>
           <Bell size={20} />
           <Grip size={20} />
-          <Avatar alt={user.username} src="img/avatar.jpg" />
+          <AccountMenu/>
         </div>
       </div>
     </nav>

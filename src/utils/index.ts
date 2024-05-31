@@ -119,28 +119,24 @@ export const LINKS: Link[] = [
             name: "Codifications",
             linksGroup: [
               {
-                name: "Create new",
-                link: "/",
+                name: "Classifications",
+                link: "/parameters/classification",
               },
               {
-                name: "Project list view",
-                link: "/",
+                name: "Dimensions",
+                link: "/parameters/dimension",
               },
               {
-                name: "Project card view",
-                link: "/",
+                name: "Grilles de dimensions",
+                link: "/parameters/grid",
               },
               {
-                name: "Project biard view",
-                link: "/",
+                name: "Collections",
+                link: "/parameters/collection",
               },
               {
-                name: "Todo list",
-                link: "/",
-              },
-              {
-                name: "Project details",
-                link: "/",
+                name: "Marques",
+                link: "/parameters/brand",
               },
             ],
             icon: Settings2,
