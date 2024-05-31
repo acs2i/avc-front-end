@@ -15,6 +15,11 @@ interface FormData {
   comment: string;
 }
 
+interface AdditionalField {
+  key: string;
+  value: string;
+}
+
 export default function CreateUserPage() {
   const [error, setError] = useState<string | null>("");
   const { notifySuccess, notifyError } = useNotify();
@@ -27,6 +32,7 @@ export default function CreateUserPage() {
     authorization: "",
     comment: "",
   });
+  const [additionalFields, setAdditionalFields] = useState<AdditionalField[]>([]);
 
   const authorizationOptions = [
     { value: "admin", name: "Admin", label: "Admin" },
@@ -39,10 +45,23 @@ export default function CreateUserPage() {
     setError("");
   };
 
+  const handleAddField = () => {
+    setAdditionalFields([...additionalFields, { key: "", value: "" }]);
+  };
+
+  const handleFieldChange = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const newFields = [...additionalFields];
+    newFields[index] = { ...newFields[index], [name]: value };
+    setAdditionalFields(newFields);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     try {
+      const dataToSend = { ...formData, additionalFields };
+      console.log("Data to send:", dataToSend);
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/auth/register`,
         {
@@ -50,7 +69,7 @@ export default function CreateUserPage() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({ ...formData, additionalFields }),
         }
       );
 
@@ -146,6 +165,29 @@ export default function CreateUserPage() {
                   validators={[]}
                   create
                 />
+                 {additionalFields.map((field, index) => (
+                  <div key={index} className="flex gap-2 mb-2">
+                    <input
+                      type="text"
+                      name="key"
+                      placeholder="Nom du champ"
+                      value={field.key}
+                      onChange={(e) => handleFieldChange(index, e)}
+                      className="w-1/2 p-2 border border-gray-300 rounded"
+                    />
+                    <input
+                      type="text"
+                      name="value"
+                      placeholder="Valeur du champ"
+                      value={field.value}
+                      onChange={(e) => handleFieldChange(index, e)}
+                      className="w-1/2 p-2 border border-gray-300 rounded"
+                    />
+                  </div>
+                ))}
+                <Button type="button" onClick={handleAddField} size="small">
+                  Ajouter un champ +
+                </Button>
               </div>
               {!isLoading ? (<div className="w-full mt-5 flex items-center gap-2">
                 <Button size="small" cancel type="button" to="/admin">

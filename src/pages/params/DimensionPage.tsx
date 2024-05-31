@@ -130,17 +130,7 @@ export default function DimensionPage() {
             <Info size={22} />
           </div>
         </div>
-        {dimensions && dimensions.length > 0 && (
-          <div className="flex justify-center p-7">
-            <Stack spacing={2}>
-              <Pagination
-                count={totalPages}
-                page={currentPage}
-                onChange={handlePageChange}
-              />
-            </Stack>
-          </div>
-        )}
+
         <div className="relative overflow-x-auto bg-white">
           <div className="px-3 mb-2 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
@@ -151,13 +141,19 @@ export default function DimensionPage() {
                 <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
               )}
             </div>
-            <Button
-              size="small"
-              to="/parameters/dimension/create/item"
-              blue
-            >
-              <Plus size={15}/>
-              Créer une Dimension
+            {dimensions && dimensions.length > 0 && (
+              <div className="flex justify-center p-7">
+                <Stack spacing={2}>
+                  <Pagination
+                    count={totalPages}
+                    page={currentPage}
+                    onChange={handlePageChange}
+                  />
+                </Stack>
+              </div>
+            )}
+            <Button size="small" to="/parameters/dimension/create/item" cancel>
+              Créer
             </Button>
           </div>
           <table className="w-full text-left mt-7">

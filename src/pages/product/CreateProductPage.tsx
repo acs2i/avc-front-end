@@ -85,12 +85,14 @@ type BrandOption = {
   value: string;
   label: string;
   YX_CODE: string;
+  YX_LIBELLE: string;
 };
 
 type CollectionOption = {
   value: string;
   label: string;
   CODE: string;
+  LIBELLE: string;
 };
 
 type FamilyOption = {
@@ -155,7 +157,7 @@ export default function CreateProductPage() {
       family: null,
       subFamily: [],
       brand: "",
-      productCollection: null,
+      productCollection: "",
       supplier: "",
       uvc: {
         code: "",
