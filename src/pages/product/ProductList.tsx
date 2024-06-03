@@ -460,7 +460,7 @@ export default function ProductList() {
           </div>
         </div>
         <table className="w-full text-left mt-7">
-          <thead className="border-t text-sm text-gray-500">
+          <thead className="border-y-[1px] border-gray-200 text-md font-[800] text-gray-700">
             <tr>
               <th scope="col" className="px-6 py-4 w-[10%]">
                 Code
@@ -550,9 +550,9 @@ export default function ProductList() {
           </tbody>
         </table>
       </div>
-      {totalItem !== null && totalItem > 10 && (
+      {/* {totalItem !== null && totalItem > 10 && (
         <ScrollToTop scrollThreshold={300} />
-      )}
+      )} */}
     </section>
   );
 }

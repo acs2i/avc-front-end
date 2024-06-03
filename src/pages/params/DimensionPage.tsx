@@ -162,15 +162,15 @@ export default function DimensionPage() {
           </div>
         </div>
         <table className="w-full text-left mt-7">
-          <thead className="border-t text-sm text-gray-500 ">
+          <thead className="border-y-[1px] border-gray-200 text-md font-[800] text-gray-700">
             <tr>
-              <th scope="col" className="px-6 py-4 w-1/3">
+              <th scope="col" className="px-6 py-2 w-1/3">
                 Libellé
               </th>
-              <th scope="col" className="px-6 py-4 w-1/3">
+              <th scope="col" className="px-6 py-2 w-1/3">
                 Code
               </th>
-              <th scope="col" className="px-6 py-4 w-1/3">
+              <th scope="col" className="px-6 py-2 w-1/3">
                 Type
               </th>
             </tr>
@@ -180,7 +180,7 @@ export default function DimensionPage() {
               dimensions.map((dimension) => (
                 <tr
                   key={dimension._id}
-                  className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
+                  className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap"
                   onClick={() =>
                     navigate(`/parameters/dimension/${dimension._id}`)
                   }
@@ -211,9 +211,9 @@ export default function DimensionPage() {
         </table>
       </div>
 
-      {totalItem !== null && totalItem > 10 && (
+      {/* {totalItem !== null && totalItem > 10 && (
         <ScrollToTop scrollThreshold={300} />
-      )}
+      )} */}
     </div>
   );
 }

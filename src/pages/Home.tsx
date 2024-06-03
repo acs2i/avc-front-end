@@ -94,7 +94,7 @@ export default function Home() {
         <div className="w-1/2">
           <div className="flex flex-col gap-8">
             <div>
-              <h3 className="text-[35px] font-bold text-gray-800">
+              <h3 className="text-[35px] font-[800] text-gray-800">
                 Tableau de bord
               </h3>
               <p className="text-[15px] text-gray-600">
@@ -112,7 +112,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="flex items-center gap-5">
-                <div className="w-[30px] h-[30px] flex items-center justify-center rounded-full bg-green-100 text-green-500">
+                <div className="w-[30px] h-[30px] flex items-center justify-center rounded-full bg-orange-100 text-orange-500">
                   <Pause size={20} />
                 </div>
                 <div className="flex flex-col">
@@ -121,7 +121,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="flex items-center gap-5">
-                <div className="w-[30px] h-[30px] flex items-center justify-center rounded-full bg-green-100 text-green-500">
+                <div className="w-[30px] h-[30px] flex items-center justify-center rounded-full bg-red-100 text-red-500">
                   <X size={20} />
                 </div>
                 <div className="flex flex-col">
@@ -138,7 +138,7 @@ export default function Home() {
 
           <div className="mt-[40px]">
             <div>
-              <h3 className="text-[25px] font-bold text-gray-800">
+              <h3 className="text-[25px] font-[800] text-gray-800">
                 Evolution des ventes
               </h3>
               <p className="text-[15px] text-gray-600">
@@ -174,7 +174,7 @@ export default function Home() {
 
       <section className="bg-white w-full p-8 border-b-[1px] border-gray-300 ">
         <div className="flx flex-col">
-          <h4 className="text-[25px] font-bold text-gray-800">
+          <h4 className="text-[25px] font-[800] text-gray-800">
             Produits récemment crées
           </h4>
           <p className="text-[15px] text-gray-600">
@@ -184,24 +184,24 @@ export default function Home() {
 
         <div className="relative overflow-x-auto mt-5">
           <table className="w-full text-left">
-            <thead className="bg-gray-200 text-sm ">
+            <thead className="border-y-[1px] border-gray-200 text-md font-[800] text-gray-700">
               <tr>
-                <th scope="col" className="px-6 py-4 w-[50px]">
+                <th scope="col" className="px-6 py-2 w-[50px]">
                   Code
                 </th>
-                <th scope="col" className="px-6 py-4 w-[300px]">
+                <th scope="col" className="px-6 py-2 w-[300px]">
                   Libellé
                 </th>
-                <th scope="col" className="px-6 py-4 w-[300px]">
+                <th scope="col" className="px-6 py-2 w-[300px]">
                   Famille
                 </th>
-                <th scope="col" className="px-6 py-4 w-[300px]">
+                <th scope="col" className="px-6 py-2 w-[300px]">
                   Sous-famille
                 </th>
-                <th scope="col" className="px-6 py-4 w-[300px]">
+                <th scope="col" className="px-6 py-2 w-[300px]">
                   Créateur
                 </th>
-                <th scope="col" className="px-6 py-4 w-[150px] text-center">
+                <th scope="col" className="px-6 py-2 w-[150px] text-center">
                   Status
                 </th>
               </tr>
@@ -271,22 +271,22 @@ export default function Home() {
       <section className="flex border-b-[1px]">
         <div className="w-1/2 h-[600px] p-8 bg-gray-100">
           <div className="flx flex-col">
-            <h4 className="text-[25px] font-bold text-gray-800">
+            <h4 className="text-[25px] font-[800] text-gray-800">
               Fournisseurs principaux
             </h4>
             <p className="text-[15px] text-gray-600">Nos fournisseurs en France</p>
           </div>
           <div className="relative overflow-x-auto mt-5">
             <table className="w-full text-left">
-              <thead className="bg-gray-200 text-sm text-gray-500">
+              <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-500">
                 <tr>
-                  <th scope="col" className="px-6 py-4 w-[400px]">
+                  <th scope="col" className="px-6 py-2 w-[400px]">
                     Code
                   </th>
-                  <th scope="col" className="px-6 py-4 w-[300px]">
+                  <th scope="col" className="px-6 py-2 w-[300px]">
                     Libellé
                   </th>
-                  <th scope="col" className="px-6 py-4 w-[300px]">
+                  <th scope="col" className="px-6 py-2 w-[300px]">
                     Juridique
                   </th>
                 </tr>

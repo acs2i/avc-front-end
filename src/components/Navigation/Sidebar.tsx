@@ -33,7 +33,7 @@ export default function Sidebar() {
               key={categoryWrapperIndex + "-" + categoryIndex}
               className="cursor-pointer"
             >
-              <h2 className="text-xs font-bold text-gray-500 uppercase">
+              <h2 className="font-bold text-gray-500 uppercase">
                 {category.name}
               </h2>
               <ul className="flex flex-col mt-6">
@@ -46,7 +46,7 @@ export default function Sidebar() {
                       >
                         {React.createElement(link.icon, { size: 17 })}
                         <div>
-                          <h3 className="text-xs">{link.name}</h3>
+                          <h3>{link.name}</h3>
                         </div>
                       </RouterLink>
                     ) : (
@@ -77,7 +77,7 @@ export default function Sidebar() {
                         )}
                         {React.createElement(link.icon, { size: 17 })}
                         <div>
-                          <h3 className="text-xs">{link.name}</h3>
+                          <h3>{link.name}</h3>
                         </div>
                       </div>
                     )}
@@ -95,7 +95,7 @@ export default function Sidebar() {
                                 ) : (
                                   <ChevronDown size={13} />
                                 )}
-                                <h4 className="text-xs">{item.name}</h4>
+                                <h4 className="text-[11px]">{item.name}</h4>
                               </div>
                               <Collapse in={openSubCategory === item.name}>
                                 <ul className="ml-[65px]">
@@ -103,7 +103,7 @@ export default function Sidebar() {
                                     <li key={linkIndex}>
                                       <RouterLink
                                         to={subLink.link}
-                                        className="flex text-gray-600 text-xs p-2 hover:bg-zinc-100 rounded-md"
+                                        className="flex text-gray-600 p-2 hover:bg-zinc-100 rounded-md"
                                       >
                                         {subLink.name}
                                       </RouterLink>
@@ -121,7 +121,7 @@ export default function Sidebar() {
                               <li key={linkIndex}>
                                 <RouterLink
                                   to={subLink.link}
-                                  className="flex text-gray-600 text-xs p-2 hover:bg-gray-200 rounded-md"
+                                  className="flex text-gray-600 p-2 hover:bg-gray-200 rounded-md"
                                 >
                                   {subLink.name}
                                 </RouterLink>
