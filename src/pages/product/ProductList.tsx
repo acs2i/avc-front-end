@@ -202,6 +202,7 @@ export default function ProductList() {
         title="Liste des articles"
         link="/product/edit"
         btnTitle="Créer un produit"
+        placeholder="Rechercher un produit"
       >
         <form className="py-3" onSubmit={handleSearch}>
           <div className="relative flex flex-wrap items-center gap-5 text-gray-600">

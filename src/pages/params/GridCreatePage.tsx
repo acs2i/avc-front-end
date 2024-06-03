@@ -154,169 +154,158 @@ export default function GridCreatePage() {
   }, [searchValue, type]);
 
   return (
-    <div>
-      <Card title="Création d'une grille de dimension" link="" createTitle="">
-        <form
-          className="w-[70%] mx-auto mt-[50px] mb-[50px]"
-          onSubmit={handleSubmit}
-        >
+    <section className="w-full h-screen bg-gray-100 p-7">
+      <form className="w-[70%] mt-[50px] mb-[50px]" onSubmit={handleSubmit}>
+        <h1 className="text-[32px] font-bold text-gray-800">
+          Créer une dimension
+        </h1>
+        <div>
           <div>
-            <div>
+            <Input
+              element="input"
+              id="LIBELLE"
+              label="Libellé de la grille"
+              placeholder="Donnez un nom à la grille"
+              validators={[]}
+              onChange={handleSetLabel}
+              create
+              required
+              gray
+            />
+          </div>
+
+          <div className="flex-1">
+            <Input
+              element="select"
+              id="TYPE"
+              label="Type de dimension"
+              placeholder="Choississez un type de dimension"
+              validators={[]}
+              onChange={handleSetType}
+              options={levelOptions}
+              create
+              required
+              gray
+            />
+          </div>
+
+          <div className="relative flex mt-3 gap-2">
+            {selectedDimensions.length > 1 && (
+              <div className="absolute left-[-50px] top-[50%] translate-y-[-50%] text-orange-400">
+                <MoveVertical size={40} />
+              </div>
+            )}
+            <div className="w-[50%] border rounded-sm p-1">
+              {selectedDimensions && (
+                <DragDropContext onDragEnd={handleDragAndDrop}>
+                  <Droppable droppableId="selectedDimensions">
+                    {(provided) => (
+                      <ul
+                        className="flex flex-col gap-1"
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                      >
+                        {selectedDimensions.map((dimension, index) => (
+                          <Draggable
+                            key={dimension._id}
+                            draggableId={dimension._id}
+                            index={index}
+                          >
+                            {(provided) => (
+                              <li
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                              >
+                                <div className="relative bg-green-700 text-white p-3 rounded-sm font-bold cursor-pointer">
+                                  {dimension.GDI_LIBELLE}
+                                  <div
+                                    className="absolute top-0 right-0 bg-orange-500 rounded-bl-md cursor-pointer hover:bg-red-500"
+                                    onClick={() =>
+                                      handleDeleteDimension(dimension._id)
+                                    }
+                                  >
+                                    <X size={18} />
+                                  </div>
+                                </div>
+                              </li>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </ul>
+                    )}
+                  </Droppable>
+                </DragDropContext>
+              )}
+            </div>
+            <div className="relative w-[50%]">
               <Input
                 element="input"
-                id="LIBELLE"
-                label="Libellé de la grille"
-                placeholder="Donnez un nom à la grille"
+                id="DIMENSION"
+                label="Ajouter des dimensions"
+                placeholder="Choississez vos dimensions"
                 validators={[]}
-                onChange={handleSetLabel}
-                required
                 gray
+                create
+                onChange={handleDropdownOpen}
+                onClick={() => setDropdownIsOpen(true)}
               />
-            </div>
-
-            <div className="flex-1">
-              <Input
-                element="select"
-                id="TYPE"
-                label="Type de dimension"
-                placeholder="Choississez un type de dimension"
-                validators={[]}
-                onChange={handleSetType}
-                options={levelOptions}
-                required
-                gray
-              />
-            </div>
-
-            <div className="relative flex mt-3 gap-2">
-              {selectedDimensions.length > 1 && (
-                <div className="absolute left-[-50px] top-[50%] translate-y-[-50%] text-orange-400">
-                  <MoveVertical size={40} />
+              {choiceValue && (
+                <div className="absolute bottom-[3px] bg-orange-400 py-2 px-4 rounded-md">
+                  <div
+                    className="absolute flex items-center justify-center h-[18px] w-[18px] top-[-2px] right-[-4px] rounded-full bg-red-600 text-white cursor-pointer"
+                    onClick={() => setChoiceValue("")}
+                  >
+                    <X />
+                  </div>
+                  <p className="text-white font-bold text-sm">{choiceValue}</p>
                 </div>
               )}
-              <div className="w-[50%] border rounded-sm p-1">
-                {selectedDimensions && (
-                  <DragDropContext onDragEnd={handleDragAndDrop}>
-                    <Droppable droppableId="selectedDimensions">
-                      {(provided) => (
-                        <ul
-                          className="flex flex-col gap-1"
-                          {...provided.droppableProps}
-                          ref={provided.innerRef}
-                        >
-                          {selectedDimensions.map((dimension, index) => (
-                            <Draggable
-                              key={dimension._id}
-                              draggableId={dimension._id}
-                              index={index}
-                            >
-                              {(provided) => (
-                                <li
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  {...provided.dragHandleProps}
-                                >
-                                  <div className="relative bg-green-700 text-white p-3 rounded-sm font-bold cursor-pointer">
-                                    {dimension.GDI_LIBELLE}
-                                    <div
-                                      className="absolute top-0 right-0 bg-orange-500 rounded-bl-md cursor-pointer hover:bg-red-500"
-                                      onClick={() =>
-                                        handleDeleteDimension(dimension._id)
-                                      }
-                                    >
-                                      <X size={18} />
-                                    </div>
-                                  </div>
-                                </li>
-                              )}
-                            </Draggable>
-                          ))}
-                          {provided.placeholder}
-                        </ul>
-                      )}
-                    </Droppable>
-                  </DragDropContext>
-                )}
-              </div>
-              <div className="relative w-[50%]">
-                <Input
-                  element="input"
-                  id="DIMENSION"
-                  label="Ajouter des dimensions"
-                  placeholder="Choississez vos dimensions"
-                  validators={[]}
-                  gray
-                  onChange={handleDropdownOpen}
-                  onClick={() => setDropdownIsOpen(true)}
-                />
-                {choiceValue && (
-                  <div className="absolute bottom-[3px] bg-orange-400 py-2 px-4 rounded-md">
-                    <div
-                      className="absolute flex items-center justify-center h-[18px] w-[18px] top-[-2px] right-[-4px] rounded-full bg-red-600 text-white cursor-pointer"
-                      onClick={() => setChoiceValue("")}
-                    >
+              {dropdownIsOpen && dimensions && searchValue && (
+                <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md">
+                  <div
+                    className="h-[30px] flex justify-end cursor-pointer px-3"
+                    onClick={() => setDropdownIsOpen(false)}
+                  >
+                    <div className="h-[30px] w-[30px] flex justify-center items-center bg-orange-500 rounded-full text-white hover:bg-orange-400">
                       <X />
                     </div>
-                    <p className="text-white font-bold text-sm">
-                      {choiceValue}
-                    </p>
                   </div>
-                )}
-                {dropdownIsOpen && dimensions && searchValue && (
-                  <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md">
-                    <div
-                      className="h-[30px] flex justify-end cursor-pointer px-3"
-                      onClick={() => setDropdownIsOpen(false)}
-                    >
-                      <div className="h-[30px] w-[30px] flex justify-center items-center bg-orange-500 rounded-full text-white hover:bg-orange-400">
-                        <X />
-                      </div>
-                    </div>
-                    {dimensions.map((dimension, i) => (
-                      <ul key={i}>
-                        <li
-                          className={`cursor-pointer py-1 ${
-                            selectedDimensions.includes(dimension)
-                              ? "bg-orange-400 text-white font-bold hover:bg-orange-300"
-                              : ""
-                          } hover:bg-gray-200 text-lg px-4 py-2 border-b`}
-                          onClick={() => handleDropdownClose(dimension)}
-                        >
-                          {dimension.GDI_LIBELLE}
-                        </li>
-                      </ul>
-                    ))}
-                  </div>
-                )}
-                {/* <Tooltip title="Créer une dimension">
-                  <Link
-                    to="/parameters/dimension/create/item"
-                    className="absolute top-5 right-0"
-                  >
-                    <div className="mb-2 w-[30px] h-[30px] bg-orange-500 flex items-center justify-center text-white rounded-full cursor-pointer hover:bg-orange-400 hover:rotate-180 transition-all duration-500">
-                      <Plus size={20} />
-                    </div>
-                  </Link>
-                </Tooltip> */}
-              </div>
+                  {dimensions.map((dimension, i) => (
+                    <ul key={i}>
+                      <li
+                        className={`cursor-pointer py-1 ${
+                          selectedDimensions.includes(dimension)
+                            ? "bg-orange-400 text-white font-bold hover:bg-orange-300"
+                            : ""
+                        } hover:bg-gray-200 text-lg px-4 py-2 border-b`}
+                        onClick={() => handleDropdownClose(dimension)}
+                      >
+                        {dimension.GDI_LIBELLE}
+                      </li>
+                    </ul>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
-          {!isLoading ? (
-            <div className="mt-4 flex items-center gap-2">
-              <Button size="small" cancel type="button">
-                Annuler
-              </Button>
-              <Button size="small" green type="submit">
-                Enregister ma grille
-              </Button>
-            </div>
-          ) : (
-            <div className="mt-3">
-              <CircularProgress />
-            </div>
-          )}
-        </form>
-      </Card>
-    </div>
+        </div>
+        {!isLoading ? (
+          <div className="mt-4 flex items-center gap-2">
+            <Button size="small" cancel type="button">
+              Annuler
+            </Button>
+            <Button size="small" blue type="submit">
+              Enregister ma grille
+            </Button>
+          </div>
+        ) : (
+          <div className="mt-3">
+            <CircularProgress />
+          </div>
+        )}
+      </form>
+    </section>
   );
 }

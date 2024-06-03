@@ -39,36 +39,48 @@ export default function Sidebar() {
               <ul className="flex flex-col mt-6">
                 {category.linksGroup.map((link, i) => (
                   <li key={i} className="cursor-pointer">
-                    <div
-                      className="flex items-center gap-2 hover:bg-gray-200 p-2 rounded-md"
-                      onClick={() => handleOpenCategory(link.name)}
-                    >
-                      {openCategory != link.name ? (
-                        <ChevronRight
-                          size={13}
-                          className={
-                            (link.group && link.group.length > 0) ||
-                            (link.linksGroup && link.linksGroup.length > 0)
-                              ? "visible"
-                              : "invisible"
-                          }
-                        />
-                      ) : (
-                        <ChevronDown
-                          size={13}
-                          className={
-                            (link.group && link.group.length > 0) ||
-                            (link.linksGroup && link.linksGroup.length > 0)
-                              ? "visible"
-                              : "invisible"
-                          }
-                        />
-                      )}
-                      {React.createElement(link.icon, { size: 17 })}
-                      <div>
-                        <h3 className="text-xs">{link.name}</h3>
+                    {link.link ? (
+                      <RouterLink
+                        to={link.link}
+                        className="flex items-center gap-2 hover:bg-gray-200 p-2 rounded-md ml-5"
+                      >
+                        {React.createElement(link.icon, { size: 17 })}
+                        <div>
+                          <h3 className="text-xs">{link.name}</h3>
+                        </div>
+                      </RouterLink>
+                    ) : (
+                      <div
+                        className="flex items-center gap-2 hover:bg-gray-200 p-2 rounded-md"
+                        onClick={() => handleOpenCategory(link.name)}
+                      >
+                        {openCategory != link.name ? (
+                          <ChevronRight
+                            size={13}
+                            className={
+                              (link.group && link.group.length > 0) ||
+                              (link.linksGroup && link.linksGroup.length > 0)
+                                ? "visible"
+                                : "invisible"
+                            }
+                          />
+                        ) : (
+                          <ChevronDown
+                            size={13}
+                            className={
+                              (link.group && link.group.length > 0) ||
+                              (link.linksGroup && link.linksGroup.length > 0)
+                                ? "visible"
+                                : "invisible"
+                            }
+                          />
+                        )}
+                        {React.createElement(link.icon, { size: 17 })}
+                        <div>
+                          <h3 className="text-xs">{link.name}</h3>
+                        </div>
                       </div>
-                    </div>
+                    )}
                     <Collapse in={openCategory === link.name}>
                       {link.group ? (
                         <ul className="flex flex-col">

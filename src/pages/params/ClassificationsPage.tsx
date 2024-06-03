@@ -5,11 +5,12 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Info, Plus, SquarePen } from "lucide-react";
+import { Info, Plus } from "lucide-react";
 import Spinner from "../../components/Shared/Spinner";
-import { Divider, Tooltip } from "@mui/material";
+import { Divider } from "@mui/material";
 import ScrollToTop from "../../components/ScrollToTop";
 import Modal from "../../components/Shared/Modal";
+import Header from "../../components/Navigation/Header";
 
 type DataType = "LA1" | "LA2" | "LA3";
 
@@ -131,12 +132,13 @@ function ClassificationsPage() {
           </Button>
         </div>
       </Modal>
-      <Card
-        title="Paramétrer les classifications"
-        createTitle="Créer une Classe"
+      <Header
+        title="Liste des classifications"
         link="/parameters/classification/create"
+        btnTitle="Créer une classe"
+        placeholder="Rechercher une classification"
       >
-        <div className="flex items-center justify-center gap-4 p-7">
+        <div className="flex items-center gap-4 py-4">
           <div className="flex items-center gap-4">
             <label className="w-[90px] text-sm font-bold">Niveau :</label>
             <select
@@ -180,82 +182,82 @@ function ClassificationsPage() {
             <Info size={22} />
           </div>
         </div>
-
-        {families && families.length > 0 && (
-          <div className="flex justify-center p-7">
-            <Stack spacing={2}>
-              <Pagination
-                count={totalPages}
-                page={currentPage}
-                onChange={handlePageChange}
-              />
-            </Stack>
-          </div>
-        )}
-        <div className="overflow-x-auto bg-white">
-          <div className="px-3 mb-2 flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <h4 className="text-md">
-                <span className="font-bold">{totalItem}</span> Resultats
+      </Header>
+      
+      <div className="relative overflow-x-auto bg-white">
+        <div className="px-3 py-7 flex flex-col gap-2">
+          <div className="w-full flex justify-between items-center">
+            <div className="flex items-center">
+              <h4 className="text-md whitespace-nowrap">
+                <span className="font-bold">{totalItem}</span> Produits
               </h4>
-            </div>
-            <Button
-              size="small"
-              to="/parameters/classification/create"
-              blue
-            >
-              <Plus size={15}/>
-              Créer une Classe
-            </Button>
-          </div>
-          <table className="w-full text-left mt-7">
-            <thead className="border-t text-sm text-gray-500">
-              <tr>
-                <th scope="col" className="px-6 py-4 w-1/3">
-                  Niveau
-                </th>
-                <th scope="col" className="px-6 py-4 w-1/3">
-                  Code
-                </th>
-                <th scope="col" className="px-6 py-4 w-1/3">
-                  Libellé
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {families && families.length > 0 ? (
-                families.map((family) => (
-                  <tr
-                    key={family._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
-                    onClick={() =>
-                      navigate(`/parameters/classification/${family._id}`)
-                    }
-                  >
-                    <td className="px-6 py-4 flex items-center gap-2">
-                      {typeLabels[family.YX_TYPE]}
-                    </td>
-                    <td className="px-6 py-4">{family.YX_CODE}</td>
-                    <td className="px-6 py-4">{family.YX_LIBELLE}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6} className="px-6 py-7 text-center">
-                    {totalItem === null ? (
-                      <div className="flex justify-center overflow-hidden p-[30px]">
-                        <Spinner />
-                      </div>
-                    ) : (
-                      "Aucun Résultat"
-                    )}
-                  </td>
-                </tr>
+              {prevSearchValue && (
+                <span className="text-xl italic ml-2">{`"${prevSearchValue}"`}</span>
               )}
-            </tbody>
-          </table>
+            </div>
+            <div className="flex justify-center w-full">
+              {families && families.length > 0 && (
+                <div className="flex justify-center p-7">
+                  <Stack spacing={2}>
+                    <Pagination
+                      count={totalPages}
+                      page={currentPage}
+                      onChange={handlePageChange}
+                    />
+                  </Stack>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      </Card>
+        <table className="w-full text-left mt-7">
+          <thead className="border-t text-sm text-gray-500">
+            <tr>
+              <th scope="col" className="px-6 py-4 w-1/3">
+                Niveau
+              </th>
+              <th scope="col" className="px-6 py-4 w-1/3">
+                Code
+              </th>
+              <th scope="col" className="px-6 py-4 w-1/3">
+                Libellé
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {families && families.length > 0 ? (
+              families.map((family) => (
+                <tr
+                  key={family._id}
+                  className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
+                  onClick={() =>
+                    navigate(`/parameters/classification/${family._id}`)
+                  }
+                >
+                  <td className="px-6 py-4 flex items-center gap-2">
+                    {typeLabels[family.YX_TYPE]}
+                  </td>
+                  <td className="px-6 py-4">{family.YX_CODE}</td>
+                  <td className="px-6 py-4">{family.YX_LIBELLE}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={6} className="px-6 py-7 text-center">
+                  {totalItem === null ? (
+                    <div className="flex justify-center overflow-hidden p-[30px]">
+                      <Spinner />
+                    </div>
+                  ) : (
+                    "Aucun Résultat"
+                  )}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
       {totalItem !== null && totalItem > 10 && (
         <ScrollToTop scrollThreshold={300} />
       )}

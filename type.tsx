@@ -24,6 +24,7 @@ export type LinksGroup = {
 // Type pour un groupe de liens dans une catégorie
 export type GroupedLink = {
   name: string;
+  link?: string;
   group?: LinksGroup[];
   linksGroup?: IndividualLink[];
   icon: any;

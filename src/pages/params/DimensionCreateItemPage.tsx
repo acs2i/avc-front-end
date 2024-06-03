@@ -66,13 +66,13 @@ export default function DimensionCreateItemPage() {
   };
 
   return (
-    <div>
-      <Card title="Panel de création">
+    <section className="w-full h-screen bg-gray-100 p-7">
+    
         <form
-          className="w-[70%] mx-auto mt-[50px] mb-[50px]"
+          className="w-[70%] mt-[50px] mb-[50px]"
           onSubmit={handleSubmit}
         >
-          <h1 className="text-2xl text-center">
+          <h1 className="text-[32px] font-bold text-gray-800">
             Créer une dimension
           </h1>
           <div className="mt-5 flex flex-col justify-between">
@@ -85,6 +85,7 @@ export default function DimensionCreateItemPage() {
                 validators={[]}
                 onChange={handleChange}
                 options={levelOptions}
+                create
                 required
                 gray
               />
@@ -95,6 +96,7 @@ export default function DimensionCreateItemPage() {
                 placeholder="ex: 456"
                 onChange={handleChange}
                 validators={[VALIDATOR_REQUIRE()]}
+                create
                 required
                 gray
               />
@@ -106,6 +108,7 @@ export default function DimensionCreateItemPage() {
                 label="Libellé"
                 onChange={handleChange}
                 validators={[VALIDATOR_REQUIRE()]}
+                create
                 required
                 gray
               />
@@ -117,12 +120,12 @@ export default function DimensionCreateItemPage() {
                     type="button"
                     onClick={() => navigate(-1)}
                   >
-                    <X size={15}/>
+              
                     Annuler
                   </Button>
-                  <Button size="small" green blue type="submit">
-                    <Plus size={15}/>
-                    Créer
+                  <Button size="small" blue type="submit">
+              
+                    Créer la dimension
                   </Button>
                 </div>
               ) : (
@@ -133,7 +136,6 @@ export default function DimensionCreateItemPage() {
             </div>
           </div>
         </form>
-      </Card>
-    </div>
+    </section>
   );
 }

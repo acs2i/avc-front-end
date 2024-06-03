@@ -7,6 +7,7 @@ import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../components/Shared/Spinner";
 import { Plus } from "lucide-react";
+import Header from "../../components/Navigation/Header";
 
 interface Suppliers {
   _id: string;
@@ -59,13 +60,14 @@ export default function SuppliersPage() {
   };
 
   return (
-    <div className="relative">
-      <Card
-        title="Paramétrer les dimensions"
-        createTitle="Créer un founisseur"
-        link=""
+    <section>
+      <Header
+        title="Liste des fournisseurs"
+        link="/parameters/dimension/create/item"
+        btnTitle="Créer un fournisseur"
+        placeholder="Rechercher un fournisseur"
       >
-        <div className="flex items-center justify-center gap-4 p-7">
+        <div className="flex items-center gap-4 py-4">
           <div className="flex items-center gap-4">
             <label className="w-[60px] text-sm font-bold">Libellé :</label>
             <input
@@ -85,77 +87,77 @@ export default function SuppliersPage() {
             />
           </div>
         </div>
-        {suppliers && suppliers.length > 0 && (
-          <div className="flex justify-center p-7">
-            <Stack spacing={2}>
-              <Pagination
-                count={totalPages}
-                page={currentPage}
-                onChange={handlePageChange}
-              />
-            </Stack>
-          </div>
-        )}
-        <div className="relative overflow-x-auto bg-white">
-          <div className="px-3 mb-2 flex items-center justify-between gap-2">
-            <h4 className="text-md">
-              <span className="font-bold">{totalItem}</span> Fournisseurs
-            </h4>
-            {prevSearchValue && (
-              <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
-            )}
-            <div>
-              <Button size="small" blue>
-                <Plus size={15}/>
-                Créer un fournisseur
-              </Button>
+      </Header>
+      <div className="relative overflow-x-auto bg-white">
+        <div className="px-3 py-7 flex flex-col gap-2">
+          <div className="w-full flex justify-between items-center">
+            <div className="flex items-center">
+              <h4 className="text-md whitespace-nowrap">
+                <span className="font-bold">{totalItem}</span> Produits
+              </h4>
+              {prevSearchValue && (
+                <span className="text-xl italic ml-2">{`"${prevSearchValue}"`}</span>
+              )}
+            </div>
+            <div className="flex justify-center w-full">
+              {suppliers && suppliers.length > 0 && (
+                <div className="flex justify-center p-7">
+                  <Stack spacing={2}>
+                    <Pagination
+                      count={totalPages}
+                      page={currentPage}
+                      onChange={handlePageChange}
+                    />
+                  </Stack>
+                </div>
+              )}
             </div>
           </div>
-          <table className="w-full text-left mt-7">
-            <thead className="border-t text-sm text-gray-500">
-              <tr>
-                <th scope="col" className="px-6 py-4 w-1/3">
-                  Code
-                </th>
-                <th scope="col" className="px-6 py-4 w-1/3">
-                  Libellé
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {suppliers && suppliers.length > 0 ? (
-                suppliers.map((supplier) => (
-                  <tr
-                    key={supplier._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
-                    onClick={() =>
-                      navigate(`/parameters/dimension/${supplier._id}`)
-                    }
-                  >
-                    <td className="px-6 py-4">{supplier.T_TIERS}</td>
-                    <td className="px-6 py-4">{supplier.T_LIBELLE}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6} className="px-6 py-7 text-center">
-                    {totalItem === null ? (
-                      <div className="flex justify-center overflow-hidden p-[30px]">
-                        <Spinner />
-                      </div>
-                    ) : (
-                      "Aucun Résultat"
-                    )}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
         </div>
-      </Card>
+        <table className="w-full text-left mt-7">
+          <thead className="border-t text-sm text-gray-500">
+            <tr>
+              <th scope="col" className="px-6 py-4 w-1/3">
+                Code
+              </th>
+              <th scope="col" className="px-6 py-4 w-1/3">
+                Libellé
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {suppliers && suppliers.length > 0 ? (
+              suppliers.map((supplier) => (
+                <tr
+                  key={supplier._id}
+                  className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
+                  onClick={() =>
+                    navigate(`/parameters/dimension/${supplier._id}`)
+                  }
+                >
+                  <td className="px-6 py-4">{supplier.T_TIERS}</td>
+                  <td className="px-6 py-4">{supplier.T_LIBELLE}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={6} className="px-6 py-7 text-center">
+                  {totalItem === null ? (
+                    <div className="flex justify-center overflow-hidden p-[30px]">
+                      <Spinner />
+                    </div>
+                  ) : (
+                    "Aucun Résultat"
+                  )}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
       {totalItem !== null && totalItem > 10 && (
         <ScrollToTop scrollThreshold={300} />
       )}
-    </div>
+    </section>
   );
 }

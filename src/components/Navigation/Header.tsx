@@ -5,12 +5,13 @@ interface headerProps {
   title: string;
   link: string;
   btnTitle: string;
+  placeholder: string;
   children: any;
 }
 
-export default function Header({ title, children, link,  btnTitle }: headerProps) {
+export default function Header({ title, children, link,   btnTitle, placeholder }: headerProps) {
   return (
-    <div className="w-full h-[300px] bg-gray-100 p-8">
+    <div className="w-full h-[300px] bg-gray-100 p-8 border border-b-gray-300">
       <h3 className="text-[35px] font-bold text-gray-800">{title}</h3>
       <div className="flex flex-col gap-4">
         <div className=" flex items-center gap-4">
@@ -36,7 +37,7 @@ export default function Header({ title, children, link,  btnTitle }: headerProps
               type="search"
               id="default-search"
               className="block w-full px-[10px] py-[8px] ps-10 text-sm text-gray-900 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Search products"
+              placeholder={placeholder}
               required
             />
           </div>

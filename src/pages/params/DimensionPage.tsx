@@ -9,6 +9,7 @@ import ScrollToTop from "../../components/ScrollToTop";
 import Modal from "../../components/Shared/Modal";
 import { Divider } from "@mui/material";
 import { Info, Plus } from "lucide-react";
+import Header from "../../components/Navigation/Header";
 
 type DataType = "DI1" | "DI2";
 interface Dimension {
@@ -90,12 +91,14 @@ export default function DimensionPage() {
           </Button>
         </div>
       </Modal>
-      <Card
-        title="Paramétrer les dimensions"
-        createTitle="Créer une Dimension"
+
+      <Header
+        title="Liste des dimensions"
         link="/parameters/dimension/create/item"
+        btnTitle="Créer une dimension"
+        placeholder="Rechercher une dimension"
       >
-        <div className="flex items-center justify-center gap-4 p-7">
+        <div className="flex items-center gap-4 py-4">
           <div className="flex items-center gap-4">
             <label className="w-[60px] text-sm font-bold">Libellé :</label>
             <input
@@ -130,82 +133,84 @@ export default function DimensionPage() {
             <Info size={22} />
           </div>
         </div>
+      </Header>
 
-        <div className="relative overflow-x-auto bg-white">
-          <div className="px-3 mb-2 flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <h4 className="text-md">
-                <span className="font-bold">{totalItem}</span> Dimensions
+      <div className="relative overflow-x-auto bg-white">
+        <div className="px-3 py-7 flex flex-col gap-2">
+          <div className="w-full flex justify-between items-center">
+            <div className="flex items-center">
+              <h4 className="text-md whitespace-nowrap">
+                <span className="font-bold">{totalItem}</span> Produits
               </h4>
               {prevSearchValue && (
-                <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
+                <span className="text-xl italic ml-2">{`"${prevSearchValue}"`}</span>
               )}
             </div>
-            {dimensions && dimensions.length > 0 && (
-              <div className="flex justify-center p-7">
-                <Stack spacing={2}>
-                  <Pagination
-                    count={totalPages}
-                    page={currentPage}
-                    onChange={handlePageChange}
-                  />
-                </Stack>
-              </div>
-            )}
-            <Button size="small" to="/parameters/dimension/create/item" cancel>
-              Créer
-            </Button>
+            <div className="flex justify-center w-full">
+              {dimensions && dimensions.length > 0 && (
+                <div className="flex justify-center p-7">
+                  <Stack spacing={2}>
+                    <Pagination
+                      count={totalPages}
+                      page={currentPage}
+                      onChange={handlePageChange}
+                    />
+                  </Stack>
+                </div>
+              )}
+            </div>
           </div>
-          <table className="w-full text-left mt-7">
-            <thead className="border-t text-sm text-gray-500 ">
-              <tr>
-                <th scope="col" className="px-6 py-4 w-1/3">
-                  Libellé
-                </th>
-                <th scope="col" className="px-6 py-4 w-1/3">
-                  Code
-                </th>
-                <th scope="col" className="px-6 py-4 w-1/3">
-                  Type
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {dimensions && dimensions.length > 0 ? (
-                dimensions.map((dimension) => (
-                  <tr
-                    key={dimension._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
-                    onClick={() =>
-                      navigate(`/parameters/dimension/${dimension._id}`)
-                    }
-                  >
-                    <td className="px-6 py-4">{dimension.GDI_LIBELLE}</td>
-                    <td className="px-6 py-4">{dimension.GDI_DIMORLI}</td>
-                    <td className="px-6 py-4">
-                      {dimension.GDI_TYPEDIM in typeLabels
-                        ? typeLabels[dimension.GDI_TYPEDIM]
-                        : "Type inconnu"}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6} className="px-6 py-7 text-center">
-                    {totalItem === null ? (
-                      <div className="flex justify-center overflow-hidden p-[30px]">
-                        <Spinner />
-                      </div>
-                    ) : (
-                      "Aucun Résultat"
-                    )}
+        </div>
+        <table className="w-full text-left mt-7">
+          <thead className="border-t text-sm text-gray-500 ">
+            <tr>
+              <th scope="col" className="px-6 py-4 w-1/3">
+                Libellé
+              </th>
+              <th scope="col" className="px-6 py-4 w-1/3">
+                Code
+              </th>
+              <th scope="col" className="px-6 py-4 w-1/3">
+                Type
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {dimensions && dimensions.length > 0 ? (
+              dimensions.map((dimension) => (
+                <tr
+                  key={dimension._id}
+                  className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
+                  onClick={() =>
+                    navigate(`/parameters/dimension/${dimension._id}`)
+                  }
+                >
+                  <td className="px-6 py-4">{dimension.GDI_LIBELLE}</td>
+                  <td className="px-6 py-4">{dimension.GDI_DIMORLI}</td>
+                  <td className="px-6 py-4">
+                    {dimension.GDI_TYPEDIM in typeLabels
+                      ? typeLabels[dimension.GDI_TYPEDIM]
+                      : "Type inconnu"}
                   </td>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={6} className="px-6 py-7 text-center">
+                  {totalItem === null ? (
+                    <div className="flex justify-center overflow-hidden p-[30px]">
+                      <Spinner />
+                    </div>
+                  ) : (
+                    "Aucun Résultat"
+                  )}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
       {totalItem !== null && totalItem > 10 && (
         <ScrollToTop scrollThreshold={300} />
       )}

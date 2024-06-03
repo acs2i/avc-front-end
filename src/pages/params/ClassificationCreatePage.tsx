@@ -22,7 +22,7 @@ interface FormData {
 
 function ClassificationCreatePage() {
   const user = useSelector((state: any) => state.auth.user);
-  const [type, setType] = useState("")
+  const [type, setType] = useState("");
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
@@ -50,13 +50,13 @@ function ClassificationCreatePage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.id === "YX_TYPE") {
-        const selectedLevel = e.target.value;
-        const numericLevel = parseInt(selectedLevel.substring(2), 10);
-        const previousNumericLevel = numericLevel - 1;
-        const fetchLevel = `LA${previousNumericLevel}`;
-    
-        setType(fetchLevel);
-      }
+      const selectedLevel = e.target.value;
+      const numericLevel = parseInt(selectedLevel.substring(2), 10);
+      const previousNumericLevel = numericLevel - 1;
+      const fetchLevel = `LA${previousNumericLevel}`;
+
+      setType(fetchLevel);
+    }
 
     setFormData({
       ...formData,
@@ -66,8 +66,6 @@ function ClassificationCreatePage() {
       },
     });
   };
-
-
 
   const handleSearch = async () => {
     try {
@@ -130,10 +128,8 @@ function ClassificationCreatePage() {
           YX_CODE: "",
         },
       });
-   
     }
   };
-
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -171,116 +167,120 @@ function ClassificationCreatePage() {
   }, [searchValue]);
 
   return (
-    <div>
-      <Card title="Panel de création">
-        <form
-          className="w-[70%] mx-auto mt-[50px] mb-[50px]"
-          onSubmit={handleSubmit}
-        >
-          <h1 className="text-2xl text-center">Création de la classe</h1>
-          <div className="mt-5 flex flex-col justify-between">
-            <div className="flex flex-col">
-              <Input
-                element="select"
-                id="YX_TYPE"
-                label="Niveau"
-                placeholder="Choississez un niveau"
-                validators={[]}
-                onChange={handleChange}
-                options={levelOptions}
-                gray
-              />
-              <Input
-                element="input"
-                id="YX_CODE"
-                label="Code"
-                placeholder="Code de la class"
-                onChange={handleChange}
-                validators={[]}
-                gray
-              />
-              {type !== "" && type !== "LA0" && type !== "LANaN" && (
-                <div className="relative">
-                  <Input
-                    element="input"
-                    id="family"
-                    label="Lien avec un parent"
-                    placeholder="Choississez une famille / sous-famille"
-                    validators={[]}
-                    gray
-                    onChange={handleDropdownOpen}
-                  />
-                  {choiceValue && (
-                    <div className="absolute bottom-[3px] bg-orange-400 py-2 px-4 rounded-md">
-                      <div
-                        className="absolute flex items-center justify-center h-[18px] w-[18px] top-[-2px] right-[-4px] rounded-full bg-red-600 text-white cursor-pointer"
-                        onClick={() => setChoiceValue("")}
-                      >
-                        <X />
-                      </div>
-                      <p className="text-white font-bold text-sm">
-                        {choiceValue}
-                      </p>
+    <section className="w-full h-screen bg-gray-100 p-7">
+      <form className="w-[70%] mt-[50px] mb-[50px]" onSubmit={handleSubmit}>
+        <div>
+          <h3 className="text-[32px] font-bold text-gray-800">
+            Créer une classification
+          </h3>
+          <p className="text-[17px] text-gray-600">
+            Lorem ipsum dolor sit amet
+          </p>
+        </div>
+        <div className="mt-5 flex flex-col justify-between">
+          <div className="flex flex-col">
+            <Input
+              element="select"
+              id="YX_TYPE"
+              label="Niveau"
+              placeholder="Choississez un niveau"
+              validators={[]}
+              onChange={handleChange}
+              options={levelOptions}
+              create
+              gray
+            />
+            <Input
+              element="input"
+              id="YX_CODE"
+              label="Code"
+              placeholder="Code de la class"
+              onChange={handleChange}
+              validators={[]}
+              create
+              gray
+            />
+            {type !== "" && type !== "LA0" && type !== "LANaN" && (
+              <div className="relative">
+                <Input
+                  element="input"
+                  id="family"
+                  label="Lien avec un parent"
+                  placeholder="Choississez une famille / sous-famille"
+                  validators={[]}
+                  gray
+                  create
+                  onChange={handleDropdownOpen}
+                />
+                {choiceValue && (
+                  <div className="absolute bottom-[3px] bg-orange-400 py-2 px-4 rounded-md">
+                    <div
+                      className="absolute flex items-center justify-center h-[18px] w-[18px] top-[-2px] right-[-4px] rounded-full bg-red-600 text-white cursor-pointer"
+                      onClick={() => setChoiceValue("")}
+                    >
+                      <X />
                     </div>
-                  )}
-                  {dropdownIsOpen && families && searchValue && (
-                    <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md">
-                      <div
-                        className="h-[30px] flex justify-end cursor-pointer"
-                        onClick={() => setDropdownIsOpen(false)}
-                      >
-                        <span className="text-xl px-4">X</span>
-                      </div>
-                      {families.map((family) => (
-                        <ul>
-                          <li
-                            className="cursor-pointer py-1 hover:bg-gray-200 text-lg px-4 py-2 border-b"
-                            onClick={() => handleDropdownClose(family)}
-                          >
-                            {family.YX_LIBELLE}
-                          </li>
-                        </ul>
-                      ))}
+                    <p className="text-white font-bold text-sm">
+                      {choiceValue}
+                    </p>
+                  </div>
+                )}
+                {dropdownIsOpen && families && searchValue && (
+                  <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md">
+                    <div
+                      className="h-[30px] flex justify-end cursor-pointer"
+                      onClick={() => setDropdownIsOpen(false)}
+                    >
+                      <span className="text-xl px-4">X</span>
                     </div>
-                  )}
-                </div>
-              )}
-              <Input
-                element="input"
-                id="YX_LIBELLE"
-                type="text"
-                placeholder="Modifier le libellé"
-                label="Libellé"
-                onChange={handleChange}
-                validators={[]}
-                gray
-              />
-               {!isLoading ? (
-                <div className="flex items-center gap-2 mt-5">
-                   <Button
-                    size="small"
-                    cancel
-                    type="button"
-                    onClick={() => navigate(-1)}
-                  >
-                     <X size={15} />
-                    Annuler
-                  </Button>
-                  <Button size="small" green blue type="submit">
-                    <Plus size={15}/>
-                    Créer
-                  </Button>
-                </div>
-              ) : (
-                <div className="mt-3">
-                  <CircularProgress />
-                </div>
-              )}
-            </div>
+                    {families.map((family) => (
+                      <ul>
+                        <li
+                          className="cursor-pointer py-1 hover:bg-gray-200 text-lg px-4 py-2 border-b"
+                          onClick={() => handleDropdownClose(family)}
+                        >
+                          {family.YX_LIBELLE}
+                        </li>
+                      </ul>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            <Input
+              element="input"
+              id="YX_LIBELLE"
+              type="text"
+              placeholder="Modifier le libellé"
+              label="Libellé"
+              onChange={handleChange}
+              validators={[]}
+              create
+              gray
+            />
+            {!isLoading ? (
+              <div className="flex items-center gap-2 mt-5">
+                <Button
+                  size="small"
+                  cancel
+                  type="button"
+                  onClick={() => navigate(-1)}
+                >
+                  Annuler
+                </Button>
+                <Button size="small" green blue type="submit">
+                  Créer classification
+                </Button>
+              </div>
+            ) : (
+              <div className="mt-3">
+                <CircularProgress />
+              </div>
+            )}
           </div>
-        </form>
-      </Card>
-    </div>
+        </div>
+      </form>
+    </section>
   );
 }
 

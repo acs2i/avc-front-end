@@ -109,7 +109,7 @@ export default function ClassificationUpdatePage() {
   };
 
   return (
-    <div>
+    <section className="w-full h-screen bg-gray-100 p-7">
       <Modal
         show={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
@@ -144,19 +144,18 @@ export default function ClassificationUpdatePage() {
           </div>
         )}
       </Modal>
-      <Card title={`Mettre à jour la dimension`} link="" createTitle="">
+    
         <form
-          className="w-[70%] h-[400px] mx-auto mt-[50px] mb-[50px]"
+         className="w-[70%] mt-[50px] mb-[50px]"
           onSubmit={handleSubmit}
         >
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl">
+            <h1 className="text-[32px] font-bold text-gray-800">
               Code de la <span className="font-bold">{type} :</span>{" "}
               {dimension?.GDI_DIMORLI}
             </h1>
             {!isModify && (
               <Button size="small" blue onClick={() => setIsModify(true)}>
-                <RotateCcw size={15} />
                 Modifier la dimension
               </Button>
             )}
@@ -173,6 +172,7 @@ export default function ClassificationUpdatePage() {
                     value={libelle}
                     label="Libellé"
                     validators={[]}
+                    create
                     onChange={handleLibelleChange}
                     gray
                   />
@@ -188,6 +188,7 @@ export default function ClassificationUpdatePage() {
                     label="Libellé"
                     validators={[]}
                     disabled
+                    create
                     onChange={handleLibelleChange}
                     gray
                   />
@@ -203,24 +204,22 @@ export default function ClassificationUpdatePage() {
                     type="button"
                     onClick={() => setIsModify(false)}
                   >
-                    <X size={15} />
                     Annuler
                   </Button>
                   <Button
                     size="small"
-                    green
+                    blue
                     onClick={() => setIsModalOpen(true)}
                     type="button"
                   >
-                    <RotateCcw size={15} />
-                    Modiifer
+                    Modiifer {type}
                   </Button>
                 </div>
               </div>
             )}
           </div>
         </form>
-      </Card>
-    </div>
+  
+    </section>
   );
 }

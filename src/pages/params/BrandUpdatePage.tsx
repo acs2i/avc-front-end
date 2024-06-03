@@ -86,7 +86,7 @@ export default function BranchUpdatePage() {
   };
 
   return (
-    <div>
+    <section className="w-full h-screen bg-gray-100 p-7">
       <Modal
         show={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
@@ -121,16 +121,15 @@ export default function BranchUpdatePage() {
           </div>
         )}
       </Modal>
-      <Card title={`Mettre à jour la marque`} link="" createTitle="">
-        <form className="w-[70%] h-[400px] mx-auto mt-[50px] mb-[50px]">
+    
+        <form className="w-[70%] h-[400px] mt-[50px] mb-[50px]">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl">
+            <h1 className="text-[32px] font-bold text-gray-800">
               Code de la <span className="font-bold">marque :</span>{" "}
               {brand?.YX_CODE}
             </h1>
             {!isModify && (
               <Button size="small" blue onClick={() => setIsModify(true)}>
-                <RotateCcw size={15} />
                 Modifier la marque
               </Button>
             )}
@@ -147,6 +146,7 @@ export default function BranchUpdatePage() {
                     value={libelle}
                     label="Libellé"
                     validators={[]}
+                    create
                     onChange={handleLibelleChange}
                     gray
                   />
@@ -162,6 +162,7 @@ export default function BranchUpdatePage() {
                     label="Libellé"
                     validators={[]}
                     disabled
+                    create
                     onChange={handleLibelleChange}
                     gray
                   />
@@ -177,24 +178,24 @@ export default function BranchUpdatePage() {
                     type="button"
                     onClick={() => setIsModify(false)}
                   >
-                    <X size={15} />
+                
                     Annuler
                   </Button>
                   <Button
                     size="small"
-                    green
+                    blue
                     onClick={() => setIsModalOpen(true)}
                     type="button"
                   >
-                    <RotateCcw size={15} />
-                    Modifier
+                  
+                    Modifier la marque
                   </Button>
                 </div>
               </div>
             )}
           </div>
         </form>
-      </Card>
-    </div>
+     
+    </section>
   );
 }

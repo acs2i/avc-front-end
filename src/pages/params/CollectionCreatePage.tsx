@@ -64,13 +64,13 @@ export default function CollectionCreatePage() {
   };
 
   return (
-    <div>
-      <Card title="Panel de création">
+    <section className="w-full h-screen bg-gray-100 p-7">
+     
         <form
-          className="w-[70%] mx-auto mt-[50px] mb-[50px]"
+          className="w-[70%] mt-[50px] mb-[50px]"
           onSubmit={handleSubmit}
         >
-          <h1 className="text-2xl text-center">Créer une collection</h1>
+          <h1 className="text-[32px] font-bold text-gray-800">Créer une collection</h1>
           <div className="mt-5 flex flex-col justify-between">
             <div className="flex flex-col">
               <Input
@@ -81,6 +81,7 @@ export default function CollectionCreatePage() {
                 onChange={handleChange}
                 validators={[VALIDATOR_REQUIRE()]}
                 required
+                create
                 gray
               />
               <Input
@@ -92,6 +93,7 @@ export default function CollectionCreatePage() {
                 onChange={handleChange}
                 validators={[VALIDATOR_REQUIRE()]}
                 required
+                create
                 gray
               />
               {!isLoading ? (
@@ -102,12 +104,12 @@ export default function CollectionCreatePage() {
                     type="button"
                     onClick={() => navigate(-1)}
                   >
-                    <X size={15}/>
+                  
                     Annuler
                   </Button>
                   <Button size="small" green blue type="submit">
-                    <Plus size={15}/>
-                    Créer
+                 
+                    Créer une collection
                   </Button>
                 </div>
               ) : (
@@ -118,7 +120,7 @@ export default function CollectionCreatePage() {
             </div>
           </div>
         </form>
-      </Card>
-    </div>
+
+    </section>
   );
 }

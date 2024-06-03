@@ -65,13 +65,13 @@ export default function BrandCreatePage() {
 
 
   return (
-    <div>
-      <Card title="Panel de création">
+    <section className="w-full h-screen bg-gray-100 p-7">
+   
         <form
-          className="w-[70%] mx-auto mt-[50px] mb-[50px]"
+          className="w-[70%] mt-[50px] mb-[50px]"
           onSubmit={handleSubmit}
         >
-          <h1 className="text-2xl text-center">Créer une marque</h1>
+          <h1 className="text-[32px] font-bold text-gray-800">Créer une marque</h1>
           <div className="mt-5 flex flex-col justify-between">
             <div className="flex flex-col">
               <Input
@@ -82,6 +82,7 @@ export default function BrandCreatePage() {
                 onChange={handleChange}
                 validators={[VALIDATOR_REQUIRE()]}
                 required
+                create
                 gray
               />
               <Input
@@ -93,6 +94,7 @@ export default function BrandCreatePage() {
                 onChange={handleChange}
                 validators={[VALIDATOR_REQUIRE()]}
                 required
+                create
                 gray
               />
               {!isLoading ? (
@@ -105,8 +107,8 @@ export default function BrandCreatePage() {
                   >
                     Annuler
                   </Button>
-                  <Button size="small" green type="submit">
-                    Créer
+                  <Button size="small" blue type="submit">
+                    Créer la marque
                   </Button>
                 </div>
               ) : (
@@ -117,7 +119,7 @@ export default function BrandCreatePage() {
             </div>
           </div>
         </form>
-      </Card>
-    </div>
+      
+    </section>
   );
 }

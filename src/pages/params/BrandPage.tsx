@@ -10,6 +10,7 @@ import Spinner from "../../components/Shared/Spinner";
 import { Divider, Tooltip } from "@mui/material";
 import ScrollToTop from "../../components/ScrollToTop";
 import Modal from "../../components/Shared/Modal";
+import Header from "../../components/Navigation/Header";
 
 interface Collection {
   _id: string;
@@ -108,12 +109,14 @@ export default function BrandPage() {
           </Button>
         </div>
       </Modal>
-      <Card
-        title="Paramétrer les marques"
-        createTitle="Créer Un Marque"
+
+      <Header
+        title="Liste des marques"
         link="/parameters/brand/create"
+        btnTitle="Créer une marque"
+        placeholder="Rechercher une marque"
       >
-        <div className="flex items-center justify-center gap-4 p-7">
+        <div className="flex items-center gap-4 py-4">
           <div className="flex items-center gap-4">
             <label className="w-[60px] text-sm font-bold">Code :</label>
             <input
@@ -139,76 +142,74 @@ export default function BrandPage() {
             <Info size={22} />
           </div>
         </div>
-        {brands && brands.length > 0 && (
-          <div className="flex justify-center p-7">
-            <Stack spacing={2}>
-              <Pagination
-                count={totalPages}
-                page={currentPage}
-                onChange={handlePageChange}
-              />
-            </Stack>
-          </div>
-        )}
-        <div className="overflow-x-auto bg-white">
-          <div className="px-3 mb-2 flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <h4 className="text-md">
+      </Header>
+
+      <div className="overflow-x-auto bg-white">
+        <div className="px-3 py-7 flex flex-col gap-2">
+          <div className="w-full flex justify-between items-center">
+            <div className="flex items-center">
+              <h4 className="text-md whitespace-nowrap">
                 <span className="font-bold">{totalItem}</span> Marques
               </h4>
               {prevSearchValue && (
-                <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
+                <span className="text-xl italic ml-2">{`"${prevSearchValue}"`}</span>
               )}
             </div>
-            <Button
-              size="small"
-              to="/parameters/brand/create"
-              blue
-            >
-              <Plus size={15}/>
-              Créer Une Marque
-            </Button>
-          </div>
-          <table className="w-full text-left mt-7">
-            <thead className="border-t text-sm text-gray-500">
-              <tr>
-                <th scope="col" className="px-6 py-4 w-1/3">
-                  Code
-                </th>
-                <th scope="col" className="px-6 py-4 w-1/3">
-                  Libellé
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {brands && brands.length > 0 ? (
-                brands.map((brand) => (
-                  <tr
-                    key={brand._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
-                    onClick={() => navigate(`/parameters/brand/${brand._id}`)}
-                  >
-                    <td className="px-6 py-4">{brand.YX_CODE}</td>
-                    <td className="px-6 py-4">{brand.YX_LIBELLE}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6} className="px-6 py-7 text-center">
-                    {totalItem === null ? (
-                      <div className="flex justify-center overflow-hidden p-[30px]">
-                        <Spinner />
-                      </div>
-                    ) : (
-                      "Aucun Résultat"
-                    )}
-                  </td>
-                </tr>
+            <div className="flex justify-center w-full">
+              {brands && brands.length > 0 && (
+                <div className="flex justify-center p-7">
+                  <Stack spacing={2}>
+                    <Pagination
+                      count={totalPages}
+                      page={currentPage}
+                      onChange={handlePageChange}
+                    />
+                  </Stack>
+                </div>
               )}
-            </tbody>
-          </table>
+            </div>
+          </div>
         </div>
-      </Card>
+        
+        <table className="w-full text-left mt-7">
+          <thead className="border-t text-sm text-gray-500">
+            <tr>
+              <th scope="col" className="px-6 py-4 w-1/3">
+                Code
+              </th>
+              <th scope="col" className="px-6 py-4 w-1/3">
+                Libellé
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {brands && brands.length > 0 ? (
+              brands.map((brand) => (
+                <tr
+                  key={brand._id}
+                  className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
+                  onClick={() => navigate(`/parameters/brand/${brand._id}`)}
+                >
+                  <td className="px-6 py-4">{brand.YX_CODE}</td>
+                  <td className="px-6 py-4">{brand.YX_LIBELLE}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={6} className="px-6 py-7 text-center">
+                  {totalItem === null ? (
+                    <div className="flex justify-center overflow-hidden p-[30px]">
+                      <Spinner />
+                    </div>
+                  ) : (
+                    "Aucun Résultat"
+                  )}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
       {totalItem !== null && totalItem > 10 && (
         <ScrollToTop scrollThreshold={300} />
       )}

@@ -36,7 +36,8 @@ import {
   Shirt,
   Captions,
   BarChart2,
-  Settings2
+  Settings2,
+  Factory
 } from "lucide-react";
 
 export const LINKS: Link[] = [
@@ -142,9 +143,10 @@ export const LINKS: Link[] = [
             icon: Settings2,
           },
           {
-            name: "Chat",
+            name: "Fournisseurs",
+            link: "/suppliers/suppliers-list",
             linksGroup: [],
-            icon: MessageSquare,
+            icon: Factory,
           },
           {
             name: "Email",
