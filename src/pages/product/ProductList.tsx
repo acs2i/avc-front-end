@@ -434,32 +434,7 @@ export default function ProductList() {
       </Header>
 
       <div className="relative overflow-x-auto bg-white">
-        <div className="px-3 py-7 flex flex-col gap-2">
-          <div className="w-full flex justify-between items-center">
-            <div className="flex items-center">
-              <h4 className="text-md whitespace-nowrap">
-                <span className="font-bold">{totalItem}</span> Produits
-              </h4>
-              {prevSearchValue && (
-                <span className="text-xl italic ml-2">{`"${prevSearchValue}"`}</span>
-              )}
-            </div>
-            <div className="flex justify-center w-full">
-              {products?.products && products.products.length > 0 && (
-                <div className="flex justify-center">
-                  <Stack spacing={2}>
-                    <Pagination
-                      count={totalPages}
-                      page={currentPage}
-                      onChange={handlePageChange}
-                    />
-                  </Stack>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-        <table className="w-full text-left mt-7">
+        <table className="w-full text-left">
           <thead className="border-y-[1px] border-gray-200 text-md font-[800] text-gray-700">
             <tr>
               <th scope="col" className="px-6 py-4 w-[10%]">
@@ -523,9 +498,7 @@ export default function ProductList() {
                         <span>{product?.subFamily?.YX_CODE}</span>
                         <span className="mx-1">-</span>
                         {product?.subFamily.YX_LIBELLE && (
-                          <span>
-                            {product?.subFamily?.YX_LIBELLE}
-                          </span>
+                          <span>{product?.subFamily?.YX_LIBELLE}</span>
                         )}
                       </div>
                     ) : (
@@ -549,6 +522,32 @@ export default function ProductList() {
             )}
           </tbody>
         </table>
+        <div className="px-4 py-2 flex flex-col gap-2">
+          <div className="w-full flex justify-between items-center">
+            <div className="flex items-center">
+              <h4 className="text-md whitespace-nowrap">
+                <span className="font-bold">{totalItem}</span> Produits
+              </h4>
+              {prevSearchValue && (
+                <span className="text-xl italic ml-2">{`"${prevSearchValue}"`}</span>
+              )}
+            </div>
+            <div className="flex justify-end w-full">
+              {products?.products && products.products.length > 0 && (
+                <div className="flex justify-center">
+                  <Stack spacing={2}>
+                    <Pagination
+                      count={totalPages}
+                      page={currentPage}
+                      onChange={handlePageChange}
+                      color="primary"
+                    />
+                  </Stack>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
       {/* {totalItem !== null && totalItem > 10 && (
         <ScrollToTop scrollThreshold={300} />

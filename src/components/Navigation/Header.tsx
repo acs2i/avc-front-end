@@ -11,7 +11,7 @@ interface headerProps {
 
 export default function Header({ title, children, link,   btnTitle, placeholder }: headerProps) {
   return (
-    <div className="w-full h-[300px] bg-gray-100 p-8 border border-b-gray-300">
+    <div className="w-full h-[300px] bg-gray-100 p-8">
       <h3 className="text-[35px] font-[800] text-gray-800">{title}</h3>
       <div className="flex flex-col gap-4">
         <div className=" flex items-center gap-4">
