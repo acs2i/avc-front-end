@@ -8,6 +8,7 @@ import ScrollToTop from "../../components/ScrollToTop";
 import { Info, Plus } from "lucide-react";
 import Modal from "../../components/Shared/Modal";
 import { Divider, Tooltip } from "@mui/material";
+import Header from "../../components/Navigation/Header";
 
 interface User {
   _id: any;
@@ -84,12 +85,13 @@ export default function AdminPage() {
           </Button>
         </div>
       </Modal>
-      <Card
-        title="Paramétrer les collections"
-        createTitle="Créer Un utilisateur"
+      <Header
+        title="Liste des utilisateurs"
         link="/admin/create-user"
+        btnTitle="Créer un utilisateur"
+        placeholder="Rechercher un utilisateur"
       >
-        <div className="flex items-center justify-center gap-4 p-7">
+        <div className="flex items-center gap-4">
           <div className="flex items-center gap-4">
             <label className="w-[60px] text-sm font-bold">Nom :</label>
             <input
@@ -116,81 +118,78 @@ export default function AdminPage() {
             <Info size={22} />
           </div>
         </div>
-        <div className="relative overflow-x-auto">
-          <div className="px-3 mb-2 flex items-center justify-between gap-2">
-            <h4 className="text-md">
-              <span className="font-bold">{users.length}</span> Utilisateurs
-            </h4>
-            {prevSearchValue && (
-              <span className="text-xl italic">{`"${prevSearchValue}"`}</span>
-            )}
-            <div>
-              <Button size="small" blue to="/admin/create-user">
-                <Plus size={15}/>
-                Créer un utilisateur
-              </Button>
-            </div>
-          </div>
-          <table className="w-full text-left">
-            <thead className="bg-gray-200 text-sm text-gray-500">
-              <tr>
-                <th scope="col" className="px-6 py-4 w-1/4">
-                  Nom d'utilisateur
-                </th>
-                <th scope="col" className="px-6 py-4 w-1/4">
-                  Email
-                </th>
-                <th scope="col" className="px-6 py-4 w-1/4">
-                  Autorisations
-                </th>
-                <th scope="col" className="px-6 py-4 w-1/4">
-                  Commentaires
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {users && users.length > 0 ? (
-                users.map((user) => (
-                  <tr
-                    key={user._id}
-                    className="bg-white cursor-pointer hover:bg-slate-200 text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
-                  >
-                    <td className="px-6 py-4">{user.username}</td>
-                    <td className="px-6 py-4">{user.email}</td>
-                    <td className="px-6 py-4">
-                      {user.authorization ? user.authorization : "NC"}
-                    </td>
-                    <Tooltip
-                      title={user.comment ? user.comment : "Pas de commentaire"}
+      </Header>
+      <div className="relative overflow-x-auto">
+        <table className="w-full text-left">
+          <thead className="border-y-[1px] border-gray-200 text-md font-[800] text-gray-700">
+            <tr>
+              <th scope="col" className="px-6 py-2 w-1/4">
+                Nom d'utilisateur
+              </th>
+              <th scope="col" className="px-6 py-2 w-1/4">
+                Email
+              </th>
+              <th scope="col" className="px-6 py-2 w-[5%]">
+                Autorisations
+              </th>
+              <th scope="col" className="px-6 py-2 w-1/4">
+                Commentaires
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {users && users.length > 0 ? (
+              users.map((user) => (
+                <tr
+                  key={user._id}
+                  className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap"
+                >
+                  <td className="px-6 py-4 text-blue-600">{user.username}</td>
+                  <td className="px-6 py-4">{user.email}</td>
+                  <td className="px-6 py-4">
+                    <div
+                      className={`inline-block uppercase ${
+                        user.authorization === "admin" && "bg-green-200 border border-green-500 text-green-700"
+                      } ${
+                        user.authorization === "guest" && "bg-red-200 border border-red-500 text-red-700"
+                      } ${
+                        user.authorization === "user" && "bg-orange-200 border border-orange-500 text-orange-700"
+                      } ${
+                        !user.authorization && "bg-gray-200 border border-gray-500 text-gray-700"
+                      } px-3 py-1 rounded-md`}
                     >
-                      <td className="px-6 py-4">
-                        {user.comment
-                          ? truncateText(user.comment, 50)
-                          : "Pas de commentaire"}
-                      </td>
-                    </Tooltip>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6} className="px-6 py-7 text-center">
-                    {totalItem === null ? (
-                      <div className="flex justify-center overflow-hidden p-[30px]">
-                        <Spinner />
-                      </div>
-                    ) : (
-                      "Aucun Résultat"
-                    )}
+                      <span>
+                        {user.authorization ? user.authorization : "NC"}
+                      </span>
+                    </div>
                   </td>
+                  <Tooltip
+                    title={user.comment ? user.comment : "Pas de commentaire"}
+                  >
+                    <td className="px-6 py-4">
+                      {user.comment
+                        ? truncateText(user.comment, 50)
+                        : "Pas de commentaire"}
+                    </td>
+                  </Tooltip>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </Card>
-      {totalItem !== null && totalItem > 10 && (
-        <ScrollToTop scrollThreshold={300} />
-      )}
+              ))
+            ) : (
+              <tr>
+                <td colSpan={6} className="px-6 py-7 text-center">
+                  {totalItem === null ? (
+                    <div className="flex justify-center overflow-hidden p-[30px]">
+                      <Spinner />
+                    </div>
+                  ) : (
+                    "Aucun Résultat"
+                  )}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

@@ -8,6 +8,7 @@ import useNotify from "../../utils/hooks/useToast";
 import { useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import Button from "../../components/FormElements/Button";
+import getNumbersFromLabel from "../../utils/func/GetNumbersFromLabel";
 
 interface Dimension {
   _id: string;
@@ -190,55 +191,6 @@ export default function GridCreatePage() {
           </div>
 
           <div className="relative flex mt-3 gap-2">
-            {selectedDimensions.length > 1 && (
-              <div className="absolute left-[-50px] top-[50%] translate-y-[-50%] text-orange-400">
-                <MoveVertical size={40} />
-              </div>
-            )}
-            <div className="w-[50%] border rounded-sm p-1">
-              {selectedDimensions && (
-                <DragDropContext onDragEnd={handleDragAndDrop}>
-                  <Droppable droppableId="selectedDimensions">
-                    {(provided) => (
-                      <ul
-                        className="flex flex-col gap-1"
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                      >
-                        {selectedDimensions.map((dimension, index) => (
-                          <Draggable
-                            key={dimension._id}
-                            draggableId={dimension._id}
-                            index={index}
-                          >
-                            {(provided) => (
-                              <li
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                              >
-                                <div className="relative bg-green-700 text-white p-3 rounded-sm font-bold cursor-pointer">
-                                  {dimension.GDI_LIBELLE}
-                                  <div
-                                    className="absolute top-0 right-0 bg-orange-500 rounded-bl-md cursor-pointer hover:bg-red-500"
-                                    onClick={() =>
-                                      handleDeleteDimension(dimension._id)
-                                    }
-                                  >
-                                    <X size={18} />
-                                  </div>
-                                </div>
-                              </li>
-                            )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
-                      </ul>
-                    )}
-                  </Droppable>
-                </DragDropContext>
-              )}
-            </div>
             <div className="relative w-[50%]">
               <Input
                 element="input"
@@ -287,6 +239,52 @@ export default function GridCreatePage() {
                     </ul>
                   ))}
                 </div>
+              )}
+            </div>
+            {/* {selectedDimensions.length > 1 && (
+              <div className="absolute right-[-50px] top-[50%] translate-y-[-50%] text-orange-400">
+                <MoveVertical size={40} />
+              </div>
+            )} */}
+            <div className="w-[50%] border rounded-sm p-1">
+              {selectedDimensions && (
+                <DragDropContext onDragEnd={handleDragAndDrop}>
+                  <Droppable droppableId="selectedDimensions">
+                    {(provided) => (
+                      <ul
+                        className="flex flex-wrap gap-1"
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                      >
+                        {selectedDimensions.map((dimension, index) => (
+                          <Draggable
+                            key={dimension._id}
+                            draggableId={dimension._id}
+                            index={index}
+                          >
+                            {(provided) => (
+                              <li
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                              >
+                                <div
+                                  className="flex items-center justify-center relative w-[40px] h-[40px] bg-orange-300 text-white p-3 rounded-full font-bold cursor-pointer"
+                                  onClick={() =>
+                                    handleDeleteDimension(dimension._id)
+                                  }
+                                >
+                                  {getNumbersFromLabel(dimension.GDI_LIBELLE)}
+                                </div>
+                              </li>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </ul>
+                    )}
+                  </Droppable>
+                </DragDropContext>
               )}
             </div>
           </div>

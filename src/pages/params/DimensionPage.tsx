@@ -140,13 +140,13 @@ export default function DimensionPage() {
           <thead className="border-y-[1px] border-gray-200 text-md font-[800] text-gray-700">
             <tr>
               <th scope="col" className="px-6 py-2 w-1/3">
+                Type
+              </th>
+              <th scope="col" className="px-6 py-2 w-1/3">
                 Libellé
               </th>
-              <th scope="col" className="px-6 py-2 w-1/3">
+              <th scope="col" className="px-6 py-2 w-[10%]">
                 Code
-              </th>
-              <th scope="col" className="px-6 py-2 w-1/3">
-                Type
               </th>
             </tr>
           </thead>
@@ -160,13 +160,13 @@ export default function DimensionPage() {
                     navigate(`/parameters/dimension/${dimension._id}`)
                   }
                 >
-                  <td className="px-6 py-4">{dimension.GDI_LIBELLE}</td>
-                  <td className="px-6 py-4">{dimension.GDI_DIMORLI}</td>
-                  <td className="px-6 py-4">
+                   <td className="px-6 py-4 text-blue-600">
                     {dimension.GDI_TYPEDIM in typeLabels
                       ? typeLabels[dimension.GDI_TYPEDIM]
                       : "Type inconnu"}
                   </td>
+                  <td className="px-6 py-4">{dimension.GDI_LIBELLE}</td>
+                  <td className="px-6 py-4">{dimension.GDI_DIMORLI}</td>
                 </tr>
               ))
             ) : (

@@ -165,7 +165,7 @@ export default function CollectionPage() {
                   }
                 >
                   <td className="px-6 py-4">{collection.CODE}</td>
-                  <td className="px-6 py-4">{collection.LIBELLE}</td>
+                  <td className="px-6 py-4 ">{collection.LIBELLE}</td>
                 </tr>
               ))
             ) : (

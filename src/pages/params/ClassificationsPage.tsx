@@ -204,12 +204,12 @@ function ClassificationsPage() {
               families.map((family) => (
                 <tr
                   key={family._id}
-                  className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap"
+                  className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 whitespace-nowrap"
                   onClick={() =>
                     navigate(`/parameters/classification/${family._id}`)
                   }
                 >
-                  <td className="px-6 py-4 flex items-center gap-2">
+                  <td className="px-6 py-4 flex items-center gap-2 text-blue-600">
                     {typeLabels[family.YX_TYPE]}
                   </td>
                   <td className="px-6 py-4">{family.YX_CODE}</td>

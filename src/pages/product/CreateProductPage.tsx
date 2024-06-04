@@ -11,7 +11,7 @@ export default function CreateProductPage() {
   return (
     <section className="w-full h-screen bg-gray-100 p-7">
       <div>
-        <h3 className="text-[32px] font-bold text-gray-800">
+        <h3 className="text-[32px] font-[800] text-gray-800">
           Créer un article
         </h3>
         <p className="text-[17px] text-gray-600">Lorem ipsum dolor sit amet</p>
@@ -84,7 +84,7 @@ export default function CreateProductPage() {
             />
           </div>
           <div className="mt-3">
-            <h3 className="text-[22px] font-bold text-gray-800">
+            <h3 className="text-[22px] font-[800] text-gray-800">
               Ajouter une image
             </h3>
             <div className="w-full h-[250px] border border-dashed border-2 border-gray-300 mt-3 flex justify-center items-center">

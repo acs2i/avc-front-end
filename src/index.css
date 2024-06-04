@@ -31,6 +31,10 @@ li{
   font-weight: 600;
   font-size: 11px;
 }
+
+td{
+  font-weight: 600;
+}
 /* SCROLLBAR DESIGN ↓ */
 
 ::-webkit-scrollbar {

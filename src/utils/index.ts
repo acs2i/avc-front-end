@@ -37,7 +37,8 @@ import {
   Captions,
   BarChart2,
   Settings2,
-  Factory
+  Factory,
+  Users
 } from "lucide-react";
 
 export const LINKS: Link[] = [
@@ -220,12 +221,13 @@ export const LINKS: Link[] = [
         ],
       },
       {
-        name: "Pages",
+        name: "Admin",
         linksGroup: [
           {
-            name: "Starter",
+            name: "Utilisateurs",
+            link: "/admin",
             group: [],
-            icon: Compass,
+            icon: Users,
           },
           {
             name: "Faq",
