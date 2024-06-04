@@ -6,14 +6,18 @@ import useNotify from "../../utils/hooks/useToast";
 import Card from "../../components/Shared/Card";
 import { Avatar, CircularProgress } from "@mui/material";
 import Button from "../../components/FormElements/Button";
+import { Tooltip } from "@mui/material";
 import { X } from "lucide-react";
+import truncateText from "../../utils/func/Formattext";
+import Spinner from "../../components/Shared/Spinner";
+import { useDispatch, useSelector } from "react-redux";
 
 interface FormData {
-  name: string;
+  groupname: string;
   users: any[];
-  password: string;
   authorization: string;
-  comment: string;
+  description: string;
+  creator_id: string;
 }
 
 interface User {
@@ -25,21 +29,24 @@ interface User {
 }
 
 export default function CreateGroupPage() {
+  const creatorId = useSelector((state: any) => state.auth.user);
   const [error, setError] = useState<string | null>("");
-  const [choiceValue, setChoiceValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const { notifySuccess, notifyError } = useNotify();
   const [isLoading, setIsLoading] = useState(false);
+  const [totalItem, setTotalItem] = useState(null);
+  const limit = 20;
+  const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const [dropdownIsOpen, setDropdownIsOpen] = useState(false);
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
-    name: "",
+    groupname: "",
     users: [],
-    password: "",
     authorization: "",
-    comment: "",
+    description: "",
+    creator_id: creatorId._id,
   });
 
   const authorizationOptions = [
@@ -51,6 +58,24 @@ export default function CreateGroupPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
     setError("");
+  };
+
+  const handleUserChange = (e: any, userId: any) => {
+    const isChecked = e.target.checked;
+    setFormData((prevFormData) => {
+      const users = [...prevFormData.users];
+      if (isChecked) {
+        // Ajouter l'id de l'utilisateur coché à l'objet formData
+        users.push(userId);
+      } else {
+        // Supprimer l'id de l'utilisateur décoché de l'objet formData
+        const index = users.indexOf(userId);
+        if (index > -1) {
+          users.splice(index, 1);
+        }
+      }
+      return { ...prevFormData, users };
+    });
   };
 
   useEffect(() => {
@@ -83,7 +108,7 @@ export default function CreateGroupPage() {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/auth/register`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/group`,
         {
           method: "POST",
           headers: {
@@ -95,9 +120,9 @@ export default function CreateGroupPage() {
 
       if (response.ok) {
         setTimeout(() => {
-          notifySuccess("Utilisateur créé avec succès !");
+          notifySuccess("Groupe créé avec succès !");
           setIsLoading(false);
-          navigate("/admin");
+          navigate("/admin/created-group");
         }, 1000);
       } else {
         notifyError("Erreur lors de la création !");
@@ -108,26 +133,6 @@ export default function CreateGroupPage() {
   };
 
 
-  const handleDropdownOpen = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setChoiceValue("");
-    setDropdownIsOpen(true);
-  };
-
-  const handleDropdownClose = (users: User) => {
-    const existingDimension = selectedUsers.find(
-      (d) => d._id === users._id
-    );
-    if (!existingDimension) {
-      setSelectedUsers([...selectedUsers, users]);
-      setFormData({
-        ...formData,
-        users: [...formData.users, users._id],
-      });
-    }
-  };
-
-  console.log(formData)
-
   return (
     <section className="w-full h-screen bg-gray-100 p-7">
       <div>
@@ -137,60 +142,22 @@ export default function CreateGroupPage() {
       </div>
       <form className="flex flex-col gap-4 w-[70%]" onSubmit={handleSubmit}>
         <div className="mt-5 flex flex-col justify-between">
+          <h3 className="text-[25px] font-[800] text-gray-800">
+            Informations du groupe
+          </h3>
           <div className="flex flex-col">
             <Input
               element="input"
-              id="name"
+              id="groupname"
               type="text"
               placeholder="Entrez un nom"
               label="Nom du groupe"
-              value={formData.name}
+              value={formData.groupname}
               onChange={handleChange}
               validators={[VALIDATOR_REQUIRE()]}
               required
               create
             />
-
-            <div className="relative">
-              <Input
-                element="input"
-                id="users"
-                label="Ajouter des utilisateurs"
-                placeholder="Ajoutez des utilisateurs"
-                validators={[]}
-                gray
-                create
-                onChange={handleDropdownOpen}
-                onClick={() => setDropdownIsOpen(true)}
-              />
-              {dropdownIsOpen && users && (
-                <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md">
-                  <div
-                    className="h-[30px] flex justify-end cursor-pointer px-3"
-                    onClick={() => setDropdownIsOpen(false)}
-                  >
-                    <div className="h-[30px] w-[30px] flex justify-center items-center bg-gray-500 rounded-full text-white hover:bg-sky-400">
-                      <X />
-                    </div>
-                  </div>
-                  {users.map((user, i) => (
-                    <ul key={i}>
-                      <li
-                        className={`cursor-pointer py-1 hover:bg-gray-200 text-lg px-4 py-2 border-b flex items-center gap-3 ${
-                            selectedUsers.includes(user)
-                              ? "bg-sky-600 text-white font-bold hover:bg-sky-300"
-                              : ""
-                          }`}
-                        onClick={() => handleDropdownClose(user)}
-                      >
-                        <Avatar alt={user.username} src="img/avatar.jpg"/>
-                        {user.username}
-                      </li>
-                    </ul>
-                  ))}
-                </div>
-              )}
-            </div>
             <Input
               element="select"
               id="authorization"
@@ -205,16 +172,111 @@ export default function CreateGroupPage() {
             />
             <Input
               element="textarea"
-              id="comment"
+              id="description"
               type="text"
               placeholder="Laissez une description"
               label="Description (falcultatif)"
-              value={formData.comment}
+              value={formData.description}
               onChange={handleChange}
               maxLength={250}
               validators={[]}
               create
             />
+          </div>
+          <div className="relative overflow-x-auto mt-4">
+            <div>
+              <h3 className="text-[25px] font-[800] text-gray-800 mb-2">
+                Ajout d'utilisateurs au groupe
+              </h3>
+            </div>
+            <table className="w-full text-left">
+              <thead className="border-y-[1px] border-gray-200 text-md font-[800] text-gray-700">
+                <tr>
+                  <th scope="col" className="px-6 py-2 w-[5%]">
+                    #
+                  </th>
+                  <th scope="col" className="px-6 py-2 w-1/4">
+                    Nom d'utilisateur
+                  </th>
+                  <th scope="col" className="px-6 py-2 w-1/4">
+                    Email
+                  </th>
+                  <th scope="col" className="px-6 py-2 w-[5%]">
+                    Autorisations
+                  </th>
+                  <th scope="col" className="px-6 py-2 w-1/4">
+                    Commentaires
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {users && users.length > 0 ? (
+                  users.map((user) => (
+                    <tr
+                      key={user._id}
+                      className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap"
+                    >
+                      <td className="px-6 py-4 text-blue-600">
+                        <input
+                          type="checkbox"
+                          id="user"
+                          name="user"
+                          onChange={(e) => handleUserChange(e, user._id)}
+                        />
+                      </td>
+                      <td className="px-6 py-4 text-blue-600 text-md">
+                        {user.username}
+                      </td>
+                      <td className="px-6 py-4">{user.email}</td>
+                      <td className="px-6 py-4">
+                        <div
+                          className={`inline-block uppercase ${
+                            user.authorization === "admin" &&
+                            "bg-green-200 border border-green-500 text-green-700"
+                          } ${
+                            user.authorization === "guest" &&
+                            "bg-red-200 border border-red-500 text-red-700"
+                          } ${
+                            user.authorization === "user" &&
+                            "bg-orange-200 border border-orange-500 text-orange-700"
+                          } ${
+                            !user.authorization &&
+                            "bg-gray-200 border border-gray-500 text-gray-700"
+                          } px-3 py-1 rounded-md`}
+                        >
+                          <span>
+                            {user.authorization ? user.authorization : "NC"}
+                          </span>
+                        </div>
+                      </td>
+                      <Tooltip
+                        title={
+                          user.comment ? user.comment : "Pas de commentaire"
+                        }
+                      >
+                        <td className="px-6 py-4">
+                          {user.comment
+                            ? truncateText(user.comment, 50)
+                            : "Pas de commentaire"}
+                        </td>
+                      </Tooltip>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-7 text-center">
+                      {totalItem === null ? (
+                        <div className="flex justify-center overflow-hidden p-[30px]">
+                          <Spinner />
+                        </div>
+                      ) : (
+                        "Aucun Résultat"
+                      )}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
           {!isLoading ? (
             <div className="w-full mt-5 flex items-center gap-2">
