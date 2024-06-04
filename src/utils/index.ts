@@ -38,7 +38,9 @@ import {
   BarChart2,
   Settings2,
   Factory,
-  Users
+  Users,
+  SquarePen,
+  User
 } from "lucide-react";
 
 export const LINKS: Link[] = [
@@ -225,23 +227,23 @@ export const LINKS: Link[] = [
         linksGroup: [
           {
             name: "Utilisateurs",
-            link: "/admin",
-            group: [],
-            icon: Users,
-          },
-          {
-            name: "Faq",
             linksGroup: [
               {
-                name: "Faq accordion",
-                link: "/",
+                name: "Liste des utilisateurs",
+                link: "/admin",
               },
               {
-                name: "Faq tab",
-                link: "/",
+                name: "Créer un groupe",
+                link: "/admin/create-group",
               },
             ],
-            icon: CircleHelp,
+            icon: User,
+          },
+          {
+            name: "Produits créés",
+            link: "/draft",
+            group: [],
+            icon: SquarePen,
           },
           {
             name: "Landing",

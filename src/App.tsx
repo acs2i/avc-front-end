@@ -34,6 +34,7 @@ import AdminPage from "./pages/panel-admin/AdminPage";
 import CreateUserPage from "./pages/panel-admin/CreateUser";
 import ProductList from "./pages/product/ProductList";
 import { Navigate, Outlet } from "react-router-dom";
+import CreateGroupPage from "./pages/panel-admin/CreateGroup";
 
 function App() {
   const location = useLocation();
@@ -133,6 +134,7 @@ function App() {
               <Route path="/done" element={<DonePage />} />
               <Route path="/admin" element={<AdminPage />} />
               <Route path="/admin/create-user" element={<CreateUserPage />} />
+              <Route path="/admin/create-group" element={<CreateGroupPage />} />
             </Route>
           </Routes>
         </div>

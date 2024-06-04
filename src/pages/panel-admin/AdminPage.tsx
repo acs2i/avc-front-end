@@ -38,10 +38,10 @@ export default function AdminPage() {
   };
 
   useEffect(() => {
-    fetchCollections();
+    fetchUsers();
   }, [currentPage]);
 
-  const fetchCollections = async () => {
+  const fetchUsers = async () => {
     try {
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/auth/all-users`,

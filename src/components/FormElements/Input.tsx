@@ -110,6 +110,7 @@ const Input: React.FC<InputProps> = (props) => {
         onKeyDown={props.onKeyDown}
         className={InputClasses}
         disabled={props.disabled}
+        autoComplete="off"
       />
     ) : props.element === "textarea" ? (
       <textarea
