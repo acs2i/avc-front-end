@@ -1,5 +1,5 @@
 import getRandomColor from "../../utils/func/getRandomColor";
-import { Avatar, AvatarGroup } from "@mui/material";
+import { Avatar, AvatarGroup, Badge } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -40,7 +40,6 @@ export default function CreatedGroupPage() {
     }
   };
 
-
   return (
     <section className="w-full h-screen bg-gray-100 p-7">
       <div>
@@ -50,7 +49,10 @@ export default function CreatedGroupPage() {
       </div>
       <div className="grid grid-cols-6 gap-3 mt-5">
         {groups.map((group) => (
-          <Link to="/" className="bg-white rounded-md p-2 shadow-md flex flex-col items-center justify-center hover:scale-105 hover:bg-gray-200 transition-all">
+          <Link
+            to="/"
+            className="bg-white rounded-md p-2 shadow-md flex flex-col items-center justify-center hover:scale-105 hover:bg-gray-200 transition-all"
+          >
             <div>
               <AvatarGroup max={4} className="flex items-center">
                 {group.users.map((avatar) => (
@@ -61,7 +63,9 @@ export default function CreatedGroupPage() {
                   />
                 ))}
               </AvatarGroup>
-              <p className="text-center whitespace-nowrap text-gray-600 font-[700]">{group.groupname}</p>
+              <p className="text-center whitespace-nowrap text-gray-600 font-[700]">
+                {group.groupname}
+              </p>
             </div>
           </Link>
         ))}

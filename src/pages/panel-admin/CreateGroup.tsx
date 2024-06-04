@@ -140,7 +140,7 @@ export default function CreateGroupPage() {
           Créer un groupe
         </h3>
       </div>
-      <form className="flex flex-col gap-4 w-[70%]" onSubmit={handleSubmit}>
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <div className="mt-5 flex flex-col justify-between">
           <h3 className="text-[25px] font-[800] text-gray-800">
             Informations du groupe
@@ -190,7 +190,7 @@ export default function CreateGroupPage() {
               </h3>
             </div>
             <table className="w-full text-left">
-              <thead className="border-y-[1px] border-gray-200 text-md font-[800] text-gray-700">
+              <thead className="bg-white border-y-[1px] border-gray-200 text-md font-[800] text-gray-700">
                 <tr>
                   <th scope="col" className="px-6 py-2 w-[5%]">
                     #
@@ -214,7 +214,7 @@ export default function CreateGroupPage() {
                   users.map((user) => (
                     <tr
                       key={user._id}
-                      className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap"
+                      className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 text-xs text-gray-800 whitespace-nowrap"
                     >
                       <td className="px-6 py-4 text-blue-600">
                         <input

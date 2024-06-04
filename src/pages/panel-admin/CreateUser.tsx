@@ -6,6 +6,7 @@ import useNotify from "../../utils/hooks/useToast";
 import Card from "../../components/Shared/Card";
 import { CircularProgress } from "@mui/material";
 import Button from "../../components/FormElements/Button";
+import { Eye } from "lucide-react";
 
 interface FormData {
   username: string;
@@ -23,6 +24,7 @@ interface AdditionalField {
 export default function CreateUserPage() {
   const [error, setError] = useState<string | null>("");
   const { notifySuccess, notifyError } = useNotify();
+  const [showPass, setShowPass] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
@@ -92,6 +94,7 @@ export default function CreateUserPage() {
     }
   };
 
+
   return (
     <section className="w-full h-screen bg-gray-100 p-7">
       <div>
@@ -99,10 +102,7 @@ export default function CreateUserPage() {
           Créer un utilisateur
         </h3>
       </div>
-      <form
-        className="flex flex-col gap-4 w-[70%]"
-        onSubmit={handleSubmit}
-      >
+      <form className="flex flex-col gap-4 w-[70%]" onSubmit={handleSubmit}>
         <div className="mt-5 flex flex-col justify-between">
           <div className="flex flex-col">
             <Input
@@ -130,18 +130,28 @@ export default function CreateUserPage() {
               required
               create
             />
-            <Input
-              element="input"
-              id="password"
-              type="password"
-              placeholder="Entrez votre mot de passe"
-              label="Mot de passe"
-              value={formData.password}
-              onChange={handleChange}
-              validators={[VALIDATOR_REQUIRE()]}
-              required
-              create
-            />
+            <div className="relative">
+              <div
+                className="absolute right-[-30px] top-[45px] translate-y-[50%] text-gray-500 hover:text-gray-400 cursor-pointer"
+                onMouseDown={() => setShowPass(true)}
+                onMouseUp={() => setShowPass(false)}
+                onMouseLeave={() => setShowPass(false)}
+              >
+                <Eye size={20} />
+              </div>
+              <Input
+                element="input"
+                id="password"
+                type={!showPass ? "password" : "text"}
+                placeholder="Entrez votre mot de passe"
+                label="Mot de passe"
+                value={formData.password}
+                onChange={handleChange}
+                validators={[VALIDATOR_REQUIRE()]}
+                required
+                create
+              />
+            </div>
             <Input
               element="select"
               id="authorization"
