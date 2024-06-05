@@ -1,13 +1,11 @@
 import { Avatar, Box, Divider, Stack } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import BarChart from "../components/Charts/BarCharts";
-import { CARD, GRAPH } from "../utils";
 import DoughnutChart from "../components/Charts/Dougnhuts";
 import SparkLineChart from "../components/Charts/LineCharts";
 import PointChart from "../components/Charts/PointChart";
 import Map from "../components/Shared/Map";
 import { Pause, Star, X } from "lucide-react";
-import Card from "../components/Shared/Card";
 import CardHome from "../components/Shared/CardHome";
 import { useProducts } from "../utils/hooks/useProducts";
 
@@ -43,6 +41,19 @@ interface SearchParams {
   subFamilyChoiceValue?: string;
 }
 
+interface CardType {
+  title: string;
+  subtitle: string;
+  data1: number[];
+  data2: number[];
+  labels: string[];
+  chartType: string;
+}
+
+const CARD: CardType[] = [
+  // Define your card data here
+];
+
 export default function Home() {
   const data1 = [12, 19, 14, 5, 16, 19];
   const data2 = [14, 16, 20, 5, 18, 22];
@@ -50,7 +61,7 @@ export default function Home() {
   const colors = ["#088F8F", "#6495ED", "#89CFF0"];
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalItem, setTotalItem] = useState(null);
+  const [totalItem, setTotalItem] = useState<number | null>(null);
   const limit = 10;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const [suppliers, setSuppliers] = useState<Suppliers[]>([]);
@@ -88,6 +99,24 @@ export default function Home() {
     }
   };
 
+  // Fictitious data for the new indicators
+  const indicatorsData = {
+    coefsInferior: [120, 150, 100, 90, 80],
+    priReferences: [300, 250, 200, 150, 100],
+    packReferences: [50, 70, 60, 90, 100],
+    priceChanges: {
+      increases: [30, 40, 20, 10, 5],
+      decreases: [10, 20, 15, 25, 30],
+    },
+    nonVisibleOnline: [60, 70, 80, 90, 100],
+    missingInfo: [20, 30, 40, 50, 60],
+    blockedProducts: [5, 10, 15, 20, 25],
+    nonReassort: [15, 25, 35, 45, 55],
+    unavailable10Days: [10, 20, 30, 40, 50],
+    unavailable15Days: [5, 15, 25, 35, 45],
+    tvaByProduct: [5.5, 10, 20],
+  };
+
   return (
     <>
       <section className="w-full bg-gray-100 p-8 flex border-b-[1px] border-gray-300">
@@ -108,7 +137,7 @@ export default function Home() {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-lg font-bold">57 new orders</span>
-                  <span className="text-xs">Awating processing</span>
+                  <span className="text-xs">Awaiting processing</span>
                 </div>
               </div>
               <div className="flex items-center gap-5">
@@ -117,7 +146,7 @@ export default function Home() {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-lg font-bold">57 new orders</span>
-                  <span className="text-xs">Awating processing</span>
+                  <span className="text-xs">Awaiting processing</span>
                 </div>
               </div>
               <div className="flex items-center gap-5">
@@ -126,7 +155,7 @@ export default function Home() {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-lg font-bold">57 new orders</span>
-                  <span className="text-xs">Awating processing</span>
+                  <span className="text-xs">Awaiting processing</span>
                 </div>
               </div>
             </div>
@@ -161,6 +190,7 @@ export default function Home() {
         <div className="w-1/2 flex flex-wrap justify-end gap-6">
           {CARD.map((card) => (
             <CardHome
+              key={card.title}
               title={card.title}
               subtitle={card.subtitle}
               data1={card.data1}
@@ -178,7 +208,7 @@ export default function Home() {
             Produits récemment crées
           </h4>
           <p className="text-[15px] text-gray-600">
-            Produits créé ces dernières 24 heures
+            Produits créés ces dernières 24 heures
           </p>
         </div>
 
@@ -208,7 +238,7 @@ export default function Home() {
             </thead>
             <tbody>
               {products?.products.map((product: Product) => (
-                <tr className="border-b">
+                <tr className="border-b" key={product._id}>
                   <td className="p-4">
                     <div className="flex items-center gap-2">
                       <span className="text-xs">{product.GA_CODEARTICLE}</span>
@@ -293,7 +323,7 @@ export default function Home() {
               </thead>
               <tbody>
                 {suppliers.map((supplier, i) => (
-                  <tr className="border-b">
+                  <tr className="border-b" key={supplier._id}>
                     <td className="p-2">
                       <span className="text-xs text-blue-600">
                         {supplier.T_TIERS}
@@ -317,6 +347,159 @@ export default function Home() {
         </div>
         <div className="w-1/2">
           <Map />
+        </div>
+      </section>
+
+      <section className="bg-white w-full p-8 border-b-[1px] border-gray-300">
+        <div className="flx flex-col">
+          <h4 className="text-[25px] font-bold text-gray-800">
+            Indicateurs des Produits
+          </h4>
+          <p className="text-[15px] text-gray-600">
+            Visualiser les différents indicateurs des produits
+          </p>
+        </div>
+
+        <div className="mt-8 grid grid-cols-2 gap-6">
+          <div className="bg-gray-100 p-6 rounded-lg">
+            <h5 className="text-[20px] font-bold text-gray-800 mb-4">
+              Références avec des coefs inférieurs à X
+            </h5>
+            <div style={{ width: '100%', height: '300px' }}>
+              <BarChart
+                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
+                data1={indicatorsData.coefsInferior}
+                // Ensure your BarChart component handles color internally or pass as needed
+              />
+            </div>
+          </div>
+          <div className="bg-gray-100 p-6 rounded-lg">
+            <h5 className="text-[20px] font-bold text-gray-800 mb-4">
+              Références en PRI
+            </h5>
+            <div style={{ width: '100%', height: '300px' }}>
+              <DoughnutChart
+                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
+                data={[indicatorsData.priReferences]}
+                // Ensure your DoughnutChart component handles color internally or pass as needed
+              />
+            </div>
+          </div>
+          <div className="bg-gray-100 p-6 rounded-lg">
+            <h5 className="text-[20px] font-bold text-gray-800 mb-4">
+              Références achetées en pack
+            </h5>
+            <div style={{ width: '100%', height: '300px' }}>
+              <PointChart
+                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
+                data1={indicatorsData.packReferences}
+                // Ensure your PointChart component handles color internally or pass as needed
+              />
+            </div>
+          </div>
+          <div className="bg-gray-100 p-6 rounded-lg">
+            <h5 className="text-[20px] font-bold text-gray-800 mb-4">
+              Hausses et baisses de prix
+            </h5>
+            <div style={{ width: '100%', height: '300px' }}>
+              <BarChart
+                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
+                data1={indicatorsData.priceChanges.increases}
+                title="Hausses de prix"
+                // Ensure your BarChart component handles color internally or pass as needed
+              />
+              <BarChart
+                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
+                data1={indicatorsData.priceChanges.decreases}
+                title="Baisses de prix"
+                // Ensure your BarChart component handles color internally or pass as needed
+              />
+            </div>
+          </div>
+          <div className="bg-gray-100 p-6 rounded-lg">
+            <h5 className="text-[20px] font-bold text-gray-800 mb-4">
+              Produits non visibles sur internet
+            </h5>
+            <div style={{ width: '100%', height: '300px' }}>
+              <DoughnutChart
+                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
+                data={[indicatorsData.nonVisibleOnline]}
+                // Ensure your DoughnutChart component handles color internally or pass as needed
+              />
+            </div>
+          </div>
+          <div className="bg-gray-100 p-6 rounded-lg">
+            <h5 className="text-[20px] font-bold text-gray-800 mb-4">
+              Produits sans photos ou sans texte
+            </h5>
+            <div style={{ width: '100%', height: '300px' }}>
+              <BarChart
+                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
+                data1={indicatorsData.missingInfo}
+                // Ensure your BarChart component handles color internally or pass as needed
+              />
+            </div>
+          </div>
+          <div className="bg-gray-100 p-6 rounded-lg">
+            <h5 className="text-[20px] font-bold text-gray-800 mb-4">
+              Produits bloqués
+            </h5>
+            <div style={{ width: '100%', height: '300px' }}>
+              <DoughnutChart
+                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
+                data={[indicatorsData.blockedProducts]}
+                // Ensure your DoughnutChart component handles color internally or pass as needed
+              />
+            </div>
+          </div>
+          <div className="bg-gray-100 p-6 rounded-lg">
+            <h5 className="text-[20px] font-bold text-gray-800 mb-4">
+              Produits en non réassort
+            </h5>
+            <div style={{ width: '100%', height: '300px' }}>
+              <BarChart
+                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
+                data1={indicatorsData.nonReassort}
+                // Ensure your BarChart component handles color internally or pass as needed
+              />
+            </div>
+          </div>
+          <div className="bg-gray-100 p-6 rounded-lg">
+            <h5 className="text-[20px] font-bold text-gray-800 mb-4">
+              Produits non dispo avant 10 jours
+            </h5>
+            <div style={{ width: '100%', height: '300px' }}>
+              <DoughnutChart
+                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
+                data={[indicatorsData.unavailable10Days]}
+                // Ensure your DoughnutChart component handles color internally or pass as needed
+              />
+            </div>
+          </div>
+          <div className="bg-gray-100 p-6 rounded-lg">
+            <h5 className="text-[20px] font-bold text-gray-800 mb-4">
+              Produits non dispo avant 15 jours
+            </h5>
+            <div style={{ width: '100%', height: '300px' }}>
+              <BarChart
+                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
+                data1={indicatorsData.unavailable15Days}
+                // Ensure your BarChart component handles color internally or pass as needed
+              />
+            </div>
+          </div>
+          <div className="bg-gray-100 p-6 rounded-lg">
+            <h5 className="text-[20px] font-bold text-gray-800 mb-4">
+              TVA par produits
+            </h5>
+            <div style={{ width: '100%', height: '300px' }}>
+              <DoughnutChart
+                labels={["5.5%", "10%", "20%"]}
+                data={[indicatorsData.tvaByProduct]}
+                // Ensure your DoughnutChart component handles color internally or pass as needed
+              />
+            </div>
+          </div>
         </div>
       </section>
     </>

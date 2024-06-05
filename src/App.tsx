@@ -65,9 +65,11 @@ function App() {
     <>
         {shouldShowNavbar && <Sidebar />}
         {shouldShowNavbar && <Navbar />}
+        
+        {isAuth ?
         <div className="ml-[250px] mt-[60px]">
           <Routes>
-            <Route path="/login" element={<LoginPage />} />
+            {/* <Route path="/login" element={<LoginPage />} /> */}
             <Route element={<PrivateRoute />}>
               <Route
                 path="/"
@@ -135,7 +137,12 @@ function App() {
               <Route path="/admin/create-user" element={<CreateUserPage />} />
             </Route>
           </Routes>
-        </div>
+        </div> 
+        : 
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+        </Routes> 
+        }
   
     </>
   );
