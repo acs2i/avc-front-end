@@ -1,10 +1,49 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Card from "../../components/Shared/Card";
 import { LINKCARD_DRAFT, PRODUCTS } from "../../utils/index";
 import { Divider } from "@mui/material";
 
+
+interface Draft {
+  creator_id: string;
+  description_ref: string;
+  reference: string;
+  designation_longue: string;
+  designation_courte: string;
+  marque: string;
+  collection: string;
+  description_brouillon: string;
+}
+
+
 export default function DraftPage() {
   const [page, setPage] = useState("draft");
+
+  // useEffect(() => {
+  //   fetchDraft();
+  // }, []);
+
+  // const fetchDraft = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       `${process.env.REACT_APP_URL_DEV}/api/v1/auth/all-users`,
+  //       {
+  //         method: "GET",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       }
+  //     );
+
+  //     const data = await response.json();
+  //     setUsers(data);
+  //   } catch (error) {
+  //     console.error("Erreur lors de la requête", error);
+  //   } finally {
+    
+  //   }
+  // };
+
   return (
     <section>
       <div className="w-full h-[300px] bg-gray-100 p-8">
