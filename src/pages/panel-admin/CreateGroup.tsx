@@ -65,10 +65,8 @@ export default function CreateGroupPage() {
     setFormData((prevFormData) => {
       const users = [...prevFormData.users];
       if (isChecked) {
-        // Ajouter l'id de l'utilisateur coché à l'objet formData
         users.push(userId);
       } else {
-        // Supprimer l'id de l'utilisateur décoché de l'objet formData
         const index = users.indexOf(userId);
         if (index > -1) {
           users.splice(index, 1);
