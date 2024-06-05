@@ -17,9 +17,9 @@ interface Grid {
 const UVCGrid: React.FC<UVCGridProps> = ({ onDimensionsChange }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [grids, setGrids] = useState<Grid[]>([]);
-  const [sizes, setSizes] = useState<string[]>([]);
-  const [colors, setColors] = useState<string[]>([]);
-  const [uvcGrid, setUvcGrid] = useState<boolean[][]>([]);
+  const [sizes, setSizes] = useState<string[]>(["0"]);
+  const [colors, setColors] = useState<string[]>(["0"]);
+  const [uvcGrid, setUvcGrid] = useState<boolean[][]>([[true]]);
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 20;
   const [totalItem, setTotalItem] = useState<number | null>(null);
@@ -51,16 +51,25 @@ const UVCGrid: React.FC<UVCGridProps> = ({ onDimensionsChange }) => {
     }
   }, [sizes, colors]);
 
+  const removePrefix = (data: string[], prefix: string) => {
+    const regex = new RegExp(`^${prefix}\\s*`, 'i');
+    return data.map(item => item.replace(regex, '').trim());
+  };
+
   const importSizes = (newSizes: string[]) => {
-    setSizes(newSizes);
-    const newGrid = colors.map(() => newSizes.map(() => true));
+    const cleanedSizes = removePrefix(newSizes, 'Taille');
+    setSizes(cleanedSizes);
+    const newGrid = colors.map(() => cleanedSizes.map(() => true));
     setUvcGrid(newGrid);
+    updateDimensions(newGrid);
   };
 
   const importColors = (newColors: string[]) => {
-    setColors(newColors);
-    const newGrid = newColors.map(() => sizes.map(() => true));
+    const cleanedColors = removePrefix(newColors, 'Couleur');
+    setColors(cleanedColors);
+    const newGrid = cleanedColors.map(() => sizes.map(() => true));
     setUvcGrid(newGrid);
+    updateDimensions(newGrid);
   };
 
   useEffect(() => {
