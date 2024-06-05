@@ -3,14 +3,12 @@ import Input from "../../components/FormElements/Input";
 import { useNavigate } from "react-router-dom";
 import { VALIDATOR_REQUIRE } from "../../utils/validator";
 import useNotify from "../../utils/hooks/useToast";
-import Card from "../../components/Shared/Card";
-import { Avatar, CircularProgress } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import Button from "../../components/FormElements/Button";
 import { Tooltip } from "@mui/material";
-import { X } from "lucide-react";
 import truncateText from "../../utils/func/Formattext";
 import Spinner from "../../components/Shared/Spinner";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 interface FormData {
   groupname: string;
@@ -39,7 +37,6 @@ export default function CreateGroupPage() {
   const [totalItem, setTotalItem] = useState(null);
   const limit = 20;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
-  const [dropdownIsOpen, setDropdownIsOpen] = useState(false);
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
     groupname: "",
@@ -132,7 +129,7 @@ export default function CreateGroupPage() {
 
 
   return (
-    <section className="w-full h-screen bg-gray-100 p-7">
+    <section className="w-full bg-gray-100 p-7">
       <div>
         <h3 className="text-[32px] font-[800] text-gray-800">
           Créer un groupe

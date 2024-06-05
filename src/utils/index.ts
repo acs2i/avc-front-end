@@ -51,58 +51,8 @@ export const LINKS: Link[] = [
         linksGroup: [
           {
             name: "Tableau de bord",
-            group: [
-              {
-                name: "Admin",
-                linksGroup: [
-                  {
-                    name: "Add product",
-                    link: "/apps/add-product",
-                  },
-                  {
-                    name: "Products",
-                    link: "/apps/products",
-                  },
-                  {
-                    name: "Customers",
-                    link: "/",
-                  },
-                  {
-                    name: "Customers details",
-                    link: "/",
-                  },
-                  {
-                    name: "Refund",
-                    link: "/",
-                  },
-                ],
-              },
-              {
-                name: "Customer",
-                linksGroup: [
-                  {
-                    name: "Homepage",
-                    link: "/",
-                  },
-                  {
-                    name: "Product details",
-                    link: "/",
-                  },
-                  {
-                    name: "Product filter",
-                    link: "/",
-                  },
-                  {
-                    name: "Checkout",
-                    link: "/",
-                  },
-                  {
-                    name: "Shipping info",
-                    link: "/",
-                  },
-                ],
-              },
-            ],
+            link: "/",
+            linksGroup: [],
             icon: BarChart2,
           },
           {

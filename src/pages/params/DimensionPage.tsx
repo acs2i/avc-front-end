@@ -142,12 +142,13 @@ export default function DimensionPage() {
               <th scope="col" className="px-6 py-2 w-1/3">
                 Type
               </th>
-              <th scope="col" className="px-6 py-2 w-1/3">
-                Libellé
-              </th>
               <th scope="col" className="px-6 py-2 w-[10%]">
                 Code
               </th>
+              <th scope="col" className="px-6 py-2 w-1/3">
+                Libellé
+              </th>
+             
             </tr>
           </thead>
           <tbody>
@@ -165,8 +166,8 @@ export default function DimensionPage() {
                       ? typeLabels[dimension.GDI_TYPEDIM]
                       : "Type inconnu"}
                   </td>
-                  <td className="px-6 py-4">{dimension.GDI_LIBELLE}</td>
                   <td className="px-6 py-4">{dimension.GDI_DIMORLI}</td>
+                  <td className="px-6 py-4">{dimension.GDI_LIBELLE}</td>
                 </tr>
               ))
             ) : (

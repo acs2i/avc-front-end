@@ -8,6 +8,11 @@ import { ImageUp } from "lucide-react";
 import Button from "../../components/FormElements/Button";
 import useNotify from "../../utils/hooks/useToast";
 import { CircularProgress } from "@mui/material";
+import { useFamilies } from "../../utils/hooks/useFamilies";
+import { ActionMeta, SingleValue } from "react-select";
+import CreatableSelect from "react-select/creatable";
+import useFetch from "../../utils/hooks/usefetch";
+import UVCGrid from "../../components/UVCGrid";
 
 interface FormData {
   creator_id: string;
@@ -15,25 +20,121 @@ interface FormData {
   reference: string;
   designation_longue: string;
   designation_courte: string;
-  marque: string;
+  supplier_name: string;
+  supplier_ref: string;
+  family: string[];
+  subFamily: string[];
+  dimension_type: string;
+  dimension: string[];
+  brand: string;
   collection: string;
+  composition: string;
   description_brouillon: string;
 }
 
+type Family = {
+  _id: string;
+  YX_TYPE: string;
+  YX_CODE: string;
+  YX_LIBELLE: string;
+};
+
+type FamilyOption = {
+  value: string;
+  label: string;
+};
+
+type BrandOption = {
+  value: string;
+  label: string;
+  YX_CODE: string;
+  YX_LIBELLE: string;
+};
+
+type CollectionOption = {
+  value: string;
+  label: string;
+  CODE: string;
+  LIBELLE: string;
+};
+
+const customStyles = {
+  control: (provided: any) => ({
+    ...provided,
+    border: "none", // Supprimer la bordure
+    boxShadow: "none",
+    borderRadius: "10px", // Ajouter une bordure arrondie
+    "&:hover": {
+      border: "none", // Assurez-vous que la bordure n'apparaît pas au survol
+    },
+  }),
+  option: (provided: any, state: any) => ({
+    ...provided,
+    borderBottom: "1px solid #e5e5e5",
+    backgroundColor: state.isSelected ? "#e5e5e5" : "white",
+    color: state.isSelected ? "black" : "gray",
+    "&:hover": {
+      backgroundColor: "#e5e5e5",
+      color: "black",
+    },
+  }),
+  singleValue: (provided: any) => ({
+    ...provided,
+    color: "gray",
+  }),
+};
+
 export default function CreateProductPage() {
   const creatorId = useSelector((state: any) => state.auth.user);
+
   const { notifySuccess, notifyError } = useNotify();
   const [isLoading, setIsLoading] = useState(false);
+  const [familyValue, setFamilyValue] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [inputValueFamily, setInputValueFamily] = useState("");
+  const [inputSubValueFamily, setInputSubValueFamily] = useState("");
+  const [inputValueBrand, setInputValueBrand] = useState("");
+  const [inputValueCollection, setInputValueCollection] = useState("");
+  const [selectedOptionFamily, setSelectedOptionFamily] =
+    useState<SingleValue<FamilyOption> | null>(null);
+  const [selectedOptionSubFamily, setSelectedOptionSubFamily] =
+    useState<SingleValue<FamilyOption> | null>(null);
+  const [selectedOptionBrand, setSelectedOptionBrand] =
+    useState<SingleValue<BrandOption> | null>(null);
+  const [selectedOptionCollection, setSelectedOptionCollection] =
+    useState<SingleValue<CollectionOption> | null>(null);
+  const [optionsFamily, setOptionsFamily] = useState<FamilyOption[]>([]);
+  const [optionsSubFamily, setOptionsSubFamily] = useState<FamilyOption[]>([]);
+  const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
+  const [optionsCollection, setOptionsCollection] = useState<
+    CollectionOption[]
+  >([]);
+  const dimensionsOptions = [
+    {
+      value: "Taille/Couleur",
+      label: "Taille/Couleur",
+      name: "Taille/Couleur",
+    },
+  ];
+  const limit = 10;
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState<FormData>({
     creator_id: creatorId._id,
     description_ref: "",
     reference: "",
     designation_longue: "",
     designation_courte: "",
-    marque: "",
+    supplier_name: "",
+    supplier_ref: "",
+    family: [],
+    subFamily: [],
+    dimension_type: "",
+    brand: "",
     collection: "",
     description_brouillon: "",
+    dimension: [],
+    composition: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,6 +146,278 @@ export default function CreateProductPage() {
           ? e.target.value.substring(0, 15)
           : formData.designation_courte,
     });
+  };
+
+  const handleChangeBrand = (selectedOption: SingleValue<BrandOption>) => {
+    const brandLabel = selectedOption ? selectedOption.label : "";
+    setSelectedOptionBrand(selectedOption);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      brand: brandLabel,
+    }));
+  };
+
+  const handleChangeCollection = (
+    selectedOption: SingleValue<CollectionOption>
+  ) => {
+    const collectionLabel = selectedOption ? selectedOption.label : "";
+    setSelectedOptionCollection(selectedOption);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      productCollection: collectionLabel,
+    }));
+  };
+
+  const handleChangeFamily = (newValue: SingleValue<FamilyOption> | null) => {
+    setSelectedOptionFamily(newValue);
+
+    if (newValue) {
+      setFormData({
+        ...formData,
+        family: [newValue.value],
+      });
+    } else {
+      setFormData({
+        ...formData,
+        family: [],
+      });
+    }
+  };
+
+  const handleChangeSubFamily = (
+    newValue: SingleValue<FamilyOption> | null
+  ) => {
+    setSelectedOptionSubFamily(newValue);
+
+    if (newValue) {
+      setFormData({
+        ...formData,
+        subFamily: [newValue.value],
+      });
+    } else {
+      setFormData({
+        ...formData,
+        subFamily: [],
+      });
+    }
+  };
+
+   const handleGridChange = (grid: string[][]) => {
+    // Flatten the grid and join color and size
+    const flattenedGrid = grid.flat();
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      dimension: flattenedGrid,
+    }));
+  };
+
+  const handleInputChangeBrand = async (inputValueBrand: string) => {
+    setInputValueBrand(inputValueBrand);
+
+    if (inputValueBrand === "") {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/brand`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+
+        const optionsBrand = data.data?.map((brand: BrandOption) => ({
+          value: brand.YX_LIBELLE,
+          label: brand.YX_LIBELLE,
+        }));
+
+        setOptionsBrand(optionsBrand);
+      } catch (error) {
+        console.error("Erreur lors de la requête", error);
+      }
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/brand/search?YX_LIBELLE=${inputValueBrand}&page=${currentPage}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+
+      const optionsBrand = data.data?.map((brand: BrandOption) => ({
+        value: brand.YX_LIBELLE,
+        label: brand.YX_LIBELLE,
+      }));
+
+      setOptionsBrand(optionsBrand);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
+  const handleInputChangeCollection = async (inputValueCollection: string) => {
+    setInputValueCollection(inputValueCollection);
+
+    // console.log(inputValue);
+    if (inputValueCollection === "") {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/collection`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+
+        const optionsCollection = data.data?.map(
+          (collection: CollectionOption) => ({
+            value: collection.LIBELLE,
+            label: collection.LIBELLE,
+          })
+        );
+
+        setOptionsCollection(optionsCollection);
+      } catch (error) {
+        console.error("Erreur lors de la requête", error);
+      }
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/collection/search?LIBELLE=${inputValueCollection}&page=${currentPage}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+
+      const optionsCollection = data.data?.map(
+        (collection: CollectionOption) => ({
+          value: collection.LIBELLE,
+          label: collection.LIBELLE,
+        })
+      );
+
+      setOptionsCollection(optionsCollection);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
+  const handleInputChangeFamily = async (inputValueFamily: string) => {
+    setInputValueFamily(inputValueFamily);
+
+    if (inputValueFamily === "") {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/family`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+
+        const optionsFamily = data.data?.map((family: Family) => ({
+          value: family.YX_LIBELLE,
+          label: family.YX_LIBELLE,
+        }));
+
+        setOptionsFamily(optionsFamily);
+      } catch (error) {
+        console.error("Erreur lors de la requête", error);
+      }
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/family/search?YX_LIBELLE=${inputValueFamily}&page=${currentPage}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+
+      const optionsFamily = data.data?.map((family: Family) => ({
+        value: family.YX_LIBELLE,
+        label: family.YX_LIBELLE,
+      }));
+
+      setOptionsFamily(optionsFamily);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
+  const handleInputChangeSubFamily = async (inputValueSubFamily: string) => {
+    setInputSubValueFamily(inputValueSubFamily);
+
+    if (inputValueSubFamily === "") {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/family/search?YX_LIBELLE=""&page=${currentPage}&limit=${limit}&YX_TYPE=LA2`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+
+        const optionsSubFamily = data.data?.map((family: Family) => ({
+          value: family.YX_LIBELLE,
+          label: family.YX_LIBELLE,
+        }));
+
+        setOptionsSubFamily(optionsSubFamily);
+      } catch (error) {
+        console.error("Erreur lors de la requête", error);
+      }
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/family/search?YX_LIBELLE=${inputValueSubFamily}&page=${currentPage}&limit=${limit}&YX_TYPE=LA2`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+
+      const optionsSubFamily = data.data?.map((family: Family) => ({
+        value: family.YX_LIBELLE,
+        label: family.YX_LIBELLE,
+      }));
+
+      setOptionsSubFamily(optionsSubFamily);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -70,12 +443,15 @@ export default function CreateProductPage() {
         }, 1000);
       } else {
         notifyError("Erreur lors de la création !");
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Erreur lors de la requête", error);
+      setIsLoading(false);
     }
   };
 
+  console.log(formData);
 
   return (
     <section className="w-full h-screen bg-gray-100 p-7">
@@ -83,7 +459,12 @@ export default function CreateProductPage() {
         <h3 className="text-[32px] font-[800] text-gray-800">
           Créer un article
         </h3>
-        <p className="text-[17px] text-gray-600">Lorem ipsum dolor sit amet</p>
+        {creatorId && (
+          <p className="text-[17px] text-gray-600 italic">
+            Création par{" "}
+            <span className="font-[600]">{creatorId.username}</span>
+          </p>
+        )}
       </div>
       <form onSubmit={handleSubmit}>
         <div className="flex gap-7 mt-[50px]">
@@ -137,9 +518,10 @@ export default function CreateProductPage() {
               </div>
               <Input
                 element="input"
-                id="supplier"
+                id="supplier_name"
                 label="Nom :"
-                value=""
+                value={formData.supplier_name}
+                onChange={handleChange}
                 validators={[]}
                 placeholder="Ajouter la référence du produit"
                 create
@@ -147,15 +529,24 @@ export default function CreateProductPage() {
               />
               <Input
                 element="input"
-                id="reference"
+                id="supplier_ref"
                 label="Référence produit :"
-                value=""
+                value={formData.supplier_ref}
+                onChange={handleChange}
                 validators={[]}
                 placeholder="Ajouter la designation du produit"
                 create
                 gray
               />
             </div>
+            {/* Section Grille de dimension */}
+            <div className="mt-3">
+              <UVCGrid
+                onDimensionsChange={handleGridChange}
+              />
+            </div>
+
+            {/* Section Image */}
             <div className="mt-3">
               <h3 className="text-[22px] font-[800] text-gray-800">
                 Ajouter une image
@@ -178,64 +569,86 @@ export default function CreateProductPage() {
           <div className="w-[30%] flex flex-col gap-5">
             <Card title="Classification principale">
               <div className="flex flex-col gap-3">
-                <Input
-                  element="select"
-                  id="family"
-                  label="Famille :"
-                  value=""
-                  validators={[]}
-                  placeholder="Selectionnez un famille"
-                  gray
-                />
-                <Input
-                  element="select"
-                  id="family"
-                  label="Sous-famille :"
-                  value=""
-                  validators={[]}
-                  placeholder="Selectionnez une sous-famille"
-                  gray
-                />
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Famille
+                  </label>
+                  <CreatableSelect<FamilyOption>
+                    value={selectedOptionFamily}
+                    onChange={handleChangeFamily}
+                    onInputChange={handleInputChangeFamily}
+                    inputValue={inputValueFamily}
+                    options={optionsFamily}
+                    placeholder="Selectionner une famille"
+                    styles={customStyles}
+                    className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Sous-famille
+                  </label>
+                  <CreatableSelect<FamilyOption>
+                    value={selectedOptionSubFamily}
+                    onChange={handleChangeSubFamily}
+                    onInputChange={handleInputChangeSubFamily}
+                    inputValue={inputSubValueFamily}
+                    options={optionsSubFamily}
+                    placeholder="Selectionner une sous-famille"
+                    styles={customStyles}
+                    className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                    required
+                  />
+                </div>
               </div>
             </Card>
             <Card title="Caractéristiques du produit">
               <div className="flex flex-col gap-3">
                 <Input
                   element="select"
-                  id="dimension"
-                  label="Dimensions :"
-                  value=""
+                  id="dimension_type"
+                  label="Type de dimension :"
+                  value={formData.dimension_type}
+                  options={dimensionsOptions}
+                  onChange={handleChange}
                   validators={[]}
-                  placeholder="Selectionnez une dimension"
+                  placeholder="Selectionnez un type de dimension"
                   gray
                 />
-                <Input
-                  element="select"
-                  id="composition"
-                  label="Composition :"
-                  value=""
-                  validators={[]}
-                  placeholder="Selectionnez une composition"
-                  gray
-                />
-                <Input
-                  element="select"
-                  id="collection"
-                  label="Collection :"
-                  value=""
-                  validators={[]}
-                  placeholder="Selectionnez une collection"
-                  gray
-                />
-                <Input
-                  element="select"
-                  id="theme"
-                  label="Thème :"
-                  value=""
-                  validators={[]}
-                  placeholder="Selectionnez un thème"
-                  gray
-                />
+
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Marque
+                  </label>
+                  <CreatableSelect<BrandOption>
+                    value={selectedOptionBrand}
+                    onChange={handleChangeBrand}
+                    onInputChange={handleInputChangeBrand}
+                    inputValue={inputValueBrand}
+                    options={optionsBrand}
+                    placeholder="Selectionner une marque"
+                    styles={customStyles}
+                    className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Collection
+                  </label>
+                  <CreatableSelect<CollectionOption>
+                    value={selectedOptionCollection}
+                    onChange={handleChangeCollection}
+                    onInputChange={handleInputChangeCollection}
+                    inputValue={inputValueCollection}
+                    options={optionsCollection}
+                    placeholder="Selectionner une collection"
+                    styles={customStyles}
+                    className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                    required
+                  />
+                </div>
               </div>
             </Card>
           </div>
