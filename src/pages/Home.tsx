@@ -8,6 +8,7 @@ import Map from "../components/Shared/Map";
 import { Pause, Star, X } from "lucide-react";
 import CardHome from "../components/Shared/CardHome";
 import { useProducts } from "../utils/hooks/useProducts";
+import { CARD, GRAPH } from "../utils";
 
 interface Suppliers {
   _id: string;
@@ -50,9 +51,7 @@ interface CardType {
   chartType: string;
 }
 
-const CARD: CardType[] = [
-  // Define your card data here
-];
+
 
 export default function Home() {
   const data1 = [12, 19, 14, 5, 16, 19];
