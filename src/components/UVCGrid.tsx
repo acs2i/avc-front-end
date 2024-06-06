@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Palette, Ruler } from "lucide-react";
+import { Palette, Plus, Ruler } from "lucide-react";
 import Button from "./FormElements/Button";
 import Modal from "./Shared/Modal";
 
@@ -36,10 +36,11 @@ const UVCGrid: React.FC<UVCGridProps> = ({ onDimensionsChange }) => {
   };
 
   const updateDimensions = (grid: boolean[][]) => {
-    const dimensions = grid
-      .map((row, i) =>
-        row.map((col, j) => (col ? `${colors[i]},${sizes[j]}` : '')).filter(Boolean)
-      );
+    const dimensions = grid.map((row, i) =>
+      row
+        .map((col, j) => (col ? `${colors[i]},${sizes[j]}` : ""))
+        .filter(Boolean)
+    );
     onDimensionsChange(dimensions);
   };
 
@@ -52,24 +53,64 @@ const UVCGrid: React.FC<UVCGridProps> = ({ onDimensionsChange }) => {
   }, [sizes, colors]);
 
   const removePrefix = (data: string[], prefix: string) => {
-    const regex = new RegExp(`^${prefix}\\s*`, 'i');
-    return data.map(item => item.replace(regex, '').trim());
+    const regex = new RegExp(`^${prefix}\\s*`, "i");
+    return data.map((item) => item.replace(regex, "").trim());
   };
 
   const importSizes = (newSizes: string[]) => {
-    const cleanedSizes = removePrefix(newSizes, 'Taille');
-    setSizes(cleanedSizes);
-    const newGrid = colors.map(() => cleanedSizes.map(() => true));
+    const cleanedSizes = removePrefix(newSizes, "Taille");
+    const updatedSizes = [...sizes, ...cleanedSizes];
+    const uniqueSizes = Array.from(new Set(updatedSizes)); // Remove duplicates
+  
+    setSizes(uniqueSizes);
+  
+    const newGrid = colors.map((_, colorIndex) =>
+      uniqueSizes.map((size, sizeIndex) => uvcGrid[colorIndex]?.[sizeIndex] ?? true)
+    );
     setUvcGrid(newGrid);
     updateDimensions(newGrid);
   };
 
   const importColors = (newColors: string[]) => {
-    const cleanedColors = removePrefix(newColors, 'Couleur');
-    setColors(cleanedColors);
-    const newGrid = cleanedColors.map(() => sizes.map(() => true));
+    const cleanedColors = removePrefix(newColors, "Couleur");
+    const updatedColors = [...colors, ...cleanedColors];
+    const uniqueColors = Array.from(new Set(updatedColors)); // Remove duplicates
+  
+    setColors(uniqueColors);
+  
+    const newGrid = uniqueColors.map((_, colorIndex) =>
+      sizes.map((size, sizeIndex) => uvcGrid[colorIndex]?.[sizeIndex] ?? true)
+    );
     setUvcGrid(newGrid);
     updateDimensions(newGrid);
+  };
+
+  const addNewColor = () => {
+    const newColors = [...colors, ""];
+    const newGrid = [...uvcGrid, sizes.map(() => true)];
+    setColors(newColors);
+    setUvcGrid(newGrid);
+    updateDimensions(newGrid);
+  };
+
+  const addNewSize = () => {
+    const newSizes = [...sizes, ""];
+    const newGrid = uvcGrid.map((row) => [...row, true]);
+    setSizes(newSizes);
+    setUvcGrid(newGrid);
+    updateDimensions(newGrid);
+  };
+
+  const handleColorChange = (index: number, value: string) => {
+    const newColors = colors.map((color, i) => (i === index ? value : color));
+    setColors(newColors);
+    updateDimensions(uvcGrid);
+  };
+
+  const handleSizeChange = (index: number, value: string) => {
+    const newSizes = sizes.map((size, i) => (i === index ? value : size));
+    setSizes(newSizes);
+    updateDimensions(uvcGrid);
   };
 
   useEffect(() => {
@@ -192,7 +233,7 @@ const UVCGrid: React.FC<UVCGridProps> = ({ onDimensionsChange }) => {
           type="button"
         >
           <Ruler size={17} />
-          Importer une grille de tailles
+          Associer une grille de tailles
         </Button>
         <Button
           size="small"
@@ -201,11 +242,19 @@ const UVCGrid: React.FC<UVCGridProps> = ({ onDimensionsChange }) => {
           type="button"
         >
           <Palette size={17} />
-          Importer une grille de couleurs
+          Associer une grille de couleurs
+        </Button>
+        <Button size="small" green onClick={addNewSize} type="button">
+          <Plus size={17} />
+          Ajouter une taille
+        </Button>
+        <Button size="small" green onClick={addNewColor} type="button">
+          <Plus size={17} />
+          Ajouter une couleur
         </Button>
       </div>
-      <div className="overflow-x-auto bg-white">
-        <table className="w-full mx-auto border">
+      <div className="overflow-x-auto">
+        <table className="w-full mx-auto border bg-white">
           <thead className="bg-gray-100 text-sm text-gray-600 border border-solid border-gray-300">
             <tr>
               <th
@@ -220,20 +269,37 @@ const UVCGrid: React.FC<UVCGridProps> = ({ onDimensionsChange }) => {
                   scope="col"
                   className="px-6 py-2 text-center border border-solid border-gray-300 border-b"
                 >
-                  {size}
+                  <input
+                    type="text"
+                    value={size}
+                    onChange={(e) => handleSizeChange(index, e.target.value)}
+                    className="w-full text-center bg-gray-100 focus:outline-none"
+                  />
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="text-center text-xs">
+          <tbody className="relative text-center text-xs">
             {colors.map((color, colorIndex) => (
               <tr
                 key={colorIndex}
-                className="border text-gray-700 hover:bg-slate-200 cursor-pointer"
+                className="border text-gray-700 cursor-pointer"
               >
-                <td className="py-2 px-2 border">{color}</td>
+                <td className="min-w-[200px] py-2 px-2 border">
+                  <input
+                    type="text"
+                    value={color}
+                    onChange={(e) =>
+                      handleColorChange(colorIndex, e.target.value)
+                    }
+                    className="w-full text-center bg-white focus:outline-none"
+                  />
+                </td>
                 {sizes.map((size, sizeIndex) => (
-                  <td key={sizeIndex} className="py-2 px-2 border">
+                  <td
+                    key={sizeIndex}
+                    className="min-w-[200px] py-2 px-2 border"
+                  >
                     <input
                       type="checkbox"
                       checked={uvcGrid[colorIndex][sizeIndex]}

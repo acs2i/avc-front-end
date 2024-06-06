@@ -20,7 +20,7 @@ export default function Header({
     <div
   className="w-full h-[300px] bg-image bg-cover bg-center relative"
   style={{
-    backgroundImage: `url(${"/img/background_2.jpg"})`,
+    backgroundImage: `url(${"/img/background_forest.jpg"})`,
     backgroundPosition: '50% 90%',
     backgroundSize: 'cover',
   }}

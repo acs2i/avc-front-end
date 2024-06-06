@@ -415,7 +415,7 @@ export default function ProductList() {
 
             {!isLoading ? (
               <div>
-                <Button type="submit" size="small" gray>
+                <Button type="submit" size="small" blue>
                   Lancer la Recherche
                 </Button>
               </div>

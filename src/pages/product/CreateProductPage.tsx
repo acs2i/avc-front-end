@@ -15,7 +15,7 @@ import useFetch from "../../utils/hooks/usefetch";
 import UVCGrid from "../../components/UVCGrid";
 
 interface FormData {
-  creator_id: string;
+  creator_id: any;
   description_ref: string;
   reference: string;
   designation_longue: string;
@@ -27,7 +27,7 @@ interface FormData {
   dimension_type: string;
   dimension: string[];
   brand: string;
-  collection: string;
+  ref_collection: string;
   composition: string;
   description_brouillon: string;
 }
@@ -131,7 +131,7 @@ export default function CreateProductPage() {
     subFamily: [],
     dimension_type: "",
     brand: "",
-    collection: "",
+    ref_collection: "",
     description_brouillon: "",
     dimension: [],
     composition: "",
@@ -164,7 +164,7 @@ export default function CreateProductPage() {
     setSelectedOptionCollection(selectedOption);
     setFormData((prevFormData) => ({
       ...prevFormData,
-      productCollection: collectionLabel,
+      ref_collection: collectionLabel,
     }));
   };
 
@@ -451,10 +451,11 @@ export default function CreateProductPage() {
     }
   };
 
-  console.log(formData);
+  console.log(formData)
+ 
 
   return (
-    <section className="w-full h-screen bg-gray-100 p-7">
+    <section className="w-full bg-gray-100 p-7">
       <div>
         <h3 className="text-[32px] font-[800] text-gray-800">
           Créer un article
@@ -466,7 +467,7 @@ export default function CreateProductPage() {
           </p>
         )}
       </div>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="mb-[400px]">
         <div className="flex gap-7 mt-[50px]">
           <div className="w-[70%] flex flex-col gap-3">
             <div className="relative border p-3 ">
@@ -482,7 +483,6 @@ export default function CreateProductPage() {
                 validators={[]}
                 placeholder="Ajouter la référence du produit"
                 create
-                required
                 gray
               />
               <Input
@@ -494,7 +494,6 @@ export default function CreateProductPage() {
                 validators={[]}
                 placeholder="Ajouter la designation du produit"
                 create
-                required
                 gray
               />
               <Input
@@ -506,7 +505,6 @@ export default function CreateProductPage() {
                 validators={[]}
                 placeholder=""
                 create
-                required
                 gray
               />
             </div>
@@ -540,11 +538,11 @@ export default function CreateProductPage() {
               />
             </div>
             {/* Section Grille de dimension */}
-            <div className="mt-3">
+            {formData.dimension_type !== "" && <div className="mt-3">
               <UVCGrid
                 onDimensionsChange={handleGridChange}
               />
-            </div>
+            </div>}
 
             {/* Section Image */}
             <div className="mt-3">

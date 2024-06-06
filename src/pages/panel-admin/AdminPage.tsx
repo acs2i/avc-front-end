@@ -121,18 +121,18 @@ export default function AdminPage() {
       </Header>
       <div className="relative overflow-x-auto">
         <table className="w-full text-left">
-          <thead className="border-y-[1px] border-gray-200 text-md font-[800] text-gray-700">
+          <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
             <tr>
-              <th scope="col" className="px-6 py-2 w-1/4">
+              <th scope="col" className="px-6 py-2 w-[10%]">
                 Nom d'utilisateur
               </th>
-              <th scope="col" className="px-6 py-2 w-1/4">
+              <th scope="col" className="px-6 py-2 w-[15%]">
                 Email
               </th>
               <th scope="col" className="px-6 py-2 w-[5%]">
                 Autorisations
               </th>
-              <th scope="col" className="px-6 py-2 w-1/4">
+              <th scope="col" className="px-6 py-2 w-[15%]">
                 Commentaires
               </th>
             </tr>
@@ -142,7 +142,7 @@ export default function AdminPage() {
               users.map((user) => (
                 <tr
                   key={user._id}
-                  className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap"
+                  className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 text-[10px] text-gray-800 even:bg-slate-50 whitespace-nowrap"
                 >
                   <td className="px-6 py-4 text-blue-600">{user.username}</td>
                   <td className="px-6 py-4">{user.email}</td>
@@ -156,9 +156,9 @@ export default function AdminPage() {
                         user.authorization === "user" && "bg-orange-200 border border-orange-500 text-orange-700"
                       } ${
                         !user.authorization && "bg-gray-200 border border-gray-500 text-gray-700"
-                      } px-3 py-1 rounded-md`}
+                      } px-1 rounded-[3px]`}
                     >
-                      <span>
+                      <span className="text-[8px]">
                         {user.authorization ? user.authorization : "NC"}
                       </span>
                     </div>

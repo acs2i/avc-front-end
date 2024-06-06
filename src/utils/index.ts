@@ -102,56 +102,6 @@ export const LINKS: Link[] = [
             icon: Factory,
           },
           {
-            name: "Email",
-            linksGroup: [
-              {
-                name: "Inbox",
-                link: "/",
-              },
-              {
-                name: "Email details",
-                link: "/",
-              },
-              {
-                name: "Compose",
-                link: "/",
-              },
-            ],
-            icon: Mail,
-          },
-          {
-            name: "Events",
-            linksGroup: [
-              {
-                name: "Create an event",
-                link: "/",
-              },
-              {
-                name: "Event detail",
-                link: "/",
-              },
-            ],
-            icon: Bookmark,
-          },
-          {
-            name: "Kanban",
-            linksGroup: [
-              {
-                name: "Kanban",
-                link: "/",
-              },
-              {
-                name: "Boards",
-                link: "/",
-              },
-              {
-                name: "Create Board",
-                link: "/",
-              },
-            ],
-            icon: BarChart,
-          },
-          {
             name: "Social",
             linksGroup: [
               {
@@ -166,7 +116,8 @@ export const LINKS: Link[] = [
             icon: Share2,
           },
           {
-            name: "Calendar",
+            name: "Calendrier",
+            link: "/calendar",
             linksGroup: [],
             icon: CalendarDays,
           },
