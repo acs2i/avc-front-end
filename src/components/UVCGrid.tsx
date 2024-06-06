@@ -61,11 +61,13 @@ const UVCGrid: React.FC<UVCGridProps> = ({ onDimensionsChange }) => {
     const cleanedSizes = removePrefix(newSizes, "Taille");
     const updatedSizes = [...sizes, ...cleanedSizes];
     const uniqueSizes = Array.from(new Set(updatedSizes)); // Remove duplicates
-  
+
     setSizes(uniqueSizes);
-  
+
     const newGrid = colors.map((_, colorIndex) =>
-      uniqueSizes.map((size, sizeIndex) => uvcGrid[colorIndex]?.[sizeIndex] ?? true)
+      uniqueSizes.map(
+        (size, sizeIndex) => uvcGrid[colorIndex]?.[sizeIndex] ?? true
+      )
     );
     setUvcGrid(newGrid);
     updateDimensions(newGrid);
@@ -75,9 +77,9 @@ const UVCGrid: React.FC<UVCGridProps> = ({ onDimensionsChange }) => {
     const cleanedColors = removePrefix(newColors, "Couleur");
     const updatedColors = [...colors, ...cleanedColors];
     const uniqueColors = Array.from(new Set(updatedColors)); // Remove duplicates
-  
+
     setColors(uniqueColors);
-  
+
     const newGrid = uniqueColors.map((_, colorIndex) =>
       sizes.map((size, sizeIndex) => uvcGrid[colorIndex]?.[sizeIndex] ?? true)
     );
@@ -184,20 +186,40 @@ const UVCGrid: React.FC<UVCGridProps> = ({ onDimensionsChange }) => {
             <h4 className="text-[18px] font-[700] text-gray-700">
               Choisissez une grille de tailles :
             </h4>
-            <ul className="grid grid-cols-5 gap-2 mt-3">
-              {grids
-                .filter((grid) => grid.TYPE === "Taille")
-                .map((grid) => (
-                  <li
-                    key={grid._id}
-                    className="bg-green-100 text-green-600 border border-green-600 rounded-lg text-center py-3 hover:bg-green-100 cursor-pointer"
-                  >
-                    <button onClick={() => handleImportSizes(grid._id)}>
-                      {grid.LIBELLE}
-                    </button>
-                  </li>
-                ))}
-            </ul>
+            <div className="relative overflow-x-auto bg-white">
+              <table className="w-full text-left">
+                <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
+                  <tr>
+                    <th scope="col" className="px-6 py-2 w-1/2">
+                      Libellé
+                    </th>
+                    <th scope="col" className="px-6 py-2 w-1/2">
+                      Dimensions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {grids
+                    .filter((grid) => grid.TYPE === "Taille")
+                    .map((grid) => (
+                      <tr
+                        key={grid._id}
+                        className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap"
+                        onClick={() => handleImportSizes(grid._id)}
+                      >
+                        <td className="px-6 py-4">{grid.LIBELLE}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center flex-wrap gap-2">
+                            {grid.DIMENSIONS.map((dimension) => (
+                              <span className="bg-orange-200 w-[30px] h-[30px] rounded-full flex items-center justify-center text-gray-800">{removePrefix([dimension], "Taille")}</span>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
         {showColorGridOptions && (
@@ -205,20 +227,40 @@ const UVCGrid: React.FC<UVCGridProps> = ({ onDimensionsChange }) => {
             <h4 className="text-[18px] font-[700] text-gray-700">
               Choisissez une grille de couleurs :
             </h4>
-            <ul className="grid grid-cols-5 gap-2 mt-3">
-              {grids
-                .filter((grid) => grid.TYPE === "Couleur")
-                .map((grid) => (
-                  <li
-                    key={grid._id}
-                    className="bg-orange-100 text-orange-600 border border-orange-600 rounded-lg text-center py-3 hover:bg-orange-100 cursor-pointer"
-                  >
-                    <button onClick={() => handleImportColors(grid._id)}>
-                      {grid.LIBELLE}
-                    </button>
-                  </li>
-                ))}
-            </ul>
+            <div className="relative overflow-x-auto bg-white">
+              <table className="w-full text-left">
+                <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
+                  <tr>
+                    <th scope="col" className="px-6 py-2 w-1/2">
+                      Libellé
+                    </th>
+                    <th scope="col" className="px-6 py-2 w-1/2">
+                      Dimensions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {grids
+                    .filter((grid) => grid.TYPE === "Couleur")
+                    .map((grid) => (
+                      <tr
+                        key={grid._id}
+                        className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap"
+                        onClick={() => handleImportColors(grid._id)}
+                      >
+                        <td className="px-6 py-4">{grid.LIBELLE}</td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center flex-wrap gap-2">
+                            {grid.DIMENSIONS.map((dimension) => (
+                              <span className="bg-orange-200 w-[30px] h-[30px] rounded-full flex items-center justify-center text-gray-800">{removePrefix([dimension], "Couleur")}</span>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </Modal>

@@ -451,8 +451,7 @@ export default function CreateProductPage() {
     }
   };
 
-  console.log(formData)
- 
+
 
   return (
     <section className="w-full bg-gray-100 p-7">

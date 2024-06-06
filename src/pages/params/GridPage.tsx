@@ -168,11 +168,11 @@ export default function GridPage() {
         <div className="px-4 py-2 flex flex-col gap-2">
           <div className="w-full flex justify-between items-center">
             <div className="flex items-center">
-              <h4 className="text-md whitespace-nowrap">
+              <h4 className="text-sm whitespace-nowrap">
                 <span className="font-bold">{totalItem}</span> Dimensions
               </h4>
               {prevSearchValue && (
-                <span className="text-xl italic ml-2">{`"${prevSearchValue}"`}</span>
+                <span className="text-sm italic ml-2">{`"${prevSearchValue}"`}</span>
               )}
             </div>
             <div className="flex justify-end w-full">
@@ -184,6 +184,7 @@ export default function GridPage() {
                       page={currentPage}
                       onChange={handlePageChange}
                       color="primary"
+                      size="small"
                     />
                   </Stack>
                 </div>

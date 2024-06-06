@@ -435,24 +435,24 @@ export default function ProductList() {
 
       <div className="relative overflow-x-auto bg-white">
         <table className="w-full text-left">
-          <thead className="border-y-[1px] border-gray-200 text-md font-[800] text-gray-700">
+          <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
             <tr>
-              <th scope="col" className="px-6 py-4 w-[10%]">
+              <th scope="col" className="px-6 py-2 w-[10%]">
                 Code
               </th>
-              <th scope="col" className="px-6 py-4 w-1/6">
+              <th scope="col" className="px-6 py-2 w-1/6">
                 Libellé
               </th>
-              <th scope="col" className="px-6 py-4 w-1/6">
+              <th scope="col" className="px-6 py-2 w-1/6">
                 Marque
               </th>
-              <th scope="col" className="px-6 py-4 w-[10%]">
+              <th scope="col" className="px-6 py-2 w-[10%]">
                 Founisseur
               </th>
-              <th scope="col" className="px-6 py-4 w-1/6">
+              <th scope="col" className="px-6 py-2 w-1/6">
                 Famille
               </th>
-              <th scope="col" className="px-6 py-4 w-1/6">
+              <th scope="col" className="px-6 py-2 w-1/6">
                 Sous-famille
               </th>
             </tr>
@@ -462,14 +462,14 @@ export default function ProductList() {
               products.products.map((product: Product) => (
                 <tr
                   key={product._id}
-                  className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-[11px] text-gray-800 whitespace-nowrap border"
+                  className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap border"
                   onClick={() => navigate(`/product/${product._id}`)}
                 >
-                  <td className="px-6 py-7">{product.GA_CODEARTICLE}</td>
-                  <td className="px-6 py-7 text-blue-600">
+                  <td className="px-6 py-4">{product.GA_CODEARTICLE}</td>
+                  <td className="px-6 py-4 text-blue-600">
                     {truncateText(product.GA_LIBELLE, 50)}
                   </td>
-                  <td className="px-6 py-7">
+                  <td className="px-6 py-4">
                     {product.brand ? (
                       <div>
                         <span>{product?.brand?.YX_CODE}</span>
@@ -480,10 +480,10 @@ export default function ProductList() {
                       <span>-</span>
                     )}
                   </td>
-                  <td className="px-6 py-7">{product.GA_FOURNPRINC}</td>
-                  <td className="px-6 py-7">
+                  <td className="px-6 py-4">{product.GA_FOURNPRINC}</td>
+                  <td className="px-6 py-4">
                     {product.family ? (
-                      <div className="inline-block bg-gray-300 px-3 py-1 rounded-md font-bold">
+                      <div className="inline-block font-bold">
                         <span>{product.family?.YX_CODE}</span>
                         <span className="mx-1">-</span>
                         <span>{product.family?.YX_LIBELLE}</span>
@@ -492,9 +492,9 @@ export default function ProductList() {
                       <span>-</span>
                     )}
                   </td>
-                  <td className="px-6 py-7">
+                  <td className="px-6 py-4">
                     {product.subFamily ? (
-                      <div className="inline-block bg-gray-200 px-3 py-1 rounded-md font-bold">
+                      <div className="inline-block font-bold">
                         <span>{product?.subFamily?.YX_CODE}</span>
                         <span className="mx-1">-</span>
                         {product?.subFamily.YX_LIBELLE && (
@@ -509,7 +509,7 @@ export default function ProductList() {
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="px-6 py-7 text-center">
+                <td colSpan={6} className="px-6 py-4 text-center">
                   {totalItem === null ? (
                     <div className="flex justify-center overflow-hidden p-[30px]">
                       <Spinner />

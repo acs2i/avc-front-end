@@ -127,6 +127,12 @@ export const LINKS: Link[] = [
         name: "Admin",
         linksGroup: [
           {
+            name: "Produits créés",
+            link: "/draft",
+            group: [],
+            icon: SquarePen,
+          },
+          {
             name: "Utilisateurs",
             linksGroup: [
               {
@@ -145,60 +151,6 @@ export const LINKS: Link[] = [
             icon: User,
           },
           {
-            name: "Produits créés",
-            link: "/draft",
-            group: [],
-            icon: SquarePen,
-          },
-          {
-            name: "Landing",
-            linksGroup: [
-              {
-                name: "Default",
-                link: "/",
-              },
-              {
-                name: "Alternate",
-                link: "/",
-              },
-            ],
-            icon: Globe,
-          },
-          {
-            name: "Pricing",
-            linksGroup: [
-              {
-                name: "Pricing column",
-                link: "/",
-              },
-              {
-                name: "Pricing grid",
-                link: "/",
-              },
-            ],
-            icon: Tag,
-          },
-          {
-            name: "Notifications",
-            linksGroup: [],
-            icon: Bell,
-          },
-          {
-            name: "Members",
-            linksGroup: [],
-            icon: UsersRound,
-          },
-          {
-            name: "Timeline",
-            linksGroup: [],
-            icon: Clock,
-          },
-          {
-            name: "Comming soon",
-            linksGroup: [],
-            icon: Hourglass,
-          },
-          {
             name: "Errors",
             linksGroup: [
               {
@@ -215,157 +167,6 @@ export const LINKS: Link[] = [
               },
             ],
             icon: TriangleAlert,
-          },
-          {
-            name: "Authentication",
-            group: [
-              {
-                name: "Simple",
-                linksGroup: [
-                  {
-                    name: "Sign in",
-                    link: "/",
-                  },
-                  {
-                    name: "Sign up",
-                    link: "/",
-                  },
-                  {
-                    name: "Sign out",
-                    link: "/",
-                  },
-                  {
-                    name: "Forgot password",
-                    link: "/",
-                  },
-                  {
-                    name: "Reset password",
-                    link: "/",
-                  },
-                  {
-                    name: "Lock screen",
-                    link: "/",
-                  },
-                  {
-                    name: "2FA",
-                    link: "/",
-                  },
-                ],
-              },
-              {
-                name: "Split",
-                linksGroup: [
-                  {
-                    name: "Sign in",
-                    link: "/",
-                  },
-                  {
-                    name: "Sign up",
-                    link: "/",
-                  },
-                  {
-                    name: "Sign out",
-                    link: "/",
-                  },
-                  {
-                    name: "Forgot password",
-                    link: "/",
-                  },
-                  {
-                    name: "Reset password",
-                    link: "/",
-                  },
-                  {
-                    name: "Lock screen",
-                    link: "/",
-                  },
-                  {
-                    name: "2FA",
-                    link: "/",
-                  },
-                ],
-              },
-              {
-                name: "Card",
-                linksGroup: [
-                  {
-                    name: "Sign in",
-                    link: "/",
-                  },
-                  {
-                    name: "Sign up",
-                    link: "/",
-                  },
-                  {
-                    name: "Sign out",
-                    link: "/",
-                  },
-                  {
-                    name: "Forgot password",
-                    link: "/",
-                  },
-                  {
-                    name: "Reset password",
-                    link: "/",
-                  },
-                  {
-                    name: "Lock screen",
-                    link: "/",
-                  },
-                  {
-                    name: "2FA",
-                    link: "/",
-                  },
-                ],
-              },
-            ],
-            icon: Lock,
-          },
-          {
-            name: "Layout",
-            linksGroup: [
-              {
-                name: "Vertical sidenav",
-                link: "/",
-              },
-              {
-                name: "Dark mode",
-                link: "/",
-              },
-              {
-                name: "Sidenav collapse",
-                link: "/",
-              },
-              {
-                name: "Darknav",
-                link: "/",
-              },
-              {
-                name: "Topnav slim",
-                link: "/",
-              },
-              {
-                name: "Navbar top slim",
-                link: "/",
-              },
-              {
-                name: "Navbar top",
-                link: "/",
-              },
-              {
-                name: "Navbar slim",
-                link: "/",
-              },
-              {
-                name: "Combo nav slim",
-                link: "/",
-              },
-              {
-                name: "Dual nav",
-                link: "/",
-              },
-            ],
-            icon: PanelsTopLeft,
           },
         ],
       },

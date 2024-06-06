@@ -19,6 +19,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Switch } from "@mui/material";
 
 export default function AccountMenu() {
   const user = useSelector((state: any) => state.auth.user);
@@ -34,6 +35,7 @@ export default function AccountMenu() {
     setAnchorEl(null);
   };
 
+  const label = { inputProps: { "aria-label": "Switch demo" } };
   return (
     <React.Fragment>
       <Tooltip title="Account settings">
@@ -55,7 +57,13 @@ export default function AccountMenu() {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem>
+        <MenuItem
+          sx={{
+            "&:hover": {
+              backgroundColor: "transparent",
+            },
+          }}
+        >
           <div className="flex flex-col">
             <div className="flex flex-col items-center justify-center mb-4">
               <div className="flex justify-center">
@@ -68,29 +76,32 @@ export default function AccountMenu() {
               <span className="text-sm font-bold text-gray-600">
                 {user ? user.username : "test"}
               </span>
+              <div>
+                <Switch {...label} defaultChecked />
+              </div>
             </div>
             <Divider />
             <div className="w-[300px] mt-4 mb-4">
               <ul className="flex flex-col gap-3">
-                <li>
+                <li className="hover:bg-gray-100 py-2">
                   <div className="flex items-center gap-2">
                     <User size={18} />
                     <span className="text-[13px]">Mon profile</span>
                   </div>
                 </li>
-                <li>
+                <li className="hover:bg-gray-100 py-2">
                   <div className="flex items-center gap-2">
                     <PieChart size={18} />
                     <span className="text-[13px]">Mon tableau de bord</span>
                   </div>
                 </li>
-                <li>
+                <li className="hover:bg-gray-100 py-2">
                   <div className="flex items-center gap-2">
                     <Activity size={18} />
                     <span className="text-[13px]">Mon activité</span>
                   </div>
                 </li>
-                <li>
+                <li className="hover:bg-gray-100 py-2">
                   <div className="flex items-center gap-2">
                     <Settings size={18} />
                     <span className="text-[13px]">Paramètres</span>
