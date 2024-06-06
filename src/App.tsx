@@ -3,12 +3,9 @@ import { Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import SingleProductPage from "./pages/product/SingleProductPage";
 import Sidebar from "./components/Navigation/Sidebar";
-import PageContainer from "./components/Shared/PageContainer";
-import SectionContainer from "./components/Shared/SectionContainer";
 import LoginPage from "./pages/login/LoginPage";
 import { useLocation } from "react-router-dom";
 import Navbar from "./components/Navigation/Navbar";
-import { LINKS } from "./utils";
 import { useSelector } from "react-redux";
 import SuppliersPage from "./pages/suppliers/SuppliersPage";
 import CreateProductPage from "./pages/product/CreateProductPage";
@@ -68,6 +65,7 @@ function App() {
     <>
         {shouldShowNavbar && <Sidebar />}
         {shouldShowNavbar && <Navbar />}
+        {isAuth ?
         <div className="ml-[250px] mt-[60px]">
           <Routes>
             <Route path="/login" element={<LoginPage />} />
@@ -141,7 +139,11 @@ function App() {
               <Route path="/calendar" element={<CalendarPage />} />
             </Route>
           </Routes>
-        </div>
+        </div> : 
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+        </Routes> 
+        }
   
     </>
   );
