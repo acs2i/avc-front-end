@@ -7,13 +7,22 @@ import { useSelector } from "react-redux";
 import useNotify from "../../utils/hooks/useToast";
 import { VALIDATOR_REQUIRE } from "../../utils/validator";
 import { CircularProgress } from "@mui/material";
+import { ChevronLeft } from "lucide-react";
 
 interface FormData {
   brand: { YX_CODE: string; YX_LIBELLE: string };
   creatorId: string;
 }
 
-export default function BrandCreatePage() {
+interface BrandCreatePageProps {
+  onCreate: () => void;
+  onClose: () => void;
+}
+
+export default function BrandCreatePage({
+  onCreate,
+  onClose,
+}: BrandCreatePageProps) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const user = useSelector((state: any) => state.auth.user);
@@ -52,7 +61,8 @@ export default function BrandCreatePage() {
         setTimeout(() => {
           notifySuccess("Marque crée avec succés !");
           setIsLoading(false);
-          navigate(-1);
+          onCreate();
+          onClose();
         }, 1000);
       } else {
         notifyError("Erreur lors de la création");
@@ -62,64 +72,64 @@ export default function BrandCreatePage() {
     }
   };
 
-
-
   return (
-    <section className="w-full h-screen bg-gray-100 p-7">
-   
-        <form
-          className="w-[70%] mt-[50px] mb-[50px]"
-          onSubmit={handleSubmit}
-        >
-          <h1 className="text-[32px] font-bold text-gray-800">Créer une marque</h1>
-          <div className="mt-5 flex flex-col justify-between">
-            <div className="flex flex-col">
-              <Input
-                element="input"
-                id="YX_CODE"
-                label="Code"
-                placeholder="ex: 456"
-                onChange={handleChange}
-                validators={[VALIDATOR_REQUIRE()]}
-                required
-                create
-                gray
-              />
-              <Input
-                element="input"
-                id="YX_LIBELLE"
-                type="text"
-                placeholder="Nom de la collection"
-                label="Libellé"
-                onChange={handleChange}
-                validators={[VALIDATOR_REQUIRE()]}
-                required
-                create
-                gray
-              />
-              {!isLoading ? (
-                <div className="flex items-center gap-2 mt-5">
-                   <Button
-                    size="small"
-                    cancel
-                    type="button"
-                    onClick={() => navigate(-1)}
-                  >
-                    Annuler
-                  </Button>
-                  <Button size="small" blue type="submit">
-                    Créer la marque
-                  </Button>
-                </div>
-              ) : (
-                <div className="mt-3">
-                  <CircularProgress />
-                </div>
-              )}
-            </div>
+    <section className="w-full p-4">
+      <form className="mb-[50px]" onSubmit={handleSubmit}>
+        <div className="flex items-center gap-3">
+          <div onClick={onClose} className="cursor-pointer">
+            <ChevronLeft />
           </div>
-        </form>
-      
+          <h3 className="text-[32px] font-bold text-gray-800">
+            Créer une collection
+          </h3>
+        </div>
+        <div className="mt-5 flex flex-col justify-between">
+          <div className="flex flex-col">
+            <Input
+              element="input"
+              id="YX_CODE"
+              label="Code"
+              placeholder="ex: 456"
+              onChange={handleChange}
+              validators={[VALIDATOR_REQUIRE()]}
+              required
+              create
+              gray
+            />
+            <Input
+              element="input"
+              id="YX_LIBELLE"
+              type="text"
+              placeholder="Nom de la collection"
+              label="Libellé"
+              onChange={handleChange}
+              validators={[VALIDATOR_REQUIRE()]}
+              required
+              create
+              gray
+            />
+            {!isLoading ? (
+              <div className="flex items-center gap-2 mt-5">
+                <Button
+                  size="small"
+                  cancel
+                  type="button"
+                  onClick={() => navigate(-1)}
+                >
+                  Annuler
+                </Button>
+                <Button size="small" blue type="submit">
+                  Créer la marque
+                </Button>
+              </div>
+            ) : (
+              <div className="mt-3">
+                <CircularProgress />
+              </div>
+            )}
+          </div>
+        </div>
+      </form>
     </section>
   );
 }

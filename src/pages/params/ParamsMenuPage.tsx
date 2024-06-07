@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { LINKS_Params } from "../../utils/index";
 import Card from "../../components/Shared/Card";
@@ -6,81 +6,273 @@ import { Info } from "lucide-react";
 import Modal from "../../components/Shared/Modal";
 import Button from "../../components/FormElements/Button";
 import { Divider } from "@mui/material";
+import ClassificationsPage from "./ClassificationsPage";
+import DimensionPage from "./DimensionPage";
+import GridPage from "./GridPage";
+import CollectionPage from "./CollectionPage";
+import BrandPage from "./BrandPage";
+import ClassificationUpdatePage from "./ClassificationUpdatePage";
+import DimensionUpdatePage from "./DimensionUpdatePage";
+import CollectionUpdatePage from "./CollectionUpdatePage";
+import BranchUpdatePage from "./BrandUpdatePage";
+import ClassificationCreatePage from "./ClassificationCreatePage";
+import DimensionCreateItemPage from "./DimensionCreateItemPage";
+import CollectionCreatePage from "./CollectionCreatePage";
+import BrandCreatePage from "./BrandCreatePage";
+import GridCreatePage from "./GridCreatePage";
+
+type DataType = "LA1" | "LA2" | "LA3";
+type DataTypeDimension = "DI1" | "DI2";
+
+interface Family {
+  _id: string;
+  YX_CODE: string;
+  YX_TYPE: DataType;
+  YX_LIBELLE: string;
+}
+
+interface Dimension {
+  _id: string;
+  GDI_DIMORLI: string;
+  GDI_LIBELLE: string;
+  GDI_TYPEDIM: DataTypeDimension;
+}
+
+interface Collection {
+  _id: string;
+  CODE: string;
+  LIBELLE: string;
+}
+
+interface Brand {
+  _id: string;
+  YX_CODE: string;
+  YX_LIBELLE: string;
+}
+interface Grid {
+  _id: string;
+  TYPE: string;
+  LIBELLE: string;
+  DIMENSIONS: string[];
+}
 
 function ParamsMenuPage() {
   const location = useLocation();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [page, setPage] = useState("classe");
+  const [shouldRefetch, setShouldRefetch] = useState(false);
+  const [selectedFamily, setSelectedFamily] = useState<Family | null>(null);
+  const [selectedGrid, setSelectedGrid] = useState<Grid | null>(null);
+  const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
+  const [selectedCollection, setSelectedCollection] =
+    useState<Collection | null>(null);
+  const [selectedDimension, setSelectedDimension] = useState<Dimension | null>(
+    null
+  );
+  const [isCreatePanelOpen, setIsCreatePanelOpen] = useState(false);
+
+  const handleRefetch = () => {
+    setShouldRefetch((prev) => !prev);
+  };
+
+  const handleCloseClassification = () => {
+    setSelectedFamily(null);
+  };
+
+  const handleCloseDimension = () => {
+    setSelectedDimension(null);
+  };
+
+  const handleCloseCollection = () => {
+    setSelectedCollection(null);
+  };
+
+  const handleCloseBrand = () => {
+    setSelectedBrand(null);
+  };
+
+  const handleOpenCreatePanel = () => {
+    setIsCreatePanelOpen(true);
+  };
+
+  const handleCloseCreatePanel = () => {
+    setIsCreatePanelOpen(false);
+  };
+
+  useEffect(() => {
+    setSelectedFamily(null);
+    setSelectedDimension(null);
+    setSelectedCollection(null);
+    setSelectedBrand(null);
+  }, [page]);
 
   return (
-    <div>
-      <Modal
-        show={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
-        onClose={() => setIsModalOpen(false)}
-        header="Informations"
-        icon="i"
-      >
-        <div className="px-7 mb-5">
-          <p className="text-gray-800 text-xl">
-            Cliquez sur une des catégories pour entrer dans le panneau
-            d'édition. Une fois dans le panneau d'édition, vous pouvez modifier
-            ou créer une nouvelle entrée dans le paramètre choisi.
-          </p>
+    <div className="w-full h-screen bg-gray-100 p-7">
+      <div className="h-[70px] mb-3 flex items-center gap-4 w-full">
+        <div className="w-[300px]">
+          <button
+            onClick={handleOpenCreatePanel}
+            className="bg-blue-500 text-white text-[12px] font-[700] w-full py-2 rounded-md"
+          >
+            Créer une {page === "classe" && "classification"}
+            {page === "dimension" && "dimension"}
+            {page === "grid" && "grille"}
+            {page === "collection" && "collection"}
+            {page === "brand" && "marque"}
+          </button>
         </div>
-        <Divider />
-        <div className="flex justify-end mt-7 px-7">
-          <Button blue size="small" onClick={() => setIsModalOpen(false)}>
-            J'ai compris
-          </Button>
-        </div>
-      </Modal>
-      <Card title="Mes paramètres" createTitle="" link="">
-        <div className=" w-[80%] xl:w-[70%] mx-auto mt-5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 h-[70px]">
-              <div className="h-2/3 w-[8px] bg-[#01972B]"></div>
-              <h4 className="text-3xl text-gray-600">
-                <span className="font-bold text-gray-700">Paramétrer</span> les
-                données
-              </h4>
-            </div>
-            <div
-              className="cursor-pointer text-gray-500"
-              onClick={() => setIsModalOpen(true)}
+        <div className="relative w-full">
+          <div className="absolute inset-y-0 start-0 flex items-center ps-3 cursor-pointer">
+            <svg
+              className="w-4 h-4 text-gray-500 dark:text-gray-400"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 20 20"
             >
-              <Info size={22} />
-            </div>
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+              />
+            </svg>
           </div>
-          <div className="mt-2 flex flex-wrap gap-2 py-5">
-            {LINKS_Params.map((link, i) => (
-              <Link
-                to={link.link}
-                key={i}
-                className={`w-[250px] h-[250px] border-2 border-gray-300 hover:scale-110 text-white rounded-xl shadow-lg transition-all`}
-                style={{
-                  backgroundImage: `url(${link.bg})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                }}
-              >
-                <div
-                  className={`flex flex-col items-center justify-center h-full bg-black bg-opacity-20 p-2 rounded gap-3`}
-                >
-                    <span className="text-xl font-bold">{link.name}</span>
-             
-                  {React.createElement(link.icon, {
-                    size: new RegExp(`^${link.link}(/.*)?$`).test(
-                      location.pathname
-                    )
-                      ? 60
-                      : 40,
-                  })}
-                </div>
-              </Link>
-            ))}
-          </div>
+          <input
+            type="search"
+            id="default-search"
+            className="block w-full px-[10px] py-[8px] ps-10 text-sm text-gray-900 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Search..."
+            required
+          />
         </div>
-      </Card>
+      </div>
+      <div className="flex gap-4">
+        <div className="w-[300px] h-[400px] border-t-[1px] border-gray-300">
+          {LINKS_Params.map((link) => (
+            <div
+              key={link.page}
+              className={`border-r-[1px] border-b-[1px] border-gray-300 py-3 flex items-center gap-3 cursor-pointer ${
+                page === link.page ? "text-blue-500" : "text-gray-500"
+              } hover:text-blue-500`}
+              onClick={() => setPage(link.page)}
+            >
+              {React.createElement(link.icon, {
+                size: new RegExp(`^${link.link}(/.*)?$`).test(location.pathname)
+                  ? 20
+                  : 15,
+              })}
+              <span className="text-xs font-[600]">{link.name}</span>
+            </div>
+          ))}
+        </div>
+        <div className="w-full flex gap-7">
+          <div className="w-full">
+            {page === "classe" && (
+              <ClassificationsPage
+                onSelectFamily={setSelectedFamily}
+                shouldRefetch={shouldRefetch}
+              />
+            )}
+            {page === "dimension" && (
+              <DimensionPage
+                onSelectDimension={setSelectedDimension}
+                shouldRefetch={shouldRefetch}
+              />
+            )}
+            {page === "grid" && (
+              <GridPage
+                onSelectGrid={setSelectedGrid}
+                shouldRefetch={shouldRefetch}
+              />
+            )}
+            {page === "collection" && (
+              <CollectionPage
+                onSelectCollection={setSelectedCollection}
+                shouldRefetch={shouldRefetch}
+              />
+            )}
+            {page === "brand" && (
+              <BrandPage
+                onSelectBrand={setSelectedBrand}
+                shouldRefetch={shouldRefetch}
+              />
+            )}
+          </div>
+          {/* artie mise ajour composant */}
+          {selectedFamily && (
+            <div className="w-full h-[400px] bg-white rounded-lg border shadow-md">
+              <ClassificationUpdatePage
+                selectedFamily={selectedFamily}
+                onClose={handleCloseClassification}
+                onUpdate={handleRefetch}
+              />
+            </div>
+          )}
+          {selectedDimension && (
+            <div className="w-full h-[400px] bg-white rounded-lg border shadow-md">
+              <DimensionUpdatePage
+                selectedDimension={selectedDimension}
+                onClose={handleCloseDimension}
+                onUpdate={handleRefetch}
+              />
+            </div>
+          )}
+          {selectedCollection && (
+            <div className="w-full h-[400px] bg-white rounded-lg border shadow-md">
+              <CollectionUpdatePage
+                selectedCollection={selectedCollection}
+                onClose={handleCloseCollection}
+                onUpdate={handleRefetch}
+              />
+            </div>
+          )}
+          {selectedBrand && (
+            <div className="w-full h-[400px] bg-white rounded-lg border shadow-md">
+              <BranchUpdatePage
+                selectedBrand={selectedBrand}
+                onClose={handleCloseBrand}
+                onUpdate={handleRefetch}
+              />
+            </div>
+          )}
+          {/* Partie création composant */}
+          {isCreatePanelOpen && (
+            <div className="w-full bg-white rounded-lg border shadow-md">
+              {page === "classe" && (
+                <ClassificationCreatePage
+                  onClose={handleCloseCreatePanel}
+                  onCreate={handleRefetch}
+                />
+              )}
+              {page === "dimension" && (
+                <DimensionCreateItemPage
+                  onClose={handleCloseCreatePanel}
+                  onCreate={handleRefetch}
+                />
+              )}
+              {page === "grid" && (
+                <GridCreatePage
+                  onClose={handleCloseCreatePanel}
+                  onCreate={handleRefetch}
+                />
+              )}
+              {page === "collection" && (
+                <CollectionCreatePage
+                  onClose={handleCloseCreatePanel}
+                  onCreate={handleRefetch}
+                />
+              )}
+              {page === "brand" && (
+                <BrandCreatePage
+                  onClose={handleCloseCreatePanel}
+                  onCreate={handleRefetch}
+                />
+              )}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

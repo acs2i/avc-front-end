@@ -71,28 +71,8 @@ export const LINKS: Link[] = [
           },
           {
             name: "Codifications",
-            linksGroup: [
-              {
-                name: "Classifications",
-                link: "/parameters/classification",
-              },
-              {
-                name: "Dimensions",
-                link: "/parameters/dimension",
-              },
-              {
-                name: "Grilles de dimensions",
-                link: "/parameters/grid",
-              },
-              {
-                name: "Collections",
-                link: "/parameters/collection",
-              },
-              {
-                name: "Marques",
-                link: "/parameters/brand",
-              },
-            ],
+            link: "/parameters",
+            linksGroup: [],
             icon: Settings2,
           },
           {
@@ -178,31 +158,31 @@ export const LINKS_Params: Params[] = [
     name: "Classifications",
     link: "/parameters/classification",
     icon: ListOrdered,
-    bg: "/img/bg_params_1.png",
+    page: "classe",
   },
   {
     name: "Dimensions",
     link: "/parameters/dimension",
     icon: Ruler,
-    bg: "/img/bg_params_2.jpg",
+    page: "dimension",
   },
   {
     name: "Grilles de dimensions",
     link: "/parameters/grid",
     icon: Grid3X3,
-    bg: "/img/bg_params_3.png",
+    page: "grid",
   },
   {
     name: "Collections",
     link: "/parameters/collection",
     icon: Shirt,
-    bg: "/img/bg_params_4.png",
+    page: "collection",
   },
   {
     name: "Marques",
     link: "/parameters/brand",
     icon: Captions,
-    bg: "/img/bg_params_5.png",
+    page: "brand",
   },
 ];
 

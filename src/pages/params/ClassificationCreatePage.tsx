@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Card from "../../components/Shared/Card";
 import Input from "../../components/FormElements/Input";
-import { Plus, X } from "lucide-react";
+import { ChevronLeft, Plus, X } from "lucide-react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import useNotify from "../../utils/hooks/useToast";
@@ -15,12 +15,20 @@ interface Family {
   YX_LIBELLE: string;
 }
 
+interface ClassificationCreatePageProps {
+  onCreate: () => void;
+  onClose: () => void;
+}
+
 interface FormData {
   family: { YX_CODE: string; YX_LIBELLE: string; YX_TYPE: string };
   creatorId: string;
 }
 
-function ClassificationCreatePage() {
+function ClassificationCreatePage({
+  onCreate,
+  onClose,
+}: ClassificationCreatePageProps) {
   const user = useSelector((state: any) => state.auth.user);
   const [type, setType] = useState("");
   const navigate = useNavigate();
@@ -150,7 +158,8 @@ function ClassificationCreatePage() {
         setTimeout(() => {
           notifySuccess("Marque crée avec succés !");
           setIsLoading(false);
-          navigate(-1);
+          onCreate();
+          onClose();
         }, 1000);
       } else {
         notifyError("Erreur lors de la création");
@@ -167,15 +176,15 @@ function ClassificationCreatePage() {
   }, [searchValue]);
 
   return (
-    <section className="w-full h-screen bg-gray-100 p-7">
-      <form className="w-[70%] mt-[50px] mb-[50px]" onSubmit={handleSubmit}>
-        <div>
+    <section className="w-full p-4">
+      <form className="mb-[50px]" onSubmit={handleSubmit}>
+        <div className="flex items-center gap-3">
+          <div onClick={onClose} className="cursor-pointer">
+            <ChevronLeft />
+          </div>
           <h3 className="text-[32px] font-bold text-gray-800">
             Créer une classification
           </h3>
-          <p className="text-[17px] text-gray-600">
-            Lorem ipsum dolor sit amet
-          </p>
         </div>
         <div className="mt-5 flex flex-col justify-between">
           <div className="flex flex-col">

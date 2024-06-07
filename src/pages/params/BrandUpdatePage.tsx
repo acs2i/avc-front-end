@@ -7,12 +7,18 @@ import Button from "../../components/FormElements/Button";
 import { CircularProgress, Divider } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
 import Modal from "../../components/Shared/Modal";
-import { RotateCcw, X } from "lucide-react";
+import { ChevronLeft, RotateCcw, X } from "lucide-react";
 
-interface Branch {
+interface Brand {
   _id: string;
   YX_CODE: any;
   YX_LIBELLE: any;
+}
+
+interface BrandUpdatePageProps {
+  selectedBrand: Brand;
+  onUpdate: () => void;
+  onClose: () => void;
 }
 
 interface FormData {
@@ -20,13 +26,18 @@ interface FormData {
   YX_LIBELLE: string;
 }
 
-export default function BranchUpdatePage() {
-  const { id } = useParams();
+export default function BranchUpdatePage({
+  selectedBrand,
+  onUpdate,
+  onClose,
+}: BrandUpdatePageProps) {
+  const id = selectedBrand._id;
+  const [brandUpdate, setBrandUpdate] = useState<Brand | null>(null);
   const { notifySuccess, notifyError } = useNotify();
   const [isModify, setIsModify] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { data: brand } = useFetch<Branch>(
+  const { data: brand } = useFetch<Brand>(
     `${process.env.REACT_APP_URL_DEV}/api/v1/brand/${id}`
   );
   const [libelle, setLibelle] = useState("");
@@ -56,6 +67,12 @@ export default function BranchUpdatePage() {
     }
   }, [brand]);
 
+  useEffect(() => {
+    if (selectedBrand) {
+      setBrandUpdate(selectedBrand);
+    }
+  }, [selectedBrand]);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -74,7 +91,8 @@ export default function BranchUpdatePage() {
         setTimeout(() => {
           notifySuccess("Brand modifiée avec succès !");
           setIsLoading(false);
-          navigate(-1);
+          onUpdate();
+          onClose();
         }, 1000);
       } else {
         notifyError("Erreur lors de la modif !");
@@ -86,7 +104,7 @@ export default function BranchUpdatePage() {
   };
 
   return (
-    <section className="w-full h-screen bg-gray-100 p-7">
+    <section className="w-full p-4">
       <Modal
         show={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
@@ -121,81 +139,84 @@ export default function BranchUpdatePage() {
           </div>
         )}
       </Modal>
-    
-        <form className="w-[70%] h-[400px] mt-[50px] mb-[50px]">
-          <div className="flex items-center justify-between">
-            <h1 className="text-[32px] font-bold text-gray-800">
-              Code de la <span className="font-bold">marque :</span>{" "}
-              {brand?.YX_CODE}
-            </h1>
-            {!isModify && (
-              <Button size="small" blue onClick={() => setIsModify(true)}>
-                Modifier la marque
-              </Button>
-            )}
+
+      <form className="mb-[50px]">
+        <div className="flex items-center justify-between">
+          <div onClick={onClose} className="cursor-pointer">
+            <ChevronLeft />
           </div>
-          <div className="mt-5 flex flex-col justify-between">
-            <div className="flex flex-col">
-              {isModify ? (
-                <div>
-                  <Input
-                    element="input"
-                    id="label"
-                    type="text"
-                    placeholder="Modifier le libellé"
-                    value={libelle}
-                    label="Libellé"
-                    validators={[]}
-                    create
-                    onChange={handleLibelleChange}
-                    gray
-                  />
-                </div>
-              ) : (
-                <div>
-                  <Input
-                    element="input"
-                    id="label"
-                    type="text"
-                    placeholder="Modifier le libellé"
-                    value={libelle}
-                    label="Libellé"
-                    validators={[]}
-                    disabled
-                    create
-                    onChange={handleLibelleChange}
-                    gray
-                  />
-                </div>
-              )}
-            </div>
-            {isModify && (
-              <div className="w-full mt-2">
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="small"
-                    cancel
-                    type="button"
-                    onClick={() => setIsModify(false)}
-                  >
-                
-                    Annuler
-                  </Button>
-                  <Button
-                    size="small"
-                    blue
-                    onClick={() => setIsModalOpen(true)}
-                    type="button"
-                  >
-                  
-                    Modifier la marque
-                  </Button>
-                </div>
+          <h1 className="text-[20px] font-bold text-gray-800">
+            Code de la <span className="font-bold">marque :</span>{" "}
+            {brand?.YX_CODE}
+          </h1>
+          {!isModify && (
+            <Button size="small" blue onClick={() => setIsModify(true)}>
+              Modifier
+            </Button>
+          )}
+        </div>
+        <div className="mt-3">
+          <Divider />
+        </div>
+        <div className="mt-5 flex flex-col justify-between">
+          <div className="flex flex-col">
+            {isModify ? (
+              <div>
+                <Input
+                  element="input"
+                  id="label"
+                  type="text"
+                  placeholder="Modifier le libellé"
+                  value={libelle}
+                  label="Libellé"
+                  validators={[]}
+                  create
+                  onChange={handleLibelleChange}
+                  gray
+                />
+              </div>
+            ) : (
+              <div>
+                <Input
+                  element="input"
+                  id="label"
+                  type="text"
+                  placeholder="Modifier le libellé"
+                  value={libelle}
+                  label="Libellé"
+                  validators={[]}
+                  disabled
+                  create
+                  onChange={handleLibelleChange}
+                  gray
+                />
               </div>
             )}
           </div>
-        </form>
-     
+          {isModify && (
+            <div className="w-full mt-2">
+              <div className="flex items-center gap-2">
+                <Button
+                  size="small"
+                  cancel
+                  type="button"
+                  onClick={() => setIsModify(false)}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  size="small"
+                  blue
+                  onClick={() => setIsModalOpen(true)}
+                  type="button"
+                >
+                  Modifier la marque
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </form>
     </section>
   );
 }

@@ -21,7 +21,12 @@ interface Family {
   YX_LIBELLE: string;
 }
 
-function ClassificationsPage() {
+interface ClassificationsPageProps {
+  onSelectFamily: (family: Family) => void;
+  shouldRefetch: boolean;
+}
+
+function ClassificationsPage({ onSelectFamily, shouldRefetch  }: ClassificationsPageProps) {
   const [typeValue, setTypeValue] = useState("");
   const [codeValue, setCodeValue] = useState("");
   const [labelValue, setLabelValue] = useState("");
@@ -29,7 +34,7 @@ function ClassificationsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItem, setTotalItem] = useState(null);
-  const limit = 20;
+  const limit = 30;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const [families, setFamilies] = useState<Family[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -109,82 +114,13 @@ function ClassificationsPage() {
     }
   };
 
-  return (
-    <div className="relative">
-      <Modal
-        show={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
-        onClose={() => setIsModalOpen(false)}
-        header="Informations"
-        icon="i"
-      >
-        <div className="px-7 mb-5">
-          <p className="text-gray-800 text-xl">
-            Ici vous trouverez la liste de toutes les classes enregistrées.
-            Cliquez sur la classe que vous souhaitez modifier pour ouvrir le
-            panneau de modification.
-          </p>
-        </div>
-        <Divider />
-        <div className="flex justify-end mt-7 px-7">
-          <Button blue size="small" onClick={() => setIsModalOpen(false)}>
-            J'ai compris
-          </Button>
-        </div>
-      </Modal>
-      <Header
-        title="Liste des classifications"
-        link="/parameters/classification/create"
-        btnTitle="Créer une classe"
-        placeholder="Rechercher une classification"
-      >
-        <div className="flex items-center gap-4 py-4">
-          <div className="flex items-center gap-4">
-            <label className="w-[90px] text-sm font-bold">Niveau :</label>
-            <select
-              name="pets"
-              id="level"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-1.5"
-              onChange={(e) => setTypeValue(e.target.value)}
-            >
-              <option value="">Choisir un niveau</option>
-              <option value="LA1">Famille</option>
-              <option value="LA2">Sous-famille</option>
-              <option value="LA3">Sous-sous-famille</option>
-            </select>
-          </div>
-          <div className="flex items-center gap-4">
-            <label className="w-[60px] text-sm font-bold">Code :</label>
-            <input
-              type="text"
-              id="code"
-              className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
-              placeholder="Rechercher par code"
-              value={codeValue}
-              onChange={(e) => setCodeValue(e.target.value)}
-            />
-          </div>
-          <div className="flex items-center gap-4">
-            <label className="w-[60px] text-sm font-bold">Libellé :</label>
-            <input
-              type="text"
-              id="label"
-              className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
-              placeholder="Rechercher par libellé"
-              value={labelValue}
-              onChange={(e) => setLabelValue(e.target.value)}
-            />
-          </div>
-          <div
-            className="cursor-pointer text-gray-500"
-            onClick={() => setIsModalOpen(true)}
-          >
-            <Info size={22} />
-          </div>
-        </div>
-      </Header>
+  useEffect(() => {
+    fetchFamily();
+  }, [shouldRefetch]);
 
-      <div className="relative overflow-x-auto bg-white">
+  return (
+   
+      <div className="relative overflow-x-auto w-full">
         <table className="w-full text-left">
           <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
             <tr>
@@ -204,10 +140,8 @@ function ClassificationsPage() {
               families.map((family) => (
                 <tr
                   key={family._id}
-                  className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap"
-                  onClick={() =>
-                    navigate(`/parameters/classification/${family._id}`)
-                  }
+                  className="border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap"
+                  onClick={() => onSelectFamily(family)}
                 >
                   <td className="px-6 py-2 flex items-center gap-2 text-blue-600">
                     {typeLabels[family.YX_TYPE]}
@@ -259,11 +193,6 @@ function ClassificationsPage() {
           </div>
         </div>
       </div>
-
-      {/* {totalItem !== null && totalItem > 10 && (
-        <ScrollToTop scrollThreshold={300} />
-      )} */}
-    </div>
   );
 }
 

@@ -7,7 +7,7 @@ import Button from "../../components/FormElements/Button";
 import { CircularProgress, Divider } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
 import Modal from "../../components/Shared/Modal";
-import { RotateCcw, X } from "lucide-react";
+import { ChevronLeft, RotateCcw, X } from "lucide-react";
 
 interface Collection {
   _id: string;
@@ -15,13 +15,26 @@ interface Collection {
   LIBELLE: any;
 }
 
+interface CollectionUpdatePageProps {
+  selectedCollection: Collection;
+  onUpdate: () => void;
+  onClose: () => void;
+}
+
 interface FormData {
   CODE: string;
   LIBELLE: string;
 }
 
-export default function CollectionUpdatePage() {
-  const { id } = useParams();
+export default function CollectionUpdatePage({
+  selectedCollection,
+  onClose,
+  onUpdate
+}: CollectionUpdatePageProps) {
+  const id = selectedCollection._id;
+  const [collectionUpdate, setCollectionUpdate] = useState<Collection | null>(
+    null
+  );
   const { notifySuccess, notifyError } = useNotify();
   const [isModify, setIsModify] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -56,6 +69,12 @@ export default function CollectionUpdatePage() {
     }
   }, [collection]);
 
+  useEffect(() => {
+    if (selectedCollection) {
+      setCollectionUpdate(selectedCollection);
+    }
+  }, [selectedCollection]);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -74,7 +93,8 @@ export default function CollectionUpdatePage() {
         setTimeout(() => {
           notifySuccess("Collection modifiée avec succès !");
           setIsLoading(false);
-          navigate(-1);
+          onUpdate();
+          onClose();
         }, 1000);
       } else {
         notifyError("Erreur lors de la modif !");
@@ -86,8 +106,8 @@ export default function CollectionUpdatePage() {
   };
 
   return (
-    <section className="w-full h-screen bg-gray-100 p-7">
-       <Modal
+    <section className="w-full p-4">
+      <Modal
         show={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         onClose={() => setIsModalOpen(false)}
@@ -103,7 +123,7 @@ export default function CollectionUpdatePage() {
         <Divider />
         {!isLoading ? (
           <div className="flex justify-end mt-7 px-7 gap-2">
-             <Button
+            <Button
               size="small"
               danger
               type="button"
@@ -112,7 +132,7 @@ export default function CollectionUpdatePage() {
               Non
             </Button>
             <Button size="small" blue type="submit">
-             Oui
+              Oui
             </Button>
           </div>
         ) : (
@@ -121,38 +141,44 @@ export default function CollectionUpdatePage() {
           </div>
         )}
       </Modal>
-      
-        <form
-          className="w-[70%] h-[400px] mt-[50px] mb-[50px]"
-          onSubmit={handleSubmit}
-        >
-          <div className="flex items-center justify-between">
-            <h1 className="text-[32px] font-bold text-gray-800">Code de la<span className="font-bold"> collection :</span> {collection?.CODE}</h1>
-            {!isModify && (
-              <Button size="small" blue onClick={() => setIsModify(true)}>
-                Modifier la collection
-              </Button>
-            )}
+
+      <form className="mb-[50px]">
+        <div className="flex items-center justify-between">
+          <div onClick={onClose} className="cursor-pointer">
+            <ChevronLeft />
           </div>
-          <div className="mt-5 flex flex-col justify-between">
-            <div className="flex flex-col">
-              {isModify ? (
-                <div>
-                  <Input
-                    element="input"
-                    id="label"
-                    type="text"
-                    placeholder="Modifier le libellé"
-                    value={libelle}
-                    label="Libellé"
-                    validators={[]}
-                    create
-                    onChange={handleLibelleChange}
-                    gray
-                  />
-                </div>
-              ) : (
-                <div>
+          <h1 className="text-[20px] font-bold text-gray-800">
+            Code de la<span className="font-bold"> collection :</span>{" "}
+            {collection?.CODE}
+          </h1>
+          {!isModify && (
+            <Button size="small" blue onClick={() => setIsModify(true)}>
+              Modifier
+            </Button>
+          )}
+        </div>
+        <div className="mt-3">
+          <Divider />
+        </div>
+        <div className="mt-5 flex flex-col justify-between">
+          <div className="flex flex-col">
+            {isModify ? (
+              <div>
+                <Input
+                  element="input"
+                  id="label"
+                  type="text"
+                  placeholder="Modifier le libellé"
+                  value={libelle}
+                  label="Libellé"
+                  validators={[]}
+                  create
+                  onChange={handleLibelleChange}
+                  gray
+                />
+              </div>
+            ) : (
+              <div>
                 <Input
                   element="input"
                   id="label"
@@ -167,35 +193,32 @@ export default function CollectionUpdatePage() {
                   gray
                 />
               </div>
-              )}
-            </div>
-            {isModify && (
-              <div className="w-full mt-2">
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="small"
-                    cancel
-                    type="button"
-                    onClick={() => setIsModify(false)}
-                  >
-                
-                    Annuler
-                  </Button>
-                  <Button
-                    size="small"
-                    blue
-                    onClick={() => setIsModalOpen(true)}
-                    type="button"
-                  >
-                  
-                    Modifier la collection
-                  </Button>
-                </div>
-              </div>
             )}
           </div>
-        </form>
-      
+          {isModify && (
+            <div className="w-full mt-2">
+              <div className="flex items-center gap-2">
+                <Button
+                  size="small"
+                  cancel
+                  type="button"
+                  onClick={() => setIsModify(false)}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  size="small"
+                  blue
+                  onClick={() => setIsModalOpen(true)}
+                  type="button"
+                >
+                  Modifier la collection
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </form>
     </section>
   );
 }

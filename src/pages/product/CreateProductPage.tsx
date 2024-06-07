@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import Card from "../../components/Shared/Card";
-import { ImageUp } from "lucide-react";
+import { ArrowBigRight, ArrowRight, ImageUp } from "lucide-react";
 import Button from "../../components/FormElements/Button";
 import useNotify from "../../utils/hooks/useToast";
 import { CircularProgress } from "@mui/material";
@@ -58,6 +58,13 @@ type CollectionOption = {
   LIBELLE: string;
 };
 
+type SuppliersOption = {
+  value: string;
+  label: string;
+
+  T_LIBELLE: string;
+};
+
 const customStyles = {
   control: (provided: any) => ({
     ...provided,
@@ -95,6 +102,7 @@ export default function CreateProductPage() {
   const [inputSubValueFamily, setInputSubValueFamily] = useState("");
   const [inputValueBrand, setInputValueBrand] = useState("");
   const [inputValueCollection, setInputValueCollection] = useState("");
+  const [inputValueSupplier, setInputValueSupplier] = useState("");
   const [selectedOptionFamily, setSelectedOptionFamily] =
     useState<SingleValue<FamilyOption> | null>(null);
   const [selectedOptionSubFamily, setSelectedOptionSubFamily] =
@@ -103,12 +111,15 @@ export default function CreateProductPage() {
     useState<SingleValue<BrandOption> | null>(null);
   const [selectedOptionCollection, setSelectedOptionCollection] =
     useState<SingleValue<CollectionOption> | null>(null);
+  const [selectedOptionSupplier, setSelectedOptionSupplier] =
+    useState<SingleValue<SuppliersOption> | null>(null);
   const [optionsFamily, setOptionsFamily] = useState<FamilyOption[]>([]);
   const [optionsSubFamily, setOptionsSubFamily] = useState<FamilyOption[]>([]);
   const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
   const [optionsCollection, setOptionsCollection] = useState<
     CollectionOption[]
   >([]);
+  const [optionsSupplier, setOptionsSupplier] = useState<SuppliersOption[]>([]);
   const dimensionsOptions = [
     {
       value: "Taille/Couleur",
@@ -129,7 +140,7 @@ export default function CreateProductPage() {
     supplier_ref: "",
     family: [],
     subFamily: [],
-    dimension_type: "",
+    dimension_type: "Couleur/Taille",
     brand: "",
     ref_collection: "",
     description_brouillon: "",
@@ -168,6 +179,17 @@ export default function CreateProductPage() {
     }));
   };
 
+  const handleChangeSupplier = (
+    selectedOption: SingleValue<SuppliersOption>
+  ) => {
+    const supplierLabel = selectedOption ? selectedOption.label : "";
+    setSelectedOptionSupplier(selectedOption);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      supplier_name: supplierLabel,
+    }));
+  };
+
   const handleChangeFamily = (newValue: SingleValue<FamilyOption> | null) => {
     setSelectedOptionFamily(newValue);
 
@@ -202,7 +224,7 @@ export default function CreateProductPage() {
     }
   };
 
-   const handleGridChange = (grid: string[][]) => {
+  const handleGridChange = (grid: string[][]) => {
     // Flatten the grid and join color and size
     const flattenedGrid = grid.flat();
     setFormData((prevFormData) => ({
@@ -313,6 +335,58 @@ export default function CreateProductPage() {
       );
 
       setOptionsCollection(optionsCollection);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
+  const handleInputChangeSupplier = async (inputValueCollection: string) => {
+    setInputValueCollection(inputValueCollection);
+
+    // console.log(inputValue);
+    if (inputValueCollection === "") {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/supplier`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+
+        const optionsSupplier = data.data?.map((supplier: SuppliersOption) => ({
+          value: supplier.T_LIBELLE,
+          label: supplier.T_LIBELLE,
+        }));
+
+        setOptionsSupplier(optionsSupplier);
+      } catch (error) {
+        console.error("Erreur lors de la requête", error);
+      }
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/supplier?page=${currentPage}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+
+      const optionsSupplier = data.data?.map((supplier: SuppliersOption) => ({
+        value: supplier.T_LIBELLE,
+        label: supplier.T_LIBELLE,
+      }));
+
+      setOptionsSupplier(optionsSupplier);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     }
@@ -451,7 +525,7 @@ export default function CreateProductPage() {
     }
   };
 
-
+  console.log(formData);
 
   return (
     <section className="w-full bg-gray-100 p-7">
@@ -507,41 +581,11 @@ export default function CreateProductPage() {
                 gray
               />
             </div>
-            <div className="relative border p-3 ">
-              <div className="absolute top-[-15px] bg-gray-100 px-2">
-                <span className="text-[13px] italic">
-                  Fournisseur principal
-                </span>
-              </div>
-              <Input
-                element="input"
-                id="supplier_name"
-                label="Nom :"
-                value={formData.supplier_name}
-                onChange={handleChange}
-                validators={[]}
-                placeholder="Ajouter la référence du produit"
-                create
-                gray
-              />
-              <Input
-                element="input"
-                id="supplier_ref"
-                label="Référence produit :"
-                value={formData.supplier_ref}
-                onChange={handleChange}
-                validators={[]}
-                placeholder="Ajouter la designation du produit"
-                create
-                gray
-              />
-            </div>
+
             {/* Section Grille de dimension */}
-            {formData.dimension_type !== "" && <div className="mt-3">
-              <UVCGrid
-                onDimensionsChange={handleGridChange}
-              />
-            </div>}
+            <div className="mt-3">
+              <UVCGrid onDimensionsChange={handleGridChange} />
+            </div>
 
             {/* Section Image */}
             <div className="mt-3">
@@ -600,17 +644,51 @@ export default function CreateProductPage() {
                 </div>
               </div>
             </Card>
+            <Card title="Fournisseur principal">
+              <div className="flex flex-col gap-2">
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Nom
+                  </label>
+                  <CreatableSelect<SuppliersOption>
+                    value={selectedOptionSupplier}
+                    onChange={handleChangeSupplier}
+                    onInputChange={handleInputChangeSupplier}
+                    inputValue={inputValueSupplier}
+                    options={optionsSupplier}
+                    placeholder="Selectionner un fournisseur"
+                    styles={customStyles}
+                    className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                    required
+                  />
+                </div>
+                <div>
+                  <Input
+                    element="input"
+                    id="supplier_ref"
+                    label="Référence produit :"
+                    value={formData.supplier_ref}
+                    onChange={handleChange}
+                    validators={[]}
+                    placeholder="Ajouter la designation du produit"
+                    create
+                    gray
+                  />
+                </div>
+              </div>
+            </Card>
             <Card title="Caractéristiques du produit">
               <div className="flex flex-col gap-3">
                 <Input
-                  element="select"
+                  element="input"
                   id="dimension_type"
                   label="Type de dimension :"
                   value={formData.dimension_type}
-                  options={dimensionsOptions}
                   onChange={handleChange}
                   validators={[]}
                   placeholder="Selectionnez un type de dimension"
+                  create
+                  disabled
                   gray
                 />
 
@@ -651,13 +729,19 @@ export default function CreateProductPage() {
           </div>
         </div>
         {!isLoading ? (
-          <div className="flex gap-3 mt-5">
-            <Button size="small" cancel type="button">
-              Annuler
-            </Button>
-            <Button size="small" blue type="submit">
-              Enregistrer
-            </Button>
+          <div className="flex items-center justify-between gap-3 mt-[50px]">
+            <div className="flex gap-3">
+              <Button size="small" cancel type="button">
+                Annuler
+              </Button>
+              <Button size="small" blue type="submit">
+                Enregistrer
+              </Button>
+            </div>
+            <div className="flex items-center gap-3 text-blue-500 cursor-pointer ">
+              <span>Suivant</span>
+              <ArrowRight/>
+            </div>
           </div>
         ) : (
           <div className="mt-3">

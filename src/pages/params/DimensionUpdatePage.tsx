@@ -7,7 +7,7 @@ import Button from "../../components/FormElements/Button";
 import { CircularProgress, Divider } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
 import Modal from "../../components/Shared/Modal";
-import { RotateCcw, X } from "lucide-react";
+import { ChevronLeft, RotateCcw, X } from "lucide-react";
 
 interface Dimension {
   _id: string;
@@ -16,14 +16,27 @@ interface Dimension {
   GDI_LIBELLE: any;
 }
 
+interface DimensionUpdatePageProps {
+  selectedDimension: Dimension;
+  onUpdate: () => void;
+  onClose: () => void;
+}
+
 interface FormData {
   GDI_TYPEDIM: string;
   GDI_DIMORLI: string;
   GDI_LIBELLE: string;
 }
 
-export default function ClassificationUpdatePage() {
-  const { id } = useParams();
+export default function DimensionUpdatePage({
+  selectedDimension,
+  onClose,
+  onUpdate,
+}: DimensionUpdatePageProps) {
+  const id = selectedDimension._id;
+  const [dimensionUpdate, setDimensionUpadte] = useState<Dimension | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [isModify, setIsModify] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,7 +48,6 @@ export default function ClassificationUpdatePage() {
   const [libelle, setLibelle] = useState("");
   const [type, setType] = useState("");
   const [code, setCode] = useState("");
-  const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
     GDI_TYPEDIM: "",
     GDI_DIMORLI: "",
@@ -79,6 +91,12 @@ export default function ClassificationUpdatePage() {
     }
   }, [dimension]);
 
+  useEffect(() => {
+    if (selectedDimension) {
+      setDimensionUpadte(selectedDimension);
+    }
+  }, [selectedDimension]);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -97,7 +115,8 @@ export default function ClassificationUpdatePage() {
         setTimeout(() => {
           notifySuccess("Dimension modifiée avec succés !");
           setIsLoading(false);
-          navigate(-1);
+          onUpdate();
+          onClose();
         }, 1000);
       } else {
         notifyError("Erreur lors de la modification");
@@ -109,7 +128,7 @@ export default function ClassificationUpdatePage() {
   };
 
   return (
-    <section className="w-full h-screen bg-gray-100 p-7">
+    <section className="w-full p-4">
       <Modal
         show={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
@@ -144,82 +163,84 @@ export default function ClassificationUpdatePage() {
           </div>
         )}
       </Modal>
-    
-        <form
-         className="w-[70%] mt-[50px] mb-[50px]"
-          onSubmit={handleSubmit}
-        >
-          <div className="flex items-center justify-between">
-            <h1 className="text-[32px] font-bold text-gray-800">
-              Code de la <span className="font-bold">{type} :</span>{" "}
-              {dimension?.GDI_DIMORLI}
-            </h1>
-            {!isModify && (
-              <Button size="small" blue onClick={() => setIsModify(true)}>
-                Modifier la dimension
-              </Button>
-            )}
+
+      <form className="mb-[50px]">
+        <div className="flex items-center justify-between">
+          <div onClick={onClose} className="cursor-pointer">
+            <ChevronLeft />
           </div>
-          <div className="mt-5 flex flex-col justify-between">
-            <div className="flex flex-col">
-              {isModify ? (
-                <div>
-                  <Input
-                    element="input"
-                    id="label"
-                    type="text"
-                    placeholder="Modifier le libellé"
-                    value={libelle}
-                    label="Libellé"
-                    validators={[]}
-                    create
-                    onChange={handleLibelleChange}
-                    gray
-                  />
-                </div>
-              ) : (
-                <div>
-                  <Input
-                    element="input"
-                    id="label"
-                    type="text"
-                    placeholder="Modifier le libellé"
-                    value={libelle}
-                    label="Libellé"
-                    validators={[]}
-                    disabled
-                    create
-                    onChange={handleLibelleChange}
-                    gray
-                  />
-                </div>
-              )}
-            </div>
-            {isModify && (
-              <div className="w-full mt-2">
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="small"
-                    cancel
-                    type="button"
-                    onClick={() => setIsModify(false)}
-                  >
-                    Annuler
-                  </Button>
-                  <Button
-                    size="small"
-                    blue
-                    onClick={() => setIsModalOpen(true)}
-                    type="button"
-                  >
-                    Modiifer {type}
-                  </Button>
-                </div>
+          <h1 className="text-[20px] font-bold text-gray-800">
+            Code de la <span className="font-bold">{type} :</span>{" "}
+            {dimension?.GDI_DIMORLI}
+          </h1>
+          {!isModify && (
+            <Button size="small" blue onClick={() => setIsModify(true)}>
+              Modifier
+            </Button>
+          )}
+        </div>
+        <div className="mt-3">
+          <Divider />
+        </div>
+        <div className="mt-5 flex flex-col justify-between">
+          <div className="flex flex-col">
+            {isModify ? (
+              <div>
+                <Input
+                  element="input"
+                  id="label"
+                  type="text"
+                  placeholder="Modifier le libellé"
+                  value={libelle}
+                  label="Libellé"
+                  validators={[]}
+                  create
+                  onChange={handleLibelleChange}
+                  gray
+                />
+              </div>
+            ) : (
+              <div>
+                <Input
+                  element="input"
+                  id="label"
+                  type="text"
+                  placeholder="Modifier le libellé"
+                  value={libelle}
+                  label="Libellé"
+                  validators={[]}
+                  disabled
+                  create
+                  onChange={handleLibelleChange}
+                  gray
+                />
               </div>
             )}
           </div>
-        </form>
-  
+          {isModify && (
+            <div className="w-full mt-2">
+              <div className="flex items-center gap-2">
+                <Button
+                  size="small"
+                  cancel
+                  type="button"
+                  onClick={() => setIsModify(false)}
+                >
+                  Annuler
+                </Button>
+                <Button
+                  size="small"
+                  blue
+                  onClick={() => setIsModalOpen(true)}
+                  type="button"
+                >
+                  Modiifer {type}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </form>
     </section>
   );
 }

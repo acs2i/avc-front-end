@@ -7,7 +7,7 @@ import Button from "../../components/FormElements/Button";
 import { CircularProgress, Divider } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
 import Modal from "../../components/Shared/Modal";
-import { RotateCcw, X } from "lucide-react";
+import { ChevronLeft, RotateCcw, X } from "lucide-react";
 
 interface Family {
   _id: string;
@@ -16,26 +16,35 @@ interface Family {
   YX_LIBELLE: string;
 }
 
+interface ClassificationUpdatePageProps {
+  selectedFamily: Family;
+  onUpdate: () => void;
+  onClose: () => void;
+}
+
 interface FormData {
   YX_TYPE: string;
   YX_CODE: string;
   YX_LIBELLE: string;
 }
 
-export default function ClassificationUpdatePage() {
-  const { id } = useParams();
+export default function ClassificationUpdatePage({
+  selectedFamily,
+  onUpdate,
+  onClose,
+}: ClassificationUpdatePageProps) {
+  const id = selectedFamily._id;
+  const [classification, setClassification] = useState<Family | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isModify, setIsModify] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
-
   const { data: family } = useFetch<Family>(
     `${process.env.REACT_APP_URL_DEV}/api/v1/family/${id}`
   );
   const [libelle, setLibelle] = useState("");
   const [type, setType] = useState("");
   const [code, setCode] = useState();
-  const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
     YX_TYPE: "",
     YX_CODE: "",
@@ -90,6 +99,12 @@ export default function ClassificationUpdatePage() {
     }
   }, [family]);
 
+  useEffect(() => {
+    if (selectedFamily) {
+      setClassification(selectedFamily);
+    }
+  }, [selectedFamily]);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -108,7 +123,8 @@ export default function ClassificationUpdatePage() {
         setTimeout(() => {
           notifySuccess("Classification modifiée avec succés !");
           setIsLoading(false);
-          navigate(-1);
+          onUpdate();
+          onClose();
         }, 1000);
       } else {
         notifyError("Erreur lors de la modification");
@@ -120,7 +136,7 @@ export default function ClassificationUpdatePage() {
   };
 
   return (
-    <section className="w-full h-screen bg-gray-100 p-7">
+    <section className="w-full p-4">
       <Modal
         show={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
@@ -137,7 +153,7 @@ export default function ClassificationUpdatePage() {
         <Divider />
         {!isLoading ? (
           <div className="flex justify-end mt-7 px-7 gap-2">
-             <Button
+            <Button
               size="small"
               danger
               type="button"
@@ -146,7 +162,7 @@ export default function ClassificationUpdatePage() {
               Non
             </Button>
             <Button size="small" blue type="submit">
-             Oui
+              Oui
             </Button>
           </div>
         ) : (
@@ -155,104 +171,107 @@ export default function ClassificationUpdatePage() {
           </div>
         )}
       </Modal>
-
-        <form className="w-[70%] mt-[50px] mb-[50px]">
-          <div className="flex items-center justify-between">
-            <h1 className="text-[32px] font-bold text-gray-800">
-              Code de la <span className="font-bold">{type} :</span> {family?.YX_CODE}
-            </h1>
-            {!isModify && (
-              <Button size="small" blue onClick={() => setIsModify(true)}>
-                Modifier la classe
-              </Button>
+      <form className="mb-[50px]">
+        <div className="flex items-center justify-between">
+          <div onClick={onClose} className="cursor-pointer">
+            <ChevronLeft />
+          </div>
+          <h1 className="text-[20px] font-bold text-gray-800">
+            Code de la <span className="font-bold">{type} :</span>{" "}
+            {family?.YX_CODE}
+          </h1>
+          {!isModify && (
+            <Button size="small" blue onClick={() => setIsModify(true)}>
+              Modifier
+            </Button>
+          )}
+        </div>
+        <div className="mt-3">
+          <Divider />
+        </div>
+        <div className="mt-5 flex flex-col justify-between">
+          <div className="flex flex-col">
+            {isModify ? (
+              <div>
+                <Input
+                  element="input"
+                  id="level"
+                  label="Niveau"
+                  value={type}
+                  placeholder={type}
+                  disabled
+                  validators={[]}
+                  gray
+                  create
+                  onChange={handleTypeChange}
+                />
+                <Input
+                  element="input"
+                  id="label"
+                  type="text"
+                  placeholder="Modifier le libellé"
+                  value={libelle}
+                  label="Libellé"
+                  validators={[]}
+                  create
+                  onChange={handleLibelleChange}
+                  gray
+                />
+              </div>
+            ) : (
+              <div>
+                <Input
+                  element="input"
+                  id="level"
+                  label="Niveau"
+                  value={type}
+                  placeholder={type}
+                  disabled
+                  validators={[]}
+                  gray
+                  create
+                  onChange={handleTypeChange}
+                />
+                <Input
+                  element="input"
+                  id="label"
+                  type="text"
+                  placeholder="Modifier le libellé"
+                  value={libelle}
+                  label="Libellé"
+                  disabled
+                  validators={[]}
+                  create
+                  onChange={handleLibelleChange}
+                  gray
+                />
+              </div>
             )}
           </div>
-          <div className="mt-5 flex flex-col justify-between">
-            <div className="flex flex-col">
-              {isModify ? (
-                <div>
-                  <Input
-                    element="input"
-                    id="level"
-                    label="Niveau"
-                    value={type}
-                    placeholder={type}
-                    disabled
-                    validators={[]}
-                    gray
-                    create
-                    onChange={handleTypeChange}
-                  />
-                  <Input
-                    element="input"
-                    id="label"
-                    type="text"
-                    placeholder="Modifier le libellé"
-                    value={libelle}
-                    label="Libellé"
-                    validators={[]}
-                    create
-                    onChange={handleLibelleChange}
-                    gray
-                  />
-                </div>
-              ) : (
-                <div>
-                  <Input
-                    element="input"
-                    id="level"
-                    label="Niveau"
-                    value={type}
-                    placeholder={type}
-                    disabled
-                    validators={[]}
-                    gray
-                    create
-                    onChange={handleTypeChange}
-                  />
-                  <Input
-                    element="input"
-                    id="label"
-                    type="text"
-                    placeholder="Modifier le libellé"
-                    value={libelle}
-                    label="Libellé"
-                    disabled
-                    validators={[]}
-                    create
-                    onChange={handleLibelleChange}
-                    gray
-                  />
-                </div>
-              )}
+        </div>
+        {isModify && (
+          <div className="w-full mt-2">
+            <div className="flex items-center gap-2">
+              <Button
+                size="small"
+                cancel
+                type="button"
+                onClick={() => setIsModify(false)}
+              >
+                Annuler
+              </Button>
+              <Button
+                size="small"
+                blue
+                onClick={() => setIsModalOpen(true)}
+                type="button"
+              >
+                Modifier
+              </Button>
             </div>
           </div>
-          {isModify && (
-            <div className="w-full mt-2">
-              <div className="flex items-center gap-2">
-                <Button
-                  size="small"
-                  cancel
-                  type="button"
-                  onClick={() => setIsModify(false)}
-                >
-              
-                  Annuler
-                </Button>
-                <Button
-                  size="small"
-                  blue
-                  onClick={() => setIsModalOpen(true)}
-                  type="button"
-                >
-                 
-                  Modifier
-                </Button>
-              </div>
-            </div>
-          )}
-        </form>
-
+        )}
+      </form>
     </section>
   );
 }

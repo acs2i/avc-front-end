@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import SingleProductPage from "./pages/product/SingleProductPage";
 import Sidebar from "./components/Navigation/Sidebar";
 import LoginPage from "./pages/login/LoginPage";
-import { useLocation } from "react-router-dom";
 import Navbar from "./components/Navigation/Navbar";
-import { useSelector } from "react-redux";
 import SuppliersPage from "./pages/suppliers/SuppliersPage";
 import CreateProductPage from "./pages/product/CreateProductPage";
 import ParamsMenuPage from "./pages/params/ParamsMenuPage";
@@ -30,22 +30,23 @@ import DonePage from "./pages/draft/DonePage";
 import AdminPage from "./pages/panel-admin/AdminPage";
 import CreateUserPage from "./pages/panel-admin/CreateUser";
 import ProductList from "./pages/product/ProductList";
-import { Navigate, Outlet } from "react-router-dom";
 import CreateGroupPage from "./pages/panel-admin/CreateGroup";
 import CreatedGroupPage from "./pages/panel-admin/CreatedGroup";
 import CalendarPage from "./pages/calendar/CalendarPage";
+
+// Composant PrivateRoute
+const PrivateRoute = ({ isAuth } : any) => {
+  return isAuth ? <Outlet /> : <Navigate to="/login" />;
+};
 
 function App() {
   const location = useLocation();
   const excludedPaths = ["/login"];
   const isAuth = Boolean(useSelector((state: any) => state.auth.token));
 
-  console.log(isAuth);
-
   useEffect(() => {
     window.scrollTo({
       top: 0,
-      // behavior: 'smooth'
     });
   }, [location.pathname]);
 
@@ -55,96 +56,35 @@ function App() {
       : location.pathname === path
   );
 
-  const PrivateRoute = () => {
-    const isAuth = Boolean(useSelector((state: any) => state.auth.token));
-
-    return isAuth ? <Outlet /> : <Navigate to="/login" />;
-  };
-
   return (
     <>
-        {shouldShowNavbar && <Sidebar />}
-        {shouldShowNavbar && <Navbar />}
-        {isAuth ?
-        <div className="ml-[250px] mt-[60px]">
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route element={<PrivateRoute />}>
-              <Route
-                path="/"
-                element={isAuth ? <Home /> : <Navigate to="/login" />}
-              />
-              <Route path="/product/edit" element={<CreateProductPage />} />
-              <Route path="/parameters" element={<ParamsMenuPage />} />
-              <Route
-                path="/parameters/classification"
-                element={<ClassificationsPage />}
-              />
-              <Route
-                path="/parameters/classification/:id"
-                element={<ClassificationUpdatePage />}
-              />
-              <Route
-                path="/parameters/classification/create"
-                element={<ClassificationCreatePage />}
-              />
-              <Route
-                path="/parameters/collection"
-                element={<CollectionPage />}
-              />
-              <Route
-                path="/parameters/collection/:id"
-                element={<CollectionUpdatePage />}
-              />
-              <Route
-                path="/parameters/collection/create"
-                element={<CollectionCreatePage />}
-              />
-              <Route path="/parameters/dimension" element={<DimensionPage />} />
-              <Route
-                path="/parameters/dimension/:id"
-                element={<DimensionUpdatePage />}
-              />
-              <Route
-                path="/parameters/dimension/create/item"
-                element={<DimensionCreateItemPage />}
-              />
-              <Route path="/parameters/grid" element={<GridPage />} />
-              <Route
-                path="/parameters/grid/create"
-                element={<GridCreatePage />}
-              />
-              <Route path="/parameters/brand" element={<BrandPage />} />
-              <Route
-                path="/parameters/brand/:id"
-                element={<BrandUpdatePage />}
-              />
-              <Route
-                path="/parameters/brand/create"
-                element={<BrandCreatePage />}
-              />
-              <Route path="/product" element={<ProductList />} />
-              <Route path="/product/:id" element={<SingleProductPage />} />
-              <Route
-                path="/suppliers/suppliers-list"
-                element={<SuppliersPage />}
-              />
-              <Route path="/draft" element={<DraftPage />} />
-              <Route path="/in-progress" element={<InProgressPage />} />
-              <Route path="/done" element={<DonePage />} />
-              <Route path="/admin" element={<AdminPage />} />
-              <Route path="/admin/create-user" element={<CreateUserPage />} />
-              <Route path="/admin/create-group" element={<CreateGroupPage />} />
-              <Route path="/admin/created-group" element={<CreatedGroupPage />} />
-              <Route path="/calendar" element={<CalendarPage />} />
-            </Route>
-          </Routes>
-        </div> : 
+      {shouldShowNavbar && <Sidebar />}
+      {shouldShowNavbar && <Navbar />}
+      <div className={isAuth ? "ml-[250px] mt-[60px]" : ""}>
         <Routes>
+          {/* Routes publiques */}
           <Route path="/login" element={<LoginPage />} />
-        </Routes> 
-        }
-  
+
+          {/* Routes privées */}
+          <Route element={<PrivateRoute isAuth={isAuth} />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/product/edit" element={<CreateProductPage />} />
+            <Route path="/parameters" element={<ParamsMenuPage />} />
+            <Route path="/product" element={<ProductList />} />
+            <Route path="/product/:id" element={<SingleProductPage />} />
+            <Route path="/suppliers/suppliers-list" element={<SuppliersPage />} />
+            <Route path="/draft" element={<DraftPage />} />
+            <Route path="/in-progress" element={<InProgressPage />} />
+            <Route path="/done" element={<DonePage />} />
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/admin/create-user" element={<CreateUserPage />} />
+            <Route path="/admin/create-group" element={<CreateGroupPage />} />
+            <Route path="/admin/created-group" element={<CreatedGroupPage />} />
+            <Route path="/calendar" element={<CalendarPage />} />
+          </Route>
+          <Route path="*" element={<Navigate to={isAuth ? "/" : "/login"} />} />
+        </Routes>
+      </div>
     </>
   );
 }

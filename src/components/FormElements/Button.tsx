@@ -25,7 +25,7 @@ interface ButtonProps {
 
 const Button: React.FC<ButtonProps> = (props) => {
   const buttonClasses = `
-    font-inherit text-center py-4 px-6 rounded-md flex items-center gap-2
+    font-inherit text-center py-4 px-6 rounded-md flex items-center justify-center gap-2
     ${props.size === "small" ? "text-xs py-[8px] px-[10px]" : ""}
     ${props.size === "medium" ? "text-md py-[10px] px-[25px]" : ""}
     ${props.size === "xs" ? "text-xs py-[5px] px-[5px]" : ""}

@@ -13,16 +13,22 @@ interface Grid {
   DIMENSIONS: string[];
 }
 
-export default function GridPage() {
+interface GridPageProps {
+  onSelectGrid: (grid: Grid) => void;
+  shouldRefetch: boolean;
+}
+
+
+export default function GridPage({ onSelectGrid, shouldRefetch }: GridPageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [grids, setGrids] = useState<Grid[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const limit = 20;
+  const limit = 30;
   const [totalItem, setTotalItem] = useState(null);
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const [prevSearchValue, setPrevSearchValue] = useState("");
   const [expandedGrid, setExpandedGrid] = useState<Grid | null>(null);
-  const N = 5;
+  const N = 10;
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -57,44 +63,22 @@ export default function GridPage() {
     }
   };
 
+  useEffect(() => {
+    fetchGrids();
+  }, [shouldRefetch]);
+
   const handleViewMore = (grid: Grid) => {
     setExpandedGrid(grid);
   };
 
+  const extractNumbers = (str: string) => {
+    return str.replace(/^\D+\s*/, '');
+  };
+
   return (
-    <div>
-      <Header
-        title="Liste des grilles de dimensions"
-        link="/parameters/grid/create"
-        btnTitle="Créer une grille"
-        placeholder="Rechercher une grille"
-      >
-        <div className="flex items-center gap-4 py-4">
-          <div className="flex items-center gap-4">
-            <label className="w-[60px] text-sm font-bold">type :</label>
-            <input
-              type="text"
-              id="TYPE"
-              className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
-              placeholder="Rechercher un code"
-            />
-          </div>
-
-          <div className="flex items-center gap-4">
-            <label className="w-[100px] text-sm font-bold">Libellé :</label>
-            <input
-              type="text"
-              id="LIBELLE"
-              className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
-              placeholder="Rechercher un code"
-            />
-          </div>
-        </div>
-      </Header>
-
-      <div className="relative overflow-x-auto bg-white">
+       <div className="relative overflow-x-auto">
         <table className="w-full text-left">
-          <thead className="border-y-[1px] border-gray-200 text-md font-[800] text-gray-700">
+          <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
             <tr>
               <th scope="col" className="px-6 py-2 w-1/3">
                 Type
@@ -112,18 +96,20 @@ export default function GridPage() {
               ? grids.map((grid) => (
                   <tr
                     key={grid._id}
-                    className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap"
+                    className="border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap"
+                    onClick={() => onSelectGrid(grid)}
                   >
-                    <td className="px-6 py-4">{grid.TYPE}</td>
-                    <td className="px-6 py-4">{grid.LIBELLE}</td>
-                    <td className="px-6 py-4">
-                      <div className="grid grid-cols-5 gap-1">
+                    <td className="px-6 py-2">{grid.TYPE}</td>
+                    <td className="px-6 py-2">{grid.LIBELLE}</td>
+                    <td className="px-6 py-2">
+                      <div className="grid grid-cols-10 gap-1">
                         {grid.DIMENSIONS.slice(0, N).map((item, index) => (
                           <span
                             key={index}
-                            className="bg-orange-100 text-orange-500 border border-orange-500 p-1 text-center text-[10px] rounded-[5px]"
+                            className="text-[10px]"
                           >
-                            {item}
+                            {extractNumbers(item)}
+                            {index < grid.DIMENSIONS.length - 1 && ' ~ '}
                           </span>
                         ))}
                       </div>
@@ -132,7 +118,7 @@ export default function GridPage() {
                           {expandedGrid != grid && (
                             <button
                               onClick={() => handleViewMore(grid)}
-                              className="text-blue-600 text-xs"
+                              className="text-blue-600 text-[8px]"
                             >
                               Voir plus
                             </button>
@@ -143,15 +129,15 @@ export default function GridPage() {
                                 {grid.DIMENSIONS.slice(N).map((item, index) => (
                                   <span
                                     key={index}
-                                    className="bg-orange-100 text-orange-500 border border-orange-500 p-1 text-center text-[10px] rounded-[5px]"
+                                    className="text-[10px] rounded-[5px]"
                                   >
-                                    {item}
+                                     {extractNumbers(item)}
                                   </span>
                                 ))}
                               </div>
                               <button
                                 onClick={() => setExpandedGrid(null)}
-                                className="text-blue-600 text-xs"
+                                className="text-blue-600 text-[8px]"
                               >
                                 Voir moins
                               </button>
@@ -193,6 +179,6 @@ export default function GridPage() {
           </div>
         </div>
       </div>
-    </div>
+
   );
 }

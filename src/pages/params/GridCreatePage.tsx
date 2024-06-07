@@ -23,7 +23,16 @@ interface FormData {
   DIMENSIONS: string[];
 }
 
-export default function GridCreatePage() {
+interface GridCreatePageProps {
+  onCreate: () => void;
+  onClose: () => void;
+}
+
+
+export default function GridCreatePage({
+  onCreate,
+  onClose,
+}: GridCreatePageProps) {
   const [searchValue, setSearchValue] = useState("");
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -66,7 +75,8 @@ export default function GridCreatePage() {
         setTimeout(() => {
           notifySuccess("Collection crée avec succés !");
           setIsLoading(false);
-          navigate(-1);
+          onCreate();
+          onClose();
         }, 1000);
       } else {
         notifyError("Erreur lors de la création");
@@ -155,10 +165,10 @@ export default function GridCreatePage() {
   }, [searchValue, type]);
 
   return (
-    <section className="w-full h-screen bg-gray-100 p-7">
-      <form className="w-[70%] mt-[50px] mb-[50px]" onSubmit={handleSubmit}>
+    <section className="w-full p-4">
+      <form className="mb-[50px]" onSubmit={handleSubmit}>
         <h1 className="text-[32px] font-bold text-gray-800">
-          Créer une dimension
+          Créer une grille de dimension
         </h1>
         <div>
           <div>
