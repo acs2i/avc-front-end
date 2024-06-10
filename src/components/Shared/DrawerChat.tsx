@@ -16,7 +16,7 @@ const DrawerOverlay: React.FC<SideDrawerProps> = (props) => {
         return null;
       }
   const content = (
-    <aside className="fixed right-[50px] bottom-[90px] z-[3000000] h-[500px] w-[400px] bg-stone-100 shadow-md rounded-lg">
+    <aside className="fixed right-[50px] bottom-[90px] z-[3000000] h-[500px] w-[400px] bg-stone-100 shadow-xl rounded-lg border-2 border-gray-200">
       {props.children}
     </aside>
   );
