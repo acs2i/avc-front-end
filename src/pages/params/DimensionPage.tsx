@@ -114,17 +114,20 @@ export default function DimensionPage({ onSelectDimension, shouldRefetch, highli
               <tr
                 key={dimension._id}
                 className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap ${
-                  dimension._id === highlightedDimensionId ? "bg-orange-200 text-white" : ""
+                  dimension._id === highlightedDimensionId ? "bg-orange-500 text-white" : ""
                 }`}
                 onClick={() => onSelectDimension(dimension)}
               >
-                <td className="px-6 py-2 text-blue-600">
+                <td className={`px-6 py-2 text-blue-600 ${
+                  dimension._id === highlightedDimensionId ? "text-white" : ""
+                }`}>
                   {dimension.GDI_TYPEDIM in typeLabels
                     ? typeLabels[dimension.GDI_TYPEDIM]
                     : "Type inconnu"}
                 </td>
                 <td className="px-6 py-2">{dimension.GDI_DIMORLI}</td>
                 <td className="px-6 py-2">{dimension.GDI_LIBELLE}</td>
+                {dimension._id === highlightedDimensionId && <td className="px-6 py-2">Nouveau</td>}
               </tr>
             ))
           ) : (

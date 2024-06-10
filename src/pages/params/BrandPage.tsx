@@ -131,13 +131,14 @@ export default function BrandPage({
                 key={brand._id}
                 className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap ${
                   brand._id === highlightedBrandId
-                    ? "bg-orange-200 text-white"
+                    ? "bg-orange-500 text-white"
                     : ""
                 }`}
                 onClick={() => onSelectBrand(brand)}
               >
                 <td className="px-6 py-2">{brand.YX_CODE}</td>
                 <td className="px-6 py-2">{brand.YX_LIBELLE}</td>
+                {brand._id === highlightedBrandId && <td className="px-6 py-2">Nouveau</td>}
               </tr>
             ))
           ) : (

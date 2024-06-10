@@ -17,6 +17,7 @@ import ProductList from "./pages/product/ProductList";
 import CreateGroupPage from "./pages/panel-admin/CreateGroup";
 import CreatedGroupPage from "./pages/panel-admin/CreatedGroup";
 import CalendarPage from "./pages/calendar/CalendarPage";
+import Chat from "./components/Shared/Chat";
 
 // Composant PrivateRoute
 const PrivateRoute = ({ isAuth } : any) => {
@@ -67,6 +68,7 @@ function App() {
           <Route path="*" element={<Navigate to={isAuth ? "/" : "/login"} />} />
         </Routes>
       </div>
+      {shouldShowNavbar && <Chat />}
     </>
   );
 }

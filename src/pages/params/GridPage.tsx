@@ -110,7 +110,7 @@ export default function GridPage({ onSelectGrid, shouldRefetch, highlightedGridI
                     key={grid._id}
                     className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap ${
                       grid._id === highlightedGridId
-                        ? "bg-orange-200 text-white"
+                        ? "bg-orange-500 text-white"
                         : ""
                     }`}
                     onClick={() => onSelectGrid(grid)}
@@ -162,6 +162,7 @@ export default function GridPage({ onSelectGrid, shouldRefetch, highlightedGridI
                         </>
                       )}
                     </td>
+                    {grid._id === highlightedGridId && <td className="px-6 py-2">Nouveau</td>}
                   </tr>
                 ))
               : ""}

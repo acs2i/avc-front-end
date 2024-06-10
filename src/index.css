@@ -69,6 +69,25 @@ td{
 }
 
 
+.side-chat-enter {
+  height: 0;
+  overflow: hidden;
+}
+.side-chat-enter-active {
+  height: 500px;
+  transition: height 200ms ease-in-out;
+}
+.side-chat-exit {
+  height: 500px;
+  overflow: hidden;
+}
+.side-chat-exit-active {
+  height: 0;
+  transition: height 200ms ease-in-out;
+}
+
+
+
 
 .slide-enter {
   transform: scale(0%);

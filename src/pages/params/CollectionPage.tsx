@@ -129,12 +129,13 @@ export default function CollectionPage({ onSelectCollection, shouldRefetch, high
                 <tr
                   key={collection._id}
                   className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap ${
-                    collection._id === highlightedCollectionId ? "bg-orange-200 text-white" : ""
+                    collection._id === highlightedCollectionId ? "bg-orange-500 text-white" : ""
                   }`}
                   onClick={() => onSelectCollection(collection)}
                 >
                   <td className="px-6 py-2">{collection.CODE}</td>
                   <td className="px-6 py-2 ">{collection.LIBELLE}</td>
+                  {collection._id === highlightedCollectionId && <td className="px-6 py-2">Nouveau</td>}
                 </tr>
               ))
             ) : (

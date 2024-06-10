@@ -160,15 +160,18 @@ function ClassificationsPage({
               <tr
                 key={family._id}
                 className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap ${
-                  family._id === highlightedFamilyId ? "bg-orange-200 text-white" : ""
+                  family._id === highlightedFamilyId ? "bg-orange-500 text-white" : ""
                 }`}
                 onClick={() => onSelectFamily(family)}
               >
-                <td className="px-6 py-2 flex items-center gap-2 text-blue-600">
+                <td className={`px-6 py-2 flex items-center gap-2 text-blue-600 ${
+                  family._id === highlightedFamilyId ? "text-white" : ""
+                } `}>
                   {typeLabels[family.YX_TYPE]}
                 </td>
                 <td className="px-6 py-2">{family.YX_CODE}</td>
                 <td className="px-6 py-2">{family.YX_LIBELLE}</td>
+                {family._id === highlightedFamilyId && <td className="px-6 py-2">Nouveau</td>}
               </tr>
             ))
           ) : (
