@@ -15,7 +15,7 @@ interface FormData {
 }
 
 interface BrandCreatePageProps {
-  onCreate: () => void;
+  onCreate: (newBrandId: string) => void;
   onClose: () => void;
 }
 
@@ -58,10 +58,12 @@ export default function BrandCreatePage({
       );
 
       if (response.ok) {
+        const data = await response.json();
+        const newBrandId = data._id;
         setTimeout(() => {
           notifySuccess("Marque crée avec succés !");
           setIsLoading(false);
-          onCreate();
+          onCreate(newBrandId);
           onClose();
         }, 1000);
       } else {

@@ -15,7 +15,7 @@ interface FormData {
 }
 
 interface CollectionCreatePageProps {
-  onCreate: () => void;
+  onCreate: (newCollectionId: string) => void;
   onClose: () => void;
 }
 
@@ -58,10 +58,12 @@ export default function CollectionCreatePage({
       );
 
       if (response.ok) {
+        const data = await response.json();
+        const newCollectionId = data._id;
         setTimeout(() => {
           notifySuccess("Collection crée avec succés !");
           setIsLoading(false);
-          onCreate();
+          onCreate(newCollectionId);
           onClose();
         }, 1000);
       } else {

@@ -52,7 +52,7 @@ export default function SingleProductPage() {
   return (
     <section className="w-full bg-gray-100 p-8">
       <div className="relative w-full h-[300px] bg-white p-5 border rounded-lg">
-        {product && <h3 className="text-[35px] font-[800] text-gray-800">{product[0].GA_LIBELLE}</h3>}
+        {product && <h3 className="text-[35px] font-[800] text-gray-800">{product[0]?.GA_LIBELLE}</h3>}
         <div className="mt-4 mb-[30px]">
           <div className="flex justify-end">
             <div className="flex items-center gap-2">
@@ -68,9 +68,9 @@ export default function SingleProductPage() {
 
         {product && (
           <div className="absolute h-[150px] w-[150px] overflow-hidden flex items-center justify-center left-[50%] translate-x-[-50%] bottom-[-40px] border border-[10px] border-white bg-white rounded-full">
-            {product[0].imgPath ? (
+            {product[0]?.imgPath ? (
               <img
-                src={product[0].imgPath}
+                src={product[0]?.imgPath}
                 alt=""
                 className="w-full h-auto rounded-lg transition-all duration-[20s] transform scale-100 hover:scale-150 shadow-none hover:shadow-lg"
               />
@@ -87,7 +87,7 @@ export default function SingleProductPage() {
 
       {/* Paramètres généraux */}
       {product && page === "general" && (
-        <div className="mt-[50px] flex flex-col gap-3">
+        <div className="mt-[12px] flex flex-col gap-3">
           <div className="flex gap-3">
             <div className="border border-gray-200 rounded-md px-4 py-7 shadow-md w-[700px] bg-white">
               <h4 className="text-[17px] font-[800] text-sky-600">
@@ -98,16 +98,16 @@ export default function SingleProductPage() {
                   <tbody className="capitalize text-xs text-gray-700">
                     <tr>
                       <td className="py-2 font-bold">Référence :</td>
-                      <td className="px-4 py-2">{product[0].GA_CODEARTICLE}</td>
+                      <td className="px-4 py-2">{product[0]?.GA_CODEARTICLE}</td>
                     </tr>
                     <tr>
                       <td className="py-2 font-bold">Désignation :</td>
-                      <td className="px-4 py-2">{product[0].GA_LIBCOMPL}</td>
+                      <td className="px-4 py-2">{product[0]?.GA_LIBCOMPL}</td>
                     </tr>
                     <tr>
                       <td className="py-2 font-bold">Désign. courte :</td>
                       {product && (
-                        <td className="px-4 py-2">{product[0].GA_LIBELLE}</td>
+                        <td className="px-4 py-2">{product[0]?.GA_LIBELLE}</td>
                       )}
                     </tr>
                     <tr>
@@ -120,20 +120,20 @@ export default function SingleProductPage() {
                       </td>
                       <td className="px-4 py-2">
                         <div className="flex items-center justify-between">
-                          <span>{product[0].GA_FOURNPRINC}</span>
+                          <span>{product[0]?.GA_FOURNPRINC}</span>
                         </div>
                       </td>
                     </tr>
                     <tr>
                       <td className="py-2 font-bold">Marque :</td>
                       <td className="px-4 py-2">
-                        {product[0].brand.YX_LIBELLE}
+                        {product[0]?.brand.YX_LIBELLE}
                       </td>
                     </tr>
                     <tr>
                       <td className="py-2 font-bold">Collection :</td>
                       <td className="px-4 py-2">
-                        {product[0].brand.YX_LIBELLE}
+                        {product[0]?.brand.YX_LIBELLE}
                       </td>
                     </tr>
                     <tr>
@@ -142,11 +142,11 @@ export default function SingleProductPage() {
                       </td>
                       <td className="px-4 py-2">
                         <div>
-                          <span>{product[0].GA_LIBREART1}</span>
-                          {product[0].family && (
+                          <span>{product[0]?.GA_LIBREART1}</span>
+                          {product[0]?.family && (
                             <>
                               <span className="mx-1">-</span>
-                              <span>{product[0].family.YX_LIBELLE}</span>
+                              <span>{product[0]?.family.YX_LIBELLE}</span>
                             </>
                           )}
                         </div>
@@ -154,14 +154,14 @@ export default function SingleProductPage() {
                     </tr>
                     <tr>
                       <td className="py-2 font-bold">Sous-famille :</td>
-                      {product[0].GA_LIBREART2 && (
+                      {product[0]?.GA_LIBREART2 && (
                         <td className="px-4 py-2">
                           <div>
                             <span>{product[0].GA_LIBREART2}</span>
-                            {product[0].subFamily && (
+                            {product[0]?.subFamily && (
                               <>
                                 <span className="mx-1">-</span>
-                                <span>{product[0].subFamily.YX_LIBELLE}</span>
+                                <span>{product[0]?.subFamily.YX_LIBELLE}</span>
                               </>
                             )}
                           </div>
@@ -329,7 +329,7 @@ export default function SingleProductPage() {
                       Réference produit :
                     </p>
                     <p className="text-sm text-blue-500">
-                      {product[0].GA_CODEARTICLE}
+                      {product[0]?.GA_CODEARTICLE}
                     </p>
                   </div>
                   <div className="flex flex-col gap-1">

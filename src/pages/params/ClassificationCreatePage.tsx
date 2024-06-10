@@ -16,7 +16,7 @@ interface Family {
 }
 
 interface ClassificationCreatePageProps {
-  onCreate: () => void;
+  onCreate: (newFamilyId: string) => void;
   onClose: () => void;
 }
 
@@ -155,10 +155,12 @@ function ClassificationCreatePage({
       );
 
       if (response.ok) {
+        const data = await response.json();
+        const newFamilyId = data._id;
         setTimeout(() => {
           notifySuccess("Marque crée avec succés !");
           setIsLoading(false);
-          onCreate();
+          onCreate(newFamilyId);
           onClose();
         }, 1000);
       } else {

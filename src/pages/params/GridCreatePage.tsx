@@ -24,7 +24,7 @@ interface FormData {
 }
 
 interface GridCreatePageProps {
-  onCreate: () => void;
+  onCreate: (newGridId: string) => void;
   onClose: () => void;
 }
 
@@ -72,10 +72,12 @@ export default function GridCreatePage({
       );
 
       if (response.ok) {
+        const data = await response.json();
+        const newGridId = data._id;
         setTimeout(() => {
           notifySuccess("Collection crée avec succés !");
           setIsLoading(false);
-          onCreate();
+          onCreate(newGridId);
           onClose();
         }, 1000);
       } else {

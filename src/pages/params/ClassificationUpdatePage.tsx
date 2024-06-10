@@ -181,9 +181,9 @@ export default function ClassificationUpdatePage({
             {family?.YX_CODE}
           </h1>
           {!isModify && (
-            <Button size="small" blue onClick={() => setIsModify(true)}>
-              Modifier
-            </Button>
+            <div onClick={() => setIsModify(true)}>
+              <span className="text-[12px] text-blue-500">Modifier</span>
+            </div>
           )}
         </div>
         <div className="mt-3">

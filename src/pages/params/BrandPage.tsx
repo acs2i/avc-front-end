@@ -21,9 +21,16 @@ interface Brand {
 interface BrandPageProps {
   onSelectBrand: (brand: Brand) => void;
   shouldRefetch: boolean;
+  highlightedBrandId: string | null;
+  resetHighlightedBrandId: () => void;
 }
 
-export default function BrandPage({ onSelectBrand, shouldRefetch  }: BrandPageProps) {
+export default function BrandPage({
+  onSelectBrand,
+  shouldRefetch,
+  highlightedBrandId,
+  resetHighlightedBrandId,
+}: BrandPageProps) {
   const [searchValue, setSearchValue] = useState("");
   const [prevSearchValue, setPrevSearchValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +39,6 @@ export default function BrandPage({ onSelectBrand, shouldRefetch  }: BrandPagePr
   const limit = 30;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const [brands, setBrands] = useState<Brand[]>([]);
-
   const navigate = useNavigate();
 
   const handlePageChange = (
@@ -92,8 +98,19 @@ export default function BrandPage({ onSelectBrand, shouldRefetch  }: BrandPagePr
   };
 
   useEffect(() => {
+    if (highlightedBrandId) {
+      const timer = setTimeout(() => {
+        resetHighlightedBrandId();
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [highlightedBrandId, resetHighlightedBrandId]);
+
+  useEffect(() => {
     fetchBrands();
   }, [shouldRefetch]);
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left">
@@ -112,7 +129,11 @@ export default function BrandPage({ onSelectBrand, shouldRefetch  }: BrandPagePr
             brands.map((brand) => (
               <tr
                 key={brand._id}
-                className="border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800  whitespace-nowrap"
+                className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap ${
+                  brand._id === highlightedBrandId
+                    ? "bg-orange-200 text-white"
+                    : ""
+                }`}
                 onClick={() => onSelectBrand(brand)}
               >
                 <td className="px-6 py-2">{brand.YX_CODE}</td>

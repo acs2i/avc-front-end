@@ -69,6 +69,10 @@ function ParamsMenuPage() {
     null
   );
   const [isCreatePanelOpen, setIsCreatePanelOpen] = useState(false);
+   const [highlightedId, setHighlightedId] = useState<string | null>(
+    null
+  );
+  
 
   const handleRefetch = () => {
     setShouldRefetch((prev) => !prev);
@@ -97,6 +101,14 @@ function ParamsMenuPage() {
   const handleCloseCreatePanel = () => {
     setIsCreatePanelOpen(false);
   };
+  const handleCreate = (newFamilyId: string) => {
+    setHighlightedId(newFamilyId);
+    setShouldRefetch((prev) => !prev);
+  };
+
+  const resetHighlightedId = () => {
+    setHighlightedId(null);
+  };
 
   useEffect(() => {
     setSelectedFamily(null);
@@ -105,9 +117,19 @@ function ParamsMenuPage() {
     setSelectedBrand(null);
   }, [page]);
 
+
   return (
-    <div className="w-full h-screen bg-gray-100 p-7">
-      <div className="h-[70px] mb-3 flex items-center gap-4 w-full">
+    <section className="w-full h-screen bg-gray-100 p-7 relative overflow-hidden">
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage: `url(${"/img/background_forest.jpg"})`,
+          opacity: 0.1,
+          filter: "grayscale(100%)",
+          zIndex: 1,
+        }}
+      ></div>
+      <div className="h-[70px] mb-3 flex items-center gap-4 w-full relative z-10">
         <div className="w-[300px]">
           <button
             onClick={handleOpenCreatePanel}
@@ -147,7 +169,7 @@ function ParamsMenuPage() {
           />
         </div>
       </div>
-      <div className="flex gap-4">
+      <div className="flex gap-4 relative z-10">
         <div className="w-[300px] h-[400px] border-t-[1px] border-gray-300">
           {LINKS_Params.map((link) => (
             <div
@@ -172,36 +194,47 @@ function ParamsMenuPage() {
               <ClassificationsPage
                 onSelectFamily={setSelectedFamily}
                 shouldRefetch={shouldRefetch}
+                highlightedFamilyId={highlightedId}
+                resetHighlightedFamilyId={resetHighlightedId}
               />
             )}
             {page === "dimension" && (
               <DimensionPage
                 onSelectDimension={setSelectedDimension}
                 shouldRefetch={shouldRefetch}
+                highlightedDimensionId={highlightedId}
+                resetHighlightedDimensionId={resetHighlightedId}
               />
             )}
             {page === "grid" && (
               <GridPage
                 onSelectGrid={setSelectedGrid}
                 shouldRefetch={shouldRefetch}
+                highlightedGridId={highlightedId}
+                resetHighlightedGridId={resetHighlightedId}
               />
             )}
             {page === "collection" && (
               <CollectionPage
                 onSelectCollection={setSelectedCollection}
                 shouldRefetch={shouldRefetch}
+                highlightedCollectionId={highlightedId}
+                resetHighlightedCollectionId={resetHighlightedId}
               />
             )}
             {page === "brand" && (
               <BrandPage
                 onSelectBrand={setSelectedBrand}
                 shouldRefetch={shouldRefetch}
+                highlightedBrandId={highlightedId}
+                resetHighlightedBrandId={resetHighlightedId}
               />
             )}
           </div>
-          {/* artie mise ajour composant */}
+
+          {/* Partie mise a jour composant */}
           {selectedFamily && (
-            <div className="w-full h-[400px] bg-white rounded-lg border shadow-md">
+            <div className="w-full bg-white rounded-lg border shadow-md">
               <ClassificationUpdatePage
                 selectedFamily={selectedFamily}
                 onClose={handleCloseClassification}
@@ -210,7 +243,7 @@ function ParamsMenuPage() {
             </div>
           )}
           {selectedDimension && (
-            <div className="w-full h-[400px] bg-white rounded-lg border shadow-md">
+            <div className="w-full bg-white rounded-lg border shadow-md">
               <DimensionUpdatePage
                 selectedDimension={selectedDimension}
                 onClose={handleCloseDimension}
@@ -219,7 +252,7 @@ function ParamsMenuPage() {
             </div>
           )}
           {selectedCollection && (
-            <div className="w-full h-[400px] bg-white rounded-lg border shadow-md">
+            <div className="w-full bg-white rounded-lg border shadow-md">
               <CollectionUpdatePage
                 selectedCollection={selectedCollection}
                 onClose={handleCloseCollection}
@@ -228,7 +261,7 @@ function ParamsMenuPage() {
             </div>
           )}
           {selectedBrand && (
-            <div className="w-full h-[400px] bg-white rounded-lg border shadow-md">
+            <div className="w-full bg-white rounded-lg border shadow-md">
               <BranchUpdatePage
                 selectedBrand={selectedBrand}
                 onClose={handleCloseBrand}
@@ -236,44 +269,45 @@ function ParamsMenuPage() {
               />
             </div>
           )}
+
           {/* Partie création composant */}
           {isCreatePanelOpen && (
             <div className="w-full bg-white rounded-lg border shadow-md">
               {page === "classe" && (
                 <ClassificationCreatePage
                   onClose={handleCloseCreatePanel}
-                  onCreate={handleRefetch}
+                  onCreate={handleCreate}
                 />
               )}
               {page === "dimension" && (
                 <DimensionCreateItemPage
                   onClose={handleCloseCreatePanel}
-                  onCreate={handleRefetch}
+                  onCreate={handleCreate}
                 />
               )}
               {page === "grid" && (
                 <GridCreatePage
                   onClose={handleCloseCreatePanel}
-                  onCreate={handleRefetch}
+                  onCreate={handleCreate}
                 />
               )}
               {page === "collection" && (
                 <CollectionCreatePage
                   onClose={handleCloseCreatePanel}
-                  onCreate={handleRefetch}
+                  onCreate={handleCreate}
                 />
               )}
               {page === "brand" && (
                 <BrandCreatePage
                   onClose={handleCloseCreatePanel}
-                  onCreate={handleRefetch}
+                  onCreate={handleCreate}
                 />
               )}
             </div>
           )}
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 

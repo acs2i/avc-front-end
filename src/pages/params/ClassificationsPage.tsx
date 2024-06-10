@@ -24,9 +24,16 @@ interface Family {
 interface ClassificationsPageProps {
   onSelectFamily: (family: Family) => void;
   shouldRefetch: boolean;
+  highlightedFamilyId: string | null;
+  resetHighlightedFamilyId: () => void;
 }
 
-function ClassificationsPage({ onSelectFamily, shouldRefetch  }: ClassificationsPageProps) {
+function ClassificationsPage({
+  onSelectFamily,
+  shouldRefetch,
+  highlightedFamilyId,
+  resetHighlightedFamilyId,
+}: ClassificationsPageProps) {
   const [typeValue, setTypeValue] = useState("");
   const [codeValue, setCodeValue] = useState("");
   const [labelValue, setLabelValue] = useState("");
@@ -114,85 +121,99 @@ function ClassificationsPage({ onSelectFamily, shouldRefetch  }: Classifications
     }
   };
 
+
+  useEffect(() => {
+    if (highlightedFamilyId) {
+      console.log("Highlighted Family ID:", highlightedFamilyId);
+      const timer = setTimeout(() => {
+        resetHighlightedFamilyId(); // Appelez la fonction de réinitialisation
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [highlightedFamilyId, resetHighlightedFamilyId]);
+
+
   useEffect(() => {
     fetchFamily();
   }, [shouldRefetch]);
 
   return (
-   
-      <div className="relative overflow-x-auto w-full">
-        <table className="w-full text-left">
-          <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
-            <tr>
-              <th scope="col" className="px-6 py-2 w-1/3">
-                Niveau
-              </th>
-              <th scope="col" className="px-6 py-2 w-1/3">
-                Code
-              </th>
-              <th scope="col" className="px-6 py-2 w-1/3">
-                Libellé
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {families && families.length > 0 ? (
-              families.map((family) => (
-                <tr
-                  key={family._id}
-                  className="border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap"
-                  onClick={() => onSelectFamily(family)}
-                >
-                  <td className="px-6 py-2 flex items-center gap-2 text-blue-600">
-                    {typeLabels[family.YX_TYPE]}
-                  </td>
-                  <td className="px-6 py-2">{family.YX_CODE}</td>
-                  <td className="px-6 py-2">{family.YX_LIBELLE}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={6} className="px-6 py-7 text-center">
-                  {totalItem === null ? (
-                    <div className="flex justify-center overflow-hidden p-[30px]">
-                      <Spinner />
-                    </div>
-                  ) : (
-                    "Aucun Résultat"
-                  )}
+    <div className="relative overflow-x-auto w-full">
+      <table className="w-full text-left">
+        <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
+          <tr>
+            <th scope="col" className="px-6 py-2 w-1/3">
+              Niveau
+            </th>
+            <th scope="col" className="px-6 py-2 w-1/3">
+              Code
+            </th>
+            <th scope="col" className="px-6 py-2 w-1/3">
+              Libellé
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {families && families.length > 0 ? (
+            families.map((family) => (
+              <tr
+                key={family._id}
+                className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap ${
+                  family._id === highlightedFamilyId ? "bg-orange-200 text-white" : ""
+                }`}
+                onClick={() => onSelectFamily(family)}
+              >
+                <td className="px-6 py-2 flex items-center gap-2 text-blue-600">
+                  {typeLabels[family.YX_TYPE]}
                 </td>
+                <td className="px-6 py-2">{family.YX_CODE}</td>
+                <td className="px-6 py-2">{family.YX_LIBELLE}</td>
               </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={6} className="px-6 py-7 text-center">
+                {totalItem === null ? (
+                  <div className="flex justify-center overflow-hidden p-[30px]">
+                    <Spinner />
+                  </div>
+                ) : (
+                  "Aucun Résultat"
+                )}
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+      <div className="px-4 py-2 flex flex-col gap-2">
+        <div className="w-full flex justify-between items-center">
+          <div className="flex items-center">
+            <h4 className="text-xs whitespace-nowrap">
+              <span className="font-bold">{totalItem}</span> Classifications
+            </h4>
+            {prevSearchValue && (
+              <span className="text-xs italic ml-2">{`"${prevSearchValue}"`}</span>
             )}
-          </tbody>
-        </table>
-        <div className="px-4 py-2 flex flex-col gap-2">
-          <div className="w-full flex justify-between items-center">
-            <div className="flex items-center">
-              <h4 className="text-xs whitespace-nowrap">
-                <span className="font-bold">{totalItem}</span> Classifications
-              </h4>
-              {prevSearchValue && (
-                <span className="text-xs italic ml-2">{`"${prevSearchValue}"`}</span>
-              )}
-            </div>
-            <div className="flex justify-end w-full">
-              {families && families.length > 0 && (
-                <div className="flex justify-center">
-                  <Stack spacing={2}>
-                    <Pagination
-                      count={totalPages}
-                      page={currentPage}
-                      onChange={handlePageChange}
-                      color="primary"
-                      size="small"
-                    />
-                  </Stack>
-                </div>
-              )}
-            </div>
+          </div>
+          <div className="flex justify-end w-full">
+            {families && families.length > 0 && (
+              <div className="flex justify-center">
+                <Stack spacing={2}>
+                  <Pagination
+                    count={totalPages}
+                    page={currentPage}
+                    onChange={handlePageChange}
+                    color="primary"
+                    size="small"
+                  />
+                </Stack>
+              </div>
+            )}
           </div>
         </div>
       </div>
+    </div>
   );
 }
 

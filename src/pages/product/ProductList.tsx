@@ -549,9 +549,6 @@ export default function ProductList() {
           </div>
         </div>
       </div>
-      {/* {totalItem !== null && totalItem > 10 && (
-        <ScrollToTop scrollThreshold={300} />
-      )} */}
     </section>
   );
 }

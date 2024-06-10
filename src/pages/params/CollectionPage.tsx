@@ -20,10 +20,12 @@ interface Collection {
 interface CollectionPageProps {
   onSelectCollection: (collection: Collection) => void;
   shouldRefetch: boolean;
+  highlightedCollectionId: string | null;
+  resetHighlightedCollectionId: () => void;
 }
 
 
-export default function CollectionPage({ onSelectCollection, shouldRefetch }: CollectionPageProps) {
+export default function CollectionPage({ onSelectCollection, shouldRefetch, highlightedCollectionId,  resetHighlightedCollectionId }: CollectionPageProps) {
   const [searchValue, setSearchValue] = useState("");
   const [prevSearchValue, setPrevSearchValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -91,12 +93,24 @@ export default function CollectionPage({ onSelectCollection, shouldRefetch }: Co
     }
   };
 
+
+  useEffect(() => {
+    if (highlightedCollectionId) {
+      
+      const timer = setTimeout(() => {
+        resetHighlightedCollectionId();
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [highlightedCollectionId, resetHighlightedCollectionId]);
+
+
   useEffect(() => {
     fetchCollections();
   }, [shouldRefetch]);
 
   return (
-  
       <div className="relative overflow-x-auto">
         <table className="w-full text-left">
           <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
@@ -114,7 +128,9 @@ export default function CollectionPage({ onSelectCollection, shouldRefetch }: Co
               collections.map((collection) => (
                 <tr
                   key={collection._id}
-                  className="border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap"
+                  className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap ${
+                    collection._id === highlightedCollectionId ? "bg-orange-200 text-white" : ""
+                  }`}
                   onClick={() => onSelectCollection(collection)}
                 >
                   <td className="px-6 py-2">{collection.CODE}</td>

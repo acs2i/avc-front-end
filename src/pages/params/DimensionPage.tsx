@@ -23,9 +23,11 @@ interface Dimension {
 interface DimensionPageProps {
   onSelectDimension: (dimension: Dimension) => void;
   shouldRefetch: boolean;
+  highlightedDimensionId: string | null;
+  resetHighlightedDimensionId: () => void;
 }
 
-export default function DimensionPage({ onSelectDimension, shouldRefetch }: DimensionPageProps) {
+export default function DimensionPage({ onSelectDimension, shouldRefetch, highlightedDimensionId,resetHighlightedDimensionId  }: DimensionPageProps) {
   const [prevSearchValue, setPrevSearchValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -73,6 +75,19 @@ export default function DimensionPage({ onSelectDimension, shouldRefetch }: Dime
     }
   };
 
+
+  useEffect(() => {
+    if (highlightedDimensionId) {
+      
+      const timer = setTimeout(() => {
+        resetHighlightedDimensionId();
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [highlightedDimensionId, resetHighlightedDimensionId]);
+
+
   useEffect(() => {
     fetchDimensions();
   }, [shouldRefetch]);
@@ -98,7 +113,9 @@ export default function DimensionPage({ onSelectDimension, shouldRefetch }: Dime
             dimensions.map((dimension) => (
               <tr
                 key={dimension._id}
-                className="border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap"
+                className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap ${
+                  dimension._id === highlightedDimensionId ? "bg-orange-200 text-white" : ""
+                }`}
                 onClick={() => onSelectDimension(dimension)}
               >
                 <td className="px-6 py-2 text-blue-600">

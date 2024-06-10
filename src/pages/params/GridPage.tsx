@@ -16,10 +16,12 @@ interface Grid {
 interface GridPageProps {
   onSelectGrid: (grid: Grid) => void;
   shouldRefetch: boolean;
+  highlightedGridId: string | null;
+  resetHighlightedGridId: () => void;
 }
 
 
-export default function GridPage({ onSelectGrid, shouldRefetch }: GridPageProps) {
+export default function GridPage({ onSelectGrid, shouldRefetch, highlightedGridId, resetHighlightedGridId  }: GridPageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [grids, setGrids] = useState<Grid[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -64,6 +66,16 @@ export default function GridPage({ onSelectGrid, shouldRefetch }: GridPageProps)
   };
 
   useEffect(() => {
+    if (highlightedGridId) {
+      const timer = setTimeout(() => {
+        resetHighlightedGridId();
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [highlightedGridId, resetHighlightedGridId]);
+
+  useEffect(() => {
     fetchGrids();
   }, [shouldRefetch]);
 
@@ -96,7 +108,11 @@ export default function GridPage({ onSelectGrid, shouldRefetch }: GridPageProps)
               ? grids.map((grid) => (
                   <tr
                     key={grid._id}
-                    className="border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap"
+                    className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap ${
+                      grid._id === highlightedGridId
+                        ? "bg-orange-200 text-white"
+                        : ""
+                    }`}
                     onClick={() => onSelectGrid(grid)}
                   >
                     <td className="px-6 py-2">{grid.TYPE}</td>

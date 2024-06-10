@@ -10,23 +10,7 @@ import Navbar from "./components/Navigation/Navbar";
 import SuppliersPage from "./pages/suppliers/SuppliersPage";
 import CreateProductPage from "./pages/product/CreateProductPage";
 import ParamsMenuPage from "./pages/params/ParamsMenuPage";
-import CollectionPage from "./pages/params/CollectionPage";
-import ClassificationsPage from "./pages/params/ClassificationsPage";
-import DimensionPage from "./pages/params/DimensionPage";
-import BrandPage from "./pages/params/BrandPage";
-import ClassificationUpdatePage from "./pages/params/ClassificationUpdatePage";
-import CollectionUpdatePage from "./pages/params/CollectionUpdatePage";
-import DimensionUpdatePage from "./pages/params/DimensionUpdatePage";
-import ClassificationCreatePage from "./pages/params/ClassificationCreatePage";
-import CollectionCreatePage from "./pages/params/CollectionCreatePage";
-import BrandUpdatePage from "./pages/params/BrandUpdatePage";
-import BrandCreatePage from "./pages/params/BrandCreatePage";
-import DimensionCreateItemPage from "./pages/params/DimensionCreateItemPage";
 import DraftPage from "./pages/draft/DraftPage";
-import InProgressPage from "./pages/draft/InProgressPage";
-import GridPage from "./pages/params/GridPage";
-import GridCreatePage from "./pages/params/GridCreatePage";
-import DonePage from "./pages/draft/DonePage";
 import AdminPage from "./pages/panel-admin/AdminPage";
 import CreateUserPage from "./pages/panel-admin/CreateUser";
 import ProductList from "./pages/product/ProductList";
@@ -74,8 +58,6 @@ function App() {
             <Route path="/product/:id" element={<SingleProductPage />} />
             <Route path="/suppliers/suppliers-list" element={<SuppliersPage />} />
             <Route path="/draft" element={<DraftPage />} />
-            <Route path="/in-progress" element={<InProgressPage />} />
-            <Route path="/done" element={<DonePage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/admin/create-user" element={<CreateUserPage />} />
             <Route path="/admin/create-group" element={<CreateGroupPage />} />

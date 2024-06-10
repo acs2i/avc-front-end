@@ -16,7 +16,7 @@ interface FormData {
 }
 
 interface DimensionCreatePageProps {
-  onCreate: () => void;
+  onCreate: (newDimensionId: string) => void;
   onClose: () => void;
 }
 
@@ -59,10 +59,12 @@ export default function DimensionCreateItemPage({
       );
 
       if (response.ok) {
+        const data = await response.json();
+        const newDimenesionId = data._id;
         setTimeout(() => {
           notifySuccess("Marque crée avec succés !");
           setIsLoading(false);
-          onCreate();
+          onCreate(newDimenesionId);
           onClose();
         }, 1000);
       } else {
@@ -81,7 +83,7 @@ export default function DimensionCreateItemPage({
             <ChevronLeft />
           </div>
           <h3 className="text-[32px] font-bold text-gray-800">
-            Créer une classification
+            Créer une dimension
           </h3>
         </div>
         <div className="mt-5 flex flex-col justify-between">
