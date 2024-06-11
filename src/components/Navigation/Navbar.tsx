@@ -15,8 +15,10 @@ export default function Navbar() {
       <Drawer show={drawerIsOpen} onCancel={() => setDrawerIsOpen(false)}>
         <div className="w-full flex items-center justify-center py-4">
           <div className="flex items-center gap-2">
-            <Bell size={20}/>
-            <h4 className="text-center text-[25px]"><span className="font-[800]">Mes </span>notifications</h4>
+            <Bell size={20} />
+            <h4 className="text-center text-[25px]">
+              <span className="font-[800]">Mes </span>notifications
+            </h4>
           </div>
         </div>
       </Drawer>
@@ -60,7 +62,9 @@ export default function Navbar() {
             <div className="w-[30px] h-[30px] flex items-center justify-center rounded-full bg-orange-100 text-orange-400">
               <Sun size={20} />
             </div>
-            <Bell size={20} onClick={() => setDrawerIsOpen(true)} />
+            <div onClick={() => setDrawerIsOpen(true)} className="cursor-pointer hover:animate-bounce">
+              <Bell size={20}  />
+            </div>
             <Grip size={20} />
             <AccountMenu />
           </div>
