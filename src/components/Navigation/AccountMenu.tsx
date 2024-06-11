@@ -46,7 +46,7 @@ export default function AccountMenu() {
           aria-haspopup="true"
           aria-expanded={open ? "true" : undefined}
         >
-          <Avatar alt={user ? user.username : "test"} src="img/avatar.jpg" />
+          <Avatar alt={user ? user.username : "test"} src={user.imgPath && user.imgPath} />
         </IconButton>
       </Tooltip>
       <Menu
@@ -69,7 +69,7 @@ export default function AccountMenu() {
               <div className="flex justify-center">
                 <Avatar
                   alt={user ? user.username : "test"}
-                  src="img/avatar.jpg"
+                  src={user.imgPath && user.imgPath}
                   sx={{ width: 40, height: 40 }}
                 />
               </div>

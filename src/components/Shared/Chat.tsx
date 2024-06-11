@@ -9,6 +9,7 @@ interface User {
   username: string;
   email: string;
   authorization: string;
+  imgPath: string;
   comment: string;
 }
 
@@ -96,7 +97,7 @@ export default function Chat() {
                   className="flex items-center gap-2 cursor-pointer"
                   onClick={() => handleUserClick(user)}
                 >
-                  <Avatar alt={user.username} src="img/avatar.jpg" />
+                  <Avatar alt={user.username} src={user.imgPath && user.imgPath } />
                   <div className="flex flex-col">
                     <span className="text-[15px] capitalize font-[600]">
                       {user.username}

@@ -6,6 +6,7 @@ interface User {
   username: string;
   email: string;
   authorization: string;
+  imgPath: string;
 }
 
 interface Token {
