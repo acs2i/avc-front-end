@@ -36,6 +36,11 @@ export default function AccountMenu() {
   };
 
   const label = { inputProps: { "aria-label": "Switch demo" } };
+
+  if (!user) {
+    return null; // Ou vous pouvez retourner un fallback UI ici
+  }
+ 
   return (
     <React.Fragment>
       <Tooltip title="Account settings">
@@ -46,7 +51,7 @@ export default function AccountMenu() {
           aria-haspopup="true"
           aria-expanded={open ? "true" : undefined}
         >
-          <Avatar alt={user ? user.username : "test"} src={user.imgPath && user.imgPath} />
+          <Avatar alt={user?.username || "test"} src={user?.imgPath || ""} />
         </IconButton>
       </Tooltip>
       <Menu
@@ -68,13 +73,13 @@ export default function AccountMenu() {
             <div className="flex flex-col items-center justify-center mb-4">
               <div className="flex justify-center">
                 <Avatar
-                  alt={user ? user.username : "test"}
-                  src={user.imgPath && user.imgPath}
+                  alt={user?.username || "test"}
+                  src={user?.imgPath || ""}
                   sx={{ width: 40, height: 40 }}
                 />
               </div>
               <span className="text-sm font-bold text-gray-600">
-                {user ? user.username : "test"}
+                {user?.username || "test"}
               </span>
               <div>
                 <Switch {...label} defaultChecked />

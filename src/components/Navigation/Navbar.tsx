@@ -28,8 +28,8 @@ export default function Navbar() {
             <div className="w-[40px] h-[30px]">
               <img src="/img/logo.png" alt="" className="w-full h-full" />
             </div>
-            <Link to="/" className="text-2xl text-gray-600">
-              Au Vieux Campeur preref
+            <Link to="/" className="text-2xl text-gray-600 font-nunito">
+              Pré-référencement
             </Link>
           </div>
           <div className="relative w-[400px]">

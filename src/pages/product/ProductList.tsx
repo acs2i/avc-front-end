@@ -465,11 +465,11 @@ export default function ProductList() {
                   className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap border"
                   onClick={() => navigate(`/product/${product._id}`)}
                 >
-                  <td className="px-6 py-4">{product.GA_CODEARTICLE}</td>
-                  <td className="px-6 py-4 text-blue-600">
+                  <td className="px-6 py-2">{product.GA_CODEARTICLE}</td>
+                  <td className="px-6 py-2 text-blue-600">
                     {truncateText(product.GA_LIBELLE, 50)}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-2">
                     {product.brand ? (
                       <div>
                         <span>{product?.brand?.YX_CODE}</span>
@@ -480,8 +480,8 @@ export default function ProductList() {
                       <span>-</span>
                     )}
                   </td>
-                  <td className="px-6 py-4">{product.GA_FOURNPRINC}</td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-2">{product.GA_FOURNPRINC}</td>
+                  <td className="px-6 py-2">
                     {product.family ? (
                       <div className="inline-block font-bold">
                         <span>{product.family?.YX_CODE}</span>
@@ -492,7 +492,7 @@ export default function ProductList() {
                       <span>-</span>
                     )}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-2">
                     {product.subFamily ? (
                       <div className="inline-block font-bold">
                         <span>{product?.subFamily?.YX_CODE}</span>
@@ -525,11 +525,11 @@ export default function ProductList() {
         <div className="px-4 py-2 flex flex-col gap-2">
           <div className="w-full flex justify-between items-center">
             <div className="flex items-center">
-              <h4 className="text-md whitespace-nowrap">
+              <h4 className="text-sm whitespace-nowrap">
                 <span className="font-bold">{totalItem}</span> Produits
               </h4>
               {prevSearchValue && (
-                <span className="text-xl italic ml-2">{`"${prevSearchValue}"`}</span>
+                <span className="text-sm italic ml-2">{`"${prevSearchValue}"`}</span>
               )}
             </div>
             <div className="flex justify-end w-full">
@@ -541,6 +541,7 @@ export default function ProductList() {
                       page={currentPage}
                       onChange={handlePageChange}
                       color="primary"
+                      size="small"
                     />
                   </Stack>
                 </div>

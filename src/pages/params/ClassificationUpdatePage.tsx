@@ -181,7 +181,7 @@ export default function ClassificationUpdatePage({
             {family?.YX_CODE}
           </h1>
           {!isModify && (
-            <div onClick={() => setIsModify(true)}>
+            <div onClick={() => setIsModify(true)} className="cursor-pointer">
               <span className="text-[12px] text-blue-500">Modifier</span>
             </div>
           )}

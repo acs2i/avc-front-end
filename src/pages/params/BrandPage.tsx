@@ -129,7 +129,7 @@ export default function BrandPage({
             brands.map((brand) => (
               <tr
                 key={brand._id}
-                className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap ${
+                className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 whitespace-nowrap ${
                   brand._id === highlightedBrandId
                     ? "bg-orange-500 text-white"
                     : ""

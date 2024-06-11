@@ -29,7 +29,7 @@ interface FormData {
 export default function CollectionUpdatePage({
   selectedCollection,
   onClose,
-  onUpdate
+  onUpdate,
 }: CollectionUpdatePageProps) {
   const id = selectedCollection._id;
   const [collectionUpdate, setCollectionUpdate] = useState<Collection | null>(
@@ -152,9 +152,9 @@ export default function CollectionUpdatePage({
             {collection?.CODE}
           </h1>
           {!isModify && (
-            <Button size="small" blue onClick={() => setIsModify(true)}>
-              Modifier
-            </Button>
+            <div onClick={() => setIsModify(true)} className="cursor-pointer">
+              <span className="text-[12px] text-blue-500">Modifier</span>
+            </div>
           )}
         </div>
         <div className="mt-3">

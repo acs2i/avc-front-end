@@ -108,7 +108,7 @@ export default function GridPage({ onSelectGrid, shouldRefetch, highlightedGridI
               ? grids.map((grid) => (
                   <tr
                     key={grid._id}
-                    className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap ${
+                    className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 whitespace-nowrap ${
                       grid._id === highlightedGridId
                         ? "bg-orange-500 text-white"
                         : ""

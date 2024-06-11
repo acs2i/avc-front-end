@@ -62,7 +62,7 @@ export default function Chat() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <h6 className="text-gray-700 font-[700] capitalize">
-                {selectedUser ? selectedUser.username : user.username}
+                {selectedUser ? selectedUser?.username : user?.username}
               </h6>
               <div className="w-[10px] h-[10px] rounded-full bg-green-500"></div>
             </div>
@@ -97,10 +97,13 @@ export default function Chat() {
                   className="flex items-center gap-2 cursor-pointer"
                   onClick={() => handleUserClick(user)}
                 >
-                  <Avatar alt={user.username} src={user.imgPath && user.imgPath } />
+                  <Avatar
+                    alt={user && user?.username}
+                    src={user && user?.imgPath}
+                  />
                   <div className="flex flex-col">
                     <span className="text-[15px] capitalize font-[600]">
-                      {user.username}
+                      {user && user?.username}
                     </span>
                   </div>
                 </div>

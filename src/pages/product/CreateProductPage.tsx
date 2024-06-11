@@ -525,8 +525,6 @@ export default function CreateProductPage() {
     }
   };
 
-  console.log(formData);
-
   return (
     <section className="w-full bg-gray-100 p-7">
       <div>
@@ -729,13 +727,18 @@ export default function CreateProductPage() {
           </div>
         </div>
         {!isLoading ? (
-          <div className="flex items-center justify-between gap-3 mt-[50px]">
+          <div className="flex items-center justify-between gap-3 mt-[50px] w-[70%]">
             <div className="flex gap-3">
               <Button size="small" cancel type="button">
                 Annuler
               </Button>
               <Button size="small" blue type="submit">
                 Enregistrer
+              </Button>
+            </div>
+            <div>
+              <Button size="small" blue type="button">
+                Valider
               </Button>
             </div>
           </div>

@@ -106,13 +106,13 @@ export default function SuppliersPage() {
               suppliers.map((supplier) => (
                 <tr
                   key={supplier._id}
-                  className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap"
+                  className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 whitespace-nowrap"
                   onClick={() =>
                     navigate(`/parameters/dimension/${supplier._id}`)
                   }
                 >
-                  <td className="px-6 py-4">{supplier.T_TIERS}</td>
-                  <td className="px-6 py-4">{supplier.T_LIBELLE}</td>
+                  <td className="px-6 py-2">{supplier.T_TIERS}</td>
+                  <td className="px-6 py-2">{supplier.T_LIBELLE}</td>
                 </tr>
               ))
             ) : (
@@ -133,11 +133,11 @@ export default function SuppliersPage() {
         <div className="px-4 py-2 flex flex-col gap-2">
           <div className="w-full flex justify-between items-center">
             <div className="flex items-center">
-              <h4 className="text-md whitespace-nowrap">
+              <h4 className="text-sm whitespace-nowrap">
                 <span className="font-bold">{totalItem}</span> Fournisseurs
               </h4>
               {prevSearchValue && (
-                <span className="text-xl italic ml-2">{`"${prevSearchValue}"`}</span>
+                <span className="text-sm italic ml-2">{`"${prevSearchValue}"`}</span>
               )}
             </div>
             <div className="flex justify-end w-full">
@@ -149,6 +149,7 @@ export default function SuppliersPage() {
                       page={currentPage}
                       onChange={handlePageChange}
                       color="primary"
+                      size="small"
                     />
                   </Stack>
                 </div>
