@@ -55,13 +55,13 @@ export default function SingleProductPage() {
         <div className="bg-white rounded-lg h-[400px] flex flex-col shadow-md">
           <div className="relative h-[80px] bg-green-600 rounded-t-lg">
             {product && (
-              <div className="absolute bottom-[-50px] left-[50%] translate-x-[-50%] rounded-lg h-[100px] w-[100px] overflow-hidden">
+              <div className="absolute bottom-[-40px] left-[50%] translate-x-[-50%] h-[80px] w-[80px] rounded-full bg-white flex items-center justify-center p-2">
                 <img
                   src={
                     product[0]?.imgPath ? product[0]?.imgPath : "/img/logo.png"
                   }
                   alt="img"
-                  className="w-full h-auto rounded-lg transition-all duration-[20s] transform scale-100 hover:scale-150 shadow-none hover:shadow-lg"
+                  className="w-full h-full object-cover"
                 />
               </div>
             )}
@@ -295,7 +295,7 @@ export default function SingleProductPage() {
         </div>
       </div>
       <div className="bg-white rounded-lg px-4 py-7 shadow-md w-full">
-        <h4 className="text-[17px] font-[800] text-sky-600">
+        <h4 className="text-[18px] font-[800] text-gray-800">
           Unité de vente consomateur
         </h4>
         <div className="overflow-x-auto mt-4">

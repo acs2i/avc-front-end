@@ -8,6 +8,7 @@ import Map from "../components/Shared/Map";
 import { Pause, Star, X } from "lucide-react";
 import CardHome from "../components/Shared/CardHome";
 import { useProducts } from "../utils/hooks/useProducts";
+import { useNavigate } from "react-router-dom";
 import { CARD, GRAPH } from "../utils";
 
 interface Suppliers {
@@ -56,6 +57,7 @@ interface CardType {
 export default function Home() {
   const data1 = [12, 19, 14, 5, 16, 19];
   const data2 = [14, 16, 20, 5, 18, 22];
+  const navigate = useNavigate();
   const labels = ["January", "February", "March", "April", "May", "June"];
   const colors = ["#088F8F", "#6495ED", "#89CFF0"];
   const [isLoading, setIsLoading] = useState(false);
@@ -237,7 +239,7 @@ export default function Home() {
             </thead>
             <tbody>
               {products && products?.products.map((product: Product) => (
-                <tr className="border-b" key={product._id}>
+                <tr className="border-b cursor-pointer hover:bg-slate-200" key={product._id} onClick={() => navigate(`/product/${product._id}`)}>
                   <td className="p-4">
                     <div className="flex items-center gap-2">
                       <span className="text-xs">{product.GA_CODEARTICLE}</span>
