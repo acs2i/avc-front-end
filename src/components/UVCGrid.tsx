@@ -17,8 +17,8 @@ interface Grid {
 const UVCGrid: React.FC<UVCGridProps> = ({ onDimensionsChange }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [grids, setGrids] = useState<Grid[]>([]);
-  const [sizes, setSizes] = useState<string[]>(["0"]);
-  const [colors, setColors] = useState<string[]>(["0"]);
+  const [sizes, setSizes] = useState<string[]>(["000"]);
+  const [colors, setColors] = useState<string[]>(["000"]);
   const [uvcGrid, setUvcGrid] = useState<boolean[][]>([[true]]);
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 20;

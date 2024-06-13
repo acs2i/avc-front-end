@@ -236,7 +236,7 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {products?.products.map((product: Product) => (
+              {products && products?.products.map((product: Product) => (
                 <tr className="border-b" key={product._id}>
                   <td className="p-4">
                     <div className="flex items-center gap-2">
@@ -309,9 +309,6 @@ export default function Home() {
             <table className="w-full text-left">
               <thead className="bg-gray-200 text-sm text-gray-500">
                 <tr>
-                  <th scope="col" className="px-6 py-4 w-[400px]">
-                    Code
-                  </th>
                   <th scope="col" className="px-6 py-4 w-[300px]">
                     Libellé
                   </th>
@@ -321,13 +318,8 @@ export default function Home() {
                 </tr>
               </thead>
               <tbody>
-                {suppliers.map((supplier, i) => (
-                  <tr className="border-b" key={supplier._id}>
-                    <td className="p-2">
-                      <span className="text-xs text-blue-600">
-                        {supplier.T_TIERS}
-                      </span>
-                    </td>
+                {suppliers && suppliers.length > 0 && suppliers.map((supplier, i) => (
+                  <tr className="border-b" key={supplier._id}>  
                     <td className="p-2">
                       <span className="text-xs text-blue-600">
                         {supplier.T_LIBELLE}

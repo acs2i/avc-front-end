@@ -14,7 +14,7 @@ type InFosCard = {
 export default function Card({ children, title }: InFosCard) {
   return (
     <section className="bg-white shadow-md rounded-lg flex flex-col gap-1 rounded-md py-4 px-4">
-      <h4 className="text-lg font-bold">{title}</h4>
+      <h4 className="text-lg font-[700] text-gray-800">{title}</h4>
       <div className="py-2">{children}</div>
     </section>
   );

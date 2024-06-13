@@ -125,7 +125,7 @@ export default function DraftPage() {
               .map((product, i) => (
                 <tr
                   key={i}
-                  className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 even:bg-slate-50 whitespace-nowrap border"
+                  className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 even:bg-slate-50 whitespace-nowrap border"
                 >
                   <td className="px-6 py-4 text-blue-500">
                     {product.reference}

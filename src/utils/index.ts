@@ -7,7 +7,7 @@ import {
   Graph,
   MarkerInfo,
   Product,
-  Card
+  Card,
 } from "@/type";
 import {
   Phone,
@@ -40,7 +40,7 @@ import {
   Factory,
   Users,
   SquarePen,
-  User
+  User,
 } from "lucide-react";
 
 export const LINKS: Link[] = [
@@ -82,20 +82,6 @@ export const LINKS: Link[] = [
             icon: Factory,
           },
           {
-            name: "Social",
-            linksGroup: [
-              {
-                name: "Profil",
-                link: "/",
-              },
-              {
-                name: "Settings",
-                link: "/",
-              },
-            ],
-            icon: Share2,
-          },
-          {
             name: "Calendrier",
             link: "/calendar",
             linksGroup: [],
@@ -132,20 +118,7 @@ export const LINKS: Link[] = [
           },
           {
             name: "Errors",
-            linksGroup: [
-              {
-                name: "403",
-                link: "/",
-              },
-              {
-                name: "404",
-                link: "/",
-              },
-              {
-                name: "500",
-                link: "/",
-              },
-            ],
+            linksGroup: [],
             icon: TriangleAlert,
           },
         ],
@@ -185,7 +158,6 @@ export const LINKS_Params: Params[] = [
     page: "brand",
   },
 ];
-
 export const SUPPLIERS: Suppliers[] = [
   {
     code: "ERCFGJ89",
@@ -350,7 +322,6 @@ export const GRAPH: Graph[] = [
     chart: "dough",
   },
 ];
-
 
 export const MARKERS: MarkerInfo[] = [
   {
@@ -631,7 +602,6 @@ export const MARKERS: MarkerInfo[] = [
   },
 ];
 
-
 export const PRODUCTS: Product[] = [
   {
     code: "678900",
@@ -744,7 +714,6 @@ export const LINKCARD_DRAFT: LinkCard[] = [
     page: "done",
   },
 ];
-
 
 export const CARD: Card[] = [
   {

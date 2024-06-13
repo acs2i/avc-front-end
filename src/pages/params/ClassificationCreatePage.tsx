@@ -30,6 +30,7 @@ function ClassificationCreatePage({
   onClose,
 }: ClassificationCreatePageProps) {
   const user = useSelector((state: any) => state.auth.user);
+  const [classificationValue, setClassificationValue] = useState("");
   const [type, setType] = useState("");
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -53,6 +54,14 @@ function ClassificationCreatePage({
       value: "LA3",
       label: "Sous-sous-famille",
       name: "Sous-sous-famille",
+    },
+  ];
+
+  const classificationOptions = [
+    {
+      value: "Au vieux campeur",
+      label: "Au vieux campeur",
+      name: "Au vieux campeur",
     },
   ];
 
@@ -185,11 +194,23 @@ function ClassificationCreatePage({
             <ChevronLeft />
           </div>
           <h3 className="text-[32px] font-bold text-gray-800">
-            Créer une classification
+            Créer une classe
           </h3>
         </div>
         <div className="mt-5 flex flex-col justify-between">
           <div className="flex flex-col">
+            <Input
+              element="select"
+              id="classification"
+              label="Classification"
+              placeholder="Choississez une classification"
+              validators={[]}
+              onChange={(e) => setClassificationValue(e.target.value)}
+              value={classificationValue}
+              options={classificationOptions}
+              create
+              gray
+            />
             <Input
               element="select"
               id="YX_TYPE"

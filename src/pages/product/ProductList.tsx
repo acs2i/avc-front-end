@@ -83,7 +83,7 @@ export default function ProductList() {
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItem, setTotalItem] = useState(null);
-  const limit = 20;
+  const limit = 30;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const searchParams: SearchParams = {
     codeValue,
@@ -195,6 +195,9 @@ export default function ProductList() {
     subFamilyValue,
     refecthSubFamilies,
   ]);
+
+
+  console.log(products)
 
   return (
     <section className="w-full">
@@ -435,7 +438,7 @@ export default function ProductList() {
 
       <div className="relative overflow-x-auto bg-white">
         <table className="w-full text-left">
-          <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
+          <thead className="border-y-[1px] border-gray-200 text-md font-[800] text-gray-700">
             <tr>
               <th scope="col" className="px-6 py-2 w-[10%]">
                 Code
@@ -462,7 +465,7 @@ export default function ProductList() {
               products.products.map((product: Product) => (
                 <tr
                   key={product._id}
-                  className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-[10px] text-gray-800 whitespace-nowrap border"
+                  className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 whitespace-nowrap border"
                   onClick={() => navigate(`/product/${product._id}`)}
                 >
                   <td className="px-6 py-2">{product.GA_CODEARTICLE}</td>

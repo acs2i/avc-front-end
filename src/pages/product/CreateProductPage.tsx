@@ -96,7 +96,7 @@ export default function CreateProductPage() {
 
   const { notifySuccess, notifyError } = useNotify();
   const [isLoading, setIsLoading] = useState(false);
-  const [familyValue, setFamilyValue] = useState("");
+  const [classificationValue, setClassificationValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [inputValueFamily, setInputValueFamily] = useState("");
   const [inputSubValueFamily, setInputSubValueFamily] = useState("");
@@ -120,11 +120,12 @@ export default function CreateProductPage() {
     CollectionOption[]
   >([]);
   const [optionsSupplier, setOptionsSupplier] = useState<SuppliersOption[]>([]);
-  const dimensionsOptions = [
+
+  const classificationOptions = [
     {
-      value: "Taille/Couleur",
-      label: "Taille/Couleur",
-      name: "Taille/Couleur",
+      value: "Au vieux campeur",
+      label: "Au vieux campeur",
+      name: "Au vieux campeur",
     },
   ];
   const limit = 10;
@@ -341,10 +342,10 @@ export default function CreateProductPage() {
   };
 
   const handleInputChangeSupplier = async (inputValueCollection: string) => {
-    setInputValueCollection(inputValueCollection);
+    setInputValueSupplier(inputValueCollection);
 
     // console.log(inputValue);
-    if (inputValueCollection === "") {
+    if (inputValueSupplier === "") {
       try {
         const response = await fetch(
           `${process.env.REACT_APP_URL_DEV}/api/v1/supplier`,
@@ -525,6 +526,11 @@ export default function CreateProductPage() {
     }
   };
 
+
+
+
+  console.log(formData);
+
   return (
     <section className="w-full bg-gray-100 p-7">
       <div>
@@ -608,7 +614,20 @@ export default function CreateProductPage() {
           <div className="w-[30%] flex flex-col gap-5">
             <Card title="Classification principale">
               <div className="flex flex-col gap-3">
-                <div>
+                <Input
+                  element="select"
+                  id="classification"
+                  label="Classifcation principale :"
+                  value={classificationValue}
+                  onChange={(e) => setClassificationValue(e.target.value)}
+                  validators={[]}
+                  options={classificationOptions}
+                  placeholder="Choisir une classification"
+                  create
+                  gray
+                />
+
+                {classificationValue && <div>
                   <label className="text-sm font-medium text-gray-600">
                     Famille
                   </label>
@@ -623,8 +642,8 @@ export default function CreateProductPage() {
                     className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
                     required
                   />
-                </div>
-                <div>
+                </div>}
+                {classificationValue && <div>
                   <label className="text-sm font-medium text-gray-600">
                     Sous-famille
                   </label>
@@ -639,7 +658,7 @@ export default function CreateProductPage() {
                     className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
                     required
                   />
-                </div>
+                </div>}
               </div>
             </Card>
             <Card title="Fournisseur principal">

@@ -135,7 +135,7 @@ function ParamsMenuPage() {
             onClick={handleOpenCreatePanel}
             className="bg-blue-500 text-white text-[12px] font-[700] w-full py-2 rounded-md"
           >
-            Créer une {page === "classe" && "classification"}
+            Créer une {page === "classe" && "classe"}
             {page === "dimension" && "dimension"}
             {page === "grid" && "grille"}
             {page === "collection" && "collection"}
