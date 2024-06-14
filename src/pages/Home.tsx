@@ -128,7 +128,7 @@ export default function Home() {
                 Tableau de bord
               </h3>
               <p className="text-[15px] text-gray-600">
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit.
+                Vue globale des articles enregistrés
               </p>
             </div>
             <div className="flex items-center gap-5 ">
@@ -137,12 +137,12 @@ export default function Home() {
                   <Star size={20} />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-lg font-bold">57 new orders</span>
+                  <span className="text-lg font-bold">57 nouveaux produits</span>
                   <span className="text-xs">Awaiting processing</span>
                 </div>
               </div>
               <div className="flex items-center gap-5">
-                <div className="w-[30px] h-[30px] flex items-center justify-center rounded-full bg-green-100 text-green-500">
+                <div className="w-[30px] h-[30px] flex items-center justify-center rounded-full bg-orange-100 text-orange-500">
                   <Pause size={20} />
                 </div>
                 <div className="flex flex-col">
@@ -151,7 +151,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="flex items-center gap-5">
-                <div className="w-[30px] h-[30px] flex items-center justify-center rounded-full bg-green-100 text-green-500">
+                <div className="w-[30px] h-[30px] flex items-center justify-center rounded-full bg-red-100 text-red-500">
                   <X size={20} />
                 </div>
                 <div className="flex flex-col">
@@ -343,162 +343,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-white w-full p-8 border-b-[1px] border-gray-300">
-        <div className="flx flex-col">
-          <h4 className="text-[25px] font-bold text-gray-800">
-            Indicateurs des Produits
-          </h4>
-          <p className="text-[15px] text-gray-600">
-            Visualiser les différents indicateurs des produits
-          </p>
-        </div>
-
-        <div className="mt-8 grid grid-cols-2 gap-6">
-          {/* <div className="bg-gray-100 p-6 rounded-lg">
-            <h5 className="text-[20px] font-bold text-gray-800 mb-4">
-              Références avec des coefs inférieurs à X
-            </h5>
-            <div style={{ width: '100%', height: '300px' }}>
-              <BarChart
-                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
-                data1={indicatorsData.coefsInferior}
-                // Ensure your BarChart component handles color internally or pass as needed
-              />
-            </div>
-          </div> */}
-          <div className="bg-gray-100 p-6 rounded-lg">
-            <h5 className="text-[20px] font-bold text-gray-800 mb-4">
-              Références en PRI
-            </h5>
-            <div style={{ width: '100%', height: '300px' }}>
-              <DoughnutChart
-                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
-                data={[indicatorsData.priReferences]}
-                // Ensure your DoughnutChart component handles color internally or pass as needed
-              />
-            </div>
-          </div>
-          <div className="bg-gray-100 p-6 rounded-lg">
-            <h5 className="text-[20px] font-bold text-gray-800 mb-4">
-              Références achetées en pack
-            </h5>
-            <div style={{ width: '100%', height: '300px' }}>
-              <PointChart
-                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
-                data1={indicatorsData.packReferences}
-                data2={[]}
-                // Ensure your PointChart component handles color internally or pass as needed
-              />
-            </div>
-          </div>
-          <div className="bg-gray-100 p-6 rounded-lg">
-            {/* <h5 className="text-[20px] font-bold text-gray-800 mb-4">
-              Hausses et baisses de prix
-            </h5>
-            <div style={{ width: '100%', height: '300px' }}>
-              <BarChart
-                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
-                data1={indicatorsData.priceChanges.increases}
-           
-                // Ensure your BarChart component handles color internally or pass as needed
-              />
-              <BarChart
-                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
-                data1={indicatorsData.priceChanges.decreases}
-              
-                // Ensure your BarChart component handles color internally or pass as needed
-              />
-            </div> */}
-          </div>
-          <div className="bg-gray-100 p-6 rounded-lg">
-            <h5 className="text-[20px] font-bold text-gray-800 mb-4">
-              Produits non visibles sur internet
-            </h5>
-            <div style={{ width: '100%', height: '300px' }}>
-              <DoughnutChart
-                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
-                data={[indicatorsData.nonVisibleOnline]}
-                // Ensure your DoughnutChart component handles color internally or pass as needed
-              />
-            </div>
-          </div>
-          <div className="bg-gray-100 p-6 rounded-lg">
-            <h5 className="text-[20px] font-bold text-gray-800 mb-4">
-              Produits sans photos ou sans texte
-            </h5>
-            <div style={{ width: '100%', height: '300px' }}>
-              <BarChart
-                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
-                data1={indicatorsData.missingInfo}
-                data2={[]}
-                // Ensure your BarChart component handles color internally or pass as needed
-              />
-            </div>
-          </div>
-          <div className="bg-gray-100 p-6 rounded-lg">
-            <h5 className="text-[20px] font-bold text-gray-800 mb-4">
-              Produits bloqués
-            </h5>
-            <div style={{ width: '100%', height: '300px' }}>
-              <DoughnutChart
-                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
-                data={[indicatorsData.blockedProducts]}
-                // Ensure your DoughnutChart component handles color internally or pass as needed
-              />
-            </div>
-          </div>
-          <div className="bg-gray-100 p-6 rounded-lg">
-            <h5 className="text-[20px] font-bold text-gray-800 mb-4">
-              Produits en non réassort
-            </h5>
-            <div style={{ width: '100%', height: '300px' }}>
-              <BarChart
-                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
-                data1={indicatorsData.nonReassort}
-                data2={[]}
-                // Ensure your BarChart component handles color internally or pass as needed
-              />
-            </div>
-          </div>
-          <div className="bg-gray-100 p-6 rounded-lg">
-            <h5 className="text-[20px] font-bold text-gray-800 mb-4">
-              Produits non dispo avant 10 jours
-            </h5>
-            <div style={{ width: '100%', height: '300px' }}>
-              <DoughnutChart
-                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
-                data={[indicatorsData.unavailable10Days]}
-                // Ensure your DoughnutChart component handles color internally or pass as needed
-              />
-            </div>
-          </div>
-          <div className="bg-gray-100 p-6 rounded-lg">
-            <h5 className="text-[20px] font-bold text-gray-800 mb-4">
-              Produits non dispo avant 15 jours
-            </h5>
-            <div style={{ width: '100%', height: '300px' }}>
-              <BarChart
-                labels={["Cat1", "Cat2", "Cat3", "Cat4", "Cat5"]}
-                data1={indicatorsData.unavailable15Days}
-                data2={[]}
-                // Ensure your BarChart component handles color internally or pass as needed
-              />
-            </div>
-          </div>
-          <div className="bg-gray-100 p-6 rounded-lg">
-            <h5 className="text-[20px] font-bold text-gray-800 mb-4">
-              TVA par produits
-            </h5>
-            <div style={{ width: '100%', height: '300px' }}>
-              <DoughnutChart
-                labels={["5.5%", "10%", "20%"]}
-                data={[indicatorsData.tvaByProduct]}
-                // Ensure your DoughnutChart component handles color internally or pass as needed
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+      
     </>
   );
 }

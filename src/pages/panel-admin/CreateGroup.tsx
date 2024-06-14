@@ -208,7 +208,7 @@ export default function CreateGroupPage() {
                   users.map((user) => (
                     <tr
                       key={user._id}
-                      className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 text-[10px] text-gray-800 whitespace-nowrap"
+                      className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 text-[12px] text-gray-800 whitespace-nowrap"
                     >
                       <td className="px-6 py-4 text-blue-600">
                         <input

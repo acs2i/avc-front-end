@@ -90,6 +90,7 @@ export default function AdminPage() {
         link="/admin/create-user"
         btnTitle="Créer un utilisateur"
         placeholder="Rechercher un utilisateur"
+        height="300px"
       >
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-4">
@@ -142,7 +143,7 @@ export default function AdminPage() {
               users.map((user) => (
                 <tr
                   key={user._id}
-                  className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 text-[10px] text-gray-800 even:bg-slate-50 whitespace-nowrap"
+                  className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 text-[12px] text-gray-800 even:bg-slate-50 whitespace-nowrap"
                 >
                   <td className="px-6 py-4 text-blue-600">{user.username}</td>
                   <td className="px-6 py-4">{user.email}</td>

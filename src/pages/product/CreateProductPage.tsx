@@ -44,6 +44,12 @@ type FamilyOption = {
   label: string;
 };
 
+type ClasificationOption = {
+  value: string;
+  label: string;
+  name: string;
+};
+
 type BrandOption = {
   value: string;
   label: string;
@@ -96,9 +102,11 @@ export default function CreateProductPage() {
 
   const { notifySuccess, notifyError } = useNotify();
   const [isLoading, setIsLoading] = useState(false);
-  const [classificationValue, setClassificationValue] = useState("");
+  const [classificationValue, setClassificationValue] =
+    useState("Au vieux campeur");
   const [currentPage, setCurrentPage] = useState(1);
   const [inputValueFamily, setInputValueFamily] = useState("");
+  const [inputValueClassification, setInputValueClassification] = useState("");
   const [inputSubValueFamily, setInputSubValueFamily] = useState("");
   const [inputValueBrand, setInputValueBrand] = useState("");
   const [inputValueCollection, setInputValueCollection] = useState("");
@@ -393,6 +401,17 @@ export default function CreateProductPage() {
     }
   };
 
+  const handleClassificationChange = (
+    newValue: SingleValue<FamilyOption>,
+    actionMeta: ActionMeta<FamilyOption>
+  ) => {
+    setClassificationValue(newValue ? newValue.value : "");
+  };
+
+  const handleInputChangeClassification = (inputValue: string) => {
+    setInputValueClassification(inputValue);
+  };
+
   const handleInputChangeFamily = async (inputValueFamily: string) => {
     setInputValueFamily(inputValueFamily);
 
@@ -526,247 +545,253 @@ export default function CreateProductPage() {
     }
   };
 
-
-
-
   console.log(formData);
 
   return (
     <section className="w-full bg-gray-100 p-7">
-      <div>
-        <h3 className="text-[32px] font-[800] text-gray-800">
-          Créer un article
-        </h3>
-        {creatorId && (
-          <p className="text-[17px] text-gray-600 italic">
-            Création par{" "}
-            <span className="font-[600]">{creatorId.username}</span>
-          </p>
-        )}
-      </div>
-      <form onSubmit={handleSubmit} className="mb-[400px]">
-        <div className="flex gap-7 mt-[50px]">
-          <div className="w-[70%] flex flex-col gap-3">
-            <div className="relative border p-3 ">
-              <div className="absolute top-[-15px] bg-gray-100 px-2">
-                <span className="text-[17px] italic">Identification</span>
-              </div>
-              <Input
-                element="input"
-                id="reference"
-                label="Référence :"
-                value={formData.reference}
-                onChange={handleChange}
-                validators={[]}
-                placeholder="Ajouter la référence du produit"
-                create
-                gray
-              />
-              <Input
-                element="input"
-                id="designation_longue"
-                label="Désignation longue :"
-                value={formData.designation_longue}
-                onChange={handleChange}
-                validators={[]}
-                placeholder="Ajouter la designation du produit"
-                create
-                gray
-              />
-              <Input
-                element="input"
-                id="designation_courte"
-                label="Désignation Courte :"
-                value={formData.designation_courte}
-                onChange={handleChange}
-                validators={[]}
-                placeholder=""
-                create
-                gray
-              />
-            </div>
-
-            {/* Section Grille de dimension */}
-            <div className="mt-3">
-              <UVCGrid onDimensionsChange={handleGridChange} />
-            </div>
-
-            {/* Section Image */}
-            <div className="mt-3">
-              <h3 className="text-[22px] font-[800] text-gray-800">
-                Ajouter une image
+      <div className="max-w-[2024px] mx-auto">
+        <form onSubmit={handleSubmit} className="mb-[400px]">
+          <div className="flex justify-between">
+            <div>
+              <h3 className="text-[32px] font-[800] text-gray-800">
+                Créer un article
               </h3>
-              <div className="w-full h-[250px] border border-dashed border-2 border-gray-300 mt-3 flex justify-center items-center">
-                <div className="flex flex-col items-center">
-                  <p className="font-bold text-gray-600">
-                    Glissez déposez votre image ici ou{" "}
-                    <span className="text-blue-400">
-                      téléchargez depuis votre ordinateur
-                    </span>
-                  </p>
-                  <div className="text-gray-300">
-                    <ImageUp size={70} />
-                  </div>
+              {creatorId && (
+                <p className="text-[17px] text-gray-600 italic">
+                  Création par{" "}
+                  <span className="font-[600]">{creatorId.username}</span>
+                </p>
+              )}
+            </div>
+            {!isLoading ? (
+              <div className="flex items-center justify-between gap-3 mt-[50px]">
+                <div className="flex gap-3">
+                  <Button size="small" cancel type="button">
+                    Annuler
+                  </Button>
+                  <Button size="small" blue type="submit">
+                    Enregistrer
+                  </Button>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="mt-3">
+                <CircularProgress />
+              </div>
+            )}
           </div>
-          <div className="w-[30%] flex flex-col gap-5">
-            <Card title="Classification principale">
-              <div className="flex flex-col gap-3">
+
+          <div className="flex gap-7 mt-[50px]">
+            <div className="w-[70%] flex flex-col gap-3">
+              <div className="relative border p-3 ">
+                <div className="absolute top-[-15px] bg-gray-100 px-2">
+                  <span className="text-[17px] italic">Identification</span>
+                </div>
                 <Input
-                  element="select"
-                  id="classification"
-                  label="Classifcation principale :"
-                  value={classificationValue}
-                  onChange={(e) => setClassificationValue(e.target.value)}
+                  element="input"
+                  id="reference"
+                  label="Référence :"
+                  value={formData.reference}
+                  onChange={handleChange}
                   validators={[]}
-                  options={classificationOptions}
-                  placeholder="Choisir une classification"
+                  placeholder="Ajouter la référence du produit"
                   create
                   gray
                 />
+                <Input
+                  element="input"
+                  id="designation_longue"
+                  label="Désignation longue :"
+                  value={formData.designation_longue}
+                  onChange={handleChange}
+                  validators={[]}
+                  placeholder="Ajouter la designation du produit"
+                  create
+                  gray
+                />
+                <Input
+                  element="input"
+                  id="designation_courte"
+                  label="Désignation Courte :"
+                  value={formData.designation_courte}
+                  onChange={handleChange}
+                  validators={[]}
+                  placeholder=""
+                  create
+                  gray
+                />
+                <div className="mt-[30px] grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="col-span-full">
+                    <h5 className="text-[20px] font-[700]">Classification</h5>
+                  </div>
+                  <div className="col-span-1">
+                    <label className="text-sm font-medium text-gray-600">
+                      Classification principale
+                    </label>
+                    <CreatableSelect
+                      value={classificationOptions.find(
+                        (option) => option.value === classificationValue
+                      )}
+                      onChange={handleClassificationChange}
+                      onInputChange={handleInputChangeClassification}
+                      inputValue={inputValueFamily}
+                      options={classificationOptions}
+                      placeholder="Choisir une classification"
+                      styles={customStyles}
+                      className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                      required
+                    />
+                  </div>
 
-                {classificationValue && <div>
-                  <label className="text-sm font-medium text-gray-600">
-                    Famille
-                  </label>
-                  <CreatableSelect<FamilyOption>
-                    value={selectedOptionFamily}
-                    onChange={handleChangeFamily}
-                    onInputChange={handleInputChangeFamily}
-                    inputValue={inputValueFamily}
-                    options={optionsFamily}
-                    placeholder="Selectionner une famille"
-                    styles={customStyles}
-                    className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                    required
-                  />
-                </div>}
-                {classificationValue && <div>
-                  <label className="text-sm font-medium text-gray-600">
-                    Sous-famille
-                  </label>
-                  <CreatableSelect<FamilyOption>
-                    value={selectedOptionSubFamily}
-                    onChange={handleChangeSubFamily}
-                    onInputChange={handleInputChangeSubFamily}
-                    inputValue={inputSubValueFamily}
-                    options={optionsSubFamily}
-                    placeholder="Selectionner une sous-famille"
-                    styles={customStyles}
-                    className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                    required
-                  />
-                </div>}
-              </div>
-            </Card>
-            <Card title="Fournisseur principal">
-              <div className="flex flex-col gap-2">
-                <div>
-                  <label className="text-sm font-medium text-gray-600">
-                    Nom
-                  </label>
-                  <CreatableSelect<SuppliersOption>
-                    value={selectedOptionSupplier}
-                    onChange={handleChangeSupplier}
-                    onInputChange={handleInputChangeSupplier}
-                    inputValue={inputValueSupplier}
-                    options={optionsSupplier}
-                    placeholder="Selectionner un fournisseur"
-                    styles={customStyles}
-                    className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                    required
-                  />
+                  {classificationValue && (
+                    <div className="col-span-1">
+                      <label className="text-sm font-medium text-gray-600">
+                        Famille
+                      </label>
+                      <CreatableSelect
+                        value={selectedOptionFamily}
+                        onChange={handleChangeFamily}
+                        onInputChange={handleInputChangeFamily}
+                        inputValue={inputValueFamily}
+                        options={optionsFamily}
+                        placeholder="Selectionner une famille"
+                        styles={customStyles}
+                        className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                        required
+                      />
+                    </div>
+                  )}
+
+                  {classificationValue && (
+                    <div className="col-span-1">
+                      <label className="text-sm font-medium text-gray-600">
+                        Sous-famille
+                      </label>
+                      <CreatableSelect
+                        value={selectedOptionSubFamily}
+                        onChange={handleChangeSubFamily}
+                        onInputChange={handleInputChangeSubFamily}
+                        inputValue={inputSubValueFamily}
+                        options={optionsSubFamily}
+                        placeholder="Selectionner une sous-famille"
+                        styles={customStyles}
+                        className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                        required
+                      />
+                    </div>
+                  )}
                 </div>
-                <div>
+
+                <div className="mt-[30px]">
+                  <h5 className="text-[20px] font-[700] mb-4">
+                    Caractéristiques produit
+                  </h5>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">
+                        Marque
+                      </label>
+                      <CreatableSelect<BrandOption>
+                        value={selectedOptionBrand}
+                        onChange={handleChangeBrand}
+                        onInputChange={handleInputChangeBrand}
+                        inputValue={inputValueBrand}
+                        options={optionsBrand}
+                        placeholder="Selectionner une marque"
+                        styles={customStyles}
+                        className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">
+                        Collection
+                      </label>
+                      <CreatableSelect<CollectionOption>
+                        value={selectedOptionCollection}
+                        onChange={handleChangeCollection}
+                        onInputChange={handleInputChangeCollection}
+                        inputValue={inputValueCollection}
+                        options={optionsCollection}
+                        placeholder="Selectionner une collection"
+                        styles={customStyles}
+                        className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                        required
+                      />
+                    </div>
+                  </div>
                   <Input
                     element="input"
-                    id="supplier_ref"
-                    label="Référence produit :"
-                    value={formData.supplier_ref}
+                    id="dimension_type"
+                    label="Type de dimension :"
+                    value={formData.dimension_type}
                     onChange={handleChange}
                     validators={[]}
-                    placeholder="Ajouter la designation du produit"
+                    placeholder="Selectionnez un type de dimension"
                     create
+                    disabled
                     gray
                   />
                 </div>
+                <div className="mt-3">
+                  <UVCGrid onDimensionsChange={handleGridChange} />
+                </div>
               </div>
-            </Card>
-            <Card title="Caractéristiques du produit">
-              <div className="flex flex-col gap-3">
-                <Input
-                  element="input"
-                  id="dimension_type"
-                  label="Type de dimension :"
-                  value={formData.dimension_type}
-                  onChange={handleChange}
-                  validators={[]}
-                  placeholder="Selectionnez un type de dimension"
-                  create
-                  disabled
-                  gray
-                />
+            </div>
 
-                <div>
-                  <label className="text-sm font-medium text-gray-600">
-                    Marque
-                  </label>
-                  <CreatableSelect<BrandOption>
-                    value={selectedOptionBrand}
-                    onChange={handleChangeBrand}
-                    onInputChange={handleInputChangeBrand}
-                    inputValue={inputValueBrand}
-                    options={optionsBrand}
-                    placeholder="Selectionner une marque"
-                    styles={customStyles}
-                    className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                    required
-                  />
+            <div className="w-[30%] flex flex-col gap-5">
+              <Card title=" Ajouter une image">
+                <div className="w-full h-[250px] border border-dashed border-2 border-gray-300 mt-3 flex justify-center items-center">
+                  <div className="flex flex-col items-center text-center">
+                    <p className="font-bold text-gray-600">
+                      Glissez déposez votre image ici ou{" "}
+                      <span className="text-blue-400">
+                        téléchargez depuis votre ordinateur
+                      </span>
+                    </p>
+                    <div className="text-gray-300">
+                      <ImageUp size={50} />
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600">
-                    Collection
-                  </label>
-                  <CreatableSelect<CollectionOption>
-                    value={selectedOptionCollection}
-                    onChange={handleChangeCollection}
-                    onInputChange={handleInputChangeCollection}
-                    inputValue={inputValueCollection}
-                    options={optionsCollection}
-                    placeholder="Selectionner une collection"
-                    styles={customStyles}
-                    className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                    required
-                  />
+              </Card>
+              <Card title="Fournisseur principal">
+                <div className="flex flex-col gap-2">
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">
+                      Nom
+                    </label>
+                    <CreatableSelect<SuppliersOption>
+                      value={selectedOptionSupplier}
+                      onChange={handleChangeSupplier}
+                      onInputChange={handleInputChangeSupplier}
+                      inputValue={inputValueSupplier}
+                      options={optionsSupplier}
+                      placeholder="Selectionner un fournisseur"
+                      styles={customStyles}
+                      className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      element="input"
+                      id="supplier_ref"
+                      label="Référence produit :"
+                      value={formData.supplier_ref}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder="Ajouter la designation du produit"
+                      create
+                      gray
+                    />
+                  </div>
                 </div>
-              </div>
-            </Card>
-          </div>
-        </div>
-        {!isLoading ? (
-          <div className="flex items-center justify-between gap-3 mt-[50px] w-[70%]">
-            <div className="flex gap-3">
-              <Button size="small" cancel type="button">
-                Annuler
-              </Button>
-              <Button size="small" blue type="submit">
-                Enregistrer
-              </Button>
-            </div>
-            <div>
-              <Button size="small" blue type="button">
-                Valider
-              </Button>
+              </Card>
             </div>
           </div>
-        ) : (
-          <div className="mt-3">
-            <CircularProgress />
-          </div>
-        )}
-      </form>
+        </form>
+      </div>
     </section>
   );
 }

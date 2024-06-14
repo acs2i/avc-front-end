@@ -7,6 +7,7 @@ interface headerProps {
   btnTitle: string;
   placeholder: string;
   children: any;
+  height: any;
 }
 
 export default function Header({
@@ -15,16 +16,17 @@ export default function Header({
   link,
   btnTitle,
   placeholder,
+  height
 }: headerProps) {
   return (
-    <div className="w-full h-[300px] bg-gray-100 p-4 relative overflow-hidden">
-        <div
+    <div className="w-full bg-gray-100 p-4 relative overflow-hidden" style={{ height: height || 'auto' }}>
+      <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage: `url(${"/img/background_forest.jpg"})`,
-          opacity: 0.1,
-          filter: "grayscale(100%)",
-          zIndex: 1,
+          backgroundImage: `url(${"/img/background.png"})`,
+          opacity: 0.2,
+          filter: "grayscale(10%)",
+          backgroundPosition: "center bottom -50px",
         }}
       ></div>
       <div className="p-8 relative z-10">
@@ -64,7 +66,6 @@ export default function Header({
           <div>{children}</div>
         </div>
       </div>
-      <div className="absolute inset-0 bg-gray-100 opacity-90"></div>
     </div>
   );
 }

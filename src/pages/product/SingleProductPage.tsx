@@ -120,7 +120,7 @@ export default function SingleProductPage() {
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          <div className="bg-white rounded-lg h-[195px] flex flex-col shadow-md">
+          <div className="bg-white rounded-lg h-[195px] shadow-md">
             <div className="w-full">
               {product && (
                 <div>
@@ -190,6 +190,7 @@ export default function SingleProductPage() {
             </div>
           </div>
         </div>
+        
         <div className="bg-white rounded-lg h-[400px] flex flex-col shadow-md">
           <div className="w-full">
             {product && (
@@ -247,7 +248,7 @@ export default function SingleProductPage() {
                                   scope="row"
                                   className="px-6 py-4 text-center font-bold text-gray-500 border border-solid border-gray-300"
                                 >
-                                  TBEU /BASE
+                                  TBEU / BASE
                                 </th>
                                 <td className="p-0 text-center font-bold text-gray-500 border border-solid border-gray-300">
                                   <div className="h-full">
@@ -294,6 +295,7 @@ export default function SingleProductPage() {
           </div>
         </div>
       </div>
+
       <div className="bg-white rounded-lg px-4 py-7 shadow-md w-full">
         <h4 className="text-[18px] font-[800] text-gray-800">
           Unité de vente consomateur
@@ -391,15 +393,6 @@ export default function SingleProductPage() {
           )}
         </div>
       </div>
-      {/* Paramètres généraux */}
-      {/* {product && page === "general" && (
-        <div className="mt-[12px] flex flex-col gap-3">
-          <div className="flex gap-3">
-           
-          </div>
-          
-        </div>
-      )} */}
     </section>
   );
 }

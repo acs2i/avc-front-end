@@ -264,7 +264,7 @@ const UVCGrid: React.FC<UVCGridProps> = ({ onDimensionsChange }) => {
           </div>
         )}
       </Modal>
-      <h3 className="text-[22px] font-[800] text-gray-800">
+      <h3 className="text-[15px] font-[600] text-gray-800">
         Grille de dimension
       </h3>
       <div className="flex gap-2 mb-3 mt-3">
