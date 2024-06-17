@@ -5,7 +5,7 @@ import { Avatar, Divider } from "@mui/material";
 import { useSelector } from "react-redux";
 import socketIOClient from "socket.io-client";
 
-const ENDPOINT = "http://localhost:3001";
+const ENDPOINT = `${process.env.REACT_APP_URL_DEV}`;
 
 interface User {
   _id: any;
