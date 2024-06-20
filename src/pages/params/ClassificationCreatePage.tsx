@@ -30,7 +30,7 @@ function ClassificationCreatePage({
   onClose,
 }: ClassificationCreatePageProps) {
   const user = useSelector((state: any) => state.auth.user);
-  const [classificationValue, setClassificationValue] = useState("");
+  const [classificationValue, setClassificationValue] = useState("Au vieux campeur");
   const [type, setType] = useState("");
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);

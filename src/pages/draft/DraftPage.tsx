@@ -62,9 +62,10 @@ export default function DraftPage() {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url(${"/img/background_forest.jpg"})`,
-            opacity: 0.3,
-            filter: "grayscale(100%)",
+            backgroundImage: `url(${"/img/background.png"})`,
+            opacity: 0.2,
+            filter: "grayscale(10%)",
+            backgroundPosition: "center bottom -50px"
           }}
         ></div>
         <div className="relative z-10">
