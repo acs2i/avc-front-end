@@ -220,20 +220,13 @@ export default function Chat() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(msg),
         });
 
         if (!response.ok) {
-          const errorData = await response.text(); // Capture the raw text of the error
-          console.error("Erreur lors de l'envoi du message:", errorData);
-          try {
-            const errorJson = JSON.parse(errorData);
-            throw new Error(errorJson.error || "Failed to send message");
-          } catch (e) {
-            throw new Error(errorData);
-          }
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to send message");
         }
       } catch (error) {
         console.error("Erreur lors de l'envoi du message", error);
@@ -333,7 +326,7 @@ export default function Chat() {
                         alt={user && otherUser?.username}
                         src={user && otherUser?.imgPath}
                       />
-                       {connecteduser &&
+                      {connecteduser &&
                         connecteduser.unreadMessages?.[otherUser._id] !==
                           undefined &&
                         connecteduser.unreadMessages[otherUser._id] > 0 && (
@@ -348,7 +341,6 @@ export default function Chat() {
                       <span className="text-[15px] capitalize font-[600]">
                         {otherUser && otherUser?.username}
                       </span>
-                     
                     </div>
                   </div>
                 );
