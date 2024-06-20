@@ -204,33 +204,15 @@ export default function Chat() {
         message: newMessage,
         timestamp: new Date(),
       };
-
+  
       socket.emit("chat message", msg);
       setMessages((msgs) => [...msgs, msg]);
       setNewMessage("");
-
+  
       if (textareaRef.current) {
         textareaRef.current.style.height = "auto";
         textareaRef.current.rows = 1;
       }
-
-      // Send the message to the server
-      // try {
-      //   const response = await fetch(`${ENDPOINT}/api/v1/messages`, {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify(msg),
-      //   });
-
-      //   if (!response.ok) {
-      //     const errorData = await response.json();
-      //     throw new Error(errorData.message || "Failed to send message");
-      //   }
-      // } catch (error) {
-      //   console.error("Erreur lors de l'envoi du message", error);
-      // }
     }
   };
 
