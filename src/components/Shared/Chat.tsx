@@ -126,7 +126,7 @@ export default function Chat() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Si nécessaire, ajoutez le token d'authentification
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -215,30 +215,28 @@ export default function Chat() {
       }
 
       // Send the message to the server
-      try {
-        const response = await fetch(`${ENDPOINT}/api/v1/messages`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(msg),
-        });
+      // try {
+      //   const response = await fetch(`${ENDPOINT}/api/v1/messages`, {
+      //     method: "POST",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //     body: JSON.stringify(msg),
+      //   });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Failed to send message");
-        }
-      } catch (error) {
-        console.error("Erreur lors de l'envoi du message", error);
-      }
+      //   if (!response.ok) {
+      //     const errorData = await response.json();
+      //     throw new Error(errorData.message || "Failed to send message");
+      //   }
+      // } catch (error) {
+      //   console.error("Erreur lors de l'envoi du message", error);
+      // }
     }
   };
 
   const hasNewMessages = () => {
     return Object.values(newMessages).some((hasNew) => hasNew);
   };
-
-  console.log(newMessages);
 
   return (
     <>
