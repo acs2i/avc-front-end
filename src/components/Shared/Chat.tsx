@@ -1,5 +1,5 @@
 import { ChevronDown, X, Send } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import DrawerChat from "./DrawerChat";
 import { Avatar, Divider } from "@mui/material";
 import { useSelector } from "react-redux";
@@ -14,6 +14,7 @@ interface User {
   authorization: string;
   imgPath: string;
   comment: string;
+  unreadMessages: { [key: string]: number };
 }
 
 interface Message {
@@ -25,7 +26,17 @@ interface Message {
 
 export default function Chat() {
   const user = useSelector((state: any) => state.auth.user);
+  const token = useSelector((state: any) => state.auth.token);
+  const [connecteduser, setConnecteduser] = useState<User>();
+  const [newMessages, setNewMessages] = useState<{ [key: string]: boolean }>(
+    {}
+  );
+
+  const userId = user._id;
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isClicked, setIsClicked] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -34,9 +45,10 @@ export default function Chat() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = () => {
+    setIsOpen(true);
     setIsClicked(!isClicked);
     if (!isClicked && selectedUser) {
-      fetchMessages(selectedUser._id);  // Fetch messages when chat is opened
+      fetchMessages(selectedUser._id);
     }
   };
 
@@ -44,10 +56,15 @@ export default function Chat() {
     const newSocket = socketIOClient(ENDPOINT);
     setSocket(newSocket);
 
-    newSocket.emit('join', user._id);
+    newSocket.emit("join", user._id);
 
-    newSocket.on('chat message', (msg: Message) => {
+    newSocket.on("chat message", (msg: Message) => {
+      console.log("New message received:", msg);
       setMessages((msgs) => [...msgs, msg]);
+      setNewMessages((prev) => ({
+        ...prev,
+        [msg.sender]: true,
+      }));
     });
 
     return () => {
@@ -57,13 +74,21 @@ export default function Chat() {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [isOpen]);
 
   useEffect(() => {
     if (selectedUser && isClicked) {
       fetchMessages(selectedUser._id);
     }
   }, [selectedUser, isClicked]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
+  };
 
   const fetchUsers = async () => {
     setIsLoading(true);
@@ -74,7 +99,7 @@ export default function Chat() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-          }
+          },
         }
       );
 
@@ -92,14 +117,60 @@ export default function Chat() {
     }
   };
 
+  const fetchConnectedUser = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/auth/connectedUser/${userId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Si nécessaire, ajoutez le token d'authentification
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user");
+      }
+
+      const data = await response.json();
+      console.log(data);
+      setConnecteduser(data);
+
+      // Mettez à jour newMessages en fonction des messages non lus
+      const unreadMessages = data.unreadMessages || {};
+      const updatedNewMessages = Object.keys(unreadMessages).reduce(
+        (acc, key) => {
+          acc[key] = unreadMessages[key] > 0;
+          return acc;
+        },
+        {} as { [key: string]: boolean }
+      );
+      setNewMessages(updatedNewMessages);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchConnectedUser();
+  }, [isOpen]);
+
   const fetchMessages = async (contactId: string) => {
     try {
-      const response = await fetch(`${ENDPOINT}/api/v1/messages/${user._id}/${contactId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${ENDPOINT}/api/v1/messages/${user._id}/${contactId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -115,12 +186,17 @@ export default function Chat() {
 
   const handleUserClick = (user: User) => {
     setSelectedUser(user);
+    setNewMessages((prev) => ({
+      ...prev,
+      [user._id]: false,
+    }));
     if (isClicked) {
-      fetchMessages(user._id);  // Fetch messages when a user is clicked if chat is open
+      fetchMessages(user._id);
     }
   };
 
   const handleSendMessage = async () => {
+    if (newMessage.trim() === "") return;
     if (newMessage.trim() && selectedUser) {
       const msg: Message = {
         sender: user._id,
@@ -128,10 +204,15 @@ export default function Chat() {
         message: newMessage,
         timestamp: new Date(),
       };
-      
-      socket.emit('chat message', msg);
+
+      socket.emit("chat message", msg);
       setMessages((msgs) => [...msgs, msg]);
       setNewMessage("");
+
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "auto";
+        textareaRef.current.rows = 1;
+      }
 
       // Send the message to the server
       try {
@@ -139,19 +220,32 @@ export default function Chat() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(msg),
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Failed to send message");
+          const errorData = await response.text(); // Capture the raw text of the error
+          console.error("Erreur lors de l'envoi du message:", errorData);
+          try {
+            const errorJson = JSON.parse(errorData);
+            throw new Error(errorJson.error || "Failed to send message");
+          } catch (e) {
+            throw new Error(errorData);
+          }
         }
       } catch (error) {
         console.error("Erreur lors de l'envoi du message", error);
       }
     }
   };
+
+  const hasNewMessages = () => {
+    return Object.values(newMessages).some((hasNew) => hasNew);
+  };
+
+  console.log(newMessages);
 
   return (
     <>
@@ -167,7 +261,10 @@ export default function Chat() {
             {selectedUser && (
               <div
                 className="cursor-pointer"
-                onClick={() => setSelectedUser(null)}
+                onClick={() => {
+                  setSelectedUser(null);
+                  setIsOpen(false);
+                }}
               >
                 <X />
               </div>
@@ -177,24 +274,43 @@ export default function Chat() {
         <Divider />
         {selectedUser ? (
           <>
-            <div className="py-2 px-6">
-              <div className="overflow-y-auto" style={{ maxHeight: "380px" }}>
+            <div className="relative h-[440px] flex flex-col py-2">
+              <div
+                className="overflow-y-auto flex flex-col gap-2 px-3"
+                style={{ maxHeight: "380px" }}
+              >
                 {messages.map((msg: Message, index: number) => (
-                  <div key={index} className={`my-2 ${msg.sender === user._id ? 'bg-blue-400 rounded-xl ml-[33px] text-white text-right' : 'bg-gray-300 mr-[33px] rounded-xl text-black text-left'}`}>
-                    <p className="p-2 rounded">{msg.message}</p>
+                  <div
+                    key={index}
+                    className={`max-w-max ${
+                      msg.sender === user._id
+                        ? "bg-blue-400 text-white ml-auto rounded-xl px-4 py-2"
+                        : "bg-gray-300 text-black mr-auto rounded-xl px-4 py-2"
+                    }`}
+                    style={{ display: "inline-block" }}
+                  >
+                    <p className="rounded" ref={messagesEndRef}>
+                      {msg.message}
+                    </p>
                   </div>
                 ))}
               </div>
-              <div className=" flex">
-                <input
-                  type="text"
+              <div className="flex items-center justify-center gap-3 py-2 w-full mt-auto border-t">
+                <textarea
+                  ref={textareaRef}
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  className="flex-grow p-2 border rounded-l"
-                  placeholder="Type a message"
+                  className="py-2 px-4 border rounded-full w-[320px] focus:outline-none resize-none overflow-hidden"
+                  placeholder="Ecrivez votre message"
+                  rows={1}
+                  onInput={(e) => {
+                    const target = e.target as HTMLTextAreaElement;
+                    target.style.height = "auto";
+                    target.style.height = target.scrollHeight + "px";
+                  }}
                 />
-                <button onClick={handleSendMessage} className="p-2 bg-blue-600 text-white rounded-r-lg">
-                <Send />
+                <button onClick={handleSendMessage} className="text-sky-600">
+                  <Send size={18} />
                 </button>
               </div>
             </div>
@@ -205,23 +321,38 @@ export default function Chat() {
               className="flex flex-col gap-3 overflow-y-auto"
               style={{ maxHeight: "400px" }}
             >
-              {users.map((user) => (
-                <div
-                  key={user._id}
-                  className="flex items-center gap-2 cursor-pointer"
-                  onClick={() => handleUserClick(user)}
-                >
-                  <Avatar
-                    alt={user && user?.username}
-                    src={user && user?.imgPath}
-                  />
-                  <div className="flex flex-col">
-                    <span className="text-[15px] capitalize font-[600]">
-                      {user && user?.username}
-                    </span>
+              {users.map((otherUser) => {
+                return (
+                  <div
+                    key={otherUser._id}
+                    className="flex items-center gap-2 cursor-pointer"
+                    onClick={() => handleUserClick(otherUser)}
+                  >
+                    <div className="relative">
+                      <Avatar
+                        alt={user && otherUser?.username}
+                        src={user && otherUser?.imgPath}
+                      />
+                       {connecteduser &&
+                        connecteduser.unreadMessages?.[otherUser._id] !==
+                          undefined &&
+                        connecteduser.unreadMessages[otherUser._id] > 0 && (
+                          <div className="absolute top-0 right-[-5px] w-4 h-4 rounded-full bg-red-500 flex items-center justify-center">
+                            <span className="text-white text-[10px]">
+                              {connecteduser.unreadMessages[otherUser._id]}
+                            </span>
+                          </div>
+                        )}
+                    </div>
+                    <div className="relative">
+                      <span className="text-[15px] capitalize font-[600]">
+                        {otherUser && otherUser?.username}
+                      </span>
+                     
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -239,6 +370,11 @@ export default function Chat() {
         ) : (
           <div className="text-white">
             <ChevronDown />
+          </div>
+        )}
+        {hasNewMessages() && (
+          <div className="absolute top-[-5px] right-0 w-5 h-5 rounded-full bg-red-500">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
           </div>
         )}
       </div>
