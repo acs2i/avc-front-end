@@ -14,14 +14,19 @@ import DraftPage from "./pages/draft/DraftPage";
 import AdminPage from "./pages/panel-admin/AdminPage";
 import CreateUserPage from "./pages/panel-admin/CreateUser";
 import ProductList from "./pages/product/ProductList";
+import ProfilePage from "./pages/user/ProfilePage";
 import CreateGroupPage from "./pages/panel-admin/CreateGroup";
 import CreatedGroupPage from "./pages/panel-admin/CreatedGroup";
 import CalendarPage from "./pages/calendar/CalendarPage";
 import Chat from "./components/Shared/Chat";
-import Footer from "./components/Navigation/Footer";
+
+// Types
+interface PrivateRouteProps {
+  isAuth: boolean;
+}
 
 // Composant PrivateRoute
-const PrivateRoute = ({ isAuth } : any) => {
+const PrivateRoute: React.FC<PrivateRouteProps> = ({ isAuth }) => {
   return isAuth ? <Outlet /> : <Navigate to="/login" />;
 };
 
@@ -58,19 +63,22 @@ function App() {
             <Route path="/parameters" element={<ParamsMenuPage />} />
             <Route path="/product" element={<ProductList />} />
             <Route path="/product/:id" element={<SingleProductPage />} />
-            <Route path="/suppliers/suppliers-list" element={<SuppliersPage />} />
+            <Route
+              path="/suppliers/suppliers-list"
+              element={<SuppliersPage />}
+            />
             <Route path="/draft" element={<DraftPage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/admin/create-user" element={<CreateUserPage />} />
             <Route path="/admin/create-group" element={<CreateGroupPage />} />
             <Route path="/admin/created-group" element={<CreatedGroupPage />} />
+            <Route path="/user/profile/:userId" element={<ProfilePage />} />
             <Route path="/calendar" element={<CalendarPage />} />
           </Route>
           <Route path="*" element={<Navigate to={isAuth ? "/" : "/login"} />} />
         </Routes>
+        {shouldShowNavbar && isAuth && <Chat />}
       </div>
-      {shouldShowNavbar && <Chat />}
-   
     </>
   );
 }

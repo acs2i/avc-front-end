@@ -338,7 +338,7 @@ export default function Chat() {
         } border shadow-md transition-all duration-300`}
       >
         {!isClicked ? (
-          <span className="text-md text-white font-[600]">Discutions</span>
+          <span className="text-md text-white font-[600]">Discussions</span>
         ) : (
           <div className="text-white">
             <ChevronDown />

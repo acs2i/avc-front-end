@@ -99,6 +99,7 @@ const customStyles = {
 
 export default function CreateProductPage() {
   const creatorId = useSelector((state: any) => state.auth.user);
+  const token = useSelector((state: any) => state.auth.token);
 
   const { notifySuccess, notifyError } = useNotify();
   const [isLoading, setIsLoading] = useState(false);
@@ -524,6 +525,7 @@ export default function CreateProductPage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
           },
           body: JSON.stringify(formData),
         }

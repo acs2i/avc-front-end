@@ -52,8 +52,6 @@ interface CardType {
   chartType: string;
 }
 
-
-
 export default function Home() {
   const data1 = [12, 19, 14, 5, 16, 19];
   const data2 = [14, 16, 20, 5, 18, 22];
@@ -137,7 +135,9 @@ export default function Home() {
                   <Star size={20} />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-lg font-bold">57 nouveaux produits</span>
+                  <span className="text-lg font-bold">
+                    57 nouveaux produits
+                  </span>
                   <span className="text-xs">Awaiting processing</span>
                 </div>
               </div>
@@ -215,85 +215,88 @@ export default function Home() {
 
         <div className="relative overflow-x-auto mt-5">
           <table className="w-full text-left">
-            <thead className="bg-gray-200 text-sm ">
+            <thead className="border-t border-b text-sm">
               <tr>
-                <th scope="col" className="px-6 py-4 w-[50px]">
+                <th scope="col" className="px-6 py-2 w-[50px]">
                   Code
                 </th>
-                <th scope="col" className="px-6 py-4 w-[300px]">
+                <th scope="col" className="px-6 w-[300px]">
                   Libellé
                 </th>
-                <th scope="col" className="px-6 py-4 w-[300px]">
+                <th scope="col" className="px-6 w-[300px]">
                   Famille
                 </th>
-                <th scope="col" className="px-6 py-4 w-[300px]">
+                <th scope="col" className="px-6 w-[300px]">
                   Sous-famille
                 </th>
-                <th scope="col" className="px-6 py-4 w-[300px]">
-                  Créateur
-                </th>
-                <th scope="col" className="px-6 py-4 w-[150px] text-center">
+                <th scope="col" className="px-6 w-[50px]">
                   Status
+                </th>
+                <th scope="col" className="px-6 w-[150px] text-center">
+                  Date
                 </th>
               </tr>
             </thead>
             <tbody>
-              {products && products?.products.map((product: Product) => (
-                <tr className="border-b cursor-pointer hover:bg-slate-200" key={product._id} onClick={() => navigate(`/product/${product._id}`)}>
-                  <td className="p-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs">{product.GA_CODEARTICLE}</span>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-blue-600">
-                        {product.GA_LIBELLE}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="p-4 text-xs">
-                    {product.family ? (
-                      <div className="inline-block bg-gray-300 px-3 py-1 rounded-md font-bold">
-                        <span>{product.family?.YX_CODE}</span>
-                        <span className="mx-1">-</span>
-                        <span>{product.family?.YX_LIBELLE}</span>
+              {products &&
+                products?.products.map((product: Product) => (
+                  <tr
+                    className="border-b cursor-pointer hover:bg-slate-200"
+                    key={product._id}
+                    onClick={() => navigate(`/product/${product._id}`)}
+                  >
+                    <td className="p-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs">
+                          {product.GA_CODEARTICLE}
+                        </span>
                       </div>
-                    ) : (
-                      <span>-</span>
-                    )}
-                  </td>
-                  <td className="p-4 text-xs">
-                    {product.subFamily ? (
-                      <div className="inline-block bg-gray-200 px-3 py-1 rounded-md font-bold">
-                        <span>{product?.subFamily?.YX_CODE}</span>
-                        <span className="mx-1">-</span>
-                        {product?.subFamily.YX_LIBELLE && (
-                          <span>{product?.subFamily?.YX_LIBELLE}</span>
-                        )}
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-blue-600">
+                          {product.GA_LIBELLE}
+                        </span>
                       </div>
-                    ) : (
-                      <span>-</span>
-                    )}
-                  </td>
-                  <td>
-                    <div className="flex items-center gap-2">
-                      <Avatar alt="User" src="" />
-                      <span className="text-sm font-bold text-gray-600">
-                        Créateur
-                      </span>
-                    </div>
-                  </td>
-
-                  <td>
-                    <div
-                      className={`flex items-center justify-center bg-green-200 border border-green-500 text-green-700 rounded-md w-[80%] mx-auto text-xs`}
-                    >
-                      <span>ACTIF</span>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="p-4 text-xs">
+                      {product.family ? (
+                        <div>
+                          <span>{product.family?.YX_CODE}</span>
+                          <span className="mx-1">-</span>
+                          <span>{product.family?.YX_LIBELLE}</span>
+                        </div>
+                      ) : (
+                        <span>-</span>
+                      )}
+                    </td>
+                    <td className="p-4 text-xs">
+                      {product.subFamily ? (
+                        <div>
+                          <span>{product?.subFamily?.YX_CODE}</span>
+                          <span className="mx-1">-</span>
+                          {product?.subFamily.YX_LIBELLE && (
+                            <span>{product?.subFamily?.YX_LIBELLE}</span>
+                          )}
+                        </div>
+                      ) : (
+                        <span>-</span>
+                      )}
+                    </td>
+                    <td>
+                      <div
+                        className={`flex items-center justify-center bg-green-200 border border-green-500 text-green-700 rounded-md w-[50px] mx-auto text-xs`}
+                      >
+                        <span>ACTIF</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="text-center">
+                        <span className="text-xs">24/06/2024</span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
@@ -305,35 +308,39 @@ export default function Home() {
             <h4 className="text-[25px] font-bold text-gray-800">
               Fournisseurs principaux
             </h4>
-            <p className="text-[15px] text-gray-600">Nos fournisseurs en France</p>
+            <p className="text-[15px] text-gray-600">
+              Nos fournisseurs en France
+            </p>
           </div>
           <div className="relative overflow-x-auto mt-5">
             <table className="w-full text-left">
-              <thead className="bg-gray-200 text-sm text-gray-500">
+              <thead className="text-sm text-gray-500 border-t border-b">
                 <tr>
-                  <th scope="col" className="px-6 py-4 w-[300px]">
+                  <th scope="col" className="px-6 py-2 w-[300px]">
                     Libellé
                   </th>
-                  <th scope="col" className="px-6 py-4 w-[300px]">
-                    Juridique
+                  <th scope="col" className="px-6 py-2 w-[300px] text-center">
+                   Code
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {suppliers && suppliers.length > 0 && suppliers.map((supplier, i) => (
-                  <tr className="border-b" key={supplier._id}>  
-                    <td className="p-2">
-                      <span className="text-xs text-blue-600">
-                        {supplier.T_LIBELLE}
-                      </span>
-                    </td>
-                    <td>
-                      <span className="text-sm font-bold text-gray-600">
-                        {supplier.T_JURIDIQUE}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {suppliers &&
+                  suppliers.length > 0 &&
+                  suppliers.map((supplier, i) => (
+                    <tr className="border-b" key={supplier._id}>
+                      <td className="p-2">
+                        <span className="text-xs text-blue-600">
+                          {supplier.T_LIBELLE}
+                        </span>
+                      </td>
+                      <td className="text-center">
+                        <span className="text-sm font-bold text-gray-600">
+                          {supplier.T_TIERS}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
@@ -342,8 +349,6 @@ export default function Home() {
           <Map />
         </div>
       </section>
-
-      
     </>
   );
 }

@@ -18,7 +18,7 @@ import {
   User,
   UserPlus,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Switch } from "@mui/material";
 
 export default function AccountMenu() {
@@ -38,7 +38,7 @@ export default function AccountMenu() {
   const label = { inputProps: { "aria-label": "Switch demo" } };
 
   if (!user) {
-    return null; // Ou vous pouvez retourner un fallback UI ici
+    return null; 
   }
  
   return (
@@ -89,10 +89,10 @@ export default function AccountMenu() {
             <div className="w-[300px] mt-4 mb-4">
               <ul className="flex flex-col gap-3">
                 <li className="hover:bg-gray-100 py-2">
-                  <div className="flex items-center gap-2">
+                  <Link className="flex items-center gap-2" to={`/user/profile/${user._id}`}>
                     <User size={18} />
                     <span className="text-[13px]">Mon profile</span>
-                  </div>
+                  </Link>
                 </li>
                 <li className="hover:bg-gray-100 py-2">
                   <div className="flex items-center gap-2">
