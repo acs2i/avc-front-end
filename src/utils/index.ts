@@ -68,6 +68,12 @@ export const LINKS: Link[] = [
             linksGroup: [],
             icon: CalendarDays,
           },
+          {
+            name: "Chat",
+            link: "/chat",
+            linksGroup: [],
+            icon: CalendarDays,
+          },
         ],
       },
       {

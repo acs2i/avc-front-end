@@ -18,6 +18,7 @@ import ProfilePage from "./pages/user/ProfilePage";
 import CreateGroupPage from "./pages/panel-admin/CreateGroup";
 import CreatedGroupPage from "./pages/panel-admin/CreatedGroup";
 import CalendarPage from "./pages/calendar/CalendarPage";
+import ChatPage from "./pages/chat/ChatPage";
 import Chat from "./components/Shared/Chat";
 
 // Types
@@ -74,6 +75,7 @@ function App() {
             <Route path="/admin/created-group" element={<CreatedGroupPage />} />
             <Route path="/user/profile/:userId" element={<ProfilePage />} />
             <Route path="/calendar" element={<CalendarPage />} />
+            <Route path="/chat" element={<ChatPage />} />
           </Route>
           <Route path="*" element={<Navigate to={isAuth ? "/" : "/login"} />} />
         </Routes>
