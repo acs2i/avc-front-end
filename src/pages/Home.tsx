@@ -206,10 +206,10 @@ export default function Home() {
       <section className="bg-white w-full p-8 border-b-[1px] border-gray-300 ">
         <div className="flx flex-col">
           <h4 className="text-[25px] font-bold text-gray-800">
-            Produits récemment crées
+            Références récemment créées
           </h4>
           <p className="text-[15px] text-gray-600">
-            Produits créés ces dernières 24 heures
+            10 dernières références créées
           </p>
         </div>
 

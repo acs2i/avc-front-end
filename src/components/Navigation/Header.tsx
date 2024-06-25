@@ -6,7 +6,7 @@ interface headerProps {
   link: string;
   btnTitle: string;
   placeholder: string;
-  children: any;
+  children?: any;
   height: any;
 }
 
@@ -63,7 +63,7 @@ export default function Header({
               {btnTitle}
             </Button>
           </div>
-          <div>{children}</div>
+          <div className="relative">{children}</div>
         </div>
       </div>
     </div>
