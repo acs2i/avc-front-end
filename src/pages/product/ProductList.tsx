@@ -204,7 +204,7 @@ export default function ProductList() {
         link="/product/edit"
         btnTitle="Créer un produit"
         placeholder="Rechercher un produit"
-        height="400px"
+        height="300px"
       ></Header>
       <div className="relative">
         <div className="absolute bottom-0 z-[55555555]">
