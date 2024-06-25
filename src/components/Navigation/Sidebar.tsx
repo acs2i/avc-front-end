@@ -25,7 +25,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="fixed h-screen w-[250px] bg-white flex flex-col gap-3 z-[300] border-r-[1px] border-gray-300">
+    <aside className="fixed h-screen w-[250px] bg-white flex flex-col gap-3 z-[300] border-r-[1px] border-gray-300 dark:bg-gray-600 dark:border-gray-600">
       <ul className="text-gray-600 flex flex-col gap-8 px-7 py-8 overflow-y-auto">
         {LINKS.map((categoryWrapper, categoryWrapperIndex) =>
           categoryWrapper.linkCategory.map((category, categoryIndex) => (
@@ -33,12 +33,12 @@ export default function Sidebar() {
               key={categoryWrapperIndex + "-" + categoryIndex}
               className="cursor-pointer"
             >
-              <h2 className="font-bold text-gray-500 uppercase">
+              <h2 className="font-bold text-gray-500 dark:text-white uppercase">
                 {category.name}
               </h2>
               <ul className="flex flex-col mt-6">
                 {category.linksGroup.map((link, i) => (
-                  <li key={i} className="cursor-pointer">
+                  <li key={i} className="cursor-pointer dark:text-white">
                     {link.link ? (
                       <RouterLink
                         to={link.link}
@@ -51,7 +51,7 @@ export default function Sidebar() {
                       </RouterLink>
                     ) : (
                       <div
-                        className="flex items-center gap-2 hover:bg-gray-200 p-2 rounded-md"
+                        className="flex items-center gap-2 hover:bg-gray-200 p-2 rounded-md dark:text-white"
                         onClick={() => handleOpenCategory(link.name)}
                       >
                         {openCategory != link.name ? (
@@ -87,7 +87,7 @@ export default function Sidebar() {
                           {link.group.map((item, groupIndex) => (
                             <li key={groupIndex}>
                               <div
-                                className="ml-10 flex items-center gap-1 hover:bg-gray-200 p-2 rounded-md"
+                                className="ml-10 flex items-center gap-1  hover:bg-gray-200 p-2 rounded-md dark:text-white"
                                 onClick={() => handleOpenSubCategory(item.name)}
                               >
                                 {openSubCategory != item.name ? (
@@ -95,7 +95,7 @@ export default function Sidebar() {
                                 ) : (
                                   <ChevronDown size={13} />
                                 )}
-                                <h4 className="text-[11px]">{item.name}</h4>
+                                <h4 className="text-[11px] dark:text-white">{item.name}</h4>
                               </div>
                               <Collapse in={openSubCategory === item.name}>
                                 <ul className="ml-[65px]">
@@ -121,7 +121,7 @@ export default function Sidebar() {
                               <li key={linkIndex}>
                                 <RouterLink
                                   to={subLink.link}
-                                  className="flex text-gray-600 p-2 hover:bg-gray-200 rounded-md"
+                                  className="flex text-gray-600 p-2 hover:bg-gray-200 rounded-md dark:text-white"
                                 >
                                   {subLink.name}
                                 </RouterLink>

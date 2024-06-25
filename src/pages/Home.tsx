@@ -118,18 +118,18 @@ export default function Home() {
 
   return (
     <>
-      <section className="w-full bg-gray-100 p-8 flex border-b-[1px] border-gray-300">
+      <section className="w-full bg-gray-100 dark:bg-gray-800 p-8 flex border-b-[1px] border-gray-300 dark:border-gray-500">
         <div className="w-1/2">
           <div className="flex flex-col gap-8">
-            <div>
-              <h3 className="text-[35px] font-bold text-gray-800">
+            <div className="text-gray-800 dark:text-white">
+              <h3 className="text-[35px] font-bold">
                 Tableau de bord
               </h3>
-              <p className="text-[15px] text-gray-600">
+              <p className="text-[15px]">
                 Vue globale des articles enregistrés
               </p>
             </div>
-            <div className="flex items-center gap-5 ">
+            <div className="flex items-center gap-5 dark:text-white">
               <div className="flex items-center gap-5">
                 <div className="w-[30px] h-[30px] flex items-center justify-center rounded-full bg-green-100 text-green-500">
                   <Star size={20} />
@@ -168,10 +168,10 @@ export default function Home() {
 
           <div className="mt-[40px]">
             <div>
-              <h3 className="text-[25px] font-bold text-gray-800">
+              <h3 className="text-[25px] font-bold text-gray-800 dark:text-white">
                 Evolution des ventes
               </h3>
-              <p className="text-[15px] text-gray-600">
+              <p className="text-[15px] text-gray-600 dark:text-white">
                 Lorem, ipsum dolor sit amet consectetur.
               </p>
             </div>
@@ -203,19 +203,19 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-white w-full p-8 border-b-[1px] border-gray-300 ">
+      <section className="bg-white dark:bg-gray-500 w-full p-8 border-b-[1px] border-gray-300">
         <div className="flx flex-col">
-          <h4 className="text-[25px] font-bold text-gray-800">
+          <h4 className="text-[25px] font-bold text-gray-800 dark:text-white">
             Références récemment créées
           </h4>
-          <p className="text-[15px] text-gray-600">
+          <p className="text-[15px] text-gray-600 dark:text-white">
             10 dernières références créées
           </p>
         </div>
 
         <div className="relative overflow-x-auto mt-5">
           <table className="w-full text-left">
-            <thead className="border-t border-b text-sm">
+            <thead className="border-t border-b dark:border-gray-600 text-sm dark:text-white">
               <tr>
                 <th scope="col" className="px-6 py-2 w-[50px]">
                   Code
@@ -241,12 +241,12 @@ export default function Home() {
               {products &&
                 products?.products.map((product: Product) => (
                   <tr
-                    className="border-b cursor-pointer hover:bg-slate-200"
+                    className="border-b cursor-pointer hover:bg-slate-200 dark:border-gray-600"
                     key={product._id}
                     onClick={() => navigate(`/product/${product._id}`)}
                   >
                     <td className="p-4">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 dark:text-white">
                         <span className="text-xs">
                           {product.GA_CODEARTICLE}
                         </span>
@@ -254,14 +254,14 @@ export default function Home() {
                     </td>
                     <td className="p-4">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs text-blue-600">
+                        <span className="text-xs text-blue-600 dark:text-yellow-300">
                           {product.GA_LIBELLE}
                         </span>
                       </div>
                     </td>
                     <td className="p-4 text-xs">
                       {product.family ? (
-                        <div>
+                        <div className="dark:text-white">
                           <span>{product.family?.YX_CODE}</span>
                           <span className="mx-1">-</span>
                           <span>{product.family?.YX_LIBELLE}</span>
@@ -272,7 +272,7 @@ export default function Home() {
                     </td>
                     <td className="p-4 text-xs">
                       {product.subFamily ? (
-                        <div>
+                        <div className="dark:text-white">
                           <span>{product?.subFamily?.YX_CODE}</span>
                           <span className="mx-1">-</span>
                           {product?.subFamily.YX_LIBELLE && (
@@ -292,7 +292,7 @@ export default function Home() {
                     </td>
                     <td>
                       <div className="text-center">
-                        <span className="text-xs">24/06/2024</span>
+                        <span className="text-xs dark:text-white">24/06/2024</span>
                       </div>
                     </td>
                   </tr>
@@ -303,18 +303,18 @@ export default function Home() {
       </section>
 
       <section className="flex border-b-[1px]">
-        <div className="w-1/2 h-[600px] p-8 bg-gray-100">
+        <div className="w-1/2 h-[600px] p-8 bg-gray-100 dark:bg-gray-800 ">
           <div className="flx flex-col">
-            <h4 className="text-[25px] font-bold text-gray-800">
+            <h4 className="text-[25px] font-bold text-gray-800 dark:text-white">
               Fournisseurs principaux
             </h4>
-            <p className="text-[15px] text-gray-600">
+            <p className="text-[15px] text-gray-600 dark:text-white">
               Nos fournisseurs en France
             </p>
           </div>
           <div className="relative overflow-x-auto mt-5">
             <table className="w-full text-left">
-              <thead className="text-sm text-gray-500 border-t border-b">
+              <thead className="text-sm text-gray-500 dark:text-white border-t border-b dark:border-gray-500">
                 <tr>
                   <th scope="col" className="px-6 py-2 w-[300px]">
                     Libellé
@@ -328,14 +328,14 @@ export default function Home() {
                 {suppliers &&
                   suppliers.length > 0 &&
                   suppliers.map((supplier, i) => (
-                    <tr className="border-b" key={supplier._id}>
+                    <tr className="border-b dark:border-gray-500" key={supplier._id}>
                       <td className="p-2">
-                        <span className="text-xs text-blue-600">
+                        <span className="text-xs text-blue-600 dark:text-yellow-400">
                           {supplier.T_LIBELLE}
                         </span>
                       </td>
                       <td className="text-center">
-                        <span className="text-sm font-bold text-gray-600">
+                        <span className="text-sm font-bold text-gray-600 dark:text-white">
                           {supplier.T_TIERS}
                         </span>
                       </td>

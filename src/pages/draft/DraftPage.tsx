@@ -25,6 +25,7 @@ interface Draft {
 
 export default function DraftPage() {
   const userId = useSelector((state: any) => state.auth.user._id);
+  const token = useSelector((state: any) => state.auth.token);
   const [page, setPage] = useState("draft");
   const [drafts, setDrafts] = useState<Draft[]>([]);
 
@@ -44,6 +45,7 @@ export default function DraftPage() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
         }
       );

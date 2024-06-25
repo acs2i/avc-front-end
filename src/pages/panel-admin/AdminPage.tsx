@@ -9,6 +9,7 @@ import { Info, Plus } from "lucide-react";
 import Modal from "../../components/Shared/Modal";
 import { Divider, Tooltip } from "@mui/material";
 import Header from "../../components/Navigation/Header";
+import { useSelector } from "react-redux";
 
 interface User {
   _id: any;
@@ -19,6 +20,7 @@ interface User {
 }
 
 export default function AdminPage() {
+  const token = useSelector((state: any) => state.auth.token);
   const [searchValue, setSearchValue] = useState("");
   const [prevSearchValue, setPrevSearchValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -49,6 +51,7 @@ export default function AdminPage() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
         }
       );

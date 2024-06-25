@@ -30,7 +30,6 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     setLogin: (state, action: PayloadAction<{ user: User; token: Token }>) => {
-      console.log("User data received on login:", action.payload.user); // Ajoutez ceci pour vérifier les données utilisateur
       state.user = action.payload.user;
       state.token = action.payload.token;
     },

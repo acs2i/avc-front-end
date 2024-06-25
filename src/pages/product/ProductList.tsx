@@ -207,7 +207,7 @@ export default function ProductList() {
         height="400px"
       ></Header>
       <div className="relative">
-        <div className="absolute bottom-0 z-[55555555]">
+        <div className="absolute bottom-0 z-[5555]">
           <button
             className="bg-gray-200 py-2 px-5 rounded-r-lg shadow-md border border-white text-gray-700 flex items-center gap-2"
             onClick={() => setSearchIsOpen((prev) => !prev)}

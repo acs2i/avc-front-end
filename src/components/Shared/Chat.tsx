@@ -99,6 +99,7 @@ export default function Chat() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -121,7 +122,7 @@ export default function Chat() {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/auth/connectedUser/${userId}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/auth/${userId}`,
         {
           method: "GET",
           headers: {
@@ -136,7 +137,6 @@ export default function Chat() {
       }
 
       const data = await response.json();
-      console.log(data);
       setConnecteduser(data);
 
       // Mettez à jour newMessages en fonction des messages non lus
@@ -226,14 +226,14 @@ export default function Chat() {
         <div className="py-4 px-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <h6 className="text-gray-700 font-[700] capitalize">
+              <h6 className="text-gray-700 font-[700] capitalize dark:text-white">
                 {selectedUser ? selectedUser?.username : user?.username}
               </h6>
               <div className="w-[10px] h-[10px] rounded-full bg-green-500"></div>
             </div>
             {selectedUser && (
               <div
-                className="cursor-pointer"
+                className="cursor-pointer dark:text-white"
                 onClick={() => {
                   setSelectedUser(null);
                   setIsOpen(false);
@@ -249,7 +249,7 @@ export default function Chat() {
           <>
             <div className="relative h-[440px] flex flex-col py-2">
               <div
-                className="overflow-y-auto flex flex-col gap-2 px-3"
+                className="overflow-y-auto flex flex-col gap-2 px-3 mb-2"
                 style={{ maxHeight: "380px" }}
               >
                 {messages.map((msg: Message, index: number) => (
@@ -318,7 +318,7 @@ export default function Chat() {
                         )}
                     </div>
                     <div className="relative">
-                      <span className="text-[15px] capitalize font-[600]">
+                      <span className="text-[12px] capitalize font-[600] dark:text-white">
                         {otherUser && otherUser?.username}
                       </span>
                     </div>
