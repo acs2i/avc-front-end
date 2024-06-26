@@ -1,6 +1,5 @@
 import { ChevronDown, X, Send } from "lucide-react";
 import React, { useEffect, useState, useRef } from "react";
-import DrawerChat from "./DrawerChat";
 import { Avatar, Divider } from "@mui/material";
 import { useSelector } from "react-redux";
 import socketIOClient from "socket.io-client";
@@ -57,7 +56,9 @@ export default function ChatPage() {
 
     newSocket.on("chat message", (msg: Message) => {
       console.log("New message received:", msg);
-      setMessages((msgs) => [...msgs, msg]);
+      if (selectedUser && (msg.sender === selectedUser._id || msg.receiver === selectedUser._id)) {
+        setMessages((msgs) => [...msgs, msg]);
+      }
       setNewMessages((prev) => ({
         ...prev,
         [msg.sender]: true,
@@ -67,7 +68,7 @@ export default function ChatPage() {
     return () => {
       newSocket.disconnect();
     };
-  }, [user._id]);
+  }, [user._id, selectedUser]);
 
   useEffect(() => {
     fetchUsers();
@@ -90,12 +91,16 @@ export default function ChatPage() {
   const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/auth/all-users`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/auth/all-users`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch users");
@@ -114,27 +119,32 @@ export default function ChatPage() {
   const fetchConnectedUser = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/auth/connectedUser/${userId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/auth/${userId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch user");
       }
 
       const data = await response.json();
-      console.log(data);
       setConnecteduser(data);
 
       const unreadMessages = data.unreadMessages || {};
-      const updatedNewMessages = Object.keys(unreadMessages).reduce((acc, key) => {
-        acc[key] = unreadMessages[key] > 0;
-        return acc;
-      }, {} as { [key: string]: boolean });
+      const updatedNewMessages = Object.keys(unreadMessages).reduce(
+        (acc, key) => {
+          acc[key] = unreadMessages[key] > 0;
+          return acc;
+        },
+        {} as { [key: string]: boolean }
+      );
       setNewMessages(updatedNewMessages);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
@@ -149,12 +159,15 @@ export default function ChatPage() {
 
   const fetchMessages = async (contactId: string) => {
     try {
-      const response = await fetch(`${ENDPOINT}/api/v1/messages/${user._id}/${contactId}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${ENDPOINT}/api/v1/messages/${user._id}/${contactId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -174,9 +187,7 @@ export default function ChatPage() {
       ...prev,
       [user._id]: false,
     }));
-    if (isClicked) {
-      fetchMessages(user._id);
-    }
+    fetchMessages(user._id);
   };
 
   const handleSendMessage = async () => {
@@ -251,6 +262,17 @@ export default function ChatPage() {
             </h2>
             <p className="text-sm text-gray-500">Offline</p>
           </div>
+          {selectedUser && (
+            <div
+              className="cursor-pointer"
+              onClick={() => {
+                setSelectedUser(null);
+                setMessages([]);
+              }}
+            >
+              <X />
+            </div>
+          )}
         </div>
 
         <div className="flex-1 overflow-y-auto p-4">
@@ -277,7 +299,7 @@ export default function ChatPage() {
                   </div>
                 ))}
               </div>
-              <div className="flex items-center justify-center gap-3 py-2 w-full mt-auto border-t">
+              <div className="flex items-center fixed bottom-0 justify-center gap-3 py-2 w-full mt-auto border-t">
                 <textarea
                   ref={textareaRef}
                   value={newMessage}
@@ -301,21 +323,6 @@ export default function ChatPage() {
               <p>Select a user to start chatting</p>
             </div>
           )}
-        </div>
-
-        {/* Input area */}
-        <div className="fixed bottom-0 w-[68%] border-t border-gray-200 p-4 flex items-center">
-          <input
-            type="text"
-            className="flex-1 border border-gray-300 rounded-full px-4 py-2 focus:outline-none"
-            placeholder="Type your message..."
-          />
-          <button className="ml-2">
-            
-          </button>
-          <button className="ml-4 bg-blue-500 text-white rounded-full px-4 py-2">
-            Send
-          </button>
         </div>
       </div>
     </section>
