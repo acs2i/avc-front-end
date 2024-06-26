@@ -1,15 +1,17 @@
 import React, { useState } from "react";
-import { Bell, Grip, Sun } from "lucide-react";
+import { Bell, Grip, Sun, Moon } from "lucide-react";
 import { Avatar } from "@mui/material";
 import { Link } from "react-router-dom";
 import { setLogout } from "../../store/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import AccountMenu from "./AccountMenu";
 import Drawer from "../Shared/Drawer";
+import { useTheme } from "../../store/ThemeContext";
 
 export default function Navbar() {
   const user = useSelector((state: any) => state.auth.user);
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
+  const { darkMode, toggleDarkMode } = useTheme();
   return (
     <>
       <Drawer show={drawerIsOpen} onCancel={() => setDrawerIsOpen(false)}>
@@ -22,13 +24,13 @@ export default function Navbar() {
           </div>
         </div>
       </Drawer>
-      <nav className="w-full h-[60px] bg-white border-b-[1px] border-gray-300 px-6 fixed top-0 left-0 z-[400]">
+      <nav className="w-full h-[60px] bg-white dark:bg-gray-800 border-b-[1px] border-gray-300 dark:border-gray-500 px-6 fixed top-0 left-0 z-[400]">
         <div className="flex items-center justify-between h-full">
           <div className="flex items-center gap-3">
             <div className="w-[40px] h-[30px]">
               <img src="/img/logo.png" alt="" className="w-full h-full" />
             </div>
-            <Link to="/" className="text-2xl text-gray-600 font-nunito">
+            <Link to="/" className="text-2xl text-gray-600 dark:text-white font-nunito">
               Pré-référencement
             </Link>
           </div>
@@ -58,12 +60,22 @@ export default function Navbar() {
               required
             />
           </div>
-          <div className="flex items-center gap-3 text-gray-600">
-            <div className="w-[30px] h-[30px] flex items-center justify-center rounded-full bg-orange-100 text-orange-400">
-              <Sun size={20} />
+          <div className="flex items-center gap-3 dark:text-white text-gray-600">
+            <div
+              className={`w-[30px] h-[30px] flex items-center justify-center rounded-full cursor-pointer ${
+                darkMode
+                  ? "bg-gray-800 text-yellow-300"
+                  : "bg-orange-100 text-orange-400"
+              }`}
+              onClick={toggleDarkMode}
+            >
+              {darkMode ? <Moon size={20} /> : <Sun size={20} />}
             </div>
-            <div onClick={() => setDrawerIsOpen(true)} className="cursor-pointer hover:animate-bounce">
-              <Bell size={20}  />
+            <div
+              onClick={() => setDrawerIsOpen(true)}
+              className="cursor-pointer hover:animate-bounce"
+            >
+              <Bell size={20} />
             </div>
             <Grip size={20} />
             <AccountMenu />

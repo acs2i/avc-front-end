@@ -28,6 +28,7 @@ interface User {
 
 export default function CreateGroupPage() {
   const creatorId = useSelector((state: any) => state.auth.user);
+  const token = useSelector((state: any) => state.auth.token);
   const [error, setError] = useState<string | null>("");
   const [currentPage, setCurrentPage] = useState(1);
   const [users, setUsers] = useState<User[]>([]);
@@ -85,6 +86,7 @@ export default function CreateGroupPage() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -128,7 +130,7 @@ export default function CreateGroupPage() {
   };
 
   return (
-    <section className="w-full bg-gray-100 p-7">
+    <section className="w-full h-screen bg-gray-100 p-7">
       <div>
         <h3 className="text-[32px] font-[800] text-gray-800">
           Créer un groupe

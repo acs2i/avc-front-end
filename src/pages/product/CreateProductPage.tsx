@@ -547,7 +547,6 @@ export default function CreateProductPage() {
     }
   };
 
-
   return (
     <section className="w-full bg-gray-100 p-7">
       <div className="max-w-[2024px] mx-auto">
@@ -635,7 +634,7 @@ export default function CreateProductPage() {
                       )}
                       onChange={handleClassificationChange}
                       onInputChange={handleInputChangeClassification}
-                      inputValue={inputValueFamily}
+                      inputValue=""
                       options={classificationOptions}
                       placeholder="Choisir une classification"
                       styles={customStyles}

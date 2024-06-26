@@ -23,6 +23,7 @@ import { PersistGate } from "redux-persist/integration/react";
 import { BrowserRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import QueryProvider from "./utils/providers/QueryProvider";
+import { ThemeProvider } from "./store/ThemeContext";
 
 const persistConfig = {
   key: "root",
@@ -59,12 +60,14 @@ const root = ReactDOM.createRoot(
 root.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistStore(store)}>
-      <QueryProvider>
-        <BrowserRouter>
-          <ToastContainer />
-          <App />
-        </BrowserRouter>
-      </QueryProvider>
+      <ThemeProvider>
+        <QueryProvider>
+          <BrowserRouter>
+            <ToastContainer />
+            <App />
+          </BrowserRouter>
+        </QueryProvider>
+      </ThemeProvider>
     </PersistGate>
   </Provider>
 );
