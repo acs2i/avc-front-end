@@ -34,6 +34,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ isAuth }) => {
 function App() {
   const location = useLocation();
   const excludedPaths = ["/login"];
+  const excludedPathsChat = ["/chat"];
   const isAuth = Boolean(useSelector((state: any) => state.auth.token));
 
   useEffect(() => {
@@ -43,6 +44,12 @@ function App() {
   }, [location.pathname]);
 
   const shouldShowNavbar = !excludedPaths.some((path) =>
+    path.startsWith("*")
+      ? location.pathname.startsWith(path.slice(1))
+      : location.pathname === path
+  );
+
+  const shouldShowChat = !excludedPathsChat.some((path) =>
     path.startsWith("*")
       ? location.pathname.startsWith(path.slice(1))
       : location.pathname === path
@@ -79,7 +86,7 @@ function App() {
           </Route>
           <Route path="*" element={<Navigate to={isAuth ? "/" : "/login"} />} />
         </Routes>
-        {shouldShowNavbar && isAuth && <Chat />}
+        {shouldShowNavbar && isAuth && shouldShowChat && <Chat />}
       </div>
     </>
   );
