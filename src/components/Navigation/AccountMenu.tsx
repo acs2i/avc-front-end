@@ -88,12 +88,12 @@ export default function AccountMenu() {
             <Divider />
             <div className="w-[300px] mt-4 mb-4">
               <ul className="flex flex-col gap-3">
-                <li className="hover:bg-gray-100 py-2">
-                  <Link className="flex items-center gap-2" to={`/user/profile/${user._id}`}>
+                <Link className="hover:bg-gray-100 py-2" to={`/user/profile/${user._id}`}>
+                  <div className="flex items-center gap-2" >
                     <User size={18} />
                     <span className="text-[13px]">Mon profile</span>
-                  </Link>
-                </li>
+                  </div>
+                </Link>
                 <li className="hover:bg-gray-100 py-2">
                   <div className="flex items-center gap-2">
                     <PieChart size={18} />

@@ -47,6 +47,10 @@ export const LINKS: Link[] = [
                 name: "Créer un article",
                 link: "/product/edit",
               },
+              {
+                name: "Produits créés",
+                link: "/draft",
+              },
             ],
             icon: Shirt,
           },
@@ -73,12 +77,6 @@ export const LINKS: Link[] = [
       {
         name: "Admin",
         linksGroup: [
-          {
-            name: "Produits créés",
-            link: "/draft",
-            group: [],
-            icon: SquarePen,
-          },
           {
             name: "Utilisateurs",
             linksGroup: [
