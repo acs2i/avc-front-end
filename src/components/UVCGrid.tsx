@@ -267,33 +267,31 @@ const UVCGrid: React.FC<UVCGridProps> = ({ onDimensionsChange }) => {
       <h3 className="text-[15px] font-[600] text-gray-800">
         Grille de dimension
       </h3>
-      <div className="flex gap-2 mb-3 mt-3">
-        <Button
-          size="small"
-          blue
+      <div className="flex gap-4 mb-3 mt-3">
+        <button
           onClick={displaySizeGridOptions}
           type="button"
+          className="flex items-center gap-2 text-[12px] text-blue-500"
         >
           <Ruler size={17} />
           Associer une grille de tailles
-        </Button>
-        <Button
-          size="small"
-          blue
+        </button>
+        <button
           onClick={displayColorGridOptions}
           type="button"
+          className="flex items-center gap-2 text-[12px] text-blue-500"
         >
           <Palette size={17} />
           Associer une grille de couleurs
-        </Button>
-        <Button size="small" green onClick={addNewSize} type="button">
+        </button>
+        <button onClick={addNewSize} type="button" className="flex items-center gap-2 text-[12px] text-green-500">
           <Plus size={17} />
           Ajouter une taille
-        </Button>
-        <Button size="small" green onClick={addNewColor} type="button">
+        </button>
+        <button onClick={addNewColor} type="button" className="flex items-center gap-2 text-[12px] text-green-500">
           <Plus size={17} />
           Ajouter une couleur
-        </Button>
+        </button>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full mx-auto border bg-white">
