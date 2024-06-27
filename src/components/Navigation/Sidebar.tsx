@@ -137,7 +137,7 @@ export default function Sidebar() {
           ))
         )}
       </ul>
-      <p className="text-center">Version 1.0.2</p>
+      <p className="text-center">Version 1.0.3</p>
     </aside>
   );
 }
