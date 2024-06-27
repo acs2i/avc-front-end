@@ -22,6 +22,7 @@ import {
   Factory,
   SquarePen,
   User,
+  MessageSquare,
 } from "lucide-react";
 
 export const LINKS: Link[] = [
@@ -71,6 +72,12 @@ export const LINKS: Link[] = [
             link: "/calendar",
             linksGroup: [],
             icon: CalendarDays,
+          },
+          {
+            name: "Chat",
+            link: "/chat",
+            linksGroup: [],
+            icon: MessageSquare,
           },
         ],
       },
