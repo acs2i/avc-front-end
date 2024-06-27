@@ -41,6 +41,7 @@ export default function DraftPage() {
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [userId, setUserId] = useState(user);
+  const [selectedUsername, setSelectedUsername] = useState("");
   const navigate = useNavigate();
 
   const formatDate = (timestamp: any) => {
@@ -54,6 +55,13 @@ export default function DraftPage() {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  useEffect(() => {
+    const user = users.find(user => user._id === userId);
+    if (user) {
+      setSelectedUsername(user.username);
+    }
+  }, [userId, users]);
 
   const fetchUsers = async () => {
     try {
@@ -114,7 +122,7 @@ export default function DraftPage() {
         ></div>
         <div className="relative z-10">
           <h3 className="text-[35px] font-[800] text-gray-800">
-            Références créées
+            Références créées par <span className="capitalize font-[700]">{selectedUsername}</span>
           </h3>
           <div className="mt-4 mb-[30px]">
             <div className="flex justify-between">
@@ -137,12 +145,12 @@ export default function DraftPage() {
         </div>
         <div className="relative flex items-center gap-3">
           <label className="text-gray-700 font-semibold">
-            Changer d'utilisateur
+            Utilisateur :
           </label>
-          <div className="relative w-[200px]">
+          <div className="relative w-[250px]">
             <select
               name="users"
-              className="block w-full p-2 rounded-lg bg-white border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg capitalize"
+              className="block w-full p-1 rounded-lg bg-white border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg capitalize"
               value={userId}
               onChange={handleUserChange}
             >
