@@ -48,7 +48,7 @@ export const LINKS: Link[] = [
                 link: "/product/edit",
               },
               {
-                name: "Produits créés",
+                name: "Références créées",
                 link: "/draft",
               },
             ],

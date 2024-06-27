@@ -124,9 +124,8 @@ function ClassificationsPage({
 
   useEffect(() => {
     if (highlightedFamilyId) {
-      console.log("Highlighted Family ID:", highlightedFamilyId);
       const timer = setTimeout(() => {
-        resetHighlightedFamilyId(); // Appelez la fonction de réinitialisation
+        resetHighlightedFamilyId();
       }, 3000);
 
       return () => clearTimeout(timer);
@@ -164,7 +163,7 @@ function ClassificationsPage({
                 }`}
                 onClick={() => onSelectFamily(family)}
               >
-                <td className={`px-6 py-2 flex items-center gap-2 text-blue-600 ${
+                <td className={`px-6 py-2 flex items-center gap-2 ${
                   family._id === highlightedFamilyId ? "text-white" : ""
                 } `}>
                   {typeLabels[family.YX_TYPE]}

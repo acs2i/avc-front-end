@@ -1,14 +1,15 @@
 import { LINKCARD_PRODUCT } from "../../utils/index";
 import Card from "../../components/Shared/Card";
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import { LinkCard } from "@/type";
 import { Divider } from "@mui/material";
 import Button from "../../components/FormElements/Button";
 import useFetch from "../../utils/hooks/usefetch";
-import { Check, X } from "lucide-react";
+import { Check, ChevronLeft, X } from "lucide-react";
 import Modal from "../../components/Shared/Modal";
 import Header from "../../components/Navigation/Header";
+import { useNavigate } from "react-router-dom";
 
 interface Product {
   GA_CODEARTICLE: string;
@@ -36,6 +37,7 @@ interface Row {
 
 export default function SingleProductPage() {
   const [selectedRowData, setSelectedRowData] = useState<Row | null>(null);
+  const navigate = useNavigate();
   const { id } = useParams();
   const { data: product } = useFetch<Product[]>(
     `${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`
@@ -48,7 +50,12 @@ export default function SingleProductPage() {
   return (
     <section className="w-full bg-gray-100 h-screen p-8">
       <div className="flex flex-col gap-5">
-        <h1 className="text-[32px] font-[800]">Page produit</h1>
+        <div className="flex items-center gap-2">
+          <div onClick={() => navigate(-1)} className="cursor-pointer">
+            <ChevronLeft />
+          </div>
+          <h1 className="text-[32px] font-[800]">Page produit</h1>
+        </div>
         {product && <h2 className="text-[25px]">{product[0]?.GA_LIBELLE}</h2>}
       </div>
 
@@ -110,27 +117,38 @@ export default function SingleProductPage() {
 
               <div className="flex items-center text-[16px] font-[600] gap-2">
                 <span className="font-bold text-gray-700">Famille :</span>
-                <span className="text-blue-600">{product[0]?.family ? product[0]?.family.YX_LIBELLE : "N/A"}</span>
+                <span className="text-blue-600">
+                  {product[0]?.family ? product[0]?.family.YX_LIBELLE : "N/A"}
+                </span>
               </div>
 
               <div className="flex items-center text-[16px] font-[600] gap-2">
                 <span className="font-bold text-gray-700">Sous-famille :</span>
-                <span className="text-blue-600">{product[0]?.subFamily ? product[0]?.subFamily.YX_LIBELLE : "N/A"}</span>
+                <span className="text-blue-600">
+                  {product[0]?.subFamily
+                    ? product[0]?.subFamily.YX_LIBELLE
+                    : "N/A"}
+                </span>
               </div>
 
-              
               <div className="flex items-center text-[16px] font-[600] gap-2">
-                <span className="font-bold text-gray-700">Sous-sous-famille :</span>
+                <span className="font-bold text-gray-700">
+                  Sous-sous-famille :
+                </span>
                 <span className="text-blue-600">N/A</span>
               </div>
 
               <div className="flex items-center text-[16px] font-[600] gap-2">
-                <span className="font-bold text-gray-700">Conditionement :</span>
+                <span className="font-bold text-gray-700">
+                  Conditionement :
+                </span>
                 <span className="text-blue-600">N/A</span>
               </div>
 
               <div className="flex items-center text-[16px] font-[600] gap-2">
-                <span className="font-bold text-gray-700">Origine de fabrication :</span>
+                <span className="font-bold text-gray-700">
+                  Origine de fabrication :
+                </span>
                 <span className="text-blue-600">N/A</span>
               </div>
 
@@ -148,7 +166,6 @@ export default function SingleProductPage() {
                 <span className="font-bold text-gray-700">Packaging :</span>
                 <span className="text-blue-600">Standard</span>
               </div>
-
             </div>
           </div>
         )}

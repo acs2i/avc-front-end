@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { LINKCARD_DRAFT, PRODUCTS } from "../../utils/index";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
+import Input from "../../components/FormElements/Input";
 
 interface Draft {
+  _id: string;
   creator_id: any;
   description_ref: string;
   reference: string;
@@ -23,11 +26,22 @@ interface Draft {
   createdAt: any;
 }
 
+interface User {
+  _id: any;
+  username: string;
+  email: string;
+  authorization: string;
+  comment: string;
+}
+
 export default function DraftPage() {
-  const userId = useSelector((state: any) => state.auth.user._id);
+  const user = useSelector((state: any) => state.auth.user._id);
   const token = useSelector((state: any) => state.auth.token);
   const [page, setPage] = useState("draft");
   const [drafts, setDrafts] = useState<Draft[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [userId, setUserId] = useState(user);
+  const navigate = useNavigate();
 
   const formatDate = (timestamp: any) => {
     return format(new Date(timestamp), "dd/MM/yyyy HH:mm:ss");
@@ -35,7 +49,31 @@ export default function DraftPage() {
 
   useEffect(() => {
     fetchDraft();
+  }, [userId]);
+
+  useEffect(() => {
+    fetchUsers();
   }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/auth/all-users`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
 
   const fetchDraft = async () => {
     try {
@@ -58,6 +96,10 @@ export default function DraftPage() {
     }
   };
 
+  const handleUserChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setUserId(event.target.value);
+  };
+
   return (
     <section>
       <div className="w-full h-[300px] bg-gray-100 p-8 relative overflow-hidden">
@@ -67,12 +109,12 @@ export default function DraftPage() {
             backgroundImage: `url(${"/img/background.png"})`,
             opacity: 0.2,
             filter: "grayscale(10%)",
-            backgroundPosition: "center bottom -50px"
+            backgroundPosition: "center bottom -50px",
           }}
         ></div>
         <div className="relative z-10">
           <h3 className="text-[35px] font-[800] text-gray-800">
-            Produits créés
+            Références créées
           </h3>
           <div className="mt-4 mb-[30px]">
             <div className="flex justify-between">
@@ -91,6 +133,29 @@ export default function DraftPage() {
                 ))}
               </div>
             </div>
+          </div>
+        </div>
+        <div className="relative flex items-center gap-3">
+          <label className="text-gray-700 font-semibold">
+            Changer d'utilisateur
+          </label>
+          <div className="relative w-[200px]">
+            <select
+              name="users"
+              className="block w-full p-2 rounded-lg bg-white border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg capitalize"
+              value={userId}
+              onChange={handleUserChange}
+            >
+              {users.map((user) => (
+                <option
+                  key={user._id}
+                  value={user._id}
+                  className="text-lg capitalize"
+                >
+                  {user.username}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </div>
@@ -129,16 +194,17 @@ export default function DraftPage() {
                 <tr
                   key={i}
                   className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 even:bg-slate-50 whitespace-nowrap border"
+                  onClick={() => navigate(`/draft/${product._id}`)}
                 >
-                  <td className="px-6 py-4 text-blue-500">
+                  <td className="px-6 py-2 text-blue-500">
                     {product.reference}
                   </td>
-                  <td className="px-6 py-4">{product.designation_longue}</td>
-                  <td className="px-6 py-4">{product.brand}</td>
-                  <td className="px-6 py-4">{product.supplier_name}</td>
-                  <td className="px-6 py-4">{product.family}</td>
-                  <td className="px-6 py-4">{product.subFamily}</td>
-                  <td className="px-6 py-4 text-blue-600">
+                  <td className="px-6 py-2">{product.designation_longue}</td>
+                  <td className="px-6 py-2">{product.brand}</td>
+                  <td className="px-6 py-2">{product.supplier_name}</td>
+                  <td className="px-6 py-2">{product.family}</td>
+                  <td className="px-6 py-2">{product.subFamily}</td>
+                  <td className="px-6 py-2 text-blue-600">
                     {formatDate(product.createdAt)}
                   </td>
                 </tr>

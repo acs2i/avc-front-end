@@ -120,15 +120,6 @@ function ParamsMenuPage() {
 
   return (
     <section className="w-full h-screen bg-gray-100 p-7 relative overflow-hidden">
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: `url(${"/img/background_forest.jpg"})`,
-          opacity: 0.1,
-          filter: "grayscale(100%)",
-          zIndex: 1,
-        }}
-      ></div>
       <div className="h-[70px] mb-3 flex items-center gap-4 w-full relative z-10">
         <div className="w-[300px]">
           <button

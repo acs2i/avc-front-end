@@ -19,6 +19,7 @@ import CreateGroupPage from "./pages/panel-admin/CreateGroup";
 import CreatedGroupPage from "./pages/panel-admin/CreatedGroup";
 import CalendarPage from "./pages/calendar/CalendarPage";
 import Chat from "./components/Shared/Chat";
+import DraftUpdatePage from "./pages/draft/DraftUpdatePage";
 
 // Types
 interface PrivateRouteProps {
@@ -68,6 +69,7 @@ function App() {
               element={<SuppliersPage />}
             />
             <Route path="/draft" element={<DraftPage />} />
+            <Route path="/draft/:id" element={<DraftUpdatePage />} />
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/admin/create-user" element={<CreateUserPage />} />
             <Route path="/admin/create-group" element={<CreateGroupPage />} />

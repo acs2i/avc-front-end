@@ -118,7 +118,7 @@ export default function DimensionPage({ onSelectDimension, shouldRefetch, highli
                 }`}
                 onClick={() => onSelectDimension(dimension)}
               >
-                <td className={`px-6 py-2 text-blue-600 ${
+                <td className={`px-6 py-2 ${
                   dimension._id === highlightedDimensionId ? "text-white" : ""
                 }`}>
                   {dimension.GDI_TYPEDIM in typeLabels

@@ -7,6 +7,7 @@ interface headerProps {
   btnTitle: string;
   placeholder: string;
   children?: any;
+  button?: boolean;
   height: any;
 }
 
@@ -16,6 +17,7 @@ export default function Header({
   link,
   btnTitle,
   placeholder,
+  button,
   height
 }: headerProps) {
   return (
@@ -59,9 +61,9 @@ export default function Header({
                 required
               />
             </div>
-            <Button size="small" blue to={link}>
+            {button && <Button size="small" blue to={link}>
               {btnTitle}
-            </Button>
+            </Button>}
           </div>
           <div className="relative">{children}</div>
         </div>
