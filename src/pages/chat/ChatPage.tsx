@@ -254,8 +254,8 @@ export default function ChatPage() {
       </div>
 
       {/* Chat area */}
-      <div className="flex-1 flex flex-col">
-        <div className="flex items-center justify-between border-b border-gray-200 p-4">
+      <div className="w-full flex flex-col">
+        <div className="flex items-center justify-between border-b border-gray-200 p-4 w-full">
           <div>
             <h2 className="text-lg font-semibold">
               {selectedUser ? selectedUser.username : "Urito"}
@@ -299,12 +299,12 @@ export default function ChatPage() {
                   </div>
                 ))}
               </div>
-              <div className="flex items-center fixed bottom-0 justify-center gap-3 py-2 w-full mt-auto border-t">
+              <div className="flex items-center fixed bottom-0 gap-3 py-2 border-t w-full">
                 <textarea
                   ref={textareaRef}
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  className="py-2 px-4 border rounded-full w-full focus:outline-none resize-none overflow-hidden"
+                  className="py-2 px-4 border rounded-full w-[65%] focus:outline-none resize-none overflow-hidden"
                   placeholder="Type your message"
                   rows={1}
                   onInput={(e) => {

@@ -102,11 +102,6 @@ export const LINKS: Link[] = [
             ],
             icon: User,
           },
-          {
-            name: "Errors",
-            linksGroup: [],
-            icon: TriangleAlert,
-          },
         ],
       },
     ],

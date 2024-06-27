@@ -94,6 +94,7 @@ export default function AdminPage() {
         btnTitle="Créer un utilisateur"
         placeholder="Rechercher un utilisateur"
         height="300px"
+        button
       >
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-4">

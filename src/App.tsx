@@ -60,7 +60,7 @@ function App() {
     <>
       {shouldShowNavbar && <Sidebar />}
       {shouldShowNavbar && <Navbar />}
-      <div className={isAuth ? "ml-[250px] mt-[60px]" : ""}>
+      <div className={isAuth ? "ml-[50px] sm:ml-[80px] md:ml-[150px] lg:ml-[250px] mt-[60px]" : ""}>
         <Routes>
           {/* Routes publiques */}
           <Route path="/login" element={<LoginPage />} />

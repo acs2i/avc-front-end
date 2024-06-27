@@ -29,11 +29,11 @@ export default function Navbar() {
             <div className="w-[40px] h-[30px]">
               <img src="/img/logo.png" alt="" className="w-full h-full" />
             </div>
-            <Link to="/" className="text-2xl text-gray-600 dark:text-white font-nunito">
+            <Link to="/" className="text-sm md:text-2xl text-gray-600 dark:text-white font-nunito">
               Pré-référencement
             </Link>
           </div>
-          <div className="relative w-[400px]">
+          <div className="relative w-[300px] md:w-[400px]">
             <div className="absolute inset-y-0 start-0 flex items-center ps-3 cursor-pointer">
               <svg
                 className="w-4 h-4 text-gray-500 dark:text-gray-400"
