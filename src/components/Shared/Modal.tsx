@@ -15,9 +15,6 @@ const ModalOverlay = (props: any) => {
     <div className="fixed z-[10000] top-[22vh] left-[25%] w-[50%] bg-gray-100 rounded-md shadow-xl">
       <header className="w-full flex items-center justify-between py-[1rem] px-[1rem] bg-sky-600 rounded-t-md">
         <div className="flex items-center gap-3">
-          <div className="h-[30px] w-[30px] flex items-center border rounded-full jsutify-center">
-            <span className="text-white w-full text-center">{props.icon}</span>
-          </div>
           <h2 className="text-white font-bold text-xl">{props.header}</h2>
         </div>
         <div className="text-white cursor-pointer" onClick={props.onClose}>

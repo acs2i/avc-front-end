@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Palette, Plus, Ruler } from "lucide-react";
-import Button from "./FormElements/Button";
 import Modal from "./Shared/Modal";
 
 interface UVCGridProps {
@@ -179,7 +178,6 @@ const UVCGrid: React.FC<UVCGridProps> = ({ onDimensionsChange }) => {
         onCancel={() => setIsModalOpen(false)}
         onClose={() => setIsModalOpen(false)}
         header="Grille de dimensions"
-        icon="G"
       >
         {showSizeGridOptions && (
           <div className="mb-4 p-2">

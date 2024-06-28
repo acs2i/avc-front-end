@@ -82,7 +82,7 @@ const Input: React.FC<InputProps> = (props) => {
       props.orange ? "border-b-2 border-orange-400" : ""
     }
     ${props.gray ? "border-b-[1px] border-gray-300" : ""}
-    ${props.create ? "border border-gray-300 rounded-lg px-2 focus:ring-blue-500 focus:border-blue-500 mt-2" : ""}
+    ${props.create ? "border border-gray-300 rounded-lg px-2 focus:ring-blue-500 focus:border-blue-500" : ""}
     ${
       props.disabled
         ? " bg-gray-200 rounded-md border border-white text-gray-500 italic px-3 cursor-not-allowed"

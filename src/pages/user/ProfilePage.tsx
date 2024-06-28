@@ -5,6 +5,8 @@ import { Avatar, Divider } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
 import Input from "../../components/FormElements/Input";
 import Button from "../../components/FormElements/Button";
+import Modal from "../../components/Shared/Modal";
+import { Eye } from "lucide-react";
 
 interface User {
   _id: string;
@@ -25,9 +27,11 @@ interface FormData {
 export default function ProfilePage() {
   const { userId } = useParams();
   const [isUpdate, setIsUpdate] = useState(false);
+  const [showPass, setShowPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [nameInputIsOpen, setNameInputIsOpen] = useState(false);
   const [emailInputIsOpen, setEmailInputIsOpen] = useState(false);
-  const [paswordisOpen, setPasswordIsOpen] = useState(false)
+  const [paswordisOpen, setPasswordIsOpen] = useState(false);
   const [user, setUser] = useState<User>();
   const token = useSelector((state: any) => state.auth.token);
   const { notifySuccess, notifyError } = useNotify();
@@ -37,6 +41,11 @@ export default function ProfilePage() {
     email: "",
     password: "",
   });
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordsMatch, setPasswordsMatch] = useState(false);
+  const [hasStartedTypingConfirmPassword, setHasStartedTypingConfirmPassword] =
+    useState(false);
 
   const fetchUser = async () => {
     try {
@@ -61,11 +70,27 @@ export default function ProfilePage() {
         username: data.username,
         authorization: data.authorization,
         email: data.email,
-        password: data.password,
+        password: "",
       });
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     }
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    setPasswordsMatch(newPassword === confirmPassword);
+    setFormData({ ...formData, password: newPassword });
+  };
+
+  const handleConfirmPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newConfirmPassword = e.target.value;
+    setConfirmPassword(newConfirmPassword);
+    setPasswordsMatch(newConfirmPassword === password);
+    setHasStartedTypingConfirmPassword(true);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,6 +99,10 @@ export default function ProfilePage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!passwordsMatch) {
+      notifyError("Les mots de passe ne correspondent pas");
+      return;
+    }
     setIsUpdate(false);
     try {
       const response = await fetch(
@@ -107,85 +136,109 @@ export default function ProfilePage() {
   }, [userId, isUpdate]);
 
   return (
-    <section className="w-full h-screen bg-gray-100 p-7">
-      <h1 className="text-[35px]">Mon profil</h1>
-      <Divider />
-      <div
-        className={`w-full bg-white h-auto rounded-lg border border-gray-300 shadow-md mt-7`}
+    <>
+      <Modal
+        show={paswordisOpen}
+        onCancel={() => setPasswordIsOpen(false)}
+        onClose={() => setPasswordIsOpen(false)}
+        onSubmit={handleSubmit}
+        header="Changer de mot de passe"
       >
-        <form onSubmit={handleSubmit}>
-          <div className="p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <Avatar
-                alt={user?.username && user?.username}
-                src={user?.imgPath && user?.imgPath}
-                sx={{ width: 100, height: 100 }}
+        <div className="w-[70%] flex flex-col gap-3 mt-2 mx-auto">
+          <div>
+            <div className="relative">
+              <div
+                className="absolute right-[-30px] top-0 translate-y-[50%] text-gray-500 hover:text-gray-400 cursor-pointer"
+                onMouseDown={() => setShowPass(true)}
+                onMouseUp={() => setShowPass(false)}
+                onMouseLeave={() => setShowPass(false)}
+              >
+                <Eye size={20} />
+              </div>
+              <Input
+                element="input"
+                id="password"
+                type={!showPass ? "password" : "text"}
+                label=""
+                placeholder="Nouveau mot de passe"
+                validators={[]}
+                create
+                gray
+                onChange={handlePasswordChange}
               />
-
-              {!nameInputIsOpen ? (
-                <h1 className="text-[35px] capitalize font-[800]">
-                  {user?.username}
-                </h1>
-              ) : (
-                <Input
-                  element="input"
-                  id="username"
-                  label=""
-                  value={formData.username}
-                  placeholder=""
-                  validators={[]}
-                  gray
-                  onChange={handleChange}
-                />
-              )}
-              {!nameInputIsOpen ? (
-                <span
-                  className="text-blue-600 text-xs ml-5 cursor-pointer"
-                  onClick={() => setNameInputIsOpen(true)}
-                >
-                  Modifier
-                </span>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <button
-                    className="bg-transparent text-xs text-blue-600"
-                    type="submit"
-                  >
-                    Valider
-                  </button>
-                  <button
-                    className="bg-transparent text-xs text-red-600"
-                    type="button"
-                    onClick={() => setNameInputIsOpen(false)}
-                  >
-                    Annuler
-                  </button>
-                </div>
-              )}
             </div>
-            <Divider />
-            <div className="mt-3">
-              <div className="flex items-center text-[20px] gap-2 text-gray-700">
-                <span>Email :</span>
-                {!emailInputIsOpen ? (
-                  <span className="font-[600]">{user?.email}</span>
+            <div className="relative">
+              <div
+                className="absolute right-[-30px] top-0 translate-y-[50%] text-gray-500 hover:text-gray-400 cursor-pointer"
+                onMouseDown={() => setShowConfirmPass(true)}
+                onMouseUp={() => setShowConfirmPass(false)}
+                onMouseLeave={() => setShowConfirmPass(false)}
+              >
+                <Eye size={20} />
+              </div>
+              <Input
+                element="input"
+                id="confirmPassword"
+                type={!showConfirmPass ? "password" : "text"}
+                label=""
+                placeholder="Retapez le mot de passe"
+                validators={[]}
+                create
+                gray
+                onChange={handleConfirmPasswordChange}
+              />
+            </div>
+          </div>
+          {!passwordsMatch && hasStartedTypingConfirmPassword && (
+            <p className="text-red-600 text-sm">
+              Les mots de passe ne correspondent pas
+            </p>
+          )}
+          <Button
+            size="small"
+            type="submit"
+            blue={passwordsMatch}
+            disabled={!passwordsMatch}
+          >
+            Changer mon mot de passe
+          </Button>
+        </div>
+      </Modal>
+      <section className="w-full h-screen bg-gray-100 p-7">
+        <h1 className="text-[35px]">Mon profil</h1>
+        <Divider />
+        <div
+          className={`w-full bg-white h-auto rounded-lg border border-gray-300 shadow-md mt-7`}
+        >
+          <form onSubmit={handleSubmit}>
+            <div className="p-5">
+              <div className="flex items-center gap-3 mb-3">
+                <Avatar
+                  alt={user?.username && user?.username}
+                  src={user?.imgPath && user?.imgPath}
+                  sx={{ width: 100, height: 100 }}
+                />
+
+                {!nameInputIsOpen ? (
+                  <h1 className="text-[35px] capitalize font-[800]">
+                    {user?.username}
+                  </h1>
                 ) : (
                   <Input
                     element="input"
-                    id="email"
+                    id="username"
                     label=""
-                    value={formData.email}
+                    value={formData.username}
                     placeholder=""
                     validators={[]}
                     gray
                     onChange={handleChange}
                   />
                 )}
-
-                {!emailInputIsOpen ? (
+                {!nameInputIsOpen ? (
                   <span
                     className="text-blue-600 text-xs ml-5 cursor-pointer"
-                    onClick={() => setEmailInputIsOpen(true)}
+                    onClick={() => setNameInputIsOpen(true)}
                   >
                     Modifier
                   </span>
@@ -200,45 +253,79 @@ export default function ProfilePage() {
                     <button
                       className="bg-transparent text-xs text-red-600"
                       type="button"
-                      onClick={() => setEmailInputIsOpen(false)}
+                      onClick={() => setNameInputIsOpen(false)}
                     >
                       Annuler
                     </button>
                   </div>
                 )}
               </div>
-              <div className="flex items-center text-[20px] gap-2 text-gray-700 mt-3">
-                <span>Droits :</span>
-                <span className="font-[600] capitalize">
-                  {user?.authorization}
-                </span>
-              </div>
-              <div className="mt-2">
-                <button
-                  type="button"
-                  className="bg-gray-200 p-2 text-[13px] rounded-md shadow-md uppercase font-[600]"
-                  onClick={() => setPasswordIsOpen((prev) => !prev)}
-                >
-                  {!paswordisOpen ? "Changer mon mot de passe" : "Annuler changement"}
-                </button>
-                {paswordisOpen && <div className="w-[50%] flex items-end gap-3 mt-2">
-                  <Input
-                    element="input"
-                    id="password"
-                    type="password"
-                    label=""
-                    placeholder="Nouveau mot de passe"
-                    validators={[]}
-                    gray
-                    onChange={handleChange}
-                  />
-                  <Button size="small" blue type="submit">Valider</Button>
-                </div>}
+              <Divider />
+              <div className="mt-3">
+                <div className="flex items-center text-[20px] gap-2 text-gray-700">
+                  <span>Email :</span>
+                  {!emailInputIsOpen ? (
+                    <span className="font-[600]">{user?.email}</span>
+                  ) : (
+                    <Input
+                      element="input"
+                      id="email"
+                      label=""
+                      value={formData.email}
+                      placeholder=""
+                      validators={[]}
+                      gray
+                      onChange={handleChange}
+                    />
+                  )}
+
+                  {!emailInputIsOpen ? (
+                    <span
+                      className="text-blue-600 text-xs ml-5 cursor-pointer"
+                      onClick={() => setEmailInputIsOpen(true)}
+                    >
+                      Modifier
+                    </span>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <button
+                        className="bg-transparent text-xs text-blue-600"
+                        type="submit"
+                      >
+                        Valider
+                      </button>
+                      <button
+                        className="bg-transparent text-xs text-red-600"
+                        type="button"
+                        onClick={() => setEmailInputIsOpen(false)}
+                      >
+                        Annuler
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center text-[20px] gap-2 text-gray-700 mt-3">
+                  <span>Droits :</span>
+                  <span className="font-[600] capitalize">
+                    {user?.authorization}
+                  </span>
+                </div>
+                <div className="mt-2">
+                  <button
+                    type="button"
+                    className="text-[12px] font-[600] text-blue-500"
+                    onClick={() => setPasswordIsOpen((prev) => !prev)}
+                  >
+                    {!paswordisOpen
+                      ? "Changer mon mot de passe"
+                      : "Annuler changement"}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </form>
-      </div>
-    </section>
+          </form>
+        </div>
+      </section>
+    </>
   );
 }
