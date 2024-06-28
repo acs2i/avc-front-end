@@ -219,21 +219,20 @@ export default function ProfilePage() {
                   className="bg-gray-200 p-2 text-[13px] rounded-md shadow-md uppercase font-[600]"
                   onClick={() => setPasswordIsOpen((prev) => !prev)}
                 >
-                  Changer mon mot de passe
+                  {!paswordisOpen ? "Changer mon mot de passe" : "Annuler changement"}
                 </button>
-                {paswordisOpen && <div className="w-[50%] flex items-center gap-3">
+                {paswordisOpen && <div className="w-[50%] flex items-end gap-3 mt-2">
                   <Input
                     element="input"
                     id="password"
                     type="password"
                     label=""
-                    placeholder="Votre nouveau mot de passe"
+                    placeholder="Nouveau mot de passe"
                     validators={[]}
                     gray
                     onChange={handleChange}
                   />
                   <Button size="small" blue type="submit">Valider</Button>
-                  <Button size="small" cancel type="button" onClick={() => setPasswordIsOpen(false)}>Annuler</Button>
                 </div>}
               </div>
             </div>

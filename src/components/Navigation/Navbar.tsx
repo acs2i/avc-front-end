@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Bell, Grip, Sun, Moon } from "lucide-react";
 import { Avatar } from "@mui/material";
 import { Link } from "react-router-dom";
@@ -8,9 +8,75 @@ import AccountMenu from "./AccountMenu";
 import Drawer from "../Shared/Drawer";
 import { useTheme } from "../../store/ThemeContext";
 
+interface Notification {
+  message: string;
+  date: Date;
+  read: boolean;
+}
+
 export default function Navbar() {
+  const userId = useSelector((state: any) => state.auth.user._id);
+  const token = useSelector((state: any) => state.auth.token);
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const { darkMode, toggleDarkMode } = useTheme();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  const fetchNotifications = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/auth/${userId}/notifications`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+      setNotifications(data);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
+  const markNotificationsAsRead = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/auth/${userId}/notifications?markAsRead=true`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setNotifications(data);
+      } else {
+        console.error("Erreur lors de la mise à jour des notifications");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
+  useEffect(() => {
+      fetchNotifications();
+  }, [notifications]);
+
+  useEffect(() => {
+    if (drawerIsOpen) {
+      markNotificationsAsRead();
+    }
+  }, [drawerIsOpen]);
+
+  const unreadNotificationsCount = notifications.filter(n => !n.read).length;
+
   return (
     <>
       <Drawer show={drawerIsOpen} onCancel={() => setDrawerIsOpen(false)}>
@@ -22,14 +88,31 @@ export default function Navbar() {
             </h4>
           </div>
         </div>
+        <div className="p-2">
+          {notifications.length > 0 ? (
+            <ul className="bg-blue-100 p-3 rounded-md shadow-md">
+              {notifications.map((notification, index) => (
+                <li key={index} className="text-[15px] flex flex-col">
+                  <span>{notification.message}</span>
+                  <span className="text-[9px] italic text-gray-700">{new Date(notification.date).toLocaleString()}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>Aucune notification disponible.</p>
+          )}
+        </div>
       </Drawer>
-      <nav className="w-full h-[60px] bg-white dark:bg-gray-800 border-b-[1px] border-gray-300 dark:border-gray-500 px-6 fixed top-0 left-0 z-[400000]">
+      <nav className="w-full h-[60px] bg-white dark:bg-gray-800 border-b-[1px] border-gray-300 dark:border-gray-500 px-6 fixed top-0 left-0 z-[400]">
         <div className="flex items-center justify-between h-full">
           <div className="flex items-center gap-3">
             <div className="w-[40px] h-[30px]">
               <img src="/img/logo.png" alt="" className="w-full h-full" />
             </div>
-            <Link to="/" className="text-sm md:text-2xl text-gray-600 dark:text-white font-nunito">
+            <Link
+              to="/"
+              className="text-sm md:text-2xl text-gray-600 dark:text-white font-nunito"
+            >
               Pré-référencement
             </Link>
           </div>
@@ -72,8 +155,13 @@ export default function Navbar() {
             </div>
             <div
               onClick={() => setDrawerIsOpen(true)}
-              className="cursor-pointer hover:animate-bounce"
+              className="relative cursor-pointer"
             >
+               {unreadNotificationsCount > 0 && (
+                <div className="absolute h-[15px] w-[15px] bg-red-600 right-[-5px] top-[-5px] rounded-full flex items-center justify-center">
+                  <span className="text-white text-xs">{unreadNotificationsCount}</span>
+                </div>
+              )}
               <Bell size={20} />
             </div>
             <Grip size={20} />

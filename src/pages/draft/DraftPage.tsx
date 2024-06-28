@@ -43,6 +43,8 @@ export default function DraftPage() {
   const [userId, setUserId] = useState(user);
   const [selectedUsername, setSelectedUsername] = useState("");
   const navigate = useNavigate();
+  const filteredDrafts = drafts.filter((draft) => draft.status === 0);
+  const filteredInProgress = drafts.filter((draft) => draft.status === 1);
 
   const formatDate = (timestamp: any) => {
     return format(new Date(timestamp), "dd/MM/yyyy HH:mm:ss");
@@ -195,9 +197,20 @@ export default function DraftPage() {
           </thead>
           {page === "draft" && (
             <tbody>
-              {drafts
-                .filter((draft) => draft.status === 0)
-                .map((product, i) => (
+              {filteredDrafts.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={7}
+                    className="px-6 py-4 text-center text-gray-500"
+                  >
+                    <span className="capitalize font-[800]">
+                      {selectedUsername}
+                    </span>{" "}
+                    n'a pas de brouillon
+                  </td>
+                </tr>
+              ) : (
+                filteredDrafts.map((product, i) => (
                   <tr
                     key={i}
                     className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 even:bg-slate-50 whitespace-nowrap border"
@@ -215,31 +228,44 @@ export default function DraftPage() {
                       {formatDate(product.createdAt)}
                     </td>
                   </tr>
-                ))}
+                ))
+              )}
             </tbody>
           )}
           {page === "in progress" && (
             <tbody>
-              {PRODUCTS.filter((product) => product.status === 1).map(
-                (product, i) => (
+              {filteredInProgress.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={7}
+                    className="px-6 py-4 text-center text-gray-500"
+                  >
+                    <span className="capitalize font-[800]">
+                      {selectedUsername}
+                    </span>{" "}
+                    n'a pas de références en cours de validation
+                  </td>
+                </tr>
+              ) : (
+                filteredInProgress.map((product, i) => (
                   <tr
                     key={i}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
+                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 even:bg-slate-50 whitespace-nowrap border"
+                    onClick={() => navigate(`/draft/${product._id}`)}
                   >
-                    <td className="px-6 py-4">{product.code}</td>
-                    <td className="px-6 py-4">{product.name}</td>
-                    <td className="px-6 py-4">{product.brand}</td>
-                    <td className="px-6 py-4">{product.supplier}</td>
-                    <td className="px-6 py-4">{product.family}</td>
-                    <td className="px-6 py-4">{product.subFamily}</td>
-                    <td className="px-6 py-4">{product.creatorName}</td>
-                    <td className="px-6 py-4">
-                      <span className="bg-orange-500 p-2 text-white rounded-md">
-                        En cours de validation...
-                      </span>
+                    <td className="px-6 py-2 text-blue-500">
+                      {product.reference}
+                    </td>
+                    <td className="px-6 py-2">{product.designation_longue}</td>
+                    <td className="px-6 py-2">{product.brand}</td>
+                    <td className="px-6 py-2">{product.supplier_name}</td>
+                    <td className="px-6 py-2">{product.family}</td>
+                    <td className="px-6 py-2">{product.subFamily}</td>
+                    <td className="px-6 py-2 text-blue-600">
+                      {formatDate(product.createdAt)}
                     </td>
                   </tr>
-                )
+                ))
               )}
             </tbody>
           )}

@@ -27,6 +27,8 @@ interface Draft {
 
 export default function DraftUpdatePage() {
   const token = useSelector((state: any) => state.auth.token);
+  const [isSend, setisSned] = useState(true);
+  const [error, setError] = useState("")
   const navigate = useNavigate();
   const [draft, setDraft] = useState<Draft>();
   const { id } = useParams();
@@ -49,12 +51,63 @@ export default function DraftUpdatePage() {
       );
 
       const data = await response.json();
-      console.log(data);
       setDraft(data);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     } finally {
     }
+  };
+
+  const handleSend = async () => {
+    if (!draft) return;
+  
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/draft/draft/${id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status: 1 }),
+        }
+      );
+  
+      if (response.ok) {
+        const updatedDraft = await response.json();
+        setDraft(updatedDraft);
+        navigate(-1)
+      } else {
+        setError("Erreur lors de la transmission du brouillon");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+      setError("Erreur lors de la transmission du brouillon");
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/draft/draft/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        navigate(-1)
+      } else {
+        setError("Erreur lors de la suppresion du brouillon")
+      }
+    } catch (error) {
+      setError("Erreur lors de la suppression du brouillon");
+    } 
   };
 
   return (
@@ -70,11 +123,14 @@ export default function DraftUpdatePage() {
             </h1>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="small" cancel>
-              Annuler
+            <Button size="small" blue={isSend} disabled={!isSend} onClick={handleSend}>
+              Transmettre
             </Button>
-            <Button size="small" blue>
-              Valider
+            <Button size="small" inverseBlue>
+              Compléter
+            </Button>
+            <Button size="small" danger onClick={handleDelete}>
+              Supprimer
             </Button>
           </div>
         </div>
