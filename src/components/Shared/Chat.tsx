@@ -333,7 +333,7 @@ export default function Chat() {
         onClick={handleClick}
         className={`fixed bottom-[30px] right-[30px] h-[50px] ${
           isClicked ? "w-[50px]" : "w-[120px]"
-        } bg-blue-600 flex items-center justify-center cursor-pointer z-[40000000] ${
+        } bg-blue-600 flex items-center justify-center cursor-pointer z-[4000] ${
           isClicked ? "rounded-full" : "rounded-[100px]"
         } border shadow-md transition-all duration-300`}
       >

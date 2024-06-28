@@ -46,6 +46,7 @@ export default function ProfilePage() {
   const [passwordsMatch, setPasswordsMatch] = useState(false);
   const [hasStartedTypingConfirmPassword, setHasStartedTypingConfirmPassword] =
     useState(false);
+  const [isEmailValid, setIsEmailValid] = useState(true);
 
   const fetchUser = async () => {
     try {
@@ -77,6 +78,11 @@ export default function ProfilePage() {
     }
   };
 
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPassword = e.target.value;
     setPassword(newPassword);
@@ -94,15 +100,17 @@ export default function ProfilePage() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    const { id, value } = e.target;
+    setFormData({ ...formData, [id]: value });
+
+    if (id === "email") {
+      setIsEmailValid(validateEmail(value));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!passwordsMatch) {
-      notifyError("Les mots de passe ne correspondent pas");
-      return;
-    }
+   
     setIsUpdate(false);
     try {
       const response = await fetch(
@@ -181,7 +189,7 @@ export default function ProfilePage() {
                 id="confirmPassword"
                 type={!showConfirmPass ? "password" : "text"}
                 label=""
-                placeholder="Retapez le mot de passe"
+                placeholder="Confirmez le mot de passe"
                 validators={[]}
                 create
                 gray
@@ -201,6 +209,42 @@ export default function ProfilePage() {
             disabled={!passwordsMatch}
           >
             Changer mon mot de passe
+          </Button>
+        </div>
+      </Modal>
+      <Modal
+        show={emailInputIsOpen}
+        onCancel={() => setEmailInputIsOpen(false)}
+        onClose={() => setEmailInputIsOpen(false)}
+        onSubmit={handleSubmit}
+        header="Modifier mon adresse mail"
+      >
+        <div className="w-[70%] flex flex-col gap-3 mt-2 mx-auto">
+          <div>
+            <Input
+              element="input"
+              id="email"
+              label=""
+              value={formData.email}
+              placeholder="Entrez votre adresse e-mail"
+              validators={[]}
+              create
+              gray
+              onChange={handleChange}
+            />
+            {!isEmailValid && (
+              <p className="text-red-600 text-sm">
+                L'adresse e-mail n'est pas valide
+              </p>
+            )}
+          </div>
+          <Button
+            size="small"
+            type="submit"
+            blue={isEmailValid}
+            disabled={!isEmailValid}
+          >
+            Modifier mon adresse mail
           </Button>
         </div>
       </Modal>
@@ -264,45 +308,13 @@ export default function ProfilePage() {
               <div className="mt-3">
                 <div className="flex items-center text-[20px] gap-2 text-gray-700">
                   <span>Email :</span>
-                  {!emailInputIsOpen ? (
-                    <span className="font-[600]">{user?.email}</span>
-                  ) : (
-                    <Input
-                      element="input"
-                      id="email"
-                      label=""
-                      value={formData.email}
-                      placeholder=""
-                      validators={[]}
-                      gray
-                      onChange={handleChange}
-                    />
-                  )}
-
-                  {!emailInputIsOpen ? (
-                    <span
-                      className="text-blue-600 text-xs ml-5 cursor-pointer"
-                      onClick={() => setEmailInputIsOpen(true)}
-                    >
-                      Modifier
-                    </span>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <button
-                        className="bg-transparent text-xs text-blue-600"
-                        type="submit"
-                      >
-                        Valider
-                      </button>
-                      <button
-                        className="bg-transparent text-xs text-red-600"
-                        type="button"
-                        onClick={() => setEmailInputIsOpen(false)}
-                      >
-                        Annuler
-                      </button>
-                    </div>
-                  )}
+                  <span className="font-[600]">{user?.email}</span>
+                  <span
+                    className="text-blue-600 text-xs ml-5 cursor-pointer"
+                    onClick={() => setEmailInputIsOpen(true)}
+                  >
+                    Modifier
+                  </span>
                 </div>
                 <div className="flex items-center text-[20px] gap-2 text-gray-700 mt-3">
                   <span>Droits :</span>
