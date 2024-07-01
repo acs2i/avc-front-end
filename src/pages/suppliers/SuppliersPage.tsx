@@ -66,7 +66,7 @@ export default function SuppliersPage() {
         link="/parameters/dimension/create/item"
         btnTitle="Créer un fournisseur"
         placeholder="Rechercher un fournisseur"
-        height="300px"
+        height="250px"
       >
         <div className="flex items-center gap-4 py-4">
           <div className="flex items-center gap-4">
@@ -159,9 +159,6 @@ export default function SuppliersPage() {
           </div>
         </div>
       </div>
-      {/* {totalItem !== null && totalItem > 10 && (
-        <ScrollToTop scrollThreshold={300} />
-      )} */}
     </section>
   );
 }

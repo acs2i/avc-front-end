@@ -112,11 +112,11 @@ export default function DraftPage() {
 
   return (
     <section>
-      <div className="w-full h-[300px] bg-gray-100 p-8 relative overflow-hidden">
+      <div className="w-full h-[250px] bg-gray-100 p-8 relative overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: `url(${"/img/background.png"})`,
+            backgroundImage: `url(${"/img/background_forest.jpg"})`,
             opacity: 0.2,
             filter: "grayscale(10%)",
             backgroundPosition: "center bottom -50px",
@@ -201,7 +201,7 @@ export default function DraftPage() {
                 <tr>
                   <td
                     colSpan={7}
-                    className="px-6 py-4 text-center text-gray-500"
+                    className="px-6 py-2 text-center text-gray-500"
                   >
                     <span className="capitalize font-[800]">
                       {selectedUsername}

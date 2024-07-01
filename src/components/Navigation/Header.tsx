@@ -25,7 +25,7 @@ export default function Header({
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage: `url(${"/img/background.png"})`,
+          backgroundImage: `url(${"/img/background_forest.jpg"})`,
           opacity: 0.2,
           filter: "grayscale(10%)",
           backgroundPosition: "center bottom -50px",

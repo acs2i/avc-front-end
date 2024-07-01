@@ -110,7 +110,7 @@ export default function ProfilePage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-   
+
     setIsUpdate(false);
     try {
       const response = await fetch(
@@ -248,6 +248,37 @@ export default function ProfilePage() {
           </Button>
         </div>
       </Modal>
+      <Modal
+        show={nameInputIsOpen}
+        onCancel={() => setNameInputIsOpen(false)}
+        onClose={() => setNameInputIsOpen(false)}
+        onSubmit={handleSubmit}
+        header="Modifier mon nom d'utilisateur"
+      >
+        <div className="w-[70%] flex flex-col gap-3 mt-2 mx-auto">
+          <div>
+            <Input
+              element="input"
+              id="username"
+              label=""
+              value={formData.username}
+              placeholder=""
+              validators={[]}
+              create
+              gray
+              onChange={handleChange}
+            />
+          </div>
+          <Button
+            size="small"
+            type="submit"
+            blue={isEmailValid}
+            disabled={!isEmailValid}
+          >
+            Modifier mon nom d'utilisateur
+          </Button>
+        </div>
+      </Modal>
       <section className="w-full h-screen bg-gray-100 p-7">
         <h1 className="text-[35px]">Mon profil</h1>
         <Divider />
@@ -260,53 +291,23 @@ export default function ProfilePage() {
                 <Avatar
                   alt={user?.username && user?.username}
                   src={user?.imgPath && user?.imgPath}
-                  sx={{ width: 100, height: 100 }}
+                  sx={{ width: 80, height: 80 }}
                 />
 
-                {!nameInputIsOpen ? (
-                  <h1 className="text-[35px] capitalize font-[800]">
-                    {user?.username}
-                  </h1>
-                ) : (
-                  <Input
-                    element="input"
-                    id="username"
-                    label=""
-                    value={formData.username}
-                    placeholder=""
-                    validators={[]}
-                    gray
-                    onChange={handleChange}
-                  />
-                )}
-                {!nameInputIsOpen ? (
-                  <span
-                    className="text-blue-600 text-xs ml-5 cursor-pointer"
-                    onClick={() => setNameInputIsOpen(true)}
-                  >
-                    Modifier
-                  </span>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <button
-                      className="bg-transparent text-xs text-blue-600"
-                      type="submit"
-                    >
-                      Valider
-                    </button>
-                    <button
-                      className="bg-transparent text-xs text-red-600"
-                      type="button"
-                      onClick={() => setNameInputIsOpen(false)}
-                    >
-                      Annuler
-                    </button>
-                  </div>
-                )}
+                <h1 className="text-[30px] capitalize font-[800]">
+                  {user?.username}
+                </h1>
+
+                <span
+                  className="text-blue-600 text-xs ml-5 cursor-pointer"
+                  onClick={() => setNameInputIsOpen(true)}
+                >
+                  Modifier
+                </span>
               </div>
               <Divider />
               <div className="mt-3">
-                <div className="flex items-center text-[20px] gap-2 text-gray-700">
+                <div className="flex items-center text-[18px] gap-2 text-gray-700">
                   <span>Email :</span>
                   <span className="font-[600]">{user?.email}</span>
                   <span
@@ -316,7 +317,7 @@ export default function ProfilePage() {
                     Modifier
                   </span>
                 </div>
-                <div className="flex items-center text-[20px] gap-2 text-gray-700 mt-3">
+                <div className="flex items-center text-[18px] gap-2 text-gray-700 mt-3">
                   <span>Droits :</span>
                   <span className="font-[600] capitalize">
                     {user?.authorization}

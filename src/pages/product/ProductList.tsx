@@ -204,7 +204,7 @@ export default function ProductList() {
         link="/product/edit"
         btnTitle="Créer un produit"
         placeholder="Rechercher un produit"
-        height="300px"
+        height="250px"
       ></Header>
       <div className="relative">
         <div className="absolute bottom-0 z-[55]">
@@ -432,7 +432,7 @@ export default function ProductList() {
 
       <div className="relative overflow-x-auto bg-white">
         <table className="w-full text-left">
-          <thead className="border-y-[1px] border-gray-200 text-md font-[800] text-gray-700">
+          <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
             <tr>
               <th scope="col" className="px-6 py-2 w-[10%]">
                 Code
@@ -459,7 +459,7 @@ export default function ProductList() {
               products.products.map((product: Product) => (
                 <tr
                   key={product._id}
-                  className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 whitespace-nowrap border"
+                  className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-[11px] text-gray-800 whitespace-nowrap border-y-[1px] border-gray-200"
                   onClick={() => navigate(`/product/${product._id}`)}
                 >
                   <td className="px-6 py-2">{product.GA_CODEARTICLE}</td>
