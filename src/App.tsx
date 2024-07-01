@@ -35,7 +35,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ isAuth }) => {
 function App() {
   const location = useLocation();
   const excludedPaths = ["/login"];
-  const excludedPathsChat = ["/chat"];
+  const excludedPathsChat = ["/chat", "/parameters"];
   const isAuth = Boolean(useSelector((state: any) => state.auth.token));
 
   useEffect(() => {
