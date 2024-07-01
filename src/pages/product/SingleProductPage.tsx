@@ -1,15 +1,17 @@
 import { LINKCARD_PRODUCT } from "../../utils/index";
 import Card from "../../components/Shared/Card";
 import React, { useState } from "react";
+import Input from "../../components/FormElements/Input";
 import { Navigate, useParams } from "react-router-dom";
 import { LinkCard } from "@/type";
 import { Divider } from "@mui/material";
 import Button from "../../components/FormElements/Button";
 import useFetch from "../../utils/hooks/usefetch";
-import { Check, ChevronLeft, X } from "lucide-react";
+import { Check, ChevronLeft, ImageUp, X } from "lucide-react";
 import Modal from "../../components/Shared/Modal";
 import Header from "../../components/Navigation/Header";
 import { useNavigate } from "react-router-dom";
+import CreatableSelect from "react-select/creatable";
 
 interface Product {
   GA_CODEARTICLE: string;
@@ -59,113 +61,171 @@ export default function SingleProductPage() {
         {product && <h2 className="text-[25px]">{product[0]?.GA_LIBELLE}</h2>}
       </div>
 
-      <div className="mt-7 w-3/4">
+      <div className="mt-7">
         {product && (
-          <div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              <div className="flex items-center text-[16px] font-[600] gap-2">
-                <span className="font-bold text-gray-700">Référence :</span>
-                <span className="text-blue-600">
-                  {product[0]?.GA_CODEARTICLE}
-                </span>
-              </div>
+          <div className="flex gap-7 mt-[50px]">
+            <div className="w-[70%] flex flex-col gap-3">
+              <div className="relative border p-3 ">
+                <div className="absolute top-[-15px] bg-gray-100 px-2">
+                  <span className="text-[17px] italic">Identification</span>
+                </div>
+                <div className="grid grid-cols-4 gap-2 py-2">
+                  <span className="col-span-1 font-bold text-gray-700">
+                    Référence :
+                  </span>
+                  <span className="col-span-3 text-gray-600">
+                    {product[0]?.GA_CODEARTICLE}
+                  </span>
+                </div>
+                <div className="grid grid-cols-4 gap-2 py-2">
+                  <span className="col-span-1 font-bold text-gray-700">
+                    Nom d'appel :
+                  </span>
+                  <span className="col-span-3 text-gray-600 whitespace-nowrap">
+                    N/A
+                  </span>
+                </div>
+                <div className="grid grid-cols-4 gap-2 py-2">
+                  <span className="col-span-1 font-bold text-gray-700">
+                    Désignation longue :
+                  </span>
+                  <span className="col-span-3 text-gray-600 whitespace-nowrap">
+                    {product[0]?.GA_LIBELLE}
+                  </span>
+                </div>
 
-              <div className="flex items-center text-[16px] font-[600] gap-2">
-                <span className="font-bold text-gray-700">
-                  Désignation longue :
-                </span>
-                <span className="text-blue-600">{product[0]?.GA_LIBELLE}</span>
-              </div>
+                <div className="grid grid-cols-4 gap-2 py-2">
+                  <span className="col-span-1 font-bold text-gray-700">
+                    Désignation courte :
+                  </span>
+                  <span className="col-span-3 text-gray-600 whitespace-nowrap">
+                    {product[0]?.GA_LIBCOMPL}
+                  </span>
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                  <span className="col-span-1 font-bold text-gray-700">
+                    Marque :
+                  </span>
+                  <span className="col-span-3 text-gray-600">
+                    {product[0]?.brand ? product[0]?.brand.YX_LIBELLE : "N/A"}
+                  </span>
+                </div>
 
-              <div className="flex items-center text-[16px] font-[600] gap-2">
-                <span className="font-bold text-gray-700">
-                  Désignation courte :
-                </span>
-                <span className="text-blue-600">{product[0]?.GA_LIBCOMPL}</span>
-              </div>
+                <div className="mt-[30px] grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="col-span-full">
+                    <h5 className="text-[20px] font-[700]">Classification</h5>
+                  </div>
 
-              <div className="flex items-center text-[16px] font-[600] gap-2">
-                <span className="font-bold text-gray-700">Type :</span>
-                <span className="text-blue-600">Marchandise</span>
-              </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    <span className="col-span-1 font-bold text-gray-700">
+                      Famille :
+                    </span>
+                    <span className="col-span-3 text-gray-600 whitespace-nowrap">
+                      {product[0]?.family
+                        ? product[0]?.family.YX_LIBELLE
+                        : "N/A"}
+                    </span>
+                  </div>
 
-              <div className="flex items-center text-[16px] font-[600] gap-2">
-                <span className="font-bold text-gray-700">
-                  Fournisseur principal :
-                </span>
-                <span className="text-blue-600">
-                  {product[0]?.GA_FOURNPRINC}
-                </span>
-              </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    <span className="col-span-1 font-bold text-gray-700">
+                      Sous-famille :
+                    </span>
+                    <span className="col-span-3 text-gray-600 whitespace-nowrap">
+                      {product[0]?.subFamily
+                        ? product[0]?.subFamily.YX_LIBELLE
+                        : "N/A"}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-2">
+                    <span className="col-span-1 font-bold text-gray-700">
+                      Sous-sous-famille :
+                    </span>
+                    <span className="col-span-3 text-gray-600">N/A</span>
+                  </div>
+                </div>
 
-              <div className="flex items-center text-[16px] font-[600] gap-2">
-                <span className="font-bold text-gray-700">Dimensions :</span>
-                <span className="text-blue-600">Couleur/Taille</span>
-              </div>
+                <div className="mt-[30px]">
+                  <h5 className="text-[20px] font-[700] mb-4">
+                    Caractéristiques produit
+                  </h5>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-4 gap-2">
+                      <span className="col-span-1 font-bold text-gray-700">
+                        Type :
+                      </span>
+                      <span className="col-span-3 text-gray-600">
+                        Marchandise
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-4 gap-2">
+                      <span className="col-span-1 font-bold text-gray-700">
+                        Dimensions :
+                      </span>
+                      <span className="col-span-3 text-gray-600">
+                        Couleur/Taille
+                      </span>
+                    </div>
 
-              <div className="flex items-center text-[16px] font-[600] gap-2">
-                <span className="font-bold text-gray-700">Marque :</span>
-                <span className="text-blue-600">
-                  {product[0]?.brand ? product[0]?.brand.YX_LIBELLE : "N/A"}
-                </span>
+                    <div className="grid grid-cols-4 gap-2">
+                      <span className="col-span-1 font-bold text-gray-700">
+                        Collection :
+                      </span>
+                      <span className="col-span-3 text-gray-600">N/A</span>
+                    </div>
+                    
+                  </div>
+                </div>
               </div>
+            </div>
 
-              <div className="flex items-center text-[16px] font-[600] gap-2">
-                <span className="font-bold text-gray-700">Collection :</span>
-                <span className="text-blue-600">N/A</span>
-              </div>
-
-              <div className="flex items-center text-[16px] font-[600] gap-2">
-                <span className="font-bold text-gray-700">Famille :</span>
-                <span className="text-blue-600">
-                  {product[0]?.family ? product[0]?.family.YX_LIBELLE : "N/A"}
-                </span>
-              </div>
-
-              <div className="flex items-center text-[16px] font-[600] gap-2">
-                <span className="font-bold text-gray-700">Sous-famille :</span>
-                <span className="text-blue-600">
-                  {product[0]?.subFamily
-                    ? product[0]?.subFamily.YX_LIBELLE
-                    : "N/A"}
-                </span>
-              </div>
-
-              <div className="flex items-center text-[16px] font-[600] gap-2">
-                <span className="font-bold text-gray-700">
-                  Sous-sous-famille :
-                </span>
-                <span className="text-blue-600">N/A</span>
-              </div>
-
-              <div className="flex items-center text-[16px] font-[600] gap-2">
-                <span className="font-bold text-gray-700">
-                  Conditionement :
-                </span>
-                <span className="text-blue-600">N/A</span>
-              </div>
-
-              <div className="flex items-center text-[16px] font-[600] gap-2">
-                <span className="font-bold text-gray-700">
-                  Origine de fabrication :
-                </span>
-                <span className="text-blue-600">N/A</span>
-              </div>
-
-              <div className="flex items-center text-[16px] font-[600] gap-2">
-                <span className="font-bold text-gray-700">Mesure :</span>
-                <span className="text-blue-600">PCE - Pièce</span>
-              </div>
-
-              <div className="flex items-center text-[16px] font-[600] gap-2">
-                <span className="font-bold text-gray-700">Vente :</span>
-                <span className="text-blue-600">UNI - Unité</span>
-              </div>
-
-              <div className="flex items-center text-[16px] font-[600] gap-2">
-                <span className="font-bold text-gray-700">Packaging :</span>
-                <span className="text-blue-600">Standard</span>
-              </div>
+            <div className="w-[30%] flex flex-col gap-5">
+              <Card title=" Ajouter une image">
+                <div className="w-full h-[250px] border border-dashed border-2 border-gray-300 mt-3 flex justify-center items-center">
+                  <div className="flex flex-col items-center text-center">
+                    <p className="font-bold text-gray-600">
+                      Glissez déposez votre image ici ou{" "}
+                      <span className="text-blue-400">
+                        téléchargez depuis votre ordinateur
+                      </span>
+                    </p>
+                    <div className="text-gray-300">
+                      <ImageUp size={50} />
+                    </div>
+                  </div>
+                </div>
+              </Card>
+              <Card title="Fournisseur principal">
+                <div className="flex flex-col gap-2">
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">
+                      Nom
+                    </label>
+                    <Input
+                      element="input"
+                      id="reference"
+                      label="Référence :"
+                      value=""
+                      validators={[]}
+                      placeholder="Ajouter la référence du produit"
+                      create
+                      gray
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      element="input"
+                      id="reference"
+                      label="Référence :"
+                      value=""
+                      validators={[]}
+                      placeholder="Ajouter la référence du produit"
+                      create
+                      gray
+                    />
+                  </div>
+                </div>
+              </Card>
             </div>
           </div>
         )}
