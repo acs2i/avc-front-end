@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import SingleProductPage from "./pages/product/SingleProductPage";
 import Sidebar from "./components/Navigation/Sidebar";
@@ -29,14 +28,20 @@ interface PrivateRouteProps {
 
 // Composant PrivateRoute
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ isAuth }) => {
-  return isAuth ? <Outlet /> : <Navigate to="/login" />;
+  const location = useLocation();
+  return isAuth ? <Outlet /> : <Navigate to="/login" state={{ from: location }} replace />;
+};
+
+// Composant PublicRoute pour gérer la redirection des utilisateurs authentifiés
+const PublicRoute: React.FC<{ isAuth: boolean, children: any }> = ({ isAuth, children}) => {
+  return isAuth ? <Navigate to="/" replace /> : children;
 };
 
 function App() {
   const location = useLocation();
   const excludedPaths = ["/login"];
   const excludedPathsChat = ["/chat", "/parameters"];
-  const isAuth = Boolean(useSelector((state: any) => state.auth.token));
+  const isAuth = useSelector((state: any) => state.auth.token);
 
   useEffect(() => {
     window.scrollTo({
@@ -63,7 +68,14 @@ function App() {
       <div className={isAuth ? "ml-[50px] sm:ml-[80px] md:ml-[150px] lg:ml-[250px] mt-[60px]" : ""}>
         <Routes>
           {/* Routes publiques */}
-          <Route path="/login" element={<LoginPage />} />
+          <Route 
+            path="/login" 
+            element={
+              <PublicRoute isAuth={isAuth}>
+                <LoginPage />
+              </PublicRoute>
+            } 
+          />
 
           {/* Routes privées */}
           <Route element={<PrivateRoute isAuth={isAuth} />}>
@@ -72,10 +84,7 @@ function App() {
             <Route path="/parameters" element={<ParamsMenuPage />} />
             <Route path="/product" element={<ProductList />} />
             <Route path="/product/:id" element={<SingleProductPage />} />
-            <Route
-              path="/suppliers/suppliers-list"
-              element={<SuppliersPage />}
-            />
+            <Route path="/suppliers/suppliers-list" element={<SuppliersPage />} />
             <Route path="/draft" element={<DraftPage />} />
             <Route path="/draft/:id" element={<DraftUpdatePage />} />
             <Route path="/admin" element={<AdminPage />} />
@@ -83,7 +92,7 @@ function App() {
             <Route path="/admin/create-group" element={<CreateGroupPage />} />
             <Route path="/admin/created-group" element={<CreatedGroupPage />} />
             <Route path="/user/profile/:userId" element={<ProfilePage />} />
-            <Route path="/calendar" element={<CalendarPage />} />
+            <Route path="/calendar" element={<CalendarPage />} />    
             <Route path="/chat" element={<ChatPage />} />
           </Route>
           <Route path="*" element={<Navigate to={isAuth ? "/" : "/login"} />} />
