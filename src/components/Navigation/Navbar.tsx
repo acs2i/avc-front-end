@@ -67,7 +67,7 @@ export default function Navbar() {
 
   useEffect(() => {
       fetchNotifications();
-  }, [notifications]);
+  }, []);
 
   useEffect(() => {
     if (drawerIsOpen) {
