@@ -17,6 +17,7 @@ type InputProps = {
   gray?: boolean;
   required?: boolean;
   disabled?: boolean;
+  margin?: boolean;
   rows?: number;
   options?: { value: string; label: string; name: string }[];
   maxLength?: number;

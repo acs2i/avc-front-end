@@ -585,7 +585,7 @@ export default function CreateProductPage() {
             <div className="w-[70%] flex flex-col gap-3">
               <div className="relative border p-3 ">
                 <div className="absolute top-[-15px] bg-gray-100 px-2">
-                  <span className="text-[17px] italic">Identification</span>
+                  <span className="text-[13px] italic">Identification</span>
                 </div>
                 <Input
                   element="input"

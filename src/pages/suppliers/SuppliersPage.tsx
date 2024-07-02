@@ -67,6 +67,7 @@ export default function SuppliersPage() {
         btnTitle="Créer un fournisseur"
         placeholder="Rechercher un fournisseur"
         height="250px"
+        
       >
         <div className="flex items-center gap-4 py-4">
           <div className="flex items-center gap-4">

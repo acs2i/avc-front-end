@@ -23,6 +23,10 @@ import {
   SquarePen,
   User,
   MessageSquare,
+  Barcode,
+  Tag,
+  HandCoins,
+  Euro,
 } from "lucide-react";
 
 export const LINKS: Link[] = [
@@ -139,6 +143,34 @@ export const LINKS_Params: Params[] = [
     page: "brand",
   },
 ];
+
+export const LINKS_Product: Params[] = [
+  {
+    name: "UVC / EAN",
+    link: "",
+    icon: Barcode,
+    page: "dimension",
+  },
+  {
+    name: "Prix achat/vente/modulé",
+    link: "",
+    icon: Tag,
+    page: "price",
+  },
+  {
+    name: "Taxes",
+    link: "",
+    icon: HandCoins,
+    page: "fee",
+  },
+  {
+    name: "Prix UVC",
+    link: "",
+    icon: Euro,
+    page: "uvc price",
+  },
+];
+
 export const SUPPLIERS: Suppliers[] = [
   {
     code: "ERCFGJ89",
