@@ -15,7 +15,7 @@ interface Notification {
 }
 
 export default function Navbar() {
-  const userId = useSelector((state: any) => state.auth.user._id);
+  const userId = useSelector((state: any) => state?.auth?.user?._id);
   const token = useSelector((state: any) => state.auth.token);
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
   const { darkMode, toggleDarkMode } = useTheme();
