@@ -6,7 +6,7 @@ import SingleProductPage from "./pages/product/SingleProductPage";
 import Sidebar from "./components/Navigation/Sidebar";
 import LoginPage from "./pages/login/LoginPage";
 import Navbar from "./components/Navigation/Navbar";
-import SuppliersPage from "./pages/suppliers/SuppliersPage";
+import SuppliersList from "./pages/suppliers/SuppliersList";
 import CreateProductPage from "./pages/product/CreateProductPage";
 import ParamsMenuPage from "./pages/params/ParamsMenuPage";
 import DraftPage from "./pages/draft/DraftPage";
@@ -84,7 +84,7 @@ function App() {
             <Route path="/parameters" element={<ParamsMenuPage />} />
             <Route path="/product" element={<ProductList />} />
             <Route path="/product/:id" element={<SingleProductPage />} />
-            <Route path="/suppliers/suppliers-list" element={<SuppliersPage />} />
+            <Route path="/suppliers/suppliers-list" element={<SuppliersList />} />
             <Route path="/draft" element={<DraftPage />} />
             <Route path="/draft/:id" element={<DraftUpdatePage />} />
             <Route path="/admin" element={<AdminPage />} />
