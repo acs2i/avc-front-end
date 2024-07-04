@@ -235,7 +235,6 @@ export default function CreateProductPage() {
   };
 
   const handleGridChange = (grid: string[][]) => {
-    // Flatten the grid and join color and size
     const flattenedGrid = grid.flat();
     setFormData((prevFormData) => ({
       ...prevFormData,
@@ -546,6 +545,8 @@ export default function CreateProductPage() {
       setIsLoading(false);
     }
   };
+
+
 
   return (
     <section className="w-full bg-gray-100 p-7">

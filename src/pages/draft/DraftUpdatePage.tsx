@@ -119,7 +119,7 @@ export default function DraftUpdatePage() {
 
   return (
     <>
-      <section className="w-full bg-gray-100 h-screen p-8">
+      <section className="w-full bg-gray-100 p-8">
         <Modal
           show={isModalOpen}
           onCancel={() => setIsModalOpen(false)}
@@ -132,7 +132,7 @@ export default function DraftUpdatePage() {
               <div onClick={() => navigate(-1)} className="cursor-pointer">
                 <ChevronLeft />
               </div>
-              <h1 className="text-[32px] font-[800]">Page produit</h1>
+              <h1 className="text-[32px] font-[800]">Details du brouillon</h1>
             </div>
             <div className="flex items-center justify-between">
               {draft && (

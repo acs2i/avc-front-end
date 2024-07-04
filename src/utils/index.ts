@@ -146,13 +146,13 @@ export const LINKS_Params: Params[] = [
 
 export const LINKS_Product: Params[] = [
   {
-    name: "UVC / EAN",
+    name: "Dimensions",
     link: "",
-    icon: Barcode,
+    icon: Ruler,
     page: "dimension",
   },
   {
-    name: "Prix achat/vente/modulé",
+    name: "Prix",
     link: "",
     icon: Tag,
     page: "price",

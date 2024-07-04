@@ -4,6 +4,9 @@ import Modal from "./Shared/Modal";
 
 interface UVCGridProps {
   onDimensionsChange: (dimensions: string[][]) => void;
+  initialSizes?: string[];
+  initialColors?: string[];
+  initialGrid?: boolean[][];
 }
 
 interface Grid {
@@ -13,18 +16,26 @@ interface Grid {
   DIMENSIONS: string[];
 }
 
-const UVCGrid: React.FC<UVCGridProps> = ({ onDimensionsChange }) => {
+const UVCGrid: React.FC<UVCGridProps> = ({ onDimensionsChange, initialSizes = ["000"], initialColors = ["000"], initialGrid = [[true]] }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [grids, setGrids] = useState<Grid[]>([]);
-  const [sizes, setSizes] = useState<string[]>(["000"]);
-  const [colors, setColors] = useState<string[]>(["000"]);
-  const [uvcGrid, setUvcGrid] = useState<boolean[][]>([[true]]);
+  const [sizes, setSizes] = useState<string[]>(initialSizes);
+  const [colors, setColors] = useState<string[]>(initialColors);
+  const [uvcGrid, setUvcGrid] = useState<boolean[][]>(initialGrid);
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 20;
   const [totalItem, setTotalItem] = useState<number | null>(null);
   const [showSizeGridOptions, setShowSizeGridOptions] = useState(false);
   const [showColorGridOptions, setShowColorGridOptions] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+
+  useEffect(() => {
+    setSizes(initialSizes);
+    setColors(initialColors);
+    setUvcGrid(initialGrid);
+    updateDimensions(initialGrid);
+  }, [initialSizes, initialColors, initialGrid]);
 
   const toggleCheckbox = (colorIndex: number, sizeIndex: number) => {
     const newGrid = uvcGrid.map((row, i) =>

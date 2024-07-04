@@ -1,5 +1,5 @@
 import { LINKS_Product } from "../../utils/index";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import useFetch from "../../utils/hooks/usefetch";
 import { ChevronLeft, Pen } from "lucide-react";
@@ -7,6 +7,7 @@ import Modal from "../../components/Shared/Modal";
 import { useNavigate } from "react-router-dom";
 import CreatableSelect from "react-select/creatable";
 import Button from "../../components/FormElements/Button";
+import UVCGrid from "../../components/UVCGrid";
 
 interface Product {
   GA_CODEARTICLE: string;
@@ -27,6 +28,27 @@ interface Product {
   productCollection: any;
 }
 
+interface FormData {
+  creator_id: any;
+  description_ref: string;
+  reference: string;
+  designation_longue: string;
+  designation_courte: string;
+  supplier_name: string;
+  supplier_ref: string;
+  family: string[];
+  subFamily: string[];
+  dimension_type: string;
+  dimension: string[];
+  brand: string;
+  ref_collection: string;
+  composition: string;
+  description_brouillon: string;
+  initialSizes: any[];
+  initialColors: any[];
+  initialGrid: any[];
+}
+
 interface Row {
   GA_CHARLIBRE1: string;
   COULEUR: string;
@@ -45,9 +67,54 @@ export default function SingleProductPage() {
     `${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`
   );
 
-  const handleRowClick = (item: any) => {
-    setSelectedRowData(item);
+  const [formData, setFormData] = useState<FormData>({
+    creator_id: "",
+    description_ref: "",
+    reference: "",
+    designation_longue: "",
+    designation_courte: "",
+    supplier_name: "",
+    supplier_ref: "",
+    family: [],
+    subFamily: [],
+    dimension_type: "Couleur/Taille",
+    brand: "",
+    ref_collection: "",
+    description_brouillon: "",
+    dimension: [],
+    composition: "",
+    initialSizes: [],
+    initialColors: [],
+    initialGrid: [],
+  });
+
+  const handleGridChange = (grid: string[][]) => {
+    const flattenedGrid = grid.flat();
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      dimension: flattenedGrid,
+    }));
   };
+
+  useEffect(() => {
+    if (product) {
+      const initialSizes = [
+        ...new Set(product[0]?.uvcs.map((uvc) => uvc.TAILLE)),
+      ];
+      const initialColors = [
+        ...new Set(product[0]?.uvcs.map((uvc) => uvc.COULEUR)),
+      ];
+      const initialGrid = initialColors.map((color) =>
+        initialSizes.map(() => true)
+      );
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        initialSizes,
+        initialColors,
+        initialGrid,
+      }));
+    }
+  }, [product]);
 
   return (
     <section className="w-full bg-gray-100 h-screen p-8">
@@ -70,12 +137,9 @@ export default function SingleProductPage() {
               <h2 className="text-[25px]">{product[0]?.GA_LIBELLE}</h2>
             )}
             {!isModify ? (
-              <button
-                className="text-blue-500 font-[600]"
-                onClick={() => setIsModify(true)}
-              >
+              <Button blue size="small" onClick={() => setIsModify(true)}>
                 {isModify ? "Annuler modification" : "Modifier"}
-              </button>
+              </Button>
             ) : (
               <div className="flex items-center gap-2">
                 <Button size="small" blue>
@@ -100,7 +164,7 @@ export default function SingleProductPage() {
             <>
               {/* Indentification */}
               <div className="flex gap-7 mt-[50px] items-stretch">
-                <div className="w-[70%] flex flex-col gap-3 bg-white">
+                <div className="w-[60%] flex flex-col gap-3 bg-white shadow-md">
                   <div className="relative border border-gray-300 p-3 flex-1">
                     <div className="absolute top-[-15px] bg-gradient-to-b from-gray-100 from-40% to-white px-2">
                       <span className="text-[13px] italic">Identification</span>
@@ -176,65 +240,58 @@ export default function SingleProductPage() {
                       )}
                     </div>
 
-                    <div className="mt-[30px] grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="col-span-full">
-                        <h5 className="text-[20px] font-[700]">
-                          Classification
-                        </h5>
-                      </div>
-                      <div className="grid grid-cols-4 gap-2">
-                        <span className="col-span-1 font-bold text-gray-700">
-                          Famille :
+                    <div className="grid grid-cols-4 gap-2 py-2">
+                      <span className="col-span-1 font-bold text-gray-700">
+                        Famille :
+                      </span>
+                      {!isModify ? (
+                        <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                          {product[0]?.family
+                            ? product[0]?.family.YX_LIBELLE
+                            : "N/A"}
                         </span>
-                        {!isModify ? (
-                          <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
-                            {product[0]?.family
-                              ? product[0]?.family.YX_LIBELLE
-                              : "N/A"}
-                          </span>
-                        ) : (
-                          <input
-                            type="text"
-                            className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                          />
-                        )}
-                      </div>
-                      <div className="grid grid-cols-4 gap-2">
-                        <span className="col-span-1 font-bold text-gray-700">
-                          Sous-famille :
+                      ) : (
+                        <input
+                          type="text"
+                          className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                        />
+                      )}
+                    </div>
+                    <div className="grid grid-cols-4 gap-2 py-2">
+                      <span className="col-span-1 font-bold text-gray-700">
+                        Sous-famille :
+                      </span>
+                      {!isModify ? (
+                        <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                          {product[0]?.subFamily
+                            ? product[0]?.subFamily.YX_LIBELLE
+                            : "N/A"}
                         </span>
-                        {!isModify ? (
-                          <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
-                            {product[0]?.subFamily
-                              ? product[0]?.subFamily.YX_LIBELLE
-                              : "N/A"}
-                          </span>
-                        ) : (
-                          <input
-                            type="text"
-                            className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                          />
-                        )}
-                      </div>
-                      <div className="grid grid-cols-4 gap-2">
-                        <span className="col-span-1 font-bold text-gray-700">
-                          Ss-famille :
+                      ) : (
+                        <input
+                          type="text"
+                          className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                        />
+                      )}
+                    </div>
+                    <div className="grid grid-cols-4 gap-2 py-2">
+                      <span className="col-span-1 font-bold text-gray-700">
+                        Sous-sous-famille :
+                      </span>
+                      {!isModify ? (
+                        <span className="col-span-3 text-gray-600 text-[14px]">
+                          N/A
                         </span>
-                        {!isModify ? (
-                          <span className="col-span-3 text-gray-600 text-[14px]">
-                            N/A
-                          </span>
-                        ) : (
-                          <input
-                            type="text"
-                            className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                          />
-                        )}
-                      </div>
+                      ) : (
+                        <input
+                          type="text"
+                          className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                        />
+                      )}
                     </div>
                   </div>
                 </div>
-                <div className="w-[30%] flex flex-col gap-5">
+                <div className="w-[40%] flex flex-col gap-5">
                   <div className="w-full h-full flex-1">
                     <img
                       src="/img/logo_2.png"
@@ -245,31 +302,33 @@ export default function SingleProductPage() {
                 </div>
               </div>
 
-              {/* Fournisseur */}
-              <div className="flex gap-7 mt-[50px]">
-                <div className="w-[50%] flex flex-col gap-3 bg-white">
+              <div className="flex gap-7 mt-[50px] items-stretch">
+                {/* Fournisseur */}
+                <div className="w-1/3 flex flex-col gap-3 bg-white shadow-md">
                   <div
                     className={`relative border border-gray-300 p-3 ${
                       isModify ? "h-[270px]" : "h-[230px]"
                     }`}
                   >
-                    <div
-                      className="absolute right-[10px] cursor-pointer text-gray-600"
-                      onClick={() => setIsModalOpen(true)}
-                    >
-                      <Pen size={17} />
-                    </div>
+                    {!isModify && (
+                      <div
+                        className="absolute right-[10px] cursor-pointer text-gray-600"
+                        onClick={() => setIsModalOpen(true)}
+                      >
+                        <Pen size={17} />
+                      </div>
+                    )}
                     <div className="absolute top-[-15px] bg-gradient-to-b from-gray-100 from-40% to-white px-2">
                       <span className="text-[13px] italic">
-                        Founisseur principal
+                        Fournisseur principal
                       </span>
                     </div>
-                    <div className="grid grid-cols-4 gap-2 py-2">
-                      <span className="col-span-1 font-bold text-gray-700">
+                    <div className="grid grid-cols-12 gap-2 py-2">
+                      <span className="col-span-6 font-bold text-gray-700 text-[13px]">
                         Code :
                       </span>
                       {!isModify ? (
-                        <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
                           {product[0]?.GA_FOURNPRINC
                             ? product[0]?.GA_FOURNPRINC
                             : "N/A"}
@@ -277,75 +336,74 @@ export default function SingleProductPage() {
                       ) : (
                         <input
                           type="text"
-                          className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
                         />
                       )}
                     </div>
-                    <div className="grid grid-cols-4 gap-2 py-2">
-                      <span className="col-span-1 font-bold text-gray-700">
+                    <div className="grid grid-cols-12 gap-2 py-2">
+                      <span className="col-span-6 font-bold text-gray-700 text-[13px]">
                         Ref. produit :
                       </span>
                       {!isModify ? (
-                        <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
                           N/A
                         </span>
                       ) : (
                         <input
                           type="text"
-                          className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
                         />
                       )}
                     </div>
-                    <div className="grid grid-cols-4 gap-2 py-2">
-                      <span className="col-span-1 font-bold text-gray-700">
+                    <div className="grid grid-cols-12 gap-2 py-2">
+                      <span className="col-span-6 font-bold text-gray-700 text-[13px]">
                         Multiple achat :
                       </span>
                       {!isModify ? (
-                        <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
                           N/A
                         </span>
                       ) : (
                         <input
                           type="text"
-                          className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
                         />
                       )}
                     </div>
-                    <div className="grid grid-cols-4 gap-2 py-2">
-                      <span className="col-span-1 font-bold text-gray-700">
+                    <div className="grid grid-cols-12 gap-2 py-2">
+                      <span className="col-span-6 font-bold text-gray-700 text-[13px]">
                         Origine :
                       </span>
                       {!isModify ? (
-                        <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
                           N/A
                         </span>
                       ) : (
                         <input
                           type="text"
-                          className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
                         />
                       )}
                     </div>
-                    <div className="grid grid-cols-4 gap-2 py-2">
-                      <span className="col-span-1 font-bold text-gray-700">
-                        Catégorie devise :
+                    <div className="grid grid-cols-12 gap-2 py-2">
+                      <span className="col-span-6 font-bold text-gray-700 text-[13px]">
+                        Catégorie douanière :
                       </span>
                       {!isModify ? (
-                        <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
                           N/A
                         </span>
                       ) : (
                         <input
                           type="text"
-                          className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
                         />
                       )}
                     </div>
                   </div>
                 </div>
-
                 {/* Caractéristiques produit */}
-                <div className="w-[50%] flex flex-col gap-3 bg-white">
+                <div className="w-1/3 flex flex-col gap-3 bg-white shadow-md">
                   <div
                     className={`relative border border-gray-300 p-3 ${
                       isModify ? "h-[270px]" : "h-[230px]"
@@ -356,35 +414,35 @@ export default function SingleProductPage() {
                         Caractéristiques produit
                       </span>
                     </div>
-                    <div className="grid grid-cols-4 gap-2 py-2">
-                      <span className="col-span-1 font-bold text-gray-700">
+                    <div className="grid grid-cols-12 gap-2 py-2">
+                      <span className="col-span-4 font-bold text-gray-700 text-[13px]">
                         Type :
                       </span>
                       {!isModify ? (
-                        <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
                           Marchandise
                         </span>
                       ) : (
                         <input
                           type="text"
-                          className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
                         />
                       )}
                     </div>
-                    <div className="grid grid-cols-4 gap-2 py-2">
-                      <span className="col-span-1 font-bold text-gray-700">
+                    <div className="grid grid-cols-12 gap-2 py-2">
+                      <span className="col-span-4 font-bold text-gray-700 text-[13px]">
                         Dimensions :
                       </span>
-                      <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                      <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
                         Couleur/Taille
                       </span>
                     </div>
-                    <div className="grid grid-cols-4 gap-2 py-2">
-                      <span className="col-span-1 font-bold text-gray-700">
+                    <div className="grid grid-cols-12 gap-2 py-2">
+                      <span className="col-span-4 font-bold text-gray-700 text-[13px]">
                         Collection :
                       </span>
                       {!isModify ? (
-                        <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
                           {product[0]?.productCollection
                             ? product[0]?.productCollection.YX_LIBELLE
                             : "N/A"}
@@ -392,130 +450,120 @@ export default function SingleProductPage() {
                       ) : (
                         <input
                           type="text"
-                          className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
+                {/* Prix produit */}
+                <div className="w-1/3 flex flex-col gap-3 bg-white shadow-md">
+                  <div
+                    className={`relative border border-gray-300 p-3 ${
+                      isModify ? "h-[270px]" : "h-[230px]"
+                    }`}
+                  >
+                    <div className="absolute top-[-15px] bg-gradient-to-b from-gray-100 from-40% to-white px-2">
+                      <span className="text-[13px] italic">Prix</span>
+                    </div>
+                    <div className="grid grid-cols-12 gap-2 py-2">
+                      <span className="col-span-6 font-bold text-gray-700 text-[13px]">
+                        Prix Achat (PAEU) :
+                      </span>
+                      {!isModify ? (
+                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                          100,20
+                        </span>
+                      ) : (
+                        <input
+                          type="text"
+                          className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                        />
+                      )}
+                    </div>
+                    <div className="grid grid-cols-12 gap-2 py-2">
+                      <span className="col-span-6 font-bold text-gray-700 text-[13px]">
+                        Prix Vente (TBEU/PB) :
+                      </span>
+                      {!isModify ? (
+                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                          100,20
+                        </span>
+                      ) : (
+                        <input
+                          type="text"
+                          className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                        />
+                      )}
+                    </div>
+                    <div className="grid grid-cols-12 gap-2 py-2">
+                      <span className="col-span-6 font-bold text-gray-700 text-[13px]">
+                        Prix Modulé (TBEU/PMEU) :
+                      </span>
+                      {!isModify ? (
+                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                          100,20
+                        </span>
+                      ) : (
+                        <input
+                          type="text"
+                          className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
                         />
                       )}
                     </div>
                   </div>
                 </div>
               </div>
-            </>
+            </>  
+          )}
+        </div>
+
+        {/* Partie onglets */}
+        <div className="mt-[30px] flex">
+          <div className="w-[30%] border-t-[1px] border-gray-300">
+            {LINKS_Product.map((link) => (
+              <div
+                key={link.page}
+                className={`relative border-r-[1px] border-b-[1px] border-gray-300 py-4 flex items-center gap-3 cursor-pointer ${
+                  page === link.page ? "text-blue-500" : "text-gray-500"
+                } hover:text-blue-500`}
+                onClick={() => setPage(link.page)}
+              >
+                {React.createElement(link.icon, {
+                  size: new RegExp(`^${link.link}(/.*)?$`).test(
+                    location.pathname
+                  )
+                    ? 20
+                    : 15,
+                })}
+                <span className="text-xs font-[600]">{link.name}</span>
+                {page === link.page && (
+                  <>
+                    <div
+                      className="absolute right-0 top-1/2 transform -translate-y-1/2 rotate-180 w-5 h-5 bg-gray-300"
+                      style={{ clipPath: "polygon(0 0, 100% 50%, 0 100%)" }}
+                    ></div>
+                    <div
+                      className="absolute right-[-1px] top-1/2 transform -translate-y-1/2 rotate-180 w-4 h-4 bg-gray-100"
+                      style={{ clipPath: "polygon(0 0, 100% 50%, 0 100%)" }}
+                    ></div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+          {page === "dimension" && (
+            <div className="w-[70%] border-t-[1px] border-gray-300 px-5 py-2">
+              <UVCGrid
+                onDimensionsChange={handleGridChange}
+                initialSizes={formData.initialSizes}
+                initialColors={formData.initialColors}
+                initialGrid={formData.initialGrid}
+              />
+            </div>
           )}
         </div>
       </form>
-
-      {/* Partie onglets */}
-      <div className="mt-[30px] flex">
-        <div className="w-[30%] border-t-[1px] border-gray-300">
-          {LINKS_Product.map((link) => (
-            <div
-              key={link.page}
-              className={`relative border-r-[1px] border-b-[1px] border-gray-300 py-4 flex items-center gap-3 cursor-pointer ${
-                page === link.page ? "text-blue-500" : "text-gray-500"
-              } hover:text-blue-500`}
-              onClick={() => setPage(link.page)}
-            >
-              {React.createElement(link.icon, {
-                size: new RegExp(`^${link.link}(/.*)?$`).test(location.pathname)
-                  ? 20
-                  : 15,
-              })}
-              <span className="text-xs font-[600]">{link.name}</span>
-              {page === link.page && (
-                <>
-                  <div
-                    className="absolute right-0 top-1/2 transform -translate-y-1/2 rotate-180 w-5 h-5 bg-gray-300"
-                    style={{ clipPath: "polygon(0 0, 100% 50%, 0 100%)" }}
-                  ></div>
-                  <div
-                    className="absolute right-[-1px] top-1/2 transform -translate-y-1/2 rotate-180 w-4 h-4 bg-gray-100"
-                    style={{ clipPath: "polygon(0 0, 100% 50%, 0 100%)" }}
-                  ></div>
-                </>
-              )}
-            </div>
-          ))}
-        </div>
-        {page === "dimension" && (
-          <div className="w-[70%] border-t-[1px] border-gray-300 py-2">
-            <h4 className="text-[18px] font-[800] text-gray-800 w-[90%] mx-auto">
-              Unité de vente consomateur
-            </h4>
-            <div className="overflow-x-auto mt-4">
-              <table className="w-[90%] mx-auto border">
-                <thead className="bg-gray-100 text-sm text-gray-600 border border-solid border-gray-300">
-                  <tr>
-                    <th
-                      scope="col"
-                      className="px-6 py-2 text-center border border-solid border-gray-300 border-b"
-                    >
-                      Code
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-2 text-center border border-solid border-gray-300 border-b"
-                    >
-                      Dimensions
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-2 text-center border border-solid border-gray-300 border-b"
-                    >
-                      Code à barres
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="text-center text-xs">
-                  {product &&
-                    product[0]?.uvcs.map((item) => (
-                      <tr
-                        className="border text-gray-700 hover:bg-slate-200 cursor-pointer"
-                        onClick={() => handleRowClick(item)}
-                      >
-                        <td className="py-2 px-2 border">
-                          {item.GA_CHARLIBRE1}
-                        </td>
-                        <td className="py-2 px-2 flex items-center justify-center gap-1">
-                          <span>{item.COULEUR}</span>
-                          <span>,</span>
-                          <span>{item.TAILLE}</span>
-                        </td>
-                        <td className="border">
-                          <span>000000033254</span>
-                        </td>
-                      </tr>
-                    ))}
-
-                  {selectedRowData && (
-                    <tr
-                      className="border cursor-pointer bg-sky-800 text-white font-bold"
-                      onClick={() => setSelectedRowData(null)}
-                    >
-                      <td className="py-4">{selectedRowData.GA_CHARLIBRE1}</td>
-                      <td>
-                        {selectedRowData.COULEUR}, {selectedRowData.TAILLE}
-                      </td>
-                      <td>000000033254</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-              {selectedRowData && (
-                <div className="w-[90%] h-[70px] border mx-auto px-4 py-2">
-                  <div className="flex items-center gap-3">
-                    <span className="font-bold">Couleur :</span>
-                    <span>{selectedRowData.COULEUR}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="font-bold">Taille :</span>
-                    <span>{selectedRowData.TAILLE}</span>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
     </section>
   );
 }
