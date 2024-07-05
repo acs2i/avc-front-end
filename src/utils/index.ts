@@ -152,7 +152,7 @@ export const LINKS_Product: Params[] = [
     page: "dimension",
   },
   {
-    name: "Prix",
+    name: "Prix UVC",
     link: "",
     icon: Tag,
     page: "price",

@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import CreatableSelect from "react-select/creatable";
 import Button from "../../components/FormElements/Button";
 import UVCGrid from "../../components/UVCGrid";
+import UVCPriceTable from "../../components/UVCPricesTable";
 
 interface Product {
   GA_CODEARTICLE: string;
@@ -49,16 +50,12 @@ interface FormData {
   initialGrid: any[];
 }
 
-interface Row {
-  GA_CHARLIBRE1: string;
-  COULEUR: string;
-  TAILLE: string;
-}
+
+
 
 export default function SingleProductPage() {
   const { id } = useParams();
   const location = useLocation();
-  const [selectedRowData, setSelectedRowData] = useState<Row | null>(null);
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModify, setIsModify] = useState(false);
@@ -66,7 +63,7 @@ export default function SingleProductPage() {
   const { data: product } = useFetch<Product[]>(
     `${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`
   );
-
+  
   const [formData, setFormData] = useState<FormData>({
     creator_id: "",
     description_ref: "",
@@ -88,6 +85,10 @@ export default function SingleProductPage() {
     initialGrid: [],
   });
 
+  const [sizes, setSizes] = useState<string[]>(formData.initialSizes);
+  const [colors, setColors] = useState<string[]>(formData.initialColors);
+  const [uvcGrid, setUvcGrid] = useState<boolean[][]>(formData.initialGrid);
+
   const handleGridChange = (grid: string[][]) => {
     const flattenedGrid = grid.flat();
     setFormData((prevFormData) => ({
@@ -98,26 +99,23 @@ export default function SingleProductPage() {
 
   useEffect(() => {
     if (product) {
-      const initialSizes = [
-        ...new Set(product[0]?.uvcs.map((uvc) => uvc.TAILLE)),
-      ];
-      const initialColors = [
-        ...new Set(product[0]?.uvcs.map((uvc) => uvc.COULEUR)),
-      ];
-      const initialGrid = initialColors.map((color) =>
-        initialSizes.map(() => true)
-      );
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        initialSizes,
-        initialColors,
-        initialGrid,
-      }));
+      const initialSizes = [...new Set(product[0]?.uvcs.map((uvc) => uvc.TAILLE))];
+      const initialColors = [...new Set(product[0]?.uvcs.map((uvc) => uvc.COULEUR))];
+      const initialGrid = initialColors.map((color) => initialSizes.map(() => true));
+      setSizes(initialSizes);
+      setColors(initialColors);
+      setUvcGrid(initialGrid);
     }
   }, [product]);
 
+
+
+  
+console.log(formData)
+
+
   return (
-    <section className="w-full bg-gray-100 h-screen p-8">
+    <section className="w-full bg-gray-100 p-8">
       <Modal
         show={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
@@ -514,12 +512,12 @@ export default function SingleProductPage() {
                   </div>
                 </div>
               </div>
-            </>  
+            </>
           )}
         </div>
 
         {/* Partie onglets */}
-        <div className="mt-[30px] flex">
+        <div className="mt-[30px] flex mb-[500px]">
           <div className="w-[30%] border-t-[1px] border-gray-300">
             {LINKS_Product.map((link) => (
               <div
@@ -554,12 +552,23 @@ export default function SingleProductPage() {
           </div>
           {page === "dimension" && (
             <div className="w-[70%] border-t-[1px] border-gray-300 px-5 py-2">
-              <UVCGrid
+               <UVCGrid
                 onDimensionsChange={handleGridChange}
                 initialSizes={formData.initialSizes}
                 initialColors={formData.initialColors}
                 initialGrid={formData.initialGrid}
+                setSizes={setSizes}
+                setColors={setColors}
+                setUvcGrid={setUvcGrid}
+                sizes={sizes}
+                colors={colors}
+                uvcGrid={uvcGrid}
               />
+            </div>
+          )}
+          {page === "price" && (
+            <div className="w-[70%] border-t-[1px] border-gray-300 px-5 py-2">
+              <UVCPriceTable uvcPrices={formData.dimension} />
             </div>
           )}
         </div>

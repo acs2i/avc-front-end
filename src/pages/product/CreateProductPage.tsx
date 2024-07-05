@@ -14,6 +14,7 @@ import CreatableSelect from "react-select/creatable";
 import useFetch from "../../utils/hooks/usefetch";
 import UVCGrid from "../../components/UVCGrid";
 
+
 interface FormData {
   creator_id: any;
   description_ref: string;
@@ -30,7 +31,11 @@ interface FormData {
   ref_collection: string;
   composition: string;
   description_brouillon: string;
+  initialSizes: any[];
+  initialColors: any[];
+  initialGrid: any[];
 }
+
 
 type Family = {
   _id: string;
@@ -156,7 +161,13 @@ export default function CreateProductPage() {
     description_brouillon: "",
     dimension: [],
     composition: "",
+    initialSizes: [],
+    initialColors: [],
+    initialGrid: [],
   });
+  const [sizes, setSizes] = useState<string[]>([]);
+  const [colors, setColors] = useState<string[]>([]);
+  const [uvcGrid, setUvcGrid] = useState<boolean[][]>([]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -547,7 +558,6 @@ export default function CreateProductPage() {
   };
 
 
-
   return (
     <section className="w-full bg-gray-100 p-7">
       <div className="max-w-[2024px] mx-auto">
@@ -735,7 +745,18 @@ export default function CreateProductPage() {
                   />
                 </div>
                 <div className="mt-3">
-                  <UVCGrid onDimensionsChange={handleGridChange} />
+                <UVCGrid
+                    onDimensionsChange={handleGridChange}
+                    initialSizes={formData.initialSizes}
+                    initialColors={formData.initialColors}
+                    initialGrid={formData.initialGrid}
+                    setSizes={setSizes}
+                    setColors={setColors}
+                    setUvcGrid={setUvcGrid}
+                    sizes={sizes}
+                    colors={colors}
+                    uvcGrid={uvcGrid}
+                  />
                 </div>
               </div>
             </div>

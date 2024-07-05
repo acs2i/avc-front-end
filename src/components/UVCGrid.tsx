@@ -7,6 +7,12 @@ interface UVCGridProps {
   initialSizes?: string[];
   initialColors?: string[];
   initialGrid?: boolean[][];
+  setSizes: (sizes: string[]) => void;
+  setColors: (colors: string[]) => void;
+  setUvcGrid: (uvcGrid: boolean[][]) => void;
+  sizes: string[];
+  colors: string[];
+  uvcGrid: boolean[][];
 }
 
 interface Grid {
@@ -16,12 +22,20 @@ interface Grid {
   DIMENSIONS: string[];
 }
 
-const UVCGrid: React.FC<UVCGridProps> = ({ onDimensionsChange, initialSizes = ["000"], initialColors = ["000"], initialGrid = [[true]] }) => {
+const UVCGrid: React.FC<UVCGridProps> = ({
+  onDimensionsChange,
+  initialSizes = ["000"],
+  initialColors = ["000"],
+  initialGrid = [[true]],
+  setSizes,
+  setColors,
+  setUvcGrid,
+  sizes,
+  colors,
+  uvcGrid,
+}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [grids, setGrids] = useState<Grid[]>([]);
-  const [sizes, setSizes] = useState<string[]>(initialSizes);
-  const [colors, setColors] = useState<string[]>(initialColors);
-  const [uvcGrid, setUvcGrid] = useState<boolean[][]>(initialGrid);
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 20;
   const [totalItem, setTotalItem] = useState<number | null>(null);
@@ -29,13 +43,9 @@ const UVCGrid: React.FC<UVCGridProps> = ({ onDimensionsChange, initialSizes = ["
   const [showColorGridOptions, setShowColorGridOptions] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-
   useEffect(() => {
-    setSizes(initialSizes);
-    setColors(initialColors);
-    setUvcGrid(initialGrid);
-    updateDimensions(initialGrid);
-  }, [initialSizes, initialColors, initialGrid]);
+    updateDimensions(uvcGrid);
+  }, [sizes, colors, uvcGrid]);
 
   const toggleCheckbox = (colorIndex: number, sizeIndex: number) => {
     const newGrid = uvcGrid.map((row, i) =>
@@ -53,14 +63,6 @@ const UVCGrid: React.FC<UVCGridProps> = ({ onDimensionsChange, initialSizes = ["
     );
     onDimensionsChange(dimensions);
   };
-
-  useEffect(() => {
-    if (sizes.length > 0 && colors.length > 0) {
-      const initialGrid = colors.map(() => sizes.map(() => true));
-      setUvcGrid(initialGrid);
-      updateDimensions(initialGrid);
-    }
-  }, [sizes, colors]);
 
   const removePrefix = (data: string[], prefix: string) => {
     const regex = new RegExp(`^${prefix}\\s*`, "i");
