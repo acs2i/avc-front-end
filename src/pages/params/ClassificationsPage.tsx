@@ -41,7 +41,7 @@ function ClassificationsPage({
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItem, setTotalItem] = useState(null);
-  const limit = 30;
+  const limit = 20;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const [families, setFamilies] = useState<Family[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);

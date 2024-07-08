@@ -298,7 +298,7 @@ export default function SingleProductPage() {
                       alt="logo"
                       className="w-full h-full object-cover filter saturate-50 opacity-50"
                     />
-                    <span className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-white text-xl font-bold bg-black bg-opacity-50 p-2 rounded">
+                    <span className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-white text-xl font-bold bg-black bg-opacity-50 p-2 rounded rotate-[-20deg]">
                       Pas d'image
                     </span>
                   </div>

@@ -36,7 +36,7 @@ export default function BrandPage({
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItem, setTotalItem] = useState(null);
-  const limit = 30;
+  const limit = 20;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const [brands, setBrands] = useState<Brand[]>([]);
   const navigate = useNavigate();

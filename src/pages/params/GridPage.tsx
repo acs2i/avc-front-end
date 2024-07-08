@@ -25,7 +25,7 @@ export default function GridPage({ onSelectGrid, shouldRefetch, highlightedGridI
   const [isLoading, setIsLoading] = useState(false);
   const [grids, setGrids] = useState<Grid[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const limit = 30;
+  const limit = 20;
   const [totalItem, setTotalItem] = useState(null);
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const [prevSearchValue, setPrevSearchValue] = useState("");

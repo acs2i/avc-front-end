@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { LINKS_Params } from "../../utils/index";
 import Card from "../../components/Shared/Card";
-import { Info } from "lucide-react";
+import { Info, Settings2 } from "lucide-react";
 import Modal from "../../components/Shared/Modal";
 import Button from "../../components/FormElements/Button";
 import { Divider } from "@mui/material";
@@ -69,10 +69,7 @@ function ParamsMenuPage() {
     null
   );
   const [isCreatePanelOpen, setIsCreatePanelOpen] = useState(false);
-   const [highlightedId, setHighlightedId] = useState<string | null>(
-    null
-  );
-  
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
   const handleRefetch = () => {
     setShouldRefetch((prev) => !prev);
@@ -117,9 +114,12 @@ function ParamsMenuPage() {
     setSelectedBrand(null);
   }, [page]);
 
-
   return (
     <section className="w-full h-screen bg-gray-100 p-7 relative overflow-hidden">
+      <div className="flex items-center gap-3">
+        <Settings2 size={20}/>
+        <h3 className="text-[25px]">Codifications</h3>
+      </div>
       <div className="h-[70px] mb-3 flex items-center gap-4 w-full relative z-10">
         <div className="w-[300px]">
           <button
