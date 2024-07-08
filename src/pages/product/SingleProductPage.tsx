@@ -9,6 +9,7 @@ import CreatableSelect from "react-select/creatable";
 import Button from "../../components/FormElements/Button";
 import UVCGrid from "../../components/UVCGrid";
 import UVCPriceTable from "../../components/UVCPricesTable";
+import SupplierComponent from "../../components/SupplierComponent";
 
 interface Product {
   GA_CODEARTICLE: string;
@@ -50,9 +51,6 @@ interface FormData {
   initialGrid: any[];
 }
 
-
-
-
 export default function SingleProductPage() {
   const { id } = useParams();
   const location = useLocation();
@@ -63,7 +61,7 @@ export default function SingleProductPage() {
   const { data: product } = useFetch<Product[]>(
     `${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`
   );
-  
+
   const [formData, setFormData] = useState<FormData>({
     creator_id: "",
     description_ref: "",
@@ -99,20 +97,22 @@ export default function SingleProductPage() {
 
   useEffect(() => {
     if (product) {
-      const initialSizes = [...new Set(product[0]?.uvcs.map((uvc) => uvc.TAILLE))];
-      const initialColors = [...new Set(product[0]?.uvcs.map((uvc) => uvc.COULEUR))];
-      const initialGrid = initialColors.map((color) => initialSizes.map(() => true));
+      const initialSizes = [
+        ...new Set(product[0]?.uvcs.map((uvc) => uvc.TAILLE)),
+      ];
+      const initialColors = [
+        ...new Set(product[0]?.uvcs.map((uvc) => uvc.COULEUR)),
+      ];
+      const initialGrid = initialColors.map((color) =>
+        initialSizes.map(() => true)
+      );
       setSizes(initialSizes);
       setColors(initialColors);
       setUvcGrid(initialGrid);
     }
   }, [product]);
 
-
-
-  
-console.log(formData)
-
+  console.log(formData);
 
   return (
     <section className="w-full bg-gray-100 p-8">
@@ -121,7 +121,9 @@ console.log(formData)
         onCancel={() => setIsModalOpen(false)}
         onClose={() => setIsModalOpen(false)}
         header="Fournisseurs"
-      ></Modal>
+      >
+        <SupplierComponent/>
+      </Modal>
       <form>
         <div className="flex flex-col gap-5">
           <div className="flex items-center gap-2">
@@ -551,8 +553,8 @@ console.log(formData)
             ))}
           </div>
           {page === "dimension" && (
-            <div className="w-[70%] border-t-[1px] border-gray-300 px-5 py-2">
-               <UVCGrid
+            <div className="w-[70%] border-t-[1px] border-gray-300 px-5 py-2 h-[300px]  overflow-y-auto">
+              <UVCGrid
                 onDimensionsChange={handleGridChange}
                 initialSizes={formData.initialSizes}
                 initialColors={formData.initialColors}
@@ -567,7 +569,7 @@ console.log(formData)
             </div>
           )}
           {page === "price" && (
-            <div className="w-[70%] border-t-[1px] border-gray-300 px-5 py-2">
+            <div className="w-[70%] border-t-[1px] border-gray-300 px-5 py-2 h-[300px]  overflow-y-auto">
               <UVCPriceTable uvcPrices={formData.dimension} />
             </div>
           )}

@@ -72,7 +72,7 @@ const UVCGrid: React.FC<UVCGridProps> = ({
   const importSizes = (newSizes: string[]) => {
     const cleanedSizes = removePrefix(newSizes, "Taille");
     const updatedSizes = [...sizes, ...cleanedSizes];
-    const uniqueSizes = Array.from(new Set(updatedSizes)); // Remove duplicates
+    const uniqueSizes = Array.from(new Set(updatedSizes));
 
     setSizes(uniqueSizes);
 
@@ -88,7 +88,7 @@ const UVCGrid: React.FC<UVCGridProps> = ({
   const importColors = (newColors: string[]) => {
     const cleanedColors = removePrefix(newColors, "Couleur");
     const updatedColors = [...colors, ...cleanedColors];
-    const uniqueColors = Array.from(new Set(updatedColors)); // Remove duplicates
+    const uniqueColors = Array.from(new Set(updatedColors));
 
     setColors(uniqueColors);
 
@@ -275,9 +275,6 @@ const UVCGrid: React.FC<UVCGridProps> = ({
           </div>
         )}
       </Modal>
-      <h3 className="text-[15px] font-[600] text-gray-800">
-        Grille de dimension
-      </h3>
       <div className="flex gap-4 mb-3 mt-3">
         <button
           onClick={displaySizeGridOptions}
