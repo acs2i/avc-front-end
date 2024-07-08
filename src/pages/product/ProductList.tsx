@@ -204,231 +204,219 @@ export default function ProductList() {
         link="/product/edit"
         btnTitle="Créer un produit"
         placeholder="Rechercher un produit"
-        height="250px"
-      ></Header>
-      <div className="relative">
-        <div className="absolute bottom-0 z-[55]">
-          <button
-            className="bg-gray-200 py-2 px-5 rounded-r-lg shadow-md border border-white text-gray-700 flex items-center gap-2"
-            onClick={() => setSearchIsOpen((prev) => !prev)}
-          >
-            {searchIsOpen ? "Masquer la recherche" : "Afficher la recherche"}
-            {searchIsOpen ? <ChevronUp/> : <ChevronDown/>}
-          </button>
-        </div>
-        <Collapse in={searchIsOpen}>
-          <form className="py-3" onSubmit={handleSearch}>
-            <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-gray-600 p-4 bg-white rounded-md">
-              <div className="flex flex-col">
-                <label className="text-sm font-bold mb-1">Code :</label>
-                <input
-                  type="text"
-                  id="code"
-                  className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
-                  placeholder="Rechercher un code"
-                  value={codeValue}
-                  onChange={(e) => setCodeValue(e.target.value)}
-                  autoComplete="off"
-                />
-              </div>
-
-              <div className="flex flex-col">
-                <label className="text-sm font-bold mb-1">Libellé :</label>
-                <input
-                  type="text"
-                  id="label"
-                  className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
-                  placeholder="Rechercher par libellé"
-                  value={labelValue}
-                  onChange={(e) => setLabelValue(e.target.value)}
-                  autoComplete="off"
-                />
-              </div>
-
-              <div className="flex flex-col relative">
-                <label className="text-sm font-bold mb-1">Marque :</label>
-                <input
-                  type="text"
-                  id="brand"
-                  className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
-                  placeholder="Rechercher par marque"
-                  value={brandValue}
-                  onChange={(e) => handleBrandChange(e)}
-                  onFocus={() => setBrandDropDownIsOpen(true)}
-                  autoComplete="off"
-                />
-                {brands?.brands && brandDropDownIsOpen && brandValue && (
-                  <div className="absolute w-full bg-gray-50 z-10 py-4 rounded-b-md shadow-md top-[40px]">
-                    <div className="h-[30px] flex justify-end cursor-pointer">
-                      <span
-                        className="text-md px-4"
-                        onClick={() => setBrandDropDownIsOpen(false)}
-                      >
-                        X
-                      </span>
-                    </div>
-                    {brands?.brands.map((brand: Brand) => (
-                      <ul key={brand._id}>
-                        <li
-                          className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
-                          onClick={() => {
-                            setBrandChoiceValue(brand.YX_CODE);
-                            setBrandValue(brand.YX_LIBELLE);
-                            setBrandDropDownIsOpen(false);
-                            setCurrentPage(1);
-                          }}
-                        >
-                          {brand.YX_LIBELLE}
-                        </li>
-                      </ul>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className="flex flex-col relative">
-                <label className="text-sm font-bold mb-1">Fournisseur :</label>
-                <input
-                  type="text"
-                  id="supplier"
-                  className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
-                  placeholder="Rechercher par fournisseur"
-                  value={supplierValue}
-                  onChange={(e) => handleSupplierChange(e)}
-                  onFocus={() => setSupplierDropDownIsOpen(true)}
-                  autoComplete="off"
-                />
-                {suppliers?.suppliers &&
-                  supplierDropDownIsOpen &&
-                  supplierValue && (
-                    <div className="absolute w-full bg-gray-50 z-10 py-4 rounded-b-md shadow-md top-[40px]">
-                      <div className="h-[30px] flex justify-end cursor-pointer">
-                        <span
-                          className="text-md px-4"
-                          onClick={() => setSupplierDropDownIsOpen(false)}
-                        >
-                          X
-                        </span>
-                      </div>
-                      {suppliers?.suppliers.map((supplier: Supplier) => (
-                        <ul key={supplier._id}>
-                          <li
-                            className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
-                            onClick={() => {
-                              setSupplierChoiceValue(supplier.T_TIERS);
-                              setSupplierValue(supplier.T_LIBELLE);
-                              setSupplierDropDownIsOpen(false);
-                              setCurrentPage(1);
-                            }}
-                          >
-                            {supplier.T_LIBELLE}
-                          </li>
-                        </ul>
-                      ))}
-                    </div>
-                  )}
-              </div>
-
-              <div className="flex flex-col relative">
-                <label className="text-sm font-bold mb-1">Famille :</label>
-                <input
-                  type="text"
-                  id="family"
-                  className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
-                  placeholder="Rechercher par famille"
-                  value={familyValue}
-                  onChange={(e) => handleFamilyChange(e)}
-                  onFocus={() => setFamilyDropDownIsOpen(true)}
-                  autoComplete="off"
-                />
-                {families && familyDropDownIsOpen && (
-                  <div className="absolute w-full bg-gray-50 z-10 py-4 rounded-b-md shadow-md top-[40px]">
-                    <div className="h-[30px] flex justify-end cursor-pointer">
-                      <span
-                        className="text-md px-4"
-                        onClick={() => setFamilyDropDownIsOpen(false)}
-                      >
-                        X
-                      </span>
-                    </div>
-                    {families.families.map((family: Family) => (
-                      <ul key={family._id}>
-                        <li
-                          className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
-                          onClick={() => {
-                            setFamilyChoiceValue(family.YX_CODE);
-                            setFamilyValue(family.YX_LIBELLE);
-                            setFamilyDropDownIsOpen(false);
-                            setCurrentPage(1);
-                          }}
-                        >
-                          {family.YX_LIBELLE}
-                        </li>
-                      </ul>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className="flex flex-col relative">
-                <label className="text-sm font-bold mb-1">Sous-famille :</label>
-                <input
-                  type="text"
-                  id="subFamily"
-                  className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
-                  placeholder="Rechercher par sous-famille"
-                  value={subFamilyValue}
-                  onChange={(e) => handleSubFamilyChange(e)}
-                  onFocus={() => setSubFamilyDropDownIsOpen(true)}
-                  autoComplete="off"
-                />
-                {subFamilies?.subFamilies && subFamilyDropDownIsOpen && (
-                  <div className="absolute w-full bg-gray-50 z-10 py-4 rounded-b-md shadow-md top-[40px]">
-                    <div className="h-[30px] flex justify-end cursor-pointer">
-                      <span
-                        className="text-md px-4"
-                        onClick={() => setSubFamilyDropDownIsOpen(false)}
-                      >
-                        X
-                      </span>
-                    </div>
-                    {subFamilies?.subFamilies.map((subFamily: Family) => (
-                      <ul key={subFamily._id}>
-                        <li
-                          className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
-                          onClick={() => {
-                            setSubFamilyChoiceValue(subFamily.YX_CODE);
-                            setSubFamilyValue(subFamily.YX_LIBELLE);
-                            setSubFamilyDropDownIsOpen(false);
-                            setCurrentPage(1);
-                          }}
-                        >
-                          {subFamily.YX_LIBELLE}
-                        </li>
-                      </ul>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className="col-span-full flex justify-end">
-                {!isLoading ? (
-                  <Button type="submit" size="small" blue>
-                    Lancer la Recherche
-                  </Button>
-                ) : (
-                  <Spinner
-                    width="50px"
-                    height="40px"
-                    logoSize="90%"
-                    progressSize={50}
-                  />
-                )}
-              </div>
+        height="400px"
+      >
+        <form className="py-1" onSubmit={handleSearch}>
+          <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-gray-600 p-4">
+            <div className="flex flex-col">
+              <label className="text-sm font-bold mb-1">Code :</label>
+              <input
+                type="text"
+                id="code"
+                className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
+                placeholder="Rechercher un code"
+                value={codeValue}
+                onChange={(e) => setCodeValue(e.target.value)}
+                autoComplete="off"
+              />
             </div>
-          </form>
-        </Collapse>
-      </div>
+
+            <div className="flex flex-col">
+              <label className="text-sm font-bold mb-1">Libellé :</label>
+              <input
+                type="text"
+                id="label"
+                className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
+                placeholder="Rechercher par libellé"
+                value={labelValue}
+                onChange={(e) => setLabelValue(e.target.value)}
+                autoComplete="off"
+              />
+            </div>
+
+            <div className="flex flex-col relative">
+              <label className="text-sm font-bold mb-1">Marque :</label>
+              <input
+                type="text"
+                id="brand"
+                className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
+                placeholder="Rechercher par marque"
+                value={brandValue}
+                onChange={(e) => handleBrandChange(e)}
+                onFocus={() => setBrandDropDownIsOpen(true)}
+                autoComplete="off"
+              />
+              {brands?.brands && brandDropDownIsOpen && brandValue && (
+                <div className="absolute w-full bg-gray-50 z-10 py-4 rounded-b-md shadow-md top-[40px]">
+                  <div className="h-[30px] flex justify-end cursor-pointer">
+                    <span
+                      className="text-md px-4"
+                      onClick={() => setBrandDropDownIsOpen(false)}
+                    >
+                      X
+                    </span>
+                  </div>
+                  {brands?.brands.map((brand: Brand) => (
+                    <ul key={brand._id}>
+                      <li
+                        className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
+                        onClick={() => {
+                          setBrandChoiceValue(brand.YX_CODE);
+                          setBrandValue(brand.YX_LIBELLE);
+                          setBrandDropDownIsOpen(false);
+                          setCurrentPage(1);
+                        }}
+                      >
+                        {brand.YX_LIBELLE}
+                      </li>
+                    </ul>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col relative">
+              <label className="text-sm font-bold mb-1">Fournisseur :</label>
+              <input
+                type="text"
+                id="supplier"
+                className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
+                placeholder="Rechercher par fournisseur"
+                value={supplierValue}
+                onChange={(e) => handleSupplierChange(e)}
+                onFocus={() => setSupplierDropDownIsOpen(true)}
+                autoComplete="off"
+              />
+              {suppliers?.suppliers &&
+                supplierDropDownIsOpen &&
+                supplierValue && (
+                  <div className="absolute w-full bg-gray-50 z-10 py-4 rounded-b-md shadow-md top-[40px]">
+                    <div className="h-[30px] flex justify-end cursor-pointer">
+                      <span
+                        className="text-md px-4"
+                        onClick={() => setSupplierDropDownIsOpen(false)}
+                      >
+                        X
+                      </span>
+                    </div>
+                    {suppliers?.suppliers.map((supplier: Supplier) => (
+                      <ul key={supplier._id}>
+                        <li
+                          className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
+                          onClick={() => {
+                            setSupplierChoiceValue(supplier.T_TIERS);
+                            setSupplierValue(supplier.T_LIBELLE);
+                            setSupplierDropDownIsOpen(false);
+                            setCurrentPage(1);
+                          }}
+                        >
+                          {supplier.T_LIBELLE}
+                        </li>
+                      </ul>
+                    ))}
+                  </div>
+                )}
+            </div>
+
+            <div className="flex flex-col relative">
+              <label className="text-sm font-bold mb-1">Famille :</label>
+              <input
+                type="text"
+                id="family"
+                className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
+                placeholder="Rechercher par famille"
+                value={familyValue}
+                onChange={(e) => handleFamilyChange(e)}
+                onFocus={() => setFamilyDropDownIsOpen(true)}
+                autoComplete="off"
+              />
+              {families && familyDropDownIsOpen && (
+                <div className="absolute w-full bg-gray-50 z-10 py-4 rounded-b-md shadow-md top-[40px]">
+                  <div className="h-[30px] flex justify-end cursor-pointer">
+                    <span
+                      className="text-md px-4"
+                      onClick={() => setFamilyDropDownIsOpen(false)}
+                    >
+                      X
+                    </span>
+                  </div>
+                  {families.families.map((family: Family) => (
+                    <ul key={family._id}>
+                      <li
+                        className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
+                        onClick={() => {
+                          setFamilyChoiceValue(family.YX_CODE);
+                          setFamilyValue(family.YX_LIBELLE);
+                          setFamilyDropDownIsOpen(false);
+                          setCurrentPage(1);
+                        }}
+                      >
+                        {family.YX_LIBELLE}
+                      </li>
+                    </ul>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col relative">
+              <label className="text-sm font-bold mb-1">Sous-famille :</label>
+              <input
+                type="text"
+                id="subFamily"
+                className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
+                placeholder="Rechercher par sous-famille"
+                value={subFamilyValue}
+                onChange={(e) => handleSubFamilyChange(e)}
+                onFocus={() => setSubFamilyDropDownIsOpen(true)}
+                autoComplete="off"
+              />
+              {subFamilies?.subFamilies && subFamilyDropDownIsOpen && (
+                <div className="absolute w-full bg-gray-50 z-10 py-4 rounded-b-md shadow-md top-[40px]">
+                  <div className="h-[30px] flex justify-end cursor-pointer">
+                    <span
+                      className="text-md px-4"
+                      onClick={() => setSubFamilyDropDownIsOpen(false)}
+                    >
+                      X
+                    </span>
+                  </div>
+                  {subFamilies?.subFamilies.map((subFamily: Family) => (
+                    <ul key={subFamily._id}>
+                      <li
+                        className="cursor-pointer py-1 hover:bg-gray-200 text-xs px-4 py-2 border-b"
+                        onClick={() => {
+                          setSubFamilyChoiceValue(subFamily.YX_CODE);
+                          setSubFamilyValue(subFamily.YX_LIBELLE);
+                          setSubFamilyDropDownIsOpen(false);
+                          setCurrentPage(1);
+                        }}
+                      >
+                        {subFamily.YX_LIBELLE}
+                      </li>
+                    </ul>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="col-span-full flex justify-end">
+              {!isLoading ? (
+                <Button type="submit" size="small" blue>
+                  Lancer la Recherche
+                </Button>
+              ) : (
+                <Spinner
+                  width="50px"
+                  height="40px"
+                  logoSize="90%"
+                  progressSize={50}
+                />
+              )}
+            </div>
+          </div>
+        </form>
+      </Header>
 
       <div className="relative overflow-x-auto bg-white">
         <table className="w-full text-left">

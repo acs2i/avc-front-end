@@ -122,7 +122,7 @@ export default function SingleProductPage() {
         onClose={() => setIsModalOpen(false)}
         header="Fournisseurs"
       >
-        <SupplierComponent/>
+        <SupplierComponent />
       </Modal>
       <form>
         <div className="flex flex-col gap-5">
@@ -164,130 +164,130 @@ export default function SingleProductPage() {
             <>
               {/* Indentification */}
               <div className="flex gap-7 mt-[50px] items-stretch">
-                <div className="w-[60%] flex flex-col gap-3 bg-white shadow-md">
-                  <div className="relative border border-gray-300 p-3 flex-1">
-                    <div className="absolute top-[-15px] bg-gradient-to-b from-gray-100 from-40% to-white px-2">
-                      <span className="text-[13px] italic">Identification</span>
-                    </div>
-                    <div className="grid grid-cols-4 gap-2 py-2">
-                      <span className="col-span-1 font-bold text-gray-700">
-                        Référence :
-                      </span>
-                      <span className="col-span-3 text-gray-600 text-[14px]">
-                        {product[0]?.GA_CODEARTICLE}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-4 gap-2 py-2">
-                      <span className="col-span-1 font-bold text-gray-700">
-                        Nom d'appel :
-                      </span>
-                      {!isModify ? (
-                        <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
-                          N/A
+                <div className="w-[60%]">
+                  <h4 className="font-[700] mb-2">Identification</h4>
+                  <div className="flex flex-col gap-3 bg-white shadow-md">
+                    <div className="relative border border-gray-300 p-3 flex-1">
+                      <div className="grid grid-cols-4 gap-2 py-2">
+                        <span className="col-span-1 font-bold text-gray-700">
+                          Référence :
                         </span>
-                      ) : (
-                        <input
-                          type="text"
-                          className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                        />
-                      )}
-                    </div>
-                    <div className="grid grid-cols-4 gap-2 py-2">
-                      <span className="col-span-1 font-bold text-gray-700">
-                        Désignation longue :
-                      </span>
-                      {!isModify ? (
-                        <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
-                          {product[0]?.GA_LIBELLE}
-                        </span>
-                      ) : (
-                        <input
-                          type="text"
-                          className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                        />
-                      )}
-                    </div>
-                    <div className="grid grid-cols-4 gap-2 py-2">
-                      <span className="col-span-1 font-bold text-gray-700">
-                        Désignation courte :
-                      </span>
-                      {!isModify ? (
-                        <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
-                          {product[0]?.GA_LIBCOMPL}
-                        </span>
-                      ) : (
-                        <input
-                          type="text"
-                          className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                        />
-                      )}
-                    </div>
-                    <div className="grid grid-cols-4 gap-2 py-2">
-                      <span className="col-span-1 font-bold text-gray-700">
-                        Marque :
-                      </span>
-                      {!isModify ? (
                         <span className="col-span-3 text-gray-600 text-[14px]">
-                          {product[0]?.brand
-                            ? product[0]?.brand.YX_LIBELLE
-                            : "N/A"}
+                          {product[0]?.GA_CODEARTICLE}
                         </span>
-                      ) : (
-                        <input
-                          type="text"
-                          className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                        />
-                      )}
-                    </div>
+                      </div>
+                      <div className="grid grid-cols-4 gap-2 py-2">
+                        <span className="col-span-1 font-bold text-gray-700">
+                          Nom d'appel :
+                        </span>
+                        {!isModify ? (
+                          <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                            N/A
+                          </span>
+                        ) : (
+                          <input
+                            type="text"
+                            className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          />
+                        )}
+                      </div>
+                      <div className="grid grid-cols-4 gap-2 py-2">
+                        <span className="col-span-1 font-bold text-gray-700">
+                          Désignation longue :
+                        </span>
+                        {!isModify ? (
+                          <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                            {product[0]?.GA_LIBELLE}
+                          </span>
+                        ) : (
+                          <input
+                            type="text"
+                            className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          />
+                        )}
+                      </div>
+                      <div className="grid grid-cols-4 gap-2 py-2">
+                        <span className="col-span-1 font-bold text-gray-700">
+                          Désignation courte :
+                        </span>
+                        {!isModify ? (
+                          <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                            {product[0]?.GA_LIBCOMPL}
+                          </span>
+                        ) : (
+                          <input
+                            type="text"
+                            className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          />
+                        )}
+                      </div>
+                      <div className="grid grid-cols-4 gap-2 py-2">
+                        <span className="col-span-1 font-bold text-gray-700">
+                          Marque :
+                        </span>
+                        {!isModify ? (
+                          <span className="col-span-3 text-gray-600 text-[14px]">
+                            {product[0]?.brand
+                              ? product[0]?.brand.YX_LIBELLE
+                              : "N/A"}
+                          </span>
+                        ) : (
+                          <input
+                            type="text"
+                            className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          />
+                        )}
+                      </div>
 
-                    <div className="grid grid-cols-4 gap-2 py-2">
-                      <span className="col-span-1 font-bold text-gray-700">
-                        Famille :
-                      </span>
-                      {!isModify ? (
-                        <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
-                          {product[0]?.family
-                            ? product[0]?.family.YX_LIBELLE
-                            : "N/A"}
+                      <div className="grid grid-cols-4 gap-2 py-2">
+                        <span className="col-span-1 font-bold text-gray-700">
+                          Famille :
                         </span>
-                      ) : (
-                        <input
-                          type="text"
-                          className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                        />
-                      )}
-                    </div>
-                    <div className="grid grid-cols-4 gap-2 py-2">
-                      <span className="col-span-1 font-bold text-gray-700">
-                        Sous-famille :
-                      </span>
-                      {!isModify ? (
-                        <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
-                          {product[0]?.subFamily
-                            ? product[0]?.subFamily.YX_LIBELLE
-                            : "N/A"}
+                        {!isModify ? (
+                          <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                            {product[0]?.family
+                              ? product[0]?.family.YX_LIBELLE
+                              : "N/A"}
+                          </span>
+                        ) : (
+                          <input
+                            type="text"
+                            className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          />
+                        )}
+                      </div>
+                      <div className="grid grid-cols-4 gap-2 py-2">
+                        <span className="col-span-1 font-bold text-gray-700">
+                          Sous-famille :
                         </span>
-                      ) : (
-                        <input
-                          type="text"
-                          className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                        />
-                      )}
-                    </div>
-                    <div className="grid grid-cols-4 gap-2 py-2">
-                      <span className="col-span-1 font-bold text-gray-700">
-                        Sous-sous-famille :
-                      </span>
-                      {!isModify ? (
-                        <span className="col-span-3 text-gray-600 text-[14px]">
-                          N/A
+                        {!isModify ? (
+                          <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                            {product[0]?.subFamily
+                              ? product[0]?.subFamily.YX_LIBELLE
+                              : "N/A"}
+                          </span>
+                        ) : (
+                          <input
+                            type="text"
+                            className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          />
+                        )}
+                      </div>
+                      <div className="grid grid-cols-4 gap-2 py-2">
+                        <span className="col-span-1 font-bold text-gray-700">
+                          Sous-sous-famille :
                         </span>
-                      ) : (
-                        <input
-                          type="text"
-                          className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                        />
-                      )}
+                        {!isModify ? (
+                          <span className="col-span-3 text-gray-600 text-[14px]">
+                            N/A
+                          </span>
+                        ) : (
+                          <input
+                            type="text"
+                            className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          />
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -304,212 +304,208 @@ export default function SingleProductPage() {
 
               <div className="flex gap-7 mt-[50px] items-stretch">
                 {/* Fournisseur */}
-                <div className="w-1/3 flex flex-col gap-3 bg-white shadow-md">
-                  <div
-                    className={`relative border border-gray-300 p-3 ${
-                      isModify ? "h-[270px]" : "h-[230px]"
-                    }`}
-                  >
-                    {!isModify && (
-                      <div
-                        className="absolute right-[10px] cursor-pointer text-gray-600"
-                        onClick={() => setIsModalOpen(true)}
-                      >
-                        <Pen size={17} />
+                <div className="w-1/3 ">
+                  <h4 className="font-[700] mb-2">Fournisseur principal</h4>
+                  <div className="flex flex-col gap-3 bg-white shadow-md">
+                    <div
+                      className={`relative border border-gray-300 p-3 ${
+                        isModify ? "h-[270px]" : "h-[230px]"
+                      }`}
+                    >
+                      {!isModify && (
+                        <div
+                          className="absolute right-[10px] cursor-pointer text-gray-600"
+                          onClick={() => setIsModalOpen(true)}
+                        >
+                          <Pen size={17} />
+                        </div>
+                      )}
+                      <div className="grid grid-cols-12 gap-2 py-2">
+                        <span className="col-span-6 font-bold text-gray-700 text-[13px]">
+                          Code :
+                        </span>
+                        {!isModify ? (
+                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                            {product[0]?.GA_FOURNPRINC
+                              ? product[0]?.GA_FOURNPRINC
+                              : "N/A"}
+                          </span>
+                        ) : (
+                          <input
+                            type="text"
+                            className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          />
+                        )}
                       </div>
-                    )}
-                    <div className="absolute top-[-15px] bg-gradient-to-b from-gray-100 from-40% to-white px-2">
-                      <span className="text-[13px] italic">
-                        Fournisseur principal
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-12 gap-2 py-2">
-                      <span className="col-span-6 font-bold text-gray-700 text-[13px]">
-                        Code :
-                      </span>
-                      {!isModify ? (
-                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                          {product[0]?.GA_FOURNPRINC
-                            ? product[0]?.GA_FOURNPRINC
-                            : "N/A"}
+                      <div className="grid grid-cols-12 gap-2 py-2">
+                        <span className="col-span-6 font-bold text-gray-700 text-[13px]">
+                          Ref. produit :
                         </span>
-                      ) : (
-                        <input
-                          type="text"
-                          className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                        />
-                      )}
-                    </div>
-                    <div className="grid grid-cols-12 gap-2 py-2">
-                      <span className="col-span-6 font-bold text-gray-700 text-[13px]">
-                        Ref. produit :
-                      </span>
-                      {!isModify ? (
-                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                          N/A
+                        {!isModify ? (
+                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                            N/A
+                          </span>
+                        ) : (
+                          <input
+                            type="text"
+                            className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          />
+                        )}
+                      </div>
+                      <div className="grid grid-cols-12 gap-2 py-2">
+                        <span className="col-span-6 font-bold text-gray-700 text-[13px]">
+                          Multiple achat :
                         </span>
-                      ) : (
-                        <input
-                          type="text"
-                          className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                        />
-                      )}
-                    </div>
-                    <div className="grid grid-cols-12 gap-2 py-2">
-                      <span className="col-span-6 font-bold text-gray-700 text-[13px]">
-                        Multiple achat :
-                      </span>
-                      {!isModify ? (
-                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                          N/A
+                        {!isModify ? (
+                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                            N/A
+                          </span>
+                        ) : (
+                          <input
+                            type="text"
+                            className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          />
+                        )}
+                      </div>
+                      <div className="grid grid-cols-12 gap-2 py-2">
+                        <span className="col-span-6 font-bold text-gray-700 text-[13px]">
+                          Origine :
                         </span>
-                      ) : (
-                        <input
-                          type="text"
-                          className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                        />
-                      )}
-                    </div>
-                    <div className="grid grid-cols-12 gap-2 py-2">
-                      <span className="col-span-6 font-bold text-gray-700 text-[13px]">
-                        Origine :
-                      </span>
-                      {!isModify ? (
-                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                          N/A
+                        {!isModify ? (
+                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                            N/A
+                          </span>
+                        ) : (
+                          <input
+                            type="text"
+                            className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          />
+                        )}
+                      </div>
+                      <div className="grid grid-cols-12 gap-2 py-2">
+                        <span className="col-span-6 font-bold text-gray-700 text-[13px]">
+                          Catégorie douanière :
                         </span>
-                      ) : (
-                        <input
-                          type="text"
-                          className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                        />
-                      )}
-                    </div>
-                    <div className="grid grid-cols-12 gap-2 py-2">
-                      <span className="col-span-6 font-bold text-gray-700 text-[13px]">
-                        Catégorie douanière :
-                      </span>
-                      {!isModify ? (
-                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                          N/A
-                        </span>
-                      ) : (
-                        <input
-                          type="text"
-                          className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                        />
-                      )}
+                        {!isModify ? (
+                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                            N/A
+                          </span>
+                        ) : (
+                          <input
+                            type="text"
+                            className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          />
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
                 {/* Caractéristiques produit */}
-                <div className="w-1/3 flex flex-col gap-3 bg-white shadow-md">
-                  <div
-                    className={`relative border border-gray-300 p-3 ${
-                      isModify ? "h-[270px]" : "h-[230px]"
-                    }`}
-                  >
-                    <div className="absolute top-[-15px] bg-gradient-to-b from-gray-100 from-40% to-white px-2">
-                      <span className="text-[13px] italic">
-                        Caractéristiques produit
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-12 gap-2 py-2">
-                      <span className="col-span-4 font-bold text-gray-700 text-[13px]">
-                        Type :
-                      </span>
-                      {!isModify ? (
-                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                          Marchandise
+                <div className="w-1/3">
+                  <h4 className="font-[700] mb-2">Caractéristiques produit</h4>
+                  <div className="flex flex-col gap-3 bg-white shadow-md">
+                    <div
+                      className={`relative border border-gray-300 p-3 ${
+                        isModify ? "h-[270px]" : "h-[230px]"
+                      }`}
+                    >
+                      <div className="grid grid-cols-12 gap-2 py-2">
+                        <span className="col-span-4 font-bold text-gray-700 text-[13px]">
+                          Type :
                         </span>
-                      ) : (
-                        <input
-                          type="text"
-                          className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                        />
-                      )}
-                    </div>
-                    <div className="grid grid-cols-12 gap-2 py-2">
-                      <span className="col-span-4 font-bold text-gray-700 text-[13px]">
-                        Dimensions :
-                      </span>
-                      <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                        Couleur/Taille
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-12 gap-2 py-2">
-                      <span className="col-span-4 font-bold text-gray-700 text-[13px]">
-                        Collection :
-                      </span>
-                      {!isModify ? (
-                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                          {product[0]?.productCollection
-                            ? product[0]?.productCollection.YX_LIBELLE
-                            : "N/A"}
+                        {!isModify ? (
+                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                            Marchandise
+                          </span>
+                        ) : (
+                          <input
+                            type="text"
+                            className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          />
+                        )}
+                      </div>
+                      <div className="grid grid-cols-12 gap-2 py-2">
+                        <span className="col-span-4 font-bold text-gray-700 text-[13px]">
+                          Dimensions :
                         </span>
-                      ) : (
-                        <input
-                          type="text"
-                          className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                        />
-                      )}
+                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                          Couleur/Taille
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-12 gap-2 py-2">
+                        <span className="col-span-4 font-bold text-gray-700 text-[13px]">
+                          Collection :
+                        </span>
+                        {!isModify ? (
+                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                            {product[0]?.productCollection
+                              ? product[0]?.productCollection.YX_LIBELLE
+                              : "N/A"}
+                          </span>
+                        ) : (
+                          <input
+                            type="text"
+                            className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          />
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
                 {/* Prix produit */}
-                <div className="w-1/3 flex flex-col gap-3 bg-white shadow-md">
-                  <div
-                    className={`relative border border-gray-300 p-3 ${
-                      isModify ? "h-[270px]" : "h-[230px]"
-                    }`}
-                  >
-                    <div className="absolute top-[-15px] bg-gradient-to-b from-gray-100 from-40% to-white px-2">
-                      <span className="text-[13px] italic">Prix</span>
-                    </div>
-                    <div className="grid grid-cols-12 gap-2 py-2">
-                      <span className="col-span-6 font-bold text-gray-700 text-[13px]">
-                        Prix Achat (PAEU) :
-                      </span>
-                      {!isModify ? (
-                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                          100,20
+                <div className="w-1/3">
+                  <h4 className="font-[700] mb-2">Prix</h4>
+                  <div className="flex flex-col gap-3 bg-white shadow-md">
+                    <div
+                      className={`relative border border-gray-300 p-3 ${
+                        isModify ? "h-[270px]" : "h-[230px]"
+                      }`}
+                    >
+                      <div className="grid grid-cols-12 gap-2 py-2">
+                        <span className="col-span-6 font-bold text-gray-700 text-[13px]">
+                          Prix Achat (PAEU) :
                         </span>
-                      ) : (
-                        <input
-                          type="text"
-                          className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                        />
-                      )}
-                    </div>
-                    <div className="grid grid-cols-12 gap-2 py-2">
-                      <span className="col-span-6 font-bold text-gray-700 text-[13px]">
-                        Prix Vente (TBEU/PB) :
-                      </span>
-                      {!isModify ? (
-                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                          100,20
+                        {!isModify ? (
+                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                            100,20
+                          </span>
+                        ) : (
+                          <input
+                            type="text"
+                            className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          />
+                        )}
+                      </div>
+                      <div className="grid grid-cols-12 gap-2 py-2">
+                        <span className="col-span-6 font-bold text-gray-700 text-[13px]">
+                          Prix Vente (TBEU/PB) :
                         </span>
-                      ) : (
-                        <input
-                          type="text"
-                          className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                        />
-                      )}
-                    </div>
-                    <div className="grid grid-cols-12 gap-2 py-2">
-                      <span className="col-span-6 font-bold text-gray-700 text-[13px]">
-                        Prix Modulé (TBEU/PMEU) :
-                      </span>
-                      {!isModify ? (
-                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                          100,20
+                        {!isModify ? (
+                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                            100,20
+                          </span>
+                        ) : (
+                          <input
+                            type="text"
+                            className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          />
+                        )}
+                      </div>
+                      <div className="grid grid-cols-12 gap-2 py-2">
+                        <span className="col-span-6 font-bold text-gray-700 text-[13px]">
+                          Prix Modulé (TBEU/PMEU) :
                         </span>
-                      ) : (
-                        <input
-                          type="text"
-                          className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                        />
-                      )}
+                        {!isModify ? (
+                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                            100,20
+                          </span>
+                        ) : (
+                          <input
+                            type="text"
+                            className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                          />
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

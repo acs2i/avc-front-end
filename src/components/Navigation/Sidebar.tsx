@@ -55,7 +55,7 @@ export default function Sidebar() {
 
   return (
     <aside className="fixed h-screen bg-white flex flex-col items-center gap-1 z-[300] border-r-[1px] border-gray-300 dark:bg-gray-600 dark:border-gray-600 w-16 sm:w-20 md:w-40 lg:w-64 transition-width duration-300">
-      <ul className="text-gray-600 flex flex-col gap-2 px-2 py-4 overflow-y-auto">
+      <ul className="text-gray-600 flex flex-col gap-2 px-2 py-4 overflow-y-auto gap-5">
         {LINKS.map((categoryWrapper, categoryWrapperIndex) =>
           categoryWrapper.linkCategory.map((category, categoryIndex) => (
             <li
