@@ -16,7 +16,7 @@ interface Suppliers {
   T_JURIDIQUE: string;
 }
 
-export default function SuppliersPage() {
+export default function SuppliersList() {
   const [prevSearchValue, setPrevSearchValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -67,7 +67,7 @@ export default function SuppliersPage() {
         btnTitle="Créer un fournisseur"
         placeholder="Rechercher un fournisseur"
         height="250px"
-        
+        button
       >
         <div className="flex items-center gap-4 py-4">
           <div className="flex items-center gap-4">

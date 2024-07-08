@@ -20,6 +20,19 @@ export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Initialize the version number
+  const [version, setVersion] = useState('1.0.5');
+
+  // Update the version number based on the current date
+  useEffect(() => {
+    const currentDate: Date = new Date();
+    const startDate: Date = new Date('2024-07-03'); // The date when the version was 1.0.5
+    const daysDifference = Math.floor((currentDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const versionParts = version.split('.');
+    versionParts[versionParts.length - 1] = (parseInt(versionParts[versionParts.length - 1]) + daysDifference).toString();
+    setVersion(versionParts.join('.'));
+  }, []);
+
   const handleOpenCategory = (name: string) => {
     setOpenCategory((prev) => (prev === name ? null : name));
   };
@@ -225,7 +238,7 @@ export default function Sidebar() {
           ))
         )}
       </ul>
-      <p className="text-center">Version 1.0.3</p>
+      <p className="text-center">Version {version}</p>
     </aside>
   );
 }

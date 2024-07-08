@@ -6,7 +6,7 @@ import SingleProductPage from "./pages/product/SingleProductPage";
 import Sidebar from "./components/Navigation/Sidebar";
 import LoginPage from "./pages/login/LoginPage";
 import Navbar from "./components/Navigation/Navbar";
-import SuppliersPage from "./pages/suppliers/SuppliersPage";
+import SuppliersList from "./pages/suppliers/SuppliersList";
 import CreateProductPage from "./pages/product/CreateProductPage";
 import ParamsMenuPage from "./pages/params/ParamsMenuPage";
 import DraftPage from "./pages/draft/DraftPage";
@@ -33,7 +33,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ isAuth }) => {
 };
 
 // Composant PublicRoute pour gérer la redirection des utilisateurs authentifiés
-const PublicRoute: React.FC<{ isAuth: boolean, children: any }> = ({ isAuth, children}) => {
+const PublicRoute: React.FC<{ isAuth: boolean; children: any }> = ({ isAuth, children }) => {
   return isAuth ? <Navigate to="/" replace /> : children;
 };
 
@@ -63,18 +63,18 @@ function App() {
 
   return (
     <>
-      {shouldShowNavbar && <Sidebar />}
-      {shouldShowNavbar && <Navbar />}
+      {shouldShowNavbar && isAuth && <Sidebar />}
+      {shouldShowNavbar && isAuth && <Navbar />}
       <div className={isAuth ? "ml-[50px] sm:ml-[80px] md:ml-[150px] lg:ml-[250px] mt-[60px]" : ""}>
         <Routes>
           {/* Routes publiques */}
-          <Route 
-            path="/login" 
+          <Route
+            path="/login"
             element={
               <PublicRoute isAuth={isAuth}>
                 <LoginPage />
               </PublicRoute>
-            } 
+            }
           />
 
           {/* Routes privées */}
@@ -84,7 +84,7 @@ function App() {
             <Route path="/parameters" element={<ParamsMenuPage />} />
             <Route path="/product" element={<ProductList />} />
             <Route path="/product/:id" element={<SingleProductPage />} />
-            <Route path="/suppliers/suppliers-list" element={<SuppliersPage />} />
+            <Route path="/suppliers/suppliers-list" element={<SuppliersList />} />
             <Route path="/draft" element={<DraftPage />} />
             <Route path="/draft/:id" element={<DraftUpdatePage />} />
             <Route path="/admin" element={<AdminPage />} />
@@ -92,7 +92,7 @@ function App() {
             <Route path="/admin/create-group" element={<CreateGroupPage />} />
             <Route path="/admin/created-group" element={<CreatedGroupPage />} />
             <Route path="/user/profile/:userId" element={<ProfilePage />} />
-            <Route path="/calendar" element={<CalendarPage />} />    
+            <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/chat" element={<ChatPage />} />
           </Route>
           <Route path="*" element={<Navigate to={isAuth ? "/" : "/login"} />} />
