@@ -292,12 +292,15 @@ export default function SingleProductPage() {
                   </div>
                 </div>
                 <div className="w-[40%] flex flex-col gap-5">
-                  <div className="w-full h-full flex-1">
+                  <div className="relative w-full h-full flex-1">
                     <img
                       src="/img/logo_2.png"
                       alt="logo"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover filter saturate-50 opacity-50"
                     />
+                    <span className="absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] text-white text-xl font-bold bg-black bg-opacity-50 p-2 rounded">
+                      Pas d'image
+                    </span>
                   </div>
                 </div>
               </div>
