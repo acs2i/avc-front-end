@@ -152,10 +152,10 @@ export const LINKS_Product: Params[] = [
     page: "dimension",
   },
   {
-    name: "Prix UVC",
+    name: "UVC",
     link: "",
     icon: Tag,
-    page: "price",
+    page: "uvc",
   },
   {
     name: "Taxes",
@@ -168,6 +168,51 @@ export const LINKS_Product: Params[] = [
     link: "",
     icon: Euro,
     page: "uvc price",
+  },
+];
+
+export const LINKS_UVC: Params[] = [
+  {
+    name: "Informations",
+    link: "",
+    icon: "",
+    page: "infos",
+  },
+  {
+    name: "Prix",
+    link: "",
+    icon: "",
+    page: "price",
+  },
+  {
+    name: "Fournisseurs",
+    link: "",
+    icon: "",
+    page: "supplier",
+  },
+  {
+    name: "Côtes & poids",
+    link: "",
+    icon: "",
+    page: "weight",
+  },
+  {
+    name: "EAN",
+    link: "",
+    icon: "",
+    page: "ean",
+  },
+  {
+    name: "Blocages",
+    link: "",
+    icon: "",
+    page: "bloc",
+  },
+  {
+    name: "Champs utilisateur",
+    link: "",
+    icon: "",
+    page: "user",
   },
 ];
 

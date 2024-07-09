@@ -2,9 +2,10 @@ import React, { useState } from "react";
 
 interface UVCPriceTableProps {
   uvcPrices: string[];
+  productReference: string;
 }
 
-const UVCPriceTable: React.FC<UVCPriceTableProps> = ({ uvcPrices }) => {
+const UVCPriceTable: React.FC<UVCPriceTableProps> = ({ uvcPrices,  productReference }) => {
   const [prices, setPrices] = useState<{ [key: string]: { pa: number | string, pv: number | string, pm: number | string } }>(
     uvcPrices.reduce((acc, dimension) => {
       acc[dimension] = { pa: 0, pv: 0, pm: 0 };
@@ -25,7 +26,8 @@ const UVCPriceTable: React.FC<UVCPriceTableProps> = ({ uvcPrices }) => {
   return (
     <table className="w-full border">
       <thead>
-        <tr className="text-[15px] text-gray-400">
+        <tr className="text-[13px] text-gray-400">
+        <th className="border px-4 py-2 w-[50px]">Code UVC</th>
           <th className="border px-4 py-2 w-[50px]">Couleur</th>
           <th className="border px-4 py-2 w-[50px]">Taille</th>
           <th className="border px-4 py-2 w-[50px]">Prix Achat</th>
@@ -37,11 +39,13 @@ const UVCPriceTable: React.FC<UVCPriceTableProps> = ({ uvcPrices }) => {
         {uvcPrices.map((dimension, index) => {
           const [couleur, taille] = dimension.split(',');
           const priceData = prices[dimension] || { pa: 0, pv: 0, pm: 0 };
+          const codeUVC = `${productReference}${couleur}${taille}`;
           return (
-            <tr key={index} className="text-[13px]">
-              <td className="border px-4 py-2 text-center">{couleur}</td>
-              <td className="border px-4 py-2 text-center">{taille}</td>
-              <td className="border px-4 py-2 text-center">
+            <tr key={index} className="text-[11px]">
+              <td className="border px-4 py-1 text-center">{codeUVC}</td>
+              <td className="border px-4 py-1 text-center">{couleur}</td>
+              <td className="border px-4 py-1 text-center">{taille}</td>
+              <td className="border px-4 py-1 text-center">
                 <input
                   type="text"
                   value={priceData.pa}
@@ -49,7 +53,7 @@ const UVCPriceTable: React.FC<UVCPriceTableProps> = ({ uvcPrices }) => {
                   className="w-1/2 text-center border-[2px] focus:outline-none focus:border-blue-200 rounded-md"
                 />
               </td>
-              <td className="border px-4 py-2 text-center">
+              <td className="border px-4 py-1 text-center">
                 <input
                   type="text"
                   value={priceData.pv}
@@ -57,7 +61,7 @@ const UVCPriceTable: React.FC<UVCPriceTableProps> = ({ uvcPrices }) => {
                   className="w-1/2 text-center border-[2px] focus:outline-none focus:border-blue-200 rounded-md"
                 />
               </td>
-              <td className="border px-4 py-2 text-center">
+              <td className="border px-4 py-1 text-center">
                 <input
                   type="text"
                   value={priceData.pm}

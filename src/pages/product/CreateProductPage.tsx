@@ -14,11 +14,11 @@ import CreatableSelect from "react-select/creatable";
 import useFetch from "../../utils/hooks/usefetch";
 import UVCGrid from "../../components/UVCGrid";
 
-
 interface FormData {
   creator_id: any;
   description_ref: string;
   reference: string;
+  nom_appel: string;
   designation_longue: string;
   designation_courte: string;
   supplier_name: string;
@@ -26,6 +26,7 @@ interface FormData {
   family: string[];
   subFamily: string[];
   dimension_type: string;
+  product_type: string;
   dimension: string[];
   brand: string;
   ref_collection: string;
@@ -35,7 +36,6 @@ interface FormData {
   initialColors: any[];
   initialGrid: any[];
 }
-
 
 type Family = {
   _id: string;
@@ -148,6 +148,7 @@ export default function CreateProductPage() {
   const [formData, setFormData] = useState<FormData>({
     creator_id: creatorId._id,
     description_ref: "",
+    nom_appel: "",
     reference: "",
     designation_longue: "",
     designation_courte: "",
@@ -156,6 +157,7 @@ export default function CreateProductPage() {
     family: [],
     subFamily: [],
     dimension_type: "Couleur/Taille",
+    product_type: "Marchandise",
     brand: "",
     ref_collection: "",
     description_brouillon: "",
@@ -535,7 +537,7 @@ export default function CreateProductPage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(formData),
         }
@@ -557,7 +559,7 @@ export default function CreateProductPage() {
     }
   };
 
-
+  console.log(formData)
   return (
     <section className="w-full bg-gray-100 p-7">
       <div className="max-w-[2024px] mx-auto">
@@ -594,10 +596,8 @@ export default function CreateProductPage() {
 
           <div className="flex gap-7 mt-[50px]">
             <div className="w-[70%] flex flex-col gap-3">
-              <div className="relative border p-3 ">
-                <div className="absolute top-[-15px] bg-gray-100 px-2">
-                  <span className="text-[13px] italic">Identification</span>
-                </div>
+              <h4 className="font-[700]">Identification</h4>
+              <div className="border p-3 ">
                 <Input
                   element="input"
                   id="reference"
@@ -606,6 +606,17 @@ export default function CreateProductPage() {
                   onChange={handleChange}
                   validators={[]}
                   placeholder="Ajouter la référence du produit"
+                  create
+                  gray
+                />
+                <Input
+                  element="input"
+                  id="nom_appel"
+                  label="Nom d'appel :"
+                  value={formData.nom_appel}
+                  onChange={handleChange}
+                  validators={[]}
+                  placeholder="Ajouter le nom d'appel du produit"
                   create
                   gray
                 />
@@ -631,10 +642,23 @@ export default function CreateProductPage() {
                   create
                   gray
                 />
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Marque
+                  </label>
+                  <CreatableSelect<BrandOption>
+                    value={selectedOptionBrand}
+                    onChange={handleChangeBrand}
+                    onInputChange={handleInputChangeBrand}
+                    inputValue={inputValueBrand}
+                    options={optionsBrand}
+                    placeholder="Selectionner une marque"
+                    styles={customStyles}
+                    className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                    required
+                  />
+                </div>
                 <div className="mt-[30px] grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="col-span-full">
-                    <h5 className="text-[20px] font-[700]">Classification</h5>
-                  </div>
                   <div className="col-span-1">
                     <label className="text-sm font-medium text-gray-600">
                       Classification principale
@@ -692,28 +716,69 @@ export default function CreateProductPage() {
                     </div>
                   )}
                 </div>
-
-                <div className="mt-[30px]">
-                  <h5 className="text-[20px] font-[700] mb-4">
-                    Caractéristiques produit
-                  </h5>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              </div>
+              <div className="flex gap-7 mt-[30px]">
+                <div className="w-1/3 flex flex-col gap-2">
+                  <h4 className="font-[700]">Fournisseur principal</h4>
+                  <div className="border p-3">
                     <div>
                       <label className="text-sm font-medium text-gray-600">
-                        Marque
+                        Nom
                       </label>
-                      <CreatableSelect<BrandOption>
-                        value={selectedOptionBrand}
-                        onChange={handleChangeBrand}
-                        onInputChange={handleInputChangeBrand}
-                        inputValue={inputValueBrand}
-                        options={optionsBrand}
-                        placeholder="Selectionner une marque"
+                      <CreatableSelect<SuppliersOption>
+                        value={selectedOptionSupplier}
+                        onChange={handleChangeSupplier}
+                        onInputChange={handleInputChangeSupplier}
+                        inputValue={inputValueSupplier}
+                        options={optionsSupplier}
+                        placeholder="Selectionner un fournisseur"
                         styles={customStyles}
                         className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
                         required
                       />
                     </div>
+                    <div>
+                      <Input
+                        element="input"
+                        id="supplier_ref"
+                        label="Référence produit :"
+                        value={formData.supplier_ref}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder="Ajouter la designation du produit"
+                        create
+                        gray
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="w-1/3 flex flex-col gap-2">
+                  <h4 className="font-[700]">Caractéristiques du produit</h4>
+                  <div className="border p-3">
+                    <Input
+                      element="input"
+                      id="product_type"
+                      label="Type :"
+                      value={formData.product_type}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder="Selectionnez un type de dimension"
+                      create
+                      disabled
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      id="dimension_type"
+                      label="Type de dimension :"
+                      value={formData.dimension_type}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder="Selectionnez un type de dimension"
+                      create
+                      disabled
+                      gray
+                    />
                     <div>
                       <label className="text-sm font-medium text-gray-600">
                         Collection
@@ -731,33 +796,50 @@ export default function CreateProductPage() {
                       />
                     </div>
                   </div>
-                  <Input
-                    element="input"
-                    id="dimension_type"
-                    label="Type de dimension :"
-                    value={formData.dimension_type}
-                    onChange={handleChange}
-                    validators={[]}
-                    placeholder="Selectionnez un type de dimension"
-                    create
-                    disabled
-                    gray
-                  />
                 </div>
-                <div className="mt-3">
+                {/* <div className="w-1/3 flex flex-col gap-2">
+                  <h4 className="font-[700]">Prix</h4>
+                  <div className="border p-3">
+                    <Input
+                      element="input"
+                      id="product_type"
+                      label="Type :"
+                      value={formData.product_type}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder="Selectionnez un type de dimension"
+                      create
+                      disabled
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      id="dimension_type"
+                      label="Type de dimension :"
+                      value={formData.dimension_type}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder="Selectionnez un type de dimension"
+                      create
+                      disabled
+                      gray
+                    />
+                  </div>
+                </div> */}
+              </div>
+              <div className="mt-3">
                 <UVCGrid
-                    onDimensionsChange={handleGridChange}
-                    initialSizes={formData.initialSizes}
-                    initialColors={formData.initialColors}
-                    initialGrid={formData.initialGrid}
-                    setSizes={setSizes}
-                    setColors={setColors}
-                    setUvcGrid={setUvcGrid}
-                    sizes={sizes}
-                    colors={colors}
-                    uvcGrid={uvcGrid}
-                  />
-                </div>
+                  onDimensionsChange={handleGridChange}
+                  initialSizes={formData.initialSizes}
+                  initialColors={formData.initialColors}
+                  initialGrid={formData.initialGrid}
+                  setSizes={setSizes}
+                  setColors={setColors}
+                  setUvcGrid={setUvcGrid}
+                  sizes={sizes}
+                  colors={colors}
+                  uvcGrid={uvcGrid}
+                />
               </div>
             </div>
 
@@ -774,39 +856,6 @@ export default function CreateProductPage() {
                     <div className="text-gray-300">
                       <ImageUp size={50} />
                     </div>
-                  </div>
-                </div>
-              </Card>
-              <Card title="Fournisseur principal">
-                <div className="flex flex-col gap-2">
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">
-                      Nom
-                    </label>
-                    <CreatableSelect<SuppliersOption>
-                      value={selectedOptionSupplier}
-                      onChange={handleChangeSupplier}
-                      onInputChange={handleInputChangeSupplier}
-                      inputValue={inputValueSupplier}
-                      options={optionsSupplier}
-                      placeholder="Selectionner un fournisseur"
-                      styles={customStyles}
-                      className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      element="input"
-                      id="supplier_ref"
-                      label="Référence produit :"
-                      value={formData.supplier_ref}
-                      onChange={handleChange}
-                      validators={[]}
-                      placeholder="Ajouter la designation du produit"
-                      create
-                      gray
-                    />
                   </div>
                 </div>
               </Card>

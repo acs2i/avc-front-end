@@ -1,4 +1,4 @@
-import { LINKS_Product } from "../../utils/index";
+import { LINKS_Product, LINKS_UVC } from "../../utils/index";
 import React, { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import useFetch from "../../utils/hooks/usefetch";
@@ -10,6 +10,8 @@ import Button from "../../components/FormElements/Button";
 import UVCGrid from "../../components/UVCGrid";
 import UVCPriceTable from "../../components/UVCPricesTable";
 import SupplierComponent from "../../components/SupplierComponent";
+import UVCInfosTable from "../../components/UVCInfosTable";
+import UVCSupplierTable from "../../components/UVCSupplierTable";
 
 interface Product {
   GA_CODEARTICLE: string;
@@ -58,6 +60,7 @@ export default function SingleProductPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModify, setIsModify] = useState(false);
   const [page, setPage] = useState("dimension");
+  const [onglet, setOnglet] = useState("infos");
   const { data: product } = useFetch<Product[]>(
     `${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`
   );
@@ -115,7 +118,7 @@ export default function SingleProductPage() {
   console.log(formData);
 
   return (
-    <section className="w-full bg-gray-100 p-8">
+    <section className="w-full bg-gray-100 p-8 max-w-[2000px] mx-auto">
       <Modal
         show={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
@@ -567,9 +570,40 @@ export default function SingleProductPage() {
               />
             </div>
           )}
-          {page === "price" && (
+          {page === "uvc" && (
             <div className="w-[70%] border-t-[1px] border-gray-300 px-5 py-2 h-[300px]  overflow-y-auto">
-              <UVCPriceTable uvcPrices={formData.dimension} />
+              <ul className="flex items-center py-3 gap-3">
+                {LINKS_UVC.map((link) => (
+                  <li
+                    className={`text-[13px] font-[700] cursor-pointer ${
+                      onglet === link.page ? "text-blue-500" : "text-gray-500"
+                    } hover:text-blue-500`}
+                    onClick={() => setOnglet(link.page)}
+                  >
+                    {link.name}
+                  </li>
+                ))}
+              </ul>
+              {onglet === "infos" && product && product.length > 0 && (
+                <UVCInfosTable
+                  uvcPrices={formData.dimension}
+                  productReference={product[0].GA_CODEARTICLE || ""}
+                  productBrand={product[0]?.brand.YX_LIBELLE || ""}
+                />
+              )}
+              {onglet === "price" && product && product.length > 0 && (
+                <UVCPriceTable
+                  uvcPrices={formData.dimension}
+                  productReference={product[0].GA_CODEARTICLE || ""}
+                />
+              )}
+               {onglet === "supplier" && product && product.length > 0 && (
+                <UVCSupplierTable
+                  uvcPrices={formData.dimension}
+                  productReference={product[0].GA_CODEARTICLE || ""}
+                  productSupplier={product[0].GA_FOURNPRINC || ""}
+                />
+              )}
             </div>
           )}
         </div>
