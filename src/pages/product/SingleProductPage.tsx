@@ -2,7 +2,7 @@ import { LINKS_Product, LINKS_UVC } from "../../utils/index";
 import React, { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import useFetch from "../../utils/hooks/usefetch";
-import { ChevronLeft, Pen } from "lucide-react";
+import { ChevronLeft, Maximize2, Minimize2, Pen } from "lucide-react";
 import Modal from "../../components/Shared/Modal";
 import { useNavigate } from "react-router-dom";
 import CreatableSelect from "react-select/creatable";
@@ -38,7 +38,7 @@ interface FormData {
   reference: string;
   designation_longue: string;
   designation_courte: string;
-  call_name : string;
+  call_name: string;
   supplier_name: string;
   supplier_ref: string;
   family: string[];
@@ -56,6 +56,7 @@ interface FormData {
 
 export default function SingleProductPage() {
   const { id } = useParams();
+  const [isFullScreen, setIsFullScreen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -80,7 +81,7 @@ export default function SingleProductPage() {
     brand: "",
     ref_collection: "",
     description_brouillon: "",
-    dimension: [],  
+    dimension: [],
     composition: "",
     initialSizes: [],
     initialColors: [],
@@ -115,6 +116,11 @@ export default function SingleProductPage() {
       setUvcGrid(initialGrid);
     }
   }, [product]);
+
+  const toggleFullScreen = () => {
+    setIsFullScreen((prevState) => !prevState);
+    console.log("cliqued")
+  };
 
   console.log(formData);
 
@@ -556,7 +562,7 @@ export default function SingleProductPage() {
             ))}
           </div>
           {page === "dimension" && (
-            <div className="w-[70%] border-t-[1px] border-gray-300 px-5 py-2 h-[300px]  overflow-y-auto">
+            <div className={`border-t-[1px] border-gray-300 px-5 py-2 overflow-y-auto ${isFullScreen ? "fixed right-0 top-0 h-full w-full z-[9999] bg-gray-100 h-[300px]" : "w-[70%]"}`}>
               <UVCGrid
                 onDimensionsChange={handleGridChange}
                 initialSizes={formData.initialSizes}
@@ -568,23 +574,43 @@ export default function SingleProductPage() {
                 sizes={sizes}
                 colors={colors}
                 uvcGrid={uvcGrid}
+                isFullScreen={toggleFullScreen}
               />
             </div>
           )}
           {page === "uvc" && (
-            <div className="w-[70%] border-t-[1px] border-gray-300 px-5 py-2 h-[300px]  overflow-y-auto">
-              <ul className="flex items-center py-3 gap-3">
-                {LINKS_UVC.map((link) => (
-                  <li
-                    className={`text-[13px] font-[700] cursor-pointer ${
-                      onglet === link.page ? "text-blue-500" : "text-gray-500"
-                    } hover:text-blue-500`}
-                    onClick={() => setOnglet(link.page)}
-                  >
-                    {link.name}
-                  </li>
-                ))}
-              </ul>
+            <div
+              className={`border-t-[1px] border-gray-300 px-5 py-2 ${
+                isFullScreen
+                  ? "fixed right-0 top-0 h-full w-full z-[9999] bg-gray-100"
+                  : "w-[70%] h-[300px]"
+              } overflow-y-auto`}
+            >
+              <div className="flex items-center justify-between">
+                <ul className="flex items-center py-3 gap-3">
+                  {LINKS_UVC.map((link) => (
+                    <li
+                      key={link.page}
+                      className={`text-[13px] font-[700] cursor-pointer ${
+                        onglet === link.page ? "text-blue-500" : "text-gray-500"
+                      } hover:text-blue-500`}
+                      onClick={() => setOnglet(link.page)}
+                    >
+                      {link.name}
+                    </li>
+                  ))}
+                </ul>
+                <div
+                  className="cursor-pointer hover:text-gray-400"
+                  onClick={toggleFullScreen}
+                >
+                  {isFullScreen ? (
+                    <Minimize2 size={17} />
+                  ) : (
+                    <Maximize2 size={17} />
+                  )}
+                </div>
+              </div>
               {onglet === "infos" && product && product.length > 0 && (
                 <UVCInfosTable
                   uvcPrices={formData.dimension}
@@ -598,7 +624,7 @@ export default function SingleProductPage() {
                   productReference={product[0].GA_CODEARTICLE || ""}
                 />
               )}
-               {onglet === "supplier" && product && product.length > 0 && (
+              {onglet === "supplier" && product && product.length > 0 && (
                 <UVCSupplierTable
                   uvcPrices={formData.dimension}
                   productReference={product[0].GA_CODEARTICLE || ""}

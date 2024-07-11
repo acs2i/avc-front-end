@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Palette, Plus, Ruler } from "lucide-react";
+import { Maximize, Maximize2, Palette, Plus, Ruler } from "lucide-react";
 import Modal from "./Shared/Modal";
 
 interface UVCGridProps {
@@ -13,6 +13,7 @@ interface UVCGridProps {
   sizes: string[];
   colors: string[];
   uvcGrid: boolean[][];
+  isFullScreen?: any
 }
 
 interface Grid {
@@ -33,6 +34,7 @@ const UVCGrid: React.FC<UVCGridProps> = ({
   sizes,
   colors,
   uvcGrid,
+  isFullScreen
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [grids, setGrids] = useState<Grid[]>([]);
@@ -275,6 +277,7 @@ const UVCGrid: React.FC<UVCGridProps> = ({
           </div>
         )}
       </Modal>
+      <div className="flex items-center justify-between">
       <div className="flex gap-4 mb-3 mt-3">
         <button
           onClick={displaySizeGridOptions}
@@ -301,13 +304,17 @@ const UVCGrid: React.FC<UVCGridProps> = ({
           Ajouter une couleur
         </button>
       </div>
+        <div onClick={isFullScreen}  className="cursor-pointer hover:text-gray-400">
+          <Maximize2 size={17}/>
+        </div>
+      </div>
       <div className="overflow-x-auto">
         <table className="w-full mx-auto border bg-white">
-          <thead className="bg-gray-100 text-sm text-gray-600 border border-solid border-gray-300">
+          <thead className="bg-gray-100 text-[12px] text-gray-600 border border-solid border-gray-300">
             <tr>
               <th
                 scope="col"
-                className="px-6 py-2 text-center border border-solid border-gray-300 border-b"
+                className="px-1 py-2 text-center border border-solid border-gray-300 border-b text-[10px]"
               >
                 Couleur / Taille
               </th>
@@ -315,7 +322,7 @@ const UVCGrid: React.FC<UVCGridProps> = ({
                 <th
                   key={index}
                   scope="col"
-                  className="px-6 py-2 text-center border border-solid border-gray-300 border-b"
+                  className="px-1 py-2 text-center border border-solid border-gray-300 border-b"
                 >
                   <input
                     type="text"
@@ -327,13 +334,13 @@ const UVCGrid: React.FC<UVCGridProps> = ({
               ))}
             </tr>
           </thead>
-          <tbody className="relative text-center text-xs">
+          <tbody className="relative text-center text-[12px]">
             {colors.map((color, colorIndex) => (
               <tr
                 key={colorIndex}
                 className="border text-gray-700 cursor-pointer"
               >
-                <td className="min-w-[200px] py-2 px-2 border">
+                <td className="max-w-[200px] py-2 px-2 border">
                   <input
                     type="text"
                     value={color}
@@ -346,7 +353,7 @@ const UVCGrid: React.FC<UVCGridProps> = ({
                 {sizes.map((size, sizeIndex) => (
                   <td
                     key={sizeIndex}
-                    className="min-w-[200px] py-2 px-2 border"
+                    className="max-w-[200px] py-2 px-2 border"
                   >
                     <input
                       type="checkbox"
