@@ -38,6 +38,7 @@ interface FormData {
   reference: string;
   designation_longue: string;
   designation_courte: string;
+  call_name : string;
   supplier_name: string;
   supplier_ref: string;
   family: string[];
@@ -64,13 +65,13 @@ export default function SingleProductPage() {
   const { data: product } = useFetch<Product[]>(
     `${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`
   );
-
   const [formData, setFormData] = useState<FormData>({
     creator_id: "",
     description_ref: "",
     reference: "",
     designation_longue: "",
     designation_courte: "",
+    call_name: "",
     supplier_name: "",
     supplier_ref: "",
     family: [],
@@ -79,7 +80,7 @@ export default function SingleProductPage() {
     brand: "",
     ref_collection: "",
     description_brouillon: "",
-    dimension: [],
+    dimension: [],  
     composition: "",
     initialSizes: [],
     initialColors: [],
