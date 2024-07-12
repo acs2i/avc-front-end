@@ -79,11 +79,11 @@ const Input: React.FC<InputProps> = (props) => {
   };
 
   const InputClasses = `
-    w-full h-[40px] focus:outline-none ${
+    w-full h-[40px] focus:outline-none mt-1 ${
       props.orange ? "border-b-2 border-orange-400" : ""
     }
     ${props.gray ? "border-b-[1px] border-gray-300" : ""}
-    ${props.create ? "border border-gray-300 rounded-lg px-2 focus:ring-blue-500 focus:border-blue-500" : ""}
+    ${props.create ? "border border-gray-300 rounded-lg px-2 focus:ring-blue-500 transition-all focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]" : ""}
     ${
       props.disabled
         ? " bg-gray-200 rounded-md border border-white text-gray-500 italic px-3 cursor-not-allowed"
@@ -149,7 +149,7 @@ const Input: React.FC<InputProps> = (props) => {
       <div>
         <label
           htmlFor={props.id}
-          className="relative mb-6 text-sm font-medium text-gray-800"
+          className="relative text-sm font-medium text-gray-800"
         >
           {props.label}
           {props.required && (

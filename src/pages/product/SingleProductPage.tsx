@@ -57,9 +57,11 @@ interface FormData {
 export default function SingleProductPage() {
   const { id } = useParams();
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [desactivationInput, setDesactivationInput] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpenConfirm, setIsModalOpenConfirm] = useState(false);
   const [isModify, setIsModify] = useState(false);
   const [page, setPage] = useState("dimension");
   const [onglet, setOnglet] = useState("infos");
@@ -119,7 +121,10 @@ export default function SingleProductPage() {
 
   const toggleFullScreen = () => {
     setIsFullScreen((prevState) => !prevState);
-    console.log("cliqued")
+  };
+
+  const handleInputChange = (event: any) => {
+    setDesactivationInput(event.target.value);
   };
 
   console.log(formData);
@@ -133,6 +138,49 @@ export default function SingleProductPage() {
         header="Fournisseurs"
       >
         <SupplierComponent />
+      </Modal>
+      <Modal
+        show={isModalOpenConfirm}
+        onCancel={() => setIsModalOpenConfirm(false)}
+        onClose={() => setIsModalOpenConfirm(false)}
+        header={`Desactivation de  ${product && product[0]?.GA_LIBELLE}`}
+      >
+        <div className="border-b-[2px] py-5">
+          <div className="w-[90%] mx-auto">
+            {product && (
+              <p>
+                Recopiez ce texte pour valider la desactivation :
+                <span className="font-[800] text-[13px]">
+                  {" "}
+                  {product[0]?.GA_LIBELLE}
+                </span>
+              </p>
+            )}
+            <div className="mt-3">
+              <input
+                type="text"
+                value={desactivationInput}
+                onChange={handleInputChange}
+                className="border p-2 w-full rounded-md focus:outline-none focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 w-[90%] mx-auto">
+          {product && (
+            <button
+              type="button"
+              disabled={desactivationInput !== product[0]?.GA_LIBELLE}
+              className={`p-2 w-full rounded-md ${
+                desactivationInput !== product[0]?.GA_LIBELLE
+                  ? "bg-gray-300"
+                  : "bg-red-500 text-white"
+              }`}
+            >
+              Valider la desactivation
+            </button>
+          )}
+        </div>
       </Modal>
       <form>
         <div className="flex flex-col gap-5">
@@ -152,9 +200,6 @@ export default function SingleProductPage() {
               </Button>
             ) : (
               <div className="flex items-center gap-2">
-                <Button size="small" blue>
-                  Valider
-                </Button>
                 <Button
                   size="small"
                   cancel
@@ -162,6 +207,9 @@ export default function SingleProductPage() {
                   onClick={() => setIsModify(false)}
                 >
                   Annuler
+                </Button>
+                <Button size="small" blue>
+                  Valider
                 </Button>
               </div>
             )}
@@ -213,6 +261,7 @@ export default function SingleProductPage() {
                           <input
                             type="text"
                             className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                            value={product[0]?.GA_LIBELLE}
                           />
                         )}
                       </div>
@@ -228,6 +277,7 @@ export default function SingleProductPage() {
                           <input
                             type="text"
                             className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                            value={product[0]?.GA_LIBCOMPL}
                           />
                         )}
                       </div>
@@ -245,6 +295,9 @@ export default function SingleProductPage() {
                           <input
                             type="text"
                             className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                            value={product[0]?.brand
+                              ? product[0]?.brand.YX_LIBELLE
+                              : "N/A"}
                           />
                         )}
                       </div>
@@ -263,6 +316,9 @@ export default function SingleProductPage() {
                           <input
                             type="text"
                             className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                            value={product[0]?.family
+                              ? product[0]?.family.YX_LIBELLE
+                              : "N/A"}
                           />
                         )}
                       </div>
@@ -280,6 +336,9 @@ export default function SingleProductPage() {
                           <input
                             type="text"
                             className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                            value={product[0]?.subFamily
+                              ? product[0]?.subFamily.YX_LIBELLE
+                              : "N/A"}
                           />
                         )}
                       </div>
@@ -347,6 +406,9 @@ export default function SingleProductPage() {
                           <input
                             type="text"
                             className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                            value={product[0]?.GA_FOURNPRINC
+                              ? product[0]?.GA_FOURNPRINC
+                              : "N/A"}
                           />
                         )}
                       </div>
@@ -560,9 +622,34 @@ export default function SingleProductPage() {
                 )}
               </div>
             ))}
+            {isModify && (
+              <div className="mt-[50px] flex flex-col gap-2">
+                <Button
+                  size="medium"
+                  type="button"
+                  cancel
+                >
+                  Dupliquer la référence
+                </Button>
+                <Button
+                  size="medium"
+                  type="button"
+                  cancel
+                  onClick={() => setIsModalOpenConfirm(true)}
+                >
+                  Desactiver la référence
+                </Button>
+              </div>
+            )}
           </div>
           {page === "dimension" && (
-            <div className={`border-t-[1px] border-gray-300 px-5 py-2 overflow-y-auto ${isFullScreen ? "fixed right-0 top-0 h-full w-full z-[9999] bg-gray-100 h-[300px]" : "w-[70%]"}`}>
+            <div
+              className={`border-t-[1px] border-gray-300 px-5 py-2 overflow-y-auto ${
+                isFullScreen
+                  ? "fixed right-0 top-0 h-full w-full z-[9999] bg-gray-100 h-[300px]"
+                  : "w-[70%]"
+              }`}
+            >
               <UVCGrid
                 onDimensionsChange={handleGridChange}
                 initialSizes={formData.initialSizes}

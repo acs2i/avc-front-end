@@ -295,6 +295,7 @@ const UVCGrid: React.FC<UVCGridProps> = ({
           <Palette size={17} />
           Associer une grille de couleurs
         </button>
+        <div className="h-[30px] w-[2px] bg-gray-300"></div>
         <button onClick={addNewSize} type="button" className="flex items-center gap-2 text-[12px] text-green-500">
           <Plus size={17} />
           Ajouter une taille
