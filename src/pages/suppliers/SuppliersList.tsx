@@ -18,6 +18,8 @@ interface Suppliers {
 
 export default function SuppliersList() {
   const [prevSearchValue, setPrevSearchValue] = useState("");
+  const [codeValue, setCodeValue] = useState("");
+  const [labelValue, setLabelValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItem, setTotalItem] = useState(null);
@@ -63,35 +65,56 @@ export default function SuppliersList() {
     <section>
       <Header
         title="Liste des fournisseurs"
-        link="/parameters/dimension/create/item"
+        link="/suppliers/create"
         btnTitle="Créer un fournisseur"
         placeholder="Rechercher un fournisseur"
-        height="250px"
+        height="300px"
         button
       >
-        <div className="flex items-center gap-4 py-4">
-          <div className="flex items-center gap-4">
-            <label className="w-[60px] text-sm font-bold">Libellé :</label>
+        <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-gray-600">
+          <div className="flex flex-col">
+            <label className="text-sm font-bold mb-1">Code :</label>
             <input
               type="text"
-              id="GDI_LIBELLE"
-              className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
-              placeholder="Rechercher par libellé"
+              id="code"
+              className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
+              placeholder="Rechercher un code"
+              value={codeValue}
+              onChange={(e) => setCodeValue(e.target.value)}
+              autoComplete="off"
             />
           </div>
-          <div className="flex items-center gap-4">
-            <label className="w-[60px] text-sm font-bold">Code :</label>
+
+          <div className="flex flex-col">
+            <label className="text-sm font-bold mb-1">Libellé :</label>
             <input
               type="text"
-              id="GDI_DIMORLI"
-              className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
-              placeholder="Rechercher par code"
+              id="label"
+              className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
+              placeholder="Rechercher par libellé"
+              value={labelValue}
+              onChange={(e) => setLabelValue(e.target.value)}
+              autoComplete="off"
             />
+          </div>
+
+          <div className="col-span-full flex">
+            {!isLoading ? (
+              <Button type="submit" size="small" blue>
+                Lancer la Recherche
+              </Button>
+            ) : (
+              <Spinner
+                width="50px"
+                height="40px"
+                logoSize="90%"
+                progressSize={50}
+              />
+            )}
           </div>
         </div>
       </Header>
       <div className="relative overflow-x-auto bg-white">
-        
         <table className="w-full text-left">
           <thead className="border-y-[1px] border-gray-200 text-sm text-gray-500">
             <tr>

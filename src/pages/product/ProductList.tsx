@@ -207,7 +207,7 @@ export default function ProductList() {
         height="400px"
       >
         <form className="py-1" onSubmit={handleSearch}>
-          <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-gray-600 p-4">
+          <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-gray-600">
             <div className="flex flex-col">
               <label className="text-sm font-bold mb-1">Code :</label>
               <input

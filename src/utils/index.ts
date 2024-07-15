@@ -157,18 +157,6 @@ export const LINKS_Product: Params[] = [
     icon: Tag,
     page: "uvc",
   },
-  {
-    name: "Taxes",
-    link: "",
-    icon: HandCoins,
-    page: "fee",
-  },
-  {
-    name: "Prix UVC",
-    link: "",
-    icon: Euro,
-    page: "uvc price",
-  },
 ];
 
 export const LINKS_UVC: Params[] = [
