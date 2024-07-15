@@ -33,6 +33,8 @@ interface FormData {
   price_net: string;
   tag: string;
   paymentCondition: string;
+  franco: string;
+  budget: string;
   brands: string[];
 }
 
@@ -110,6 +112,8 @@ export default function CreateSupplierPage() {
     price_net: "non",
     tag: "non",
     paymentCondition: "45 jours fin du mois",
+    franco: "",
+    budget: "",
     brands: [""],
   });
 
@@ -473,7 +477,7 @@ export default function CreateSupplierPage() {
               </div>
             </div>
           </div>
-          <div className="flex gap-4 mt-[20px]">
+          <div className="flex gap-4 mt-[50px]">
             <div className="relative w-[70%] flex flex-col gap-3">
               <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
                 Contacts
@@ -592,14 +596,14 @@ export default function CreateSupplierPage() {
               </div>
             </div>
           </div>
-          <div className="flex gap-4 mt-[20px]">
+          <div className="flex gap-4 mt-[50px]">
             <div className="relative w-full flex flex-col gap-3">
               <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
                 Tarifs & conditionss
               </h4>
               {/* Partie tarifs */}
               <div className="border border-gray-300 p-3">
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   <Input
                     element="input"
                     id="tarif"
@@ -620,17 +624,6 @@ export default function CreateSupplierPage() {
                     validators={[]}
                     options={currencies}
                     placeholder="Choississez une devise"
-                    create
-                    gray
-                  />
-                  <Input
-                    element="input"
-                    id="tarif_validate"
-                    label="Validité des tarifs :"
-                    value={formData.tarif_validate}
-                    onChange={handleChange}
-                    validators={[]}
-                    placeholder="Ex: 6 mois, 1 mois..."
                     create
                     gray
                   />
@@ -782,6 +775,41 @@ export default function CreateSupplierPage() {
                     </div>
                   </div>
                 </div>
+                <div className="grid grid-cols-3 gap-2 mt-4">
+                  <Input
+                    element="input"
+                    id="franco"
+                    label="Franco :"
+                    value={formData.franco}
+                    onChange={handleChange}
+                    validators={[]}
+                    placeholder="Ex: 500 EUR, 1000 USD..."
+                    create
+                    gray
+                  />
+                  <Input
+                    element="input"
+                    id="tarif_validate"
+                    label="Validité des tarifs :"
+                    value={formData.tarif_validate}
+                    onChange={handleChange}
+                    validators={[]}
+                    placeholder="Ex: 6 mois, 1 mois..."
+                    create
+                    gray
+                  />
+                  <Input
+                    element="input"
+                    id="budget"
+                    label="Budget marketing :"
+                    value={formData.budget}
+                    onChange={handleChange}
+                    validators={[]}
+                    placeholder="Ex: 5000 EUR par an"
+                    create
+                    gray
+                  />
+                </div>
 
                 {/* 
              
@@ -797,11 +825,6 @@ export default function CreateSupplierPage() {
                   gray
                 /> */}
 
-                {/* Partie Radio button */}
-                {/* */}
-
-                {/* Partie condition de paimenet */}
-                {/*  */}
                 {/* Partie champs additionels */}
                 {/* <div className="mt-[20px]">
                   <div
@@ -876,6 +899,82 @@ export default function CreateSupplierPage() {
                 </div> */}
               </div>
             </div>
+          </div>
+          <div className="flex gap-4 mt-[50px]">
+            <div className="relative w-full flex flex-col gap-3">
+              <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
+                Informations additionelles
+              </h4>
+              {/* Partie tarifs */}
+              <div className="border border-gray-300 p-3">
+                <div className="py-[5px]">
+                  {additionalFields.map((field, index) => (
+                    <div
+                      key={index}
+                      className="relative grid grid-cols-2 gap-2"
+                    >
+                      <Input
+                        element="input"
+                        id={`name-${index}`}
+                        label="Nom du champ :"
+                        value={field.name}
+                        validators={[]}
+                        placeholder=""
+                        create
+                        gray
+                      />
+                      <Input
+                        element="input"
+                        id={`value-${index}`}
+                        label="Valeur du champ :"
+                        value={field.value}
+                        validators={[]}
+                        placeholder=""
+                        create
+                        gray
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeField(index)}
+                        className="absolute top-[50%] translate-y-[50%] right-[-25px] text-red-500 hover:text-red-300"
+                      >
+                        <Trash size={15} />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={addField}
+                    className="flex items-center gap-2 text-[12px] text-orange-400 mt-3"
+                  >
+                    <Plus size={17} />
+                    Ajouter un champ
+                  </button>
+                </div>
+                {/* 
+             
+                <Input
+                  element="textarea"
+                  id="discount"
+                  label="Remises applicables :"
+                  value={formData.discount}
+                  onChange={handleChange}
+                  validators={[]}
+                  placeholder="Indiquez les remises applicables (ex : 10% sur les commandes de plus de 100 unités)"
+                  create
+                  gray
+                /> */}
+              </div>
+            </div>
+          </div>
+          {/* Partie buttons */}
+          <div className="mt-[50px] w-[50%] mx-auto">
+            <button
+              className="w-full bg-sky-600 text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
+              type="submit"
+            >
+              Créer le fournisseur
+            </button>
           </div>
         </form>
       </div>

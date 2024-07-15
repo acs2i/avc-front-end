@@ -149,7 +149,7 @@ const Input: React.FC<InputProps> = (props) => {
         onBlur={props.onBlur}
         required={props.required}
         value={props.value}
-        className="bg-gray-50 border border-gray-300 text-gray-900 text-md rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)] block w-full p-2 mt-1"
+        className="bg-white border border-gray-300 text-gray-900 text-md rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)] block w-full p-2 mt-1"
       >
         <option value="" selected>
           {props.placeholder}
