@@ -64,56 +64,55 @@ export default function SuppliersList() {
   return (
     <section>
       <Header
-        title="Liste des fournisseurs"
+        title="Liste"
+        light="des fournisseurs"
         link="/suppliers/create"
         btnTitle="Créer un fournisseur"
         placeholder="Rechercher un fournisseur"
         height="300px"
-        button
       >
-     <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-gray-600">
-  <div className="flex flex-col md:flex-row items-center gap-2">
-    <label className="text-sm font-bold mb-1 md:mb-0 w-[50px]">Code :</label>
-    <input
-      type="text"
-      id="code"
-      className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md w-full"
-      placeholder="Rechercher un code"
-      value={codeValue}
-      onChange={(e) => setCodeValue(e.target.value)}
-      autoComplete="off"
-    />
-  </div>
+        <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 text-gray-600">
+          <div className="flex flex-col">
+            <label className="text-sm font-bold mb-1">Code :</label>
+            <input
+              type="text"
+              id="code"
+              className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
+              placeholder="Rechercher un code"
+              value={codeValue}
+              onChange={(e) => setCodeValue(e.target.value)}
+              autoComplete="off"
+            />
+          </div>
 
-  <div className="flex flex-col md:flex-row items-center gap-2">
-    <label className="text-sm font-bold mb-1 md:mb-0 w-[60px]">Libellé :</label>
-    <input
-      type="text"
-      id="label"
-      className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md w-full"
-      placeholder="Rechercher par libellé"
-      value={labelValue}
-      onChange={(e) => setLabelValue(e.target.value)}
-      autoComplete="off"
-    />
-  </div>
+          <div className="flex flex-col">
+            <label className="text-sm font-bold mb-1">Libellé :</label>
+            <input
+              type="text"
+              id="label"
+              className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
+              placeholder="Rechercher par libellé"
+              value={labelValue}
+              onChange={(e) => setLabelValue(e.target.value)}
+              autoComplete="off"
+            />
+          </div>
 
-  <div className="flex items-center">
-    {!isLoading ? (
-      <Button type="submit" size="small" blue>
-        Lancer la Recherche
-      </Button>
-    ) : (
-      <Spinner
-        width="50px"
-        height="40px"
-        logoSize="90%"
-        progressSize={50}
-      />
-    )}
-  </div>
-</div>
-
+          <div className="flex items-center">
+            {!isLoading ? (
+              <Button type="submit" size="small" blue>
+                Lancer la Recherche
+              </Button>
+            ) : (
+              <Spinner
+                width="50px"
+                height="40px"
+                logoSize="90%"
+                progressSize={50}
+              />
+            )}
+          </div>
+        </div>
       </Header>
       <div className="relative overflow-x-auto bg-white">
         <table className="w-full text-left">

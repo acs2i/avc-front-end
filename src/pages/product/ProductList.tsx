@@ -13,7 +13,7 @@ import { useBrands } from "../../utils/hooks/useBrands";
 import { useSuppliers } from "../../utils/hooks/useSuppliers";
 import { useSubFamilies } from "../../utils/hooks/useSubFamilies";
 import { LINKCARD_SEARCH } from "../../utils/index";
-import { Collapse, Divider } from "@mui/material";
+import { Avatar, Collapse, Divider } from "@mui/material";
 import { LinkCard } from "@/type";
 import { ChevronDown, ChevronsUpDown, ChevronUp, Plus } from "lucide-react";
 import Header from "../../components/Navigation/Header";
@@ -200,7 +200,8 @@ export default function ProductList() {
   return (
     <section className="w-full">
       <Header
-        title="Références"
+        title="Toutes"
+        light="les références"
         link="/product/edit"
         btnTitle="Créer un produit"
         placeholder="Rechercher un produit"
@@ -213,7 +214,7 @@ export default function ProductList() {
               <input
                 type="text"
                 id="code"
-                className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
+                className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
                 placeholder="Rechercher un code"
                 value={codeValue}
                 onChange={(e) => setCodeValue(e.target.value)}
@@ -226,7 +227,7 @@ export default function ProductList() {
               <input
                 type="text"
                 id="label"
-                className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
+                className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
                 placeholder="Rechercher par libellé"
                 value={labelValue}
                 onChange={(e) => setLabelValue(e.target.value)}
@@ -239,7 +240,7 @@ export default function ProductList() {
               <input
                 type="text"
                 id="brand"
-                className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
+                className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
                 placeholder="Rechercher par marque"
                 value={brandValue}
                 onChange={(e) => handleBrandChange(e)}
@@ -280,7 +281,7 @@ export default function ProductList() {
               <input
                 type="text"
                 id="supplier"
-                className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
+                className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
                 placeholder="Rechercher par fournisseur"
                 value={supplierValue}
                 onChange={(e) => handleSupplierChange(e)}
@@ -323,7 +324,7 @@ export default function ProductList() {
               <input
                 type="text"
                 id="family"
-                className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
+                className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
                 placeholder="Rechercher par famille"
                 value={familyValue}
                 onChange={(e) => handleFamilyChange(e)}
@@ -364,7 +365,7 @@ export default function ProductList() {
               <input
                 type="text"
                 id="subFamily"
-                className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
+                className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
                 placeholder="Rechercher par sous-famille"
                 value={subFamilyValue}
                 onChange={(e) => handleSubFamilyChange(e)}
@@ -430,7 +431,8 @@ export default function ProductList() {
                   </div>
                 </div>
               </th>
-              <th scope="col" className="px-6 w-1/6">
+              <th scope="col" className="px-6 w-1/7"></th>
+              <th scope="col" className="px-6 w-[5%]">
                 <div className="flex items-center">
                   <span>Libellé</span>
                   <div className="cursor-pointer">
@@ -438,7 +440,7 @@ export default function ProductList() {
                   </div>
                 </div>
               </th>
-              <th scope="col" className="px-6 w-1/6">
+              <th scope="col" className="px-6 w-1/7">
                 <div className="flex items-center">
                   <span>Marque</span>
                   <div className="cursor-pointer">
@@ -454,7 +456,7 @@ export default function ProductList() {
                   </div>
                 </div>
               </th>
-              <th scope="col" className="px-6 w-1/6">
+              <th scope="col" className="px-6 w-1/7">
                 <div className="flex items-center">
                   <span>Famille</span>
                   <div className="cursor-pointer">
@@ -462,7 +464,7 @@ export default function ProductList() {
                   </div>
                 </div>
               </th>
-              <th scope="col" className="px-6 w-1/6">
+              <th scope="col" className="px-6 w-1/7">
                 <div className="flex items-center">
                   <span>Sous-famille</span>
                   <div className="cursor-pointer">
@@ -481,6 +483,11 @@ export default function ProductList() {
                   onClick={() => navigate(`/product/${product._id}`)}
                 >
                   <td className="px-6 py-2">{product.GA_CODEARTICLE}</td>
+                  <td className="px-6 py-2">
+                    <div className="w-[60px] h-[60px] flex items-center border p-1 rounded-md">
+                      <img src="/img/logo.png" alt="" className="w-full" />
+                    </div>
+                  </td>
                   <td className="px-6 py-2 text-blue-500">
                     {truncateText(product.GA_LIBELLE, 50)}
                   </td>

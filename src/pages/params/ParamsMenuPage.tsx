@@ -115,10 +115,10 @@ function ParamsMenuPage() {
   }, [page]);
 
   return (
-    <section className="w-full h-screen bg-gray-100 p-7 relative overflow-hidden">
+    <section className="w-full h-screen bg-slate-50 p-7 relative overflow-hidden">
       <div className="flex items-center gap-3">
         <Settings2 size={20}/>
-        <h3 className="text-[25px]">Codifications</h3>
+        <h3 className="text-[25px] font-[800]">Création <span className="font-[400]">et modification des paramètres</span></h3>
       </div>
       <div className="h-[70px] mb-3 flex items-center gap-4 w-full relative z-10">
         <div className="w-[300px]">

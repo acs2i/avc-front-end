@@ -45,11 +45,11 @@ export const LINKS: Link[] = [
             name: "Articles",
             linksGroup: [
               {
-                name: "Liste des articles",
+                name: "Liste des références",
                 link: "/product",
               },
               {
-                name: "Créer un article",
+                name: "Créer une référence",
                 link: "/product/edit",
               },
               {
@@ -67,8 +67,16 @@ export const LINKS: Link[] = [
           },
           {
             name: "Fournisseurs",
-            link: "/suppliers/suppliers-list",
-            linksGroup: [],
+            linksGroup: [
+              {
+                name: "Liste des fournisseurs",
+                link: "/suppliers/suppliers-list",
+              },
+              {
+                name: "Créer un fournisseur",
+                link: "/suppliers/create",
+              },
+            ],
             icon: Factory,
           },
           {

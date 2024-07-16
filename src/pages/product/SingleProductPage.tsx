@@ -130,7 +130,7 @@ export default function SingleProductPage() {
   console.log(formData);
 
   return (
-    <section className="w-full bg-gray-100 p-8 max-w-[2000px] mx-auto">
+    <section className="w-full bg-slate-50 p-8 max-w-[2000px] mx-auto">
       <Modal
         show={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
@@ -188,16 +188,39 @@ export default function SingleProductPage() {
             <div onClick={() => navigate(-1)} className="cursor-pointer">
               <ChevronLeft />
             </div>
-            <h1 className="text-[32px] font-[800]">Page produit</h1>
+            <h1 className="text-[32px] font-[800]">
+              Page <span className="font-[600]">produit</span>
+            </h1>
           </div>
           <div className="flex items-center justify-between">
             {product && (
               <h2 className="text-[25px]">{product[0]?.GA_LIBELLE}</h2>
             )}
             {!isModify ? (
-              <Button blue size="small" onClick={() => setIsModify(true)}>
-                {isModify ? "Annuler modification" : "Modifier"}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="small"
+                  type="button"
+                  cancel
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsModalOpenConfirm(true);
+                  }}
+                >
+                  Désactiver la référence
+                </Button>
+                <Button
+                  blue
+                  size="small"
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsModify(true);
+                  }}
+                >
+                  {isModify ? "Annuler modification" : "Modifier"}
+                </Button>
+              </div>
             ) : (
               <div className="flex items-center gap-2">
                 <Button
@@ -295,9 +318,11 @@ export default function SingleProductPage() {
                           <input
                             type="text"
                             className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                            value={product[0]?.brand
-                              ? product[0]?.brand.YX_LIBELLE
-                              : "N/A"}
+                            value={
+                              product[0]?.brand
+                                ? product[0]?.brand.YX_LIBELLE
+                                : "N/A"
+                            }
                           />
                         )}
                       </div>
@@ -316,9 +341,11 @@ export default function SingleProductPage() {
                           <input
                             type="text"
                             className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                            value={product[0]?.family
-                              ? product[0]?.family.YX_LIBELLE
-                              : "N/A"}
+                            value={
+                              product[0]?.family
+                                ? product[0]?.family.YX_LIBELLE
+                                : "N/A"
+                            }
                           />
                         )}
                       </div>
@@ -336,9 +363,11 @@ export default function SingleProductPage() {
                           <input
                             type="text"
                             className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                            value={product[0]?.subFamily
-                              ? product[0]?.subFamily.YX_LIBELLE
-                              : "N/A"}
+                            value={
+                              product[0]?.subFamily
+                                ? product[0]?.subFamily.YX_LIBELLE
+                                : "N/A"
+                            }
                           />
                         )}
                       </div>
@@ -406,9 +435,11 @@ export default function SingleProductPage() {
                           <input
                             type="text"
                             className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                            value={product[0]?.GA_FOURNPRINC
-                              ? product[0]?.GA_FOURNPRINC
-                              : "N/A"}
+                            value={
+                              product[0]?.GA_FOURNPRINC
+                                ? product[0]?.GA_FOURNPRINC
+                                : "N/A"
+                            }
                           />
                         )}
                       </div>
@@ -622,25 +653,6 @@ export default function SingleProductPage() {
                 )}
               </div>
             ))}
-            {isModify && (
-              <div className="mt-[50px] flex flex-col gap-2">
-                <Button
-                  size="medium"
-                  type="button"
-                  cancel
-                >
-                  Dupliquer la référence
-                </Button>
-                <Button
-                  size="medium"
-                  type="button"
-                  cancel
-                  onClick={() => setIsModalOpenConfirm(true)}
-                >
-                  Desactiver la référence
-                </Button>
-              </div>
-            )}
           </div>
           {page === "dimension" && (
             <div
