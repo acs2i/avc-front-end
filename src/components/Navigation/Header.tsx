@@ -21,12 +21,12 @@ export default function Header({
   height
 }: headerProps) {
   return (
-    <div className="w-full bg-gray-100 p-4 relative overflow-hidden" style={{ height: height || 'auto' }}>
+    <div className="w-full bg-slate-100 p-4 relative overflow-hidden" style={{ height: height || 'auto' }}>
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage: `url(${"/img/background_forest.jpg"})`,
-          opacity: 0.2,
+          opacity: 0.05,
           filter: "grayscale(10%)",
           backgroundPosition: "center bottom -50px",
         }}

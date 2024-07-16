@@ -329,7 +329,7 @@ export default function CreateSupplierPage() {
                 Identification
               </h4>
               {/* Partie Infos */}
-              <div className="border border-gray-300 h-[450px] p-3 ">
+              <div className="border border-gray-300 h-[450px] p-3 rounded-md">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   <Input
                     element="input"
@@ -417,7 +417,7 @@ export default function CreateSupplierPage() {
                 Adresse
               </h4>
               {/* Partie adresse */}
-              <div className="border border-gray-300 h-[450px] p-3 ">
+              <div className="border border-gray-300 h-[450px] p-3 rounded-md">
                 <Input
                   element="input"
                   id="address_1"
@@ -483,7 +483,7 @@ export default function CreateSupplierPage() {
                 Contacts
               </h4>
               {/* Partie contacts */}
-              <div className="border border-gray-300 p-3 ">
+              <div className="border border-gray-300 p-3 rounded-md">
                 <div className="grid grid-cols-2 gap-2">
                   <Input
                     element="input"
@@ -562,7 +562,7 @@ export default function CreateSupplierPage() {
               <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
                 Marques
               </h4>
-              <div className="border border-gray-300 p-3 ">
+              <div className="border border-gray-300 p-3 rounded-md">
                 {brands.map((brand, index) => (
                   <div key={index} className="flex items-center gap-2 mt-2">
                     <CreatableSelect<BrandOption>
@@ -596,362 +596,271 @@ export default function CreateSupplierPage() {
               </div>
             </div>
           </div>
-          <div className="flex gap-4 mt-[50px]">
-            <div className="relative w-full flex flex-col gap-3">
-              <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
-                Tarifs & conditionss
-              </h4>
-              {/* Partie tarifs */}
-              <div className="border border-gray-300 p-3">
-                <div className="grid grid-cols-2 gap-2">
-                  <Input
-                    element="input"
-                    id="tarif"
-                    label="Tarif :"
-                    value={formData.tarif}
-                    onChange={handleChange}
-                    validators={[]}
-                    placeholder="Renseignez le tarif du fournisseur"
-                    create
-                    gray
-                  />
-                  <Input
-                    element="select"
-                    id="currency"
-                    label="Devise :"
-                    value={formData.currency}
-                    onChange={handleChange}
-                    validators={[]}
-                    options={currencies}
-                    placeholder="Choississez une devise"
-                    create
-                    gray
-                  />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-5">
-                  <fieldset className="flex justify-center">
-                    <legend className="text-sm font-medium text-gray-800 text-center">
-                      RFA :
-                    </legend>
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          id="rfa-oui"
-                          name="rfa"
-                          value="oui"
-                          checked={formData.rfa === "oui"}
-                          onChange={handleRfaChange}
-                        />
-                        <label htmlFor="rfa-oui">Oui</label>
-                      </div>
 
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          id="rfa-non"
-                          name="rfa"
-                          value="non"
-                          checked={formData.rfa === "non"}
-                          onChange={handleRfaChange}
-                        />
-                        <label htmlFor="rfa-non">Non</label>
-                      </div>
-                    </div>
-                  </fieldset>
-                  <fieldset className="flex justify-center">
-                    <legend className="text-sm font-medium text-gray-800 text-center">
-                      Prix nets :
-                    </legend>
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          id="price-oui"
-                          name="price-net"
-                          value="oui"
-                          checked={formData.price_net === "oui"}
-                          onChange={handlePriceNetChange}
-                        />
-                        <label htmlFor="price-oui">Oui</label>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          id="price-non"
-                          name="price-net"
-                          value="non"
-                          checked={formData.price_net === "non"}
-                          onChange={handlePriceNetChange}
-                        />
-                        <label htmlFor="price-non">Non</label>
-                      </div>
-                    </div>
-                  </fieldset>
-                  <fieldset className="flex justify-center">
-                    <legend className="text-sm font-medium text-gray-800 text-center">
-                      Etiquetage :
-                    </legend>
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          id="tag-oui"
-                          name="tag"
-                          value="oui"
-                          checked={formData.tag === "oui"}
-                          onChange={handleTagChange}
-                        />
-                        <label htmlFor="tag-oui">Oui</label>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          id="tag-non"
-                          name="tag"
-                          value="non"
-                          checked={formData.tag === "non"}
-                          onChange={handleTagChange}
-                        />
-                        <label htmlFor="tag-non">Non</label>
-                      </div>
-                    </div>
-                  </fieldset>
-                </div>
-                <div className="text-center mt-[30px]">
-                  <span className="text-sm font-medium text-gray-800">
-                    Condition de paiement :
-                  </span>
-                  <div className="flex items-center justify-center gap-[30px] font-[600] text-gray-700 mt-2">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        id="payment-45j"
-                        name="paymentCondition"
-                        value="45 jours fin du mois"
-                        checked={
-                          formData.paymentCondition === "45 jours fin du mois"
-                        }
-                        onChange={handlePaymentConditionChange}
-                      />
-                      <label htmlFor="payment-45j" className="text-[13px]">
-                        45 jours fin du mois
-                      </label>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        id="payment-10j"
-                        name="paymentCondition"
-                        value="10 jours réception facture avec escompte supplémentaire"
-                        checked={
-                          formData.paymentCondition ===
-                          "10 jours réception facture avec escompte supplémentaire"
-                        }
-                        onChange={handlePaymentConditionChange}
-                      />
-                      <label htmlFor="payment-10j" className="text-[13px]">
-                        10 jours réception facture avec escompte supplémentaire
-                      </label>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        id="payment-60j"
-                        name="paymentCondition"
-                        value="60 jours date facture"
-                        checked={
-                          formData.paymentCondition === "60 jours date facture"
-                        }
-                        onChange={handlePaymentConditionChange}
-                      />
-                      <label htmlFor="payment-60j" className="text-[13px]">
-                        60 jours date facture
-                      </label>
-                    </div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-3 gap-2 mt-4">
-                  <Input
-                    element="input"
-                    id="franco"
-                    label="Franco :"
-                    value={formData.franco}
-                    onChange={handleChange}
-                    validators={[]}
-                    placeholder="Ex: 500 EUR, 1000 USD..."
-                    create
-                    gray
-                  />
-                  <Input
-                    element="input"
-                    id="tarif_validate"
-                    label="Validité des tarifs :"
-                    value={formData.tarif_validate}
-                    onChange={handleChange}
-                    validators={[]}
-                    placeholder="Ex: 6 mois, 1 mois..."
-                    create
-                    gray
-                  />
-                  <Input
-                    element="input"
-                    id="budget"
-                    label="Budget marketing :"
-                    value={formData.budget}
-                    onChange={handleChange}
-                    validators={[]}
-                    placeholder="Ex: 5000 EUR par an"
-                    create
-                    gray
-                  />
-                </div>
-
-                {/* 
-             
+          <div className="relative w-full flex flex-col gap-3  mt-[50px]">
+            <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
+              Tarifs & conditions
+            </h4>
+            {/* Partie tarifs */}
+            <div className="border border-gray-300 p-3 rounded-md">
+              <div className="grid grid-cols-2 gap-2">
                 <Input
-                  element="textarea"
-                  id="discount"
-                  label="Remises applicables :"
-                  value={formData.discount}
+                  element="input"
+                  id="tarif"
+                  label="Tarif :"
+                  value={formData.tarif}
                   onChange={handleChange}
                   validators={[]}
-                  placeholder="Indiquez les remises applicables (ex : 10% sur les commandes de plus de 100 unités)"
+                  placeholder="Renseignez le tarif du fournisseur"
                   create
                   gray
-                /> */}
-
-                {/* Partie champs additionels */}
-                {/* <div className="mt-[20px]">
-                  <div
-                    className="flex items-center gap-2 cursor-pointer"
-                    onClick={() => setaddFieldIsVisible((prev) => !prev)}
-                  >
-                    <h4 className="text-sm font-medium text-gray-800 text-center">
-                      Informations additionnelles
-                    </h4>
-
-                    {!addFieldIsVisible ? (
-                      <ChevronDown size={18} />
-                    ) : (
-                      <ChevronUp size={18} />
-                    )}
-                  </div>
-                  <Collapse in={addFieldIsVisible}>
-                    <div className="py-[5px]">
-                      {additionalFields.map((field, index) => (
-                        <div
-                          key={index}
-                          className="relative grid grid-cols-2 gap-2"
-                        >
-                          <Input
-                            element="input"
-                            id={`name-${index}`}
-                            label="Nom du champ :"
-                            value={field.name}
-                            validators={[]}
-                            placeholder=""
-                            create
-                            gray
-                          />
-                          <Input
-                            element="input"
-                            id={`value-${index}`}
-                            label="Valeur du champ :"
-                            value={field.value}
-                            validators={[]}
-                            placeholder=""
-                            create
-                            gray
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeField(index)}
-                            className="absolute top-[50%] translate-y-[50%] right-[-25px] text-red-500 hover:text-red-300"
-                          >
-                            <Trash size={15} />
-                          </button>
-                        </div>
-                      ))}
-                      <button
-                        type="button"
-                        onClick={addField}
-                        className="flex items-center gap-2 text-[12px] text-orange-400 mt-3"
-                      >
-                        <Plus size={17} />
-                        Ajouter un champ
-                      </button>
+                />
+                <Input
+                  element="select"
+                  id="currency"
+                  label="Devise :"
+                  value={formData.currency}
+                  onChange={handleChange}
+                  validators={[]}
+                  options={currencies}
+                  placeholder="Choississez une devise"
+                  create
+                  gray
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-5">
+                <fieldset className="flex justify-center">
+                  <legend className="text-sm font-medium text-gray-800 text-center">
+                    RFA :
+                  </legend>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        id="rfa-oui"
+                        name="rfa"
+                        value="oui"
+                        checked={formData.rfa === "oui"}
+                        onChange={handleRfaChange}
+                      />
+                      <label htmlFor="rfa-oui">Oui</label>
                     </div>
-                  </Collapse>
-                </div> */}
-                {/* Partie buttons */}
-                {/* <div className="mt-[50px]">
-                  <button
-                    className="w-full bg-sky-600 text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
-                    type="submit"
-                  >
-                    Créer le fournisseur
-                  </button>
-                </div> */}
+
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        id="rfa-non"
+                        name="rfa"
+                        value="non"
+                        checked={formData.rfa === "non"}
+                        onChange={handleRfaChange}
+                      />
+                      <label htmlFor="rfa-non">Non</label>
+                    </div>
+                  </div>
+                </fieldset>
+                <fieldset className="flex justify-center">
+                  <legend className="text-sm font-medium text-gray-800 text-center">
+                    Prix nets :
+                  </legend>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        id="price-oui"
+                        name="price-net"
+                        value="oui"
+                        checked={formData.price_net === "oui"}
+                        onChange={handlePriceNetChange}
+                      />
+                      <label htmlFor="price-oui">Oui</label>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        id="price-non"
+                        name="price-net"
+                        value="non"
+                        checked={formData.price_net === "non"}
+                        onChange={handlePriceNetChange}
+                      />
+                      <label htmlFor="price-non">Non</label>
+                    </div>
+                  </div>
+                </fieldset>
+                <fieldset className="flex justify-center">
+                  <legend className="text-sm font-medium text-gray-800 text-center">
+                    Etiquetage :
+                  </legend>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        id="tag-oui"
+                        name="tag"
+                        value="oui"
+                        checked={formData.tag === "oui"}
+                        onChange={handleTagChange}
+                      />
+                      <label htmlFor="tag-oui">Oui</label>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        id="tag-non"
+                        name="tag"
+                        value="non"
+                        checked={formData.tag === "non"}
+                        onChange={handleTagChange}
+                      />
+                      <label htmlFor="tag-non">Non</label>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+              <div className="text-center mt-[30px]">
+                <span className="text-sm font-medium text-gray-800">
+                  Condition de paiement :
+                </span>
+                <div className="flex items-center justify-center gap-[30px] font-[600] text-gray-700 mt-2">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      id="payment-45j"
+                      name="paymentCondition"
+                      value="45 jours fin du mois"
+                      checked={
+                        formData.paymentCondition === "45 jours fin du mois"
+                      }
+                      onChange={handlePaymentConditionChange}
+                    />
+                    <label htmlFor="payment-45j" className="text-[13px]">
+                      45 jours fin du mois
+                    </label>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      id="payment-10j"
+                      name="paymentCondition"
+                      value="10 jours réception facture avec escompte supplémentaire"
+                      checked={
+                        formData.paymentCondition ===
+                        "10 jours réception facture avec escompte supplémentaire"
+                      }
+                      onChange={handlePaymentConditionChange}
+                    />
+                    <label htmlFor="payment-10j" className="text-[13px]">
+                      10 jours réception facture avec escompte supplémentaire
+                    </label>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      id="payment-60j"
+                      name="paymentCondition"
+                      value="60 jours date facture"
+                      checked={
+                        formData.paymentCondition === "60 jours date facture"
+                      }
+                      onChange={handlePaymentConditionChange}
+                    />
+                    <label htmlFor="payment-60j" className="text-[13px]">
+                      60 jours date facture
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-2 mt-4">
+                <Input
+                  element="input"
+                  id="franco"
+                  label="Franco :"
+                  value={formData.franco}
+                  onChange={handleChange}
+                  validators={[]}
+                  placeholder="Ex: 500 EUR, 1000 USD..."
+                  create
+                  gray
+                />
+                <Input
+                  element="input"
+                  id="tarif_validate"
+                  label="Validité des tarifs :"
+                  value={formData.tarif_validate}
+                  onChange={handleChange}
+                  validators={[]}
+                  placeholder="Ex: 6 mois, 1 mois..."
+                  create
+                  gray
+                />
+                <Input
+                  element="input"
+                  id="budget"
+                  label="Budget marketing :"
+                  value={formData.budget}
+                  onChange={handleChange}
+                  validators={[]}
+                  placeholder="Ex: 5000 EUR par an"
+                  create
+                  gray
+                />
               </div>
             </div>
           </div>
-          <div className="flex gap-4 mt-[50px]">
-            <div className="relative w-full flex flex-col gap-3">
-              <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
-                Informations additionelles
-              </h4>
-              {/* Partie tarifs */}
-              <div className="border border-gray-300 p-3">
-                <div className="py-[5px]">
-                  {additionalFields.map((field, index) => (
-                    <div
-                      key={index}
-                      className="relative grid grid-cols-2 gap-2"
+
+          <div className="relative w-full flex flex-col gap-3 mt-[50px]">
+            <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
+              Informations additionelles
+            </h4>
+            {/* Partie tarifs */}
+            <div className="border border-gray-300 p-3">
+              <div className="py-[5px] w-[90%] mx-auto">
+                {additionalFields.map((field, index) => (
+                  <div key={index} className="relative grid grid-cols-2 gap-2">
+                    <Input
+                      element="input"
+                      id={`name-${index}`}
+                      label="Nom du champ :"
+                      value={field.name}
+                      validators={[]}
+                      placeholder=""
+                      create
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      id={`value-${index}`}
+                      label="Valeur du champ :"
+                      value={field.value}
+                      validators={[]}
+                      placeholder=""
+                      create
+                      gray
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeField(index)}
+                      className="absolute top-[50%] translate-y-[50%] right-[-25px] text-red-500 hover:text-red-300"
                     >
-                      <Input
-                        element="input"
-                        id={`name-${index}`}
-                        label="Nom du champ :"
-                        value={field.name}
-                        validators={[]}
-                        placeholder=""
-                        create
-                        gray
-                      />
-                      <Input
-                        element="input"
-                        id={`value-${index}`}
-                        label="Valeur du champ :"
-                        value={field.value}
-                        validators={[]}
-                        placeholder=""
-                        create
-                        gray
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeField(index)}
-                        className="absolute top-[50%] translate-y-[50%] right-[-25px] text-red-500 hover:text-red-300"
-                      >
-                        <Trash size={15} />
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={addField}
-                    className="flex items-center gap-2 text-[12px] text-orange-400 mt-3"
-                  >
-                    <Plus size={17} />
-                    Ajouter un champ
-                  </button>
-                </div>
-                {/* 
+                      <Trash size={15} />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={addField}
+                  className="flex items-center gap-2 text-[12px] text-orange-400 mt-3"
+                >
+                  <Plus size={17} />
+                  Ajouter un champ
+                </button>
+              </div>
+              {/* 
              
                 <Input
                   element="textarea"
@@ -964,9 +873,9 @@ export default function CreateSupplierPage() {
                   create
                   gray
                 /> */}
-              </div>
             </div>
           </div>
+
           {/* Partie buttons */}
           <div className="mt-[50px] w-[50%] mx-auto">
             <button

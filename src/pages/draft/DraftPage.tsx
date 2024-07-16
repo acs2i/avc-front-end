@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { LINKCARD_DRAFT, PRODUCTS } from "../../utils/index";
+import { DRAFT_CATEGORY, LINKCARD_DRAFT, PRODUCTS } from "../../utils/index";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import Input from "../../components/FormElements/Input";
+import { ChevronRight, ChevronsUpDown } from "lucide-react";
 
 interface Draft {
   _id: string;
@@ -38,6 +39,7 @@ export default function DraftPage() {
   const user = useSelector((state: any) => state.auth.user._id);
   const token = useSelector((state: any) => state.auth.token);
   const [page, setPage] = useState("draft");
+  const [onglet, setOnglet] = useState("created");
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [userId, setUserId] = useState(user);
@@ -112,86 +114,146 @@ export default function DraftPage() {
 
   return (
     <section>
-      <div className="w-full h-[250px] bg-gray-100 p-8 relative overflow-hidden">
+      {/* Partie Header */}
+      <div className="w-full h-[250px] bg-slate-100 p-8 relative overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: `url(${"/img/background_forest.jpg"})`,
-            opacity: 0.2,
+            opacity: 0.05,
             filter: "grayscale(10%)",
             backgroundPosition: "center bottom -50px",
           }}
         ></div>
         <div className="relative z-10">
-          <h3 className="text-[35px] font-[800] text-gray-800">
-            Références créées par{" "}
-            <span className="capitalize font-[700]">{selectedUsername}</span>
-          </h3>
-          <div className="mt-4 mb-[30px]">
+          <div className="mt-4 mb-[5px]">
             <div className="flex justify-between">
-              <div className="flex items-center gap-7">
+              <div className="flex items-center gap-2">
                 {LINKCARD_DRAFT.map((link, i) => (
                   <React.Fragment key={i}>
                     <button
-                      className={`text-blue-600 text-sm font-[600] ${
-                        page === link.page ? "text-blue-900" : ""
+                      className={`text-sm font-[600] ${
+                        page === link.page ? "text-blue-600" : "text-gray-800"
                       }`}
                       onClick={() => setPage(link.page)}
                     >
                       {link.name}
                     </button>
+                    {i < LINKCARD_DRAFT.length - 1 && (
+                      <div className="text-gray-800">
+                        <ChevronRight size={13} />
+                      </div>
+                    )}
                   </React.Fragment>
                 ))}
               </div>
             </div>
           </div>
-        </div>
-        <div className="relative flex items-center gap-3">
-          <label className="text-gray-700 font-semibold">Utilisateur :</label>
-          <div className="relative w-[250px]">
-            <select
-              name="users"
-              className="block w-full p-1 rounded-lg bg-white border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg capitalize"
-              value={userId}
-              onChange={handleUserChange}
-            >
-              {users.map((user) => (
-                <option
-                  key={user._id}
-                  value={user._id}
-                  className="text-lg capitalize"
+          <h3 className="text-[35px] font-[800] text-gray-800">
+            Références créées par{" "}
+            <span className="capitalize font-[700]">{selectedUsername}</span>
+          </h3>
+          <div className="flex items-center gap-7 mt-[20px]">
+            {DRAFT_CATEGORY.map((link, i) => (
+              <div
+                key={i}
+                className="cursor-pointer flex items-center gap-2"
+                onClick={() => setOnglet(link.page)}
+              >
+                <button
+                  className={`text-sm font-[600] ${
+                    onglet === link.page ? "text-blue-600" : "text-gray-800"
+                  }`}
                 >
-                  {user.username}
-                </option>
-              ))}
-            </select>
+                  {link.name}
+                </button>
+                <span className="text-[14px]">(2222)</span>
+              </div>
+            ))}
+          </div>
+          <div className="relative flex items-center gap-3 mt-4">
+            <label className="text-gray-700 font-semibold">Utilisateur :</label>
+            <div className="relative w-[250px]">
+              <select
+                name="users"
+                className="block w-full p-1 rounded-lg bg-white border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg capitalize"
+                value={userId}
+                onChange={handleUserChange}
+              >
+                {users.map((user) => (
+                  <option
+                    key={user._id}
+                    value={user._id}
+                    className="text-lg capitalize"
+                  >
+                    {user.username}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
       </div>
+      {/* Partie Liste */}
       <div className="overflow-x-auto">
         <table className="w-full text-left">
-          <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
+          <thead className="border-y-[2px] border-slate-100 text-sm font-[900] text-black uppercase">
             <tr>
-              <th scope="col" className="px-6 py-2 w-[5%]">
-                Reférence
+              <th scope="col" className="px-6 py-4 w-[5%]">
+                <div className="flex items-center">
+                  <span className="leading-3">Référence</span>
+                  <div className="cursor-pointer">
+                    <ChevronsUpDown size={13} />
+                  </div>
+                </div>
               </th>
-              <th scope="col" className="px-6 py-2 w-1/6">
-                Libellé
+              <th scope="col" className="px-6 w-1/6">
+                <div className="flex items-center">
+                  <span>Libellé</span>
+                  <div className="cursor-pointer">
+                    <ChevronsUpDown size={13} />
+                  </div>
+                </div>
               </th>
-              <th scope="col" className="px-6 py-2 w-[10%]">
-                Marque
+              <th scope="col" className="px-6 w-[10%]">
+                <div className="flex items-center">
+                  <span>Marque</span>
+                  <div className="cursor-pointer">
+                    <ChevronsUpDown size={13} />
+                  </div>
+                </div>
               </th>
-              <th scope="col" className="px-6 py-2 w-[10%]">
-                Founisseur
+              <th scope="col" className="px-6 w-[10%]">
+                <div className="flex items-center">
+                  <span>Fournisseur</span>
+                  <div className="cursor-pointer">
+                    <ChevronsUpDown size={13} />
+                  </div>
+                </div>
               </th>
-              <th scope="col" className="px-6 py-2 w-1/6">
-                Famille
+              <th scope="col" className="px-6 w-1/6">
+                <div className="flex items-center">
+                  <span>Famille</span>
+                  <div className="cursor-pointer">
+                    <ChevronsUpDown size={13} />
+                  </div>
+                </div>
               </th>
-              <th scope="col" className="px-6 py-2 w-1/6">
-                Sous-famille
+              <th scope="col" className="px-6 w-1/6">
+                <div className="flex items-center">
+                  <span>Sous-famille</span>
+                  <div className="cursor-pointer">
+                    <ChevronsUpDown size={13} />
+                  </div>
+                </div>
               </th>
-              <th scope="col" className="px-6 py-2 w-[10%]">
-                Date de création
+              <th scope="col" className="px-6 w-[10%]">
+                <div className="flex items-center">
+                  <span>Date</span>
+                  <div className="cursor-pointer">
+                    <ChevronsUpDown size={13} />
+                  </div>
+                </div>
               </th>
             </tr>
           </thead>

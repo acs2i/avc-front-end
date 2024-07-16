@@ -6,7 +6,7 @@ import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../components/Shared/Spinner";
-import { Plus } from "lucide-react";
+import { ChevronsUpDown, Plus } from "lucide-react";
 import Header from "../../components/Navigation/Header";
 
 interface Suppliers {
@@ -71,58 +71,69 @@ export default function SuppliersList() {
         height="300px"
         button
       >
-        <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-gray-600">
-          <div className="flex flex-col">
-            <label className="text-sm font-bold mb-1">Code :</label>
-            <input
-              type="text"
-              id="code"
-              className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
-              placeholder="Rechercher un code"
-              value={codeValue}
-              onChange={(e) => setCodeValue(e.target.value)}
-              autoComplete="off"
-            />
-          </div>
+     <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-gray-600">
+  <div className="flex flex-col md:flex-row items-center gap-2">
+    <label className="text-sm font-bold mb-1 md:mb-0 w-[50px]">Code :</label>
+    <input
+      type="text"
+      id="code"
+      className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md w-full"
+      placeholder="Rechercher un code"
+      value={codeValue}
+      onChange={(e) => setCodeValue(e.target.value)}
+      autoComplete="off"
+    />
+  </div>
 
-          <div className="flex flex-col">
-            <label className="text-sm font-bold mb-1">Libellé :</label>
-            <input
-              type="text"
-              id="label"
-              className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md"
-              placeholder="Rechercher par libellé"
-              value={labelValue}
-              onChange={(e) => setLabelValue(e.target.value)}
-              autoComplete="off"
-            />
-          </div>
+  <div className="flex flex-col md:flex-row items-center gap-2">
+    <label className="text-sm font-bold mb-1 md:mb-0 w-[60px]">Libellé :</label>
+    <input
+      type="text"
+      id="label"
+      className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md w-full"
+      placeholder="Rechercher par libellé"
+      value={labelValue}
+      onChange={(e) => setLabelValue(e.target.value)}
+      autoComplete="off"
+    />
+  </div>
 
-          <div className="col-span-full flex">
-            {!isLoading ? (
-              <Button type="submit" size="small" blue>
-                Lancer la Recherche
-              </Button>
-            ) : (
-              <Spinner
-                width="50px"
-                height="40px"
-                logoSize="90%"
-                progressSize={50}
-              />
-            )}
-          </div>
-        </div>
+  <div className="flex items-center">
+    {!isLoading ? (
+      <Button type="submit" size="small" blue>
+        Lancer la Recherche
+      </Button>
+    ) : (
+      <Spinner
+        width="50px"
+        height="40px"
+        logoSize="90%"
+        progressSize={50}
+      />
+    )}
+  </div>
+</div>
+
       </Header>
       <div className="relative overflow-x-auto bg-white">
         <table className="w-full text-left">
-          <thead className="border-y-[1px] border-gray-200 text-sm text-gray-500">
+          <thead className="border-y-[2px] border-slate-100 text-sm font-[900] text-black uppercase">
             <tr>
-              <th scope="col" className="px-6 py-2 w-1/3">
-                Code
+              <th scope="col" className="px-6 py-4 w-1/3">
+                <div className="flex items-center">
+                  <span className="leading-3">Code</span>
+                  <div className="cursor-pointer">
+                    <ChevronsUpDown size={13} />
+                  </div>
+                </div>
               </th>
-              <th scope="col" className="px-6 py-2 w-1/3">
-                Libellé
+              <th scope="col" className="px-6 w-1/3">
+                <div className="flex items-center">
+                  <span>Libellé</span>
+                  <div className="cursor-pointer">
+                    <ChevronsUpDown size={13} />
+                  </div>
+                </div>
               </th>
             </tr>
           </thead>
@@ -131,7 +142,7 @@ export default function SuppliersList() {
               suppliers.map((supplier) => (
                 <tr
                   key={supplier._id}
-                  className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 whitespace-nowrap"
+                  className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-[11px] text-gray-500 whitespace-nowrap"
                   onClick={() =>
                     navigate(`/parameters/dimension/${supplier._id}`)
                   }

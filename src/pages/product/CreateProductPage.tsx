@@ -583,7 +583,7 @@ export default function CreateProductPage() {
   };
   console.log(formData);
   return (
-    <section className="w-full bg-gray-100 p-7">
+    <section className="w-full bg-slate-50 p-7">
       <div className="max-w-[2024px] mx-auto">
         <form onSubmit={handleSubmit} className="mb-[400px]">
           <div className="flex justify-between">
@@ -618,10 +618,10 @@ export default function CreateProductPage() {
 
           <div className="flex gap-7 mt-[80px]">
             <div className="relative w-[70%] flex flex-col gap-3">
-              <h4 className="absolute top-[-30px] font-[700] text-[14px]">
+              <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
                 Identification
               </h4>
-              <div className="border p-3 ">
+              <div className="border border-gray-300 rounded-md p-3">
                 <Input
                   element="input"
                   id="reference"
@@ -739,7 +739,7 @@ export default function CreateProductPage() {
                       />
                     </div>
                   )}
-                   {classificationValue && (
+                  {classificationValue && (
                     <div className="col-span-1">
                       <label className="text-sm font-medium text-gray-600">
                         Sous-sous-famille
@@ -760,11 +760,11 @@ export default function CreateProductPage() {
                 </div>
               </div>
               <div className="flex gap-2 mt-[30px]">
-                <div className="w-1/3 flex flex-col gap-2">
-                  <h4 className="font-[700] text-[14px]">
+                <div className="relative w-1/3 flex flex-col gap-2">
+                  <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
                     Fournisseur principal
                   </h4>
-                  <div className="border p-3">
+                  <div className="border border-gray-300 rounded-md p-3">
                     <div>
                       <Input
                         element="input"
@@ -809,11 +809,11 @@ export default function CreateProductPage() {
                     </div>
                   </div>
                 </div>
-                <div className="w-1/3 flex flex-col gap-2">
-                  <h4 className="font-[700] text-[14px]">
+                <div className="relative w-1/3 flex flex-col gap-2">
+                  <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
                     Caractéristiques du produit
                   </h4>
-                  <div className="border p-3">
+                  <div className="border border-gray-300 rounded-md p-3">
                     <Input
                       element="input"
                       id="product_type"
@@ -856,9 +856,11 @@ export default function CreateProductPage() {
                     </div>
                   </div>
                 </div>
-                <div className="w-1/3 flex flex-col gap-2">
-                  <h4 className="font-[700] text-[14px]">Prix</h4>
-                  <div className="border p-3">
+                <div className="relative w-1/3 flex flex-col gap-2">
+                  <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
+                    Prix
+                  </h4>
+                  <div className="border border-gray-300 rounded-md p-3">
                     <Input
                       element="input"
                       id="PAEU"
@@ -895,67 +897,72 @@ export default function CreateProductPage() {
                   </div>
                 </div>
               </div>
-              <div className="mt-3">
-                <div
-                  className="flex items-center gap-2 cursor-pointer"
-                  onClick={() => setaddFieldIsVisible((prev) => !prev)}
-                >
-                  <h4 className="font-[700] text-[14px]">
-                    Informations additionnelles
+              <div className="flex gap-4 mt-[30px]">
+                <div className="relative w-full flex flex-col gap-3">
+                  <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
+                    Informations additionelles
                   </h4>
-
-                  {!addFieldIsVisible ? (
-                    <ChevronDown size={18} />
-                  ) : (
-                    <ChevronUp size={18} />
-                  )}
-                </div>
-                <Collapse in={addFieldIsVisible}>
-                  <div className="py-[5px]">
-                    {additionalFields.map((field, index) => (
-                      <div
-                        key={index}
-                        className="relative grid grid-cols-2 gap-2"
-                      >
-                        <Input
-                          element="input"
-                          id={`name-${index}`}
-                          label="Nom du champ :"
-                          value={field.name}
-                          validators={[]}
-                          placeholder=""
-                          create
-                          gray
-                        />
-                        <Input
-                          element="input"
-                          id={`value-${index}`}
-                          label="Valeur du champ :"
-                          value={field.value}
-                          validators={[]}
-                          placeholder=""
-                          create
-                          gray
-                        />
-                        <button
-                          type="button"
-                          onClick={() => removeField(index)}
-                          className="absolute top-[50%] translate-y-[50%] right-[-25px] text-red-500 hover:text-red-300"
+                  {/* Partie tarifs */}
+                  <div className="border border-gray-300 p-3">
+                    <div className="py-[5px] w-[90%] mx-auto">
+                      {additionalFields.map((field, index) => (
+                        <div
+                          key={index}
+                          className="relative grid grid-cols-2 gap-2"
                         >
-                          <Trash size={15} />
-                        </button>
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={addField}
-                      className="flex items-center gap-2 text-[12px] text-orange-400 mt-3"
-                    >
-                      <Plus size={17} />
-                      Ajouter un champ
-                    </button>
+                          <Input
+                            element="input"
+                            id={`name-${index}`}
+                            label="Nom du champ :"
+                            value={field.name}
+                            validators={[]}
+                            placeholder=""
+                            create
+                            gray
+                          />
+                          <Input
+                            element="input"
+                            id={`value-${index}`}
+                            label="Valeur du champ :"
+                            value={field.value}
+                            validators={[]}
+                            placeholder=""
+                            create
+                            gray
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeField(index)}
+                            className="absolute top-[50%] translate-y-[50%] right-[-25px] text-red-500 hover:text-red-300"
+                          >
+                            <Trash size={15} />
+                          </button>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={addField}
+                        className="flex items-center gap-2 text-[12px] text-orange-400 mt-3"
+                      >
+                        <Plus size={17} />
+                        Ajouter un champ
+                      </button>
+                    </div>
+                    {/* 
+             
+                <Input
+                  element="textarea"
+                  id="discount"
+                  label="Remises applicables :"
+                  value={formData.discount}
+                  onChange={handleChange}
+                  validators={[]}
+                  placeholder="Indiquez les remises applicables (ex : 10% sur les commandes de plus de 100 unités)"
+                  create
+                  gray
+                /> */}
                   </div>
-                </Collapse>
+                </div>
               </div>
               <div className="mt-3">
                 <Divider />

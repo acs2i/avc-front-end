@@ -15,7 +15,7 @@ import { useSubFamilies } from "../../utils/hooks/useSubFamilies";
 import { LINKCARD_SEARCH } from "../../utils/index";
 import { Collapse, Divider } from "@mui/material";
 import { LinkCard } from "@/type";
-import { ChevronDown, ChevronUp, Plus } from "lucide-react";
+import { ChevronDown, ChevronsUpDown, ChevronUp, Plus } from "lucide-react";
 import Header from "../../components/Navigation/Header";
 
 interface Product {
@@ -200,7 +200,7 @@ export default function ProductList() {
   return (
     <section className="w-full">
       <Header
-        title="Liste des articles"
+        title="Références"
         link="/product/edit"
         btnTitle="Créer un produit"
         placeholder="Rechercher un produit"
@@ -420,25 +420,55 @@ export default function ProductList() {
 
       <div className="relative overflow-x-auto bg-white">
         <table className="w-full text-left">
-          <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
+          <thead className="border-y-[2px] border-slate-100 text-sm font-[900] text-black uppercase">
             <tr>
-              <th scope="col" className="px-6 py-2 w-[10%]">
-                Code
+              <th scope="col" className="px-6 py-4 w-[10%]">
+                <div className="flex items-center">
+                  <span className="leading-3">Code</span>
+                  <div className="cursor-pointer">
+                    <ChevronsUpDown size={13} />
+                  </div>
+                </div>
               </th>
-              <th scope="col" className="px-6 py-2 w-1/6">
-                Libellé
+              <th scope="col" className="px-6 w-1/6">
+                <div className="flex items-center">
+                  <span>Libellé</span>
+                  <div className="cursor-pointer">
+                    <ChevronsUpDown size={13} />
+                  </div>
+                </div>
               </th>
-              <th scope="col" className="px-6 py-2 w-1/6">
-                Marque
+              <th scope="col" className="px-6 w-1/6">
+                <div className="flex items-center">
+                  <span>Marque</span>
+                  <div className="cursor-pointer">
+                    <ChevronsUpDown size={13} />
+                  </div>
+                </div>
               </th>
-              <th scope="col" className="px-6 py-2 w-[10%]">
-                Founisseur
+              <th scope="col" className="px-6 w-[10%]">
+                <div className="flex items-center">
+                  <span>Fournisseur</span>
+                  <div className="cursor-pointer">
+                    <ChevronsUpDown size={13} />
+                  </div>
+                </div>
               </th>
-              <th scope="col" className="px-6 py-2 w-1/6">
-                Famille
+              <th scope="col" className="px-6 w-1/6">
+                <div className="flex items-center">
+                  <span>Famille</span>
+                  <div className="cursor-pointer">
+                    <ChevronsUpDown size={13} />
+                  </div>
+                </div>
               </th>
-              <th scope="col" className="px-6 py-2 w-1/6">
-                Sous-famille
+              <th scope="col" className="px-6 w-1/6">
+                <div className="flex items-center">
+                  <span>Sous-famille</span>
+                  <div className="cursor-pointer">
+                    <ChevronsUpDown size={13} />
+                  </div>
+                </div>
               </th>
             </tr>
           </thead>
@@ -447,11 +477,11 @@ export default function ProductList() {
               products.products.map((product: Product) => (
                 <tr
                   key={product._id}
-                  className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-[11px] text-gray-800 whitespace-nowrap border-y-[1px] border-gray-200"
+                  className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-[11px] text-gray-500 whitespace-nowrap border-y-[1px] border-gray-200"
                   onClick={() => navigate(`/product/${product._id}`)}
                 >
                   <td className="px-6 py-2">{product.GA_CODEARTICLE}</td>
-                  <td className="px-6 py-2 text-blue-600">
+                  <td className="px-6 py-2 text-blue-500">
                     {truncateText(product.GA_LIBELLE, 50)}
                   </td>
                   <td className="px-6 py-2">
@@ -468,7 +498,7 @@ export default function ProductList() {
                   <td className="px-6 py-2">{product.GA_FOURNPRINC}</td>
                   <td className="px-6 py-2">
                     {product.family ? (
-                      <div className="inline-block font-bold">
+                      <div className="inline-block">
                         <span>{product.family?.YX_CODE}</span>
                         <span className="mx-1">-</span>
                         <span>{product.family?.YX_LIBELLE}</span>
@@ -479,7 +509,7 @@ export default function ProductList() {
                   </td>
                   <td className="px-6 py-2">
                     {product.subFamily ? (
-                      <div className="inline-block font-bold">
+                      <div className="inline-block">
                         <span>{product?.subFamily?.YX_CODE}</span>
                         <span className="mx-1">-</span>
                         {product?.subFamily.YX_LIBELLE && (
@@ -510,9 +540,11 @@ export default function ProductList() {
         <div className="px-4 py-2 flex flex-col gap-2">
           <div className="w-full flex justify-between items-center">
             <div className="flex items-center">
-              <h4 className="text-sm whitespace-nowrap">
-                <span className="font-bold">{totalItem}</span> Produits
-              </h4>
+              {products?.products && products.products.length > 0 && (
+                <h4 className="text-sm whitespace-nowrap">
+                  <span className="font-bold">{totalItem}</span> Produits
+                </h4>
+              )}
               {prevSearchValue && (
                 <span className="text-sm italic ml-2">{`"${prevSearchValue}"`}</span>
               )}

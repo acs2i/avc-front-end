@@ -525,6 +525,21 @@ export const LINKCARD_DRAFT: LinkCard[] = [
   },
 ];
 
+export const DRAFT_CATEGORY: LinkCard[] = [
+  {
+    name: "Créés",
+    page: "created",
+  },
+  {
+    name: "Extraits",
+    page: "extract",
+  },
+  {
+    name: "Importés",
+    page: "import",
+  },
+];
+
 export const CARD: Card[] = [
   {
     title: "Total orders",
