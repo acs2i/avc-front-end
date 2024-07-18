@@ -15,8 +15,8 @@ interface Product {
   subFamily: any;
   brand: any;
   productCollection: string;
+  imgPath: string;
 }
-
 interface SearchParams {
   codeValue?: string;
   labelValue?: string;
@@ -58,6 +58,7 @@ export const useProducts = (
           page: currentPage,
           limit
         }
+       
       });
 
       const products = data.data;

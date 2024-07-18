@@ -99,7 +99,7 @@ function App() {
           </Route>
           <Route path="*" element={<Navigate to={isAuth ? "/" : "/login"} />} />
         </Routes>
-        {shouldShowNavbar && isAuth && shouldShowChat && <Chat />}
+        {/* {shouldShowNavbar && isAuth && shouldShowChat && <Chat />} */}
       </div>
     </>
   );

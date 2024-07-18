@@ -59,12 +59,7 @@ export const LINKS: Link[] = [
             ],
             icon: Shirt,
           },
-          {
-            name: "Codifications",
-            link: "/parameters",
-            linksGroup: [],
-            icon: Settings2,
-          },
+         
           {
             name: "Fournisseurs",
             linksGroup: [
@@ -80,11 +75,17 @@ export const LINKS: Link[] = [
             icon: Factory,
           },
           {
-            name: "Calendrier",
-            link: "/calendar",
+            name: "Paramètres",
+            link: "/parameters",
             linksGroup: [],
-            icon: CalendarDays,
+            icon: Settings2,
           },
+          // {
+          //   name: "Calendrier",
+          //   link: "/calendar",
+          //   linksGroup: [],
+          //   icon: CalendarDays,
+          // },
           {
             name: "Chat",
             link: "/chat",
@@ -149,6 +150,24 @@ export const LINKS_Params: Params[] = [
     link: "/parameters/brand",
     icon: Captions,
     page: "brand",
+  },
+  {
+    name: "Tarifs",
+    link: "/parameters/brand",
+    icon: Tag,
+    page: "tarif",
+  },
+  {
+    name: "Regime de taxe",
+    link: "/parameters/brand",
+    icon: HandCoins,
+    page: "tax",
+  },
+  {
+    name: "Taxes",
+    link: "/parameters/brand",
+    icon: HandCoins,
+    page: "tax",
   },
 ];
 
