@@ -46,9 +46,9 @@ export default function ProductList() {
   const [supplierValue, setSupplierValue] = useState("");
   const [prevSearchValue, setPrevSearchValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
   const [totalItem, setTotalItem] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const limit = 20;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
 
@@ -88,7 +88,7 @@ export default function ProductList() {
 
   useEffect(() => {
     fetchProducts();
-  }, [currentPage]);
+  }, []);
 
   console.log(products);
 

@@ -6,14 +6,29 @@ import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../components/Shared/Spinner";
-import { ChevronsUpDown, Plus } from "lucide-react";
+import { ChevronsUpDown, CircleSlash2, Plus } from "lucide-react";
 import Header from "../../components/Navigation/Header";
 
-interface Suppliers {
+interface Supplier {
   _id: string;
-  T_TIERS: string;
-  T_LIBELLE: string;
-  T_JURIDIQUE: string;
+  code: string;
+  company_name: string;
+  siret: string;
+  tva: string;
+  web_url: string;
+  email: string;
+  phone: string;
+  address_1: string;
+  address_2: string;
+  address_3: string;
+  postal: string;
+  country: string;
+  contacts?: any[];
+  conditions?: any[];
+  brand_id: any[];
+  status: string;
+  creator: any; // it's an object
+  additional_fields?: any;
 }
 
 export default function SuppliersList() {
@@ -25,7 +40,7 @@ export default function SuppliersList() {
   const [totalItem, setTotalItem] = useState(null);
   const limit = 20;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
-  const [suppliers, setSuppliers] = useState<Suppliers[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const navigate = useNavigate();
 
   const handlePageChange = (
@@ -54,6 +69,7 @@ export default function SuppliersList() {
       const data = await response.json();
       setSuppliers(data.data);
       setTotalItem(data.total);
+      console.log(data)
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     } finally {
@@ -118,7 +134,7 @@ export default function SuppliersList() {
         <table className="w-full text-left">
           <thead className="border-y-[2px] border-slate-100 text-sm font-[900] text-black uppercase">
             <tr>
-              <th scope="col" className="px-6 py-4 w-1/3">
+              <th scope="col" className="px-6 py-4">
                 <div className="flex items-center">
                   <span className="leading-3">Code</span>
                   <div className="cursor-pointer">
@@ -126,12 +142,27 @@ export default function SuppliersList() {
                   </div>
                 </div>
               </th>
-              <th scope="col" className="px-6 w-1/3">
+              <th scope="col" className="px-6">
                 <div className="flex items-center">
-                  <span>Libellé</span>
+                  <span>Raison Social</span>
                   <div className="cursor-pointer">
                     <ChevronsUpDown size={13} />
                   </div>
+                </div>
+              </th>
+              <th scope="col" className="px-6">
+                <div className="flex items-center">
+                  <span>Email</span>
+                </div>
+              </th>
+              <th scope="col" className="px-6">
+                <div className="flex items-center">
+                  <span>Adresse</span>
+                </div>
+              </th>
+              <th scope="col" className="px-6">
+                <div className="flex items-center">
+                  <span>Code postal</span>
                 </div>
               </th>
             </tr>
@@ -146,8 +177,11 @@ export default function SuppliersList() {
                     navigate(`/parameters/dimension/${supplier._id}`)
                   }
                 >
-                  <td className="px-6 py-2">{supplier.T_TIERS}</td>
-                  <td className="px-6 py-2">{supplier.T_LIBELLE}</td>
+                  <td className="px-6 py-2">{supplier.code}</td>
+                  <td className="px-6 py-2">{supplier.company_name}</td>
+                  <td className="px-6 py-2">{supplier.email ? supplier.email : <CircleSlash2 size={15} />}</td>
+                  <td className="px-6 py-2">{supplier.address_1 ? supplier.address_1 : <CircleSlash2 size={15} />}</td>
+                  <td className="px-6 py-2">{supplier.postal ? supplier.postal : <CircleSlash2 size={15} />}</td>
                 </tr>
               ))
             ) : (

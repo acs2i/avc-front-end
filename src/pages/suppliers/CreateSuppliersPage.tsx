@@ -10,10 +10,31 @@ import Button from "../../components/FormElements/Button";
 import useNotify from "../../utils/hooks/useToast";
 import { CircularProgress, Collapse } from "@mui/material";
 
+interface Contact {
+  firstname: string;
+  lastname: string;
+  function: string;
+  phone: string;
+  mobile: string;
+  email: string;
+}
+
+interface Condition {
+  tarif: string;
+  currency: string;
+  rfa: string;
+  net_price: string;
+  labeling: string;
+  paiement_condition: string;
+  franco: string;
+  validate_tarif: string;
+  budget: string;
+}
+
 interface FormData {
   creator_id: any;
   code: string;
-  social: string;
+  company_name: string;
   juridique: string;
   phone: string;
   email: string;
@@ -35,15 +56,16 @@ interface FormData {
   paymentCondition: string;
   franco: string;
   budget: string;
-  brands: string[];
+  brand_id: string[];
+  contacts: Contact[];
+  conditions: Condition[];
 }
 
 type BrandOption = {
-  value: string;
-  label: string;
-  YX_CODE: string;
-  YX_LIBELLE: string;
   _id: string;
+  value: string;
+  code: string;
+  label: string;
 };
 
 const customStyles = {
@@ -82,17 +104,15 @@ export default function CreateSupplierPage() {
     { name: "", value: "" },
   ]);
   const [inputValueBrand, setInputValueBrand] = useState("");
-  const [selectedOptionBrand, setSelectedOptionBrand] =
-    useState<SingleValue<BrandOption> | null>(null);
   const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
-  const [brands, setBrands] = useState<SingleValue<BrandOption>[]>([null]); // État initial avec un élément
+  const [brands, setBrands] = useState<SingleValue<BrandOption>[]>([null]);
   const { notifySuccess, notifyError } = useNotify();
   const [isLoading, setIsLoading] = useState(false);
   const [addFieldIsVisible, setaddFieldIsVisible] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     creator_id: creatorId._id,
     code: "",
-    social: "",
+    company_name: "",
     juridique: "",
     phone: "",
     email: "",
@@ -114,7 +134,30 @@ export default function CreateSupplierPage() {
     paymentCondition: "45 jours fin du mois",
     franco: "",
     budget: "",
-    brands: [""],
+    brand_id: [],
+    contacts: [
+      {
+        firstname: "",
+        lastname: "",
+        function: "",
+        phone: "",
+        mobile: "",
+        email: "",
+      },
+    ],
+    conditions: [
+      {
+        tarif: "",
+        currency: "",
+        rfa: "",
+        net_price: "",
+        labeling: "",
+        paiement_condition: "",
+        franco: "",
+        validate_tarif: "",
+        budget: "",
+      },
+    ],
   });
 
   const currencies = [
@@ -154,8 +197,8 @@ export default function CreateSupplierPage() {
         const data = await response.json();
 
         const optionsBrand = data.data?.map((brand: BrandOption) => ({
-          value: brand.YX_LIBELLE,
-          label: brand.YX_LIBELLE,
+          value: brand.label,
+          label: brand.label,
           _id: brand._id,
         }));
 
@@ -168,7 +211,7 @@ export default function CreateSupplierPage() {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/brand/search?YX_LIBELLE=${inputValueBrand}&page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/brand/search?label=${inputValueBrand}&page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -179,8 +222,8 @@ export default function CreateSupplierPage() {
       const data = await response.json();
 
       const optionsBrand = data.data?.map((brand: BrandOption) => ({
-        value: brand.YX_LIBELLE,
-        label: brand.YX_LIBELLE,
+        value: brand.label,
+        label: brand.label,
         _id: brand._id,
       }));
 
@@ -233,6 +276,28 @@ export default function CreateSupplierPage() {
       paymentCondition: e.target.value,
     });
   };
+
+  const handleContactChange =
+    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { id, value } = e.target;
+      setFormData((prevData) => ({
+        ...prevData,
+        contacts: prevData.contacts.map((contact, i) =>
+          i === index ? { ...contact, [id]: value } : contact
+        ),
+      }));
+    };
+
+  const handleConditionChange =
+    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { id, value } = e.target;
+      setFormData((prevData) => ({
+        ...prevData,
+        conditions: prevData.conditions.map((condition, i) =>
+          i === index ? { ...condition, [id]: value } : condition
+        ),
+      }));
+    };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -346,7 +411,7 @@ export default function CreateSupplierPage() {
                     element="input"
                     id="social"
                     label="Raison sociale :"
-                    value={formData.social}
+                    value={formData.company_name}
                     onChange={handleChange}
                     validators={[]}
                     placeholder="Ajouter la raison sociale"
@@ -479,7 +544,7 @@ export default function CreateSupplierPage() {
           </div>
           <div className="flex gap-4 mt-[50px]">
             <div className="relative w-[70%] flex flex-col gap-3">
-               {/* Partie contacts */}
+              {/* Partie contacts */}
               <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
                 Contacts
               </h4>
@@ -487,45 +552,45 @@ export default function CreateSupplierPage() {
                 <div className="grid grid-cols-2 gap-2">
                   <Input
                     element="input"
-                    id="address_1"
+                    id="lastname"
                     label="Nom :"
-                    value={formData.address_1}
-                    onChange={handleChange}
+                    value={formData.contacts[0].lastname}
+                    onChange={handleContactChange(0)}
                     validators={[]}
-                    placeholder="14 rue mon adresse"
+                    placeholder="Nom"
                     create
                     gray
                   />
                   <Input
                     element="input"
-                    id="address_2"
-                    label="Prénom :"
-                    value={formData.address_2}
-                    onChange={handleChange}
+                    id="firstname"
+                    label="Nom :"
+                    value={formData.contacts[0].firstname}
+                    onChange={handleContactChange(0)}
                     validators={[]}
-                    placeholder="14 rue mon adresse"
+                    placeholder="Nom"
                     create
                     gray
                   />
                 </div>
                 <Input
                   element="input"
-                  id="address_2"
+                  id="function"
                   label="Fonction :"
-                  value={formData.address_2}
-                  onChange={handleChange}
+                  value={formData.contacts[0].function}
+                  onChange={handleContactChange(0)}
                   validators={[]}
-                  placeholder="14 rue mon adresse"
+                  placeholder="Fonction"
                   create
                   gray
                 />
                 <div className="grid grid-cols-2 gap-2">
                   <Input
-                    element="phone"
+                    element="input"
                     id="phone"
                     label="Téléphone :"
-                    value={formData.phone}
-                    onChange={(e) => handlePhoneChange(e.target.value)}
+                    value={formData.contacts[0].phone}
+                    onChange={handleContactChange(0)}
                     validators={[]}
                     placeholder="0142391456"
                     create
@@ -533,12 +598,12 @@ export default function CreateSupplierPage() {
                   />
                   <Input
                     element="input"
-                    id="address_2"
+                    id="mobile"
                     label="Mobile :"
-                    value={formData.address_2}
-                    onChange={handleChange}
+                    value={formData.contacts[0].mobile}
+                    onChange={handleContactChange(0)}
                     validators={[]}
-                    placeholder="14 rue mon adresse"
+                    placeholder="Mobile"
                     create
                     gray
                   />
@@ -548,8 +613,8 @@ export default function CreateSupplierPage() {
                   type="email"
                   id="email"
                   label="Email :"
-                  value={formData.email}
-                  onChange={handleChange}
+                  value={formData.contacts[0].email}
+                  onChange={handleContactChange(0)}
                   validators={[]}
                   placeholder="ex: email@email.fr"
                   create
@@ -568,10 +633,10 @@ export default function CreateSupplierPage() {
                       element="input"
                       id="tarif"
                       label="Tarif :"
-                      value={formData.tarif}
-                      onChange={handleChange}
+                      value={formData.conditions[0].tarif}
+                      onChange={handleConditionChange(0)}
                       validators={[]}
-                      placeholder="Renseignez le tarif du fournisseur"
+                      placeholder="Tapez un tarif"
                       create
                       gray
                     />
@@ -579,8 +644,8 @@ export default function CreateSupplierPage() {
                       element="select"
                       id="currency"
                       label="Devise :"
-                      value={formData.currency}
-                      onChange={handleChange}
+                      value={formData.conditions[0].currency}
+                      onChange={handleConditionChange(0)}
                       validators={[]}
                       options={currencies}
                       placeholder="Choississez une devise"
@@ -597,11 +662,11 @@ export default function CreateSupplierPage() {
                         <div className="flex items-center gap-2">
                           <input
                             type="radio"
-                            id="rfa-oui"
+                            id="rfa"
                             name="rfa"
                             value="oui"
-                            checked={formData.rfa === "oui"}
-                            onChange={handleRfaChange}
+                            checked={formData.conditions[0].rfa === "oui"}
+                            onChange={handleConditionChange(0)}
                           />
                           <label htmlFor="rfa-oui">Oui</label>
                         </div>
@@ -609,11 +674,11 @@ export default function CreateSupplierPage() {
                         <div className="flex items-center gap-2">
                           <input
                             type="radio"
-                            id="rfa-non"
+                            id="rfa"
                             name="rfa"
                             value="non"
-                            checked={formData.rfa === "non"}
-                            onChange={handleRfaChange}
+                            checked={formData.conditions[0].rfa === "non"}
+                            onChange={handleConditionChange(0)}
                           />
                           <label htmlFor="rfa-non">Non</label>
                         </div>
@@ -627,11 +692,11 @@ export default function CreateSupplierPage() {
                         <div className="flex items-center gap-2">
                           <input
                             type="radio"
-                            id="price-oui"
+                            id="net_price"
                             name="price-net"
                             value="oui"
-                            checked={formData.price_net === "oui"}
-                            onChange={handlePriceNetChange}
+                            checked={formData.conditions[0].net_price === "oui"}
+                            onChange={handleConditionChange(0)}
                           />
                           <label htmlFor="price-oui">Oui</label>
                         </div>
@@ -639,11 +704,11 @@ export default function CreateSupplierPage() {
                         <div className="flex items-center gap-2">
                           <input
                             type="radio"
-                            id="price-non"
+                            id="net_price"
                             name="price-net"
                             value="non"
-                            checked={formData.price_net === "non"}
-                            onChange={handlePriceNetChange}
+                            checked={formData.conditions[0].net_price  === "non"}
+                            onChange={handleConditionChange(0)}
                           />
                           <label htmlFor="price-non">Non</label>
                         </div>
@@ -657,11 +722,11 @@ export default function CreateSupplierPage() {
                         <div className="flex items-center gap-2">
                           <input
                             type="radio"
-                            id="tag-oui"
+                            id="labeling"
                             name="tag"
                             value="oui"
-                            checked={formData.tag === "oui"}
-                            onChange={handleTagChange}
+                            checked={formData.conditions[0].labeling  === "oui"}
+                            onChange={handleConditionChange(0)}
                           />
                           <label htmlFor="tag-oui">Oui</label>
                         </div>
@@ -669,11 +734,11 @@ export default function CreateSupplierPage() {
                         <div className="flex items-center gap-2">
                           <input
                             type="radio"
-                            id="tag-non"
+                            id="labeling"
                             name="tag"
                             value="non"
-                            checked={formData.tag === "non"}
-                            onChange={handleTagChange}
+                            checked={formData.conditions[0].labeling  === "non"}
+                            onChange={handleConditionChange(0)}
                           />
                           <label htmlFor="tag-non">Non</label>
                         </div>
@@ -742,8 +807,8 @@ export default function CreateSupplierPage() {
                       element="input"
                       id="franco"
                       label="Franco :"
-                      value={formData.franco}
-                      onChange={handleChange}
+                      value={formData.conditions[0].franco}
+                      onChange={handleConditionChange(0)}
                       validators={[]}
                       placeholder="Ex: 500 EUR, 1000 USD..."
                       create
