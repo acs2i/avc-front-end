@@ -47,15 +47,7 @@ interface FormData {
   postal: string;
   country: string;
   currency: string;
-  tarif: string;
-  tarif_validate: string;
   discount: string;
-  rfa: string;
-  price_net: string;
-  tag: string;
-  paymentCondition: string;
-  franco: string;
-  budget: string;
   brand_id: string[];
   contacts: Contact[];
   conditions: Condition[];
@@ -125,15 +117,7 @@ export default function CreateSupplierPage() {
     postal: "",
     country: "",
     currency: "",
-    tarif: "PAEU",
-    tarif_validate: "",
     discount: "",
-    rfa: "non",
-    price_net: "non",
-    tag: "non",
-    paymentCondition: "45 jours fin du mois",
-    franco: "",
-    budget: "",
     brand_id: [],
     contacts: [
       {
@@ -176,7 +160,7 @@ export default function CreateSupplierPage() {
     setBrands(updatedBrands);
     setFormData((prevFormData) => ({
       ...prevFormData,
-      brands: updatedBrands.map((brand) => brand?._id || ""),
+      brand_id: updatedBrands.map((brand) => brand?._id || ""),
     }));
   };
 
@@ -247,36 +231,6 @@ export default function CreateSupplierPage() {
     });
   };
 
-  const handleRfaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      rfa: e.target.value,
-    });
-  };
-
-  const handlePriceNetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      price_net: e.target.value,
-    });
-  };
-
-  const handleTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      tag: e.target.value,
-    });
-  };
-
-  const handlePaymentConditionChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setFormData({
-      ...formData,
-      paymentCondition: e.target.value,
-    });
-  };
-
   const handleContactChange =
     (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
       const { id, value } = e.target;
@@ -298,38 +252,6 @@ export default function CreateSupplierPage() {
         ),
       }));
     };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/draft`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-
-      if (response.ok) {
-        setTimeout(() => {
-          notifySuccess("Brouillon créé !");
-          setIsLoading(false);
-          navigate("/draft");
-        }, 1000);
-      } else {
-        notifyError("Erreur lors de la création !");
-        setIsLoading(false);
-      }
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-      setIsLoading(false);
-    }
-  };
 
   const addBrandField = () => {
     setBrands([...brands, null]);
@@ -353,6 +275,64 @@ export default function CreateSupplierPage() {
     const updatedFields = additionalFields.filter((_, i) => i !== index);
     setAdditionalFields(updatedFields);
   };
+
+  const addContactField = () => {
+    setFormData((prevData) => ({
+      ...prevData,
+      contacts: [
+        ...prevData.contacts,
+        {
+          firstname: "",
+          lastname: "",
+          function: "",
+          phone: "",
+          mobile: "",
+          email: "",
+        },
+      ],
+    }));
+  };
+
+  const removeContactField = (index: number) => {
+    if (formData.contacts.length === 1) return; // Ne pas permettre de supprimer si un seul champ
+    setFormData((prevData) => ({
+      ...prevData,
+      contacts: prevData.contacts.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/supplier`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (response.ok) {
+        setTimeout(() => {
+          notifySuccess("Brouillon créé !");
+          setIsLoading(false);
+          navigate("/suppliers/suppliers-list");
+        }, 1000);
+      } else {
+        notifyError("Erreur lors de la création !");
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+      setIsLoading(false);
+    }
+  };
+
   console.log(formData);
   return (
     <section className="w-full bg-slate-50 p-7">
@@ -377,7 +357,7 @@ export default function CreateSupplierPage() {
                     Annuler
                   </Button>
                   <Button size="small" blue type="submit">
-                    Enregistrer
+                    Créer le fournisseur
                   </Button>
                 </div>
               </div>
@@ -409,7 +389,7 @@ export default function CreateSupplierPage() {
                   />
                   <Input
                     element="input"
-                    id="social"
+                    id="company_name"
                     label="Raison sociale :"
                     value={formData.company_name}
                     onChange={handleChange}
@@ -501,7 +481,7 @@ export default function CreateSupplierPage() {
                   value={formData.address_2}
                   onChange={handleChange}
                   validators={[]}
-                  placeholder="14 rue mon adresse"
+                  placeholder="Complément d'adresse"
                   create
                   gray
                 />
@@ -512,7 +492,7 @@ export default function CreateSupplierPage() {
                   value={formData.address_3}
                   onChange={handleChange}
                   validators={[]}
-                  placeholder="14 rue mon adresse"
+                  placeholder="Complément d'adresse"
                   create
                   gray
                 />
@@ -524,7 +504,7 @@ export default function CreateSupplierPage() {
                   value={formData.postal}
                   onChange={handleChange}
                   validators={[]}
-                  placeholder="75001"
+                  placeholder="75019"
                   create
                   gray
                 />
@@ -545,82 +525,103 @@ export default function CreateSupplierPage() {
           <div className="flex gap-4 mt-[50px]">
             <div className="relative w-[70%] flex flex-col gap-3">
               {/* Partie contacts */}
-              <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
+              <h4 className="absolute top-[-5px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
                 Contacts
               </h4>
-              <div className="border border-gray-300 p-3 rounded-md">
-                <div className="grid grid-cols-2 gap-2">
+              {formData.contacts.map((contact, index) => (
+                <div
+                  className="border border-gray-300 p-3 rounded-md mt-3"
+                  key={index}
+                >
+                  <div className="grid grid-cols-2 gap-2">
+                    <Input
+                      element="input"
+                      id="lastname"
+                      label="Nom :"
+                      value={contact.lastname}
+                      onChange={handleContactChange(index)}
+                      validators={[]}
+                      placeholder="Nom"
+                      create
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      id="firstname"
+                      label="Prénom :"
+                      value={contact.firstname}
+                      onChange={handleContactChange(index)}
+                      validators={[]}
+                      placeholder="Prénom"
+                      create
+                      gray
+                    />
+                  </div>
                   <Input
                     element="input"
-                    id="lastname"
-                    label="Nom :"
-                    value={formData.contacts[0].lastname}
-                    onChange={handleContactChange(0)}
+                    id="function"
+                    label="Fonction :"
+                    value={contact.function}
+                    onChange={handleContactChange(index)}
                     validators={[]}
-                    placeholder="Nom"
+                    placeholder="Fonction"
                     create
                     gray
                   />
+                  <div className="grid grid-cols-2 gap-2">
+                    <Input
+                      element="input"
+                      id="phone"
+                      label="Téléphone :"
+                      value={contact.phone}
+                      onChange={handleContactChange(index)}
+                      validators={[]}
+                      placeholder="0142391456"
+                      create
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      id="mobile"
+                      label="Mobile :"
+                      value={contact.mobile}
+                      onChange={handleContactChange(index)}
+                      validators={[]}
+                      placeholder="Mobile"
+                      create
+                      gray
+                    />
+                  </div>
                   <Input
                     element="input"
-                    id="firstname"
-                    label="Nom :"
-                    value={formData.contacts[0].firstname}
-                    onChange={handleContactChange(0)}
+                    type="email"
+                    id="email"
+                    label="Email :"
+                    value={contact.email}
+                    onChange={handleContactChange(index)}
                     validators={[]}
-                    placeholder="Nom"
+                    placeholder="ex: email@email.fr"
                     create
                     gray
                   />
+                  <button
+                    type="button"
+                    onClick={() => removeContactField(index)}
+                    className="flex items-center gap-2 text-[12px] text-red-500 mt-3"
+                  >
+                    <Trash size={17} />
+                    Supprimer ce contact
+                  </button>
                 </div>
-                <Input
-                  element="input"
-                  id="function"
-                  label="Fonction :"
-                  value={formData.contacts[0].function}
-                  onChange={handleContactChange(0)}
-                  validators={[]}
-                  placeholder="Fonction"
-                  create
-                  gray
-                />
-                <div className="grid grid-cols-2 gap-2">
-                  <Input
-                    element="input"
-                    id="phone"
-                    label="Téléphone :"
-                    value={formData.contacts[0].phone}
-                    onChange={handleContactChange(0)}
-                    validators={[]}
-                    placeholder="0142391456"
-                    create
-                    gray
-                  />
-                  <Input
-                    element="input"
-                    id="mobile"
-                    label="Mobile :"
-                    value={formData.contacts[0].mobile}
-                    onChange={handleContactChange(0)}
-                    validators={[]}
-                    placeholder="Mobile"
-                    create
-                    gray
-                  />
-                </div>
-                <Input
-                  element="input"
-                  type="email"
-                  id="email"
-                  label="Email :"
-                  value={formData.contacts[0].email}
-                  onChange={handleContactChange(0)}
-                  validators={[]}
-                  placeholder="ex: email@email.fr"
-                  create
-                  gray
-                />
-              </div>
+              ))}
+              <button
+                type="button"
+                onClick={addContactField}
+                className="flex items-center gap-2 text-[12px] text-orange-400 mt-1"
+              >
+                <Plus size={17} />
+                Ajouter un contact
+              </button>
               {/* Partie tarifs */}
               <div className="relative w-full flex flex-col gap-3 mt-[50px]">
                 <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
@@ -707,7 +708,7 @@ export default function CreateSupplierPage() {
                             id="net_price"
                             name="price-net"
                             value="non"
-                            checked={formData.conditions[0].net_price  === "non"}
+                            checked={formData.conditions[0].net_price === "non"}
                             onChange={handleConditionChange(0)}
                           />
                           <label htmlFor="price-non">Non</label>
@@ -725,7 +726,7 @@ export default function CreateSupplierPage() {
                             id="labeling"
                             name="tag"
                             value="oui"
-                            checked={formData.conditions[0].labeling  === "oui"}
+                            checked={formData.conditions[0].labeling === "oui"}
                             onChange={handleConditionChange(0)}
                           />
                           <label htmlFor="tag-oui">Oui</label>
@@ -737,7 +738,7 @@ export default function CreateSupplierPage() {
                             id="labeling"
                             name="tag"
                             value="non"
-                            checked={formData.conditions[0].labeling  === "non"}
+                            checked={formData.conditions[0].labeling === "non"}
                             onChange={handleConditionChange(0)}
                           />
                           <label htmlFor="tag-non">Non</label>
@@ -753,13 +754,14 @@ export default function CreateSupplierPage() {
                       <div className="flex items-center gap-2">
                         <input
                           type="radio"
-                          id="payment-45j"
+                          id="paiement_condition"
                           name="paymentCondition"
                           value="45 jours fin du mois"
                           checked={
-                            formData.paymentCondition === "45 jours fin du mois"
+                            formData.conditions[0].paiement_condition ===
+                            "45 jours fin du mois"
                           }
-                          onChange={handlePaymentConditionChange}
+                          onChange={handleConditionChange(0)}
                         />
                         <label htmlFor="payment-45j" className="text-[13px]">
                           45 jours fin du mois
@@ -769,14 +771,14 @@ export default function CreateSupplierPage() {
                       <div className="flex items-center gap-2">
                         <input
                           type="radio"
-                          id="payment-10j"
+                          id="paiement_condition"
                           name="paymentCondition"
                           value="10 jours réception facture avec escompte supplémentaire"
                           checked={
-                            formData.paymentCondition ===
+                            formData.conditions[0].paiement_condition ===
                             "10 jours réception facture avec escompte supplémentaire"
                           }
-                          onChange={handlePaymentConditionChange}
+                          onChange={handleConditionChange(0)}
                         />
                         <label htmlFor="payment-10j" className="text-[13px]">
                           10 jours réception facture avec escompte
@@ -787,14 +789,14 @@ export default function CreateSupplierPage() {
                       <div className="flex items-center gap-2">
                         <input
                           type="radio"
-                          id="payment-60j"
+                          id="paiement_condition"
                           name="paymentCondition"
                           value="60 jours date facture"
                           checked={
-                            formData.paymentCondition ===
+                            formData.conditions[0].paiement_condition ===
                             "60 jours date facture"
                           }
-                          onChange={handlePaymentConditionChange}
+                          onChange={handleConditionChange(0)}
                         />
                         <label htmlFor="payment-60j" className="text-[13px]">
                           60 jours date facture
@@ -816,10 +818,10 @@ export default function CreateSupplierPage() {
                     />
                     <Input
                       element="input"
-                      id="tarif_validate"
+                      id="validate_tarif"
                       label="Validité des tarifs :"
-                      value={formData.tarif_validate}
-                      onChange={handleChange}
+                      value={formData.conditions[0].validate_tarif}
+                      onChange={handleConditionChange(0)}
                       validators={[]}
                       placeholder="Ex: 6 mois, 1 mois..."
                       create
@@ -829,8 +831,8 @@ export default function CreateSupplierPage() {
                       element="input"
                       id="budget"
                       label="Budget marketing :"
-                      value={formData.budget}
-                      onChange={handleChange}
+                      value={formData.conditions[0].budget}
+                      onChange={handleConditionChange(0)}
                       validators={[]}
                       placeholder="Ex: 5000 EUR par an"
                       create
@@ -893,7 +895,13 @@ export default function CreateSupplierPage() {
                 </div>
               </div>
               {/* Partie buttons */}
-              <div className="mt-[50px]">
+              <div className="mt-[50px] flex gap-2">
+                <button
+                  className="w-full bg-gray-300 text-red-500 py-2 rounded-md font-[600] hover:bg-red-500 hover:text-white shadow-md"
+                  type="button"
+                >
+                  Annuler
+                </button>
                 <button
                   className="w-full bg-sky-600 text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
                   type="submit"

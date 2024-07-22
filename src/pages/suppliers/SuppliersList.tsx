@@ -94,7 +94,7 @@ export default function SuppliersList() {
               type="text"
               id="code"
               className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
-              placeholder="Rechercher un code"
+              placeholder="Rechercher par code fournisseur"
               value={codeValue}
               onChange={(e) => setCodeValue(e.target.value)}
               autoComplete="off"
@@ -102,12 +102,12 @@ export default function SuppliersList() {
           </div>
 
           <div className="flex flex-col">
-            <label className="text-sm font-bold mb-1">Libellé :</label>
+            <label className="text-sm font-bold mb-1">Raison social :</label>
             <input
               type="text"
               id="label"
               className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
-              placeholder="Rechercher par libellé"
+              placeholder="Rechercher par nom du fournisseur"
               value={labelValue}
               onChange={(e) => setLabelValue(e.target.value)}
               autoComplete="off"
