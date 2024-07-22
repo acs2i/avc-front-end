@@ -8,16 +8,19 @@ import Spinner from "../../components/Shared/Spinner";
 import ScrollToTop from "../../components/ScrollToTop";
 import Modal from "../../components/Shared/Modal";
 import { Divider } from "@mui/material";
-import { Info, Plus } from "lucide-react";
+import { ChevronsUpDown, Info, Plus } from "lucide-react";
 import Header from "../../components/Navigation/Header";
 
 type DataType = "DI1" | "DI2";
 
 interface Dimension {
   _id: string;
-  GDI_DIMORLI: string;
-  GDI_LIBELLE: string;
-  GDI_TYPEDIM: DataType;
+  code: string;
+  label: string;
+  type: string;
+  status: string;
+  creator_id: any;
+  additional_fields?: any;
 }
 
 interface DimensionPageProps {
@@ -27,7 +30,12 @@ interface DimensionPageProps {
   resetHighlightedDimensionId: () => void;
 }
 
-export default function DimensionPage({ onSelectDimension, shouldRefetch, highlightedDimensionId,resetHighlightedDimensionId  }: DimensionPageProps) {
+export default function DimensionPage({
+  onSelectDimension,
+  shouldRefetch,
+  highlightedDimensionId,
+  resetHighlightedDimensionId,
+}: DimensionPageProps) {
   const [prevSearchValue, setPrevSearchValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,12 +43,6 @@ export default function DimensionPage({ onSelectDimension, shouldRefetch, highli
   const limit = 20;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const [dimensions, setDimensions] = useState<Dimension[]>([]);
-
-
-  const typeLabels: { [key in DataType]: string } = {
-    DI1: "Couleur",
-    DI2: "Taille",
-  };
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -75,10 +77,8 @@ export default function DimensionPage({ onSelectDimension, shouldRefetch, highli
     }
   };
 
-
   useEffect(() => {
     if (highlightedDimensionId) {
-      
       const timer = setTimeout(() => {
         resetHighlightedDimensionId();
       }, 3000);
@@ -87,7 +87,6 @@ export default function DimensionPage({ onSelectDimension, shouldRefetch, highli
     }
   }, [highlightedDimensionId, resetHighlightedDimensionId]);
 
-
   useEffect(() => {
     fetchDimensions();
   }, [shouldRefetch]);
@@ -95,16 +94,36 @@ export default function DimensionPage({ onSelectDimension, shouldRefetch, highli
   return (
     <div className="relative overflow-x-auto">
       <table className="w-full text-left">
-        <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
+        <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700 uppercase">
           <tr>
-            <th scope="col" className="px-6 py-2 w-1/3">
-              Type
+            <th scope="col" className="px-6 py-4 w-1/3">
+              <div className="flex items-center">
+                <span className="leading-3">type</span>
+                <div className="cursor-pointer">
+                  <ChevronsUpDown size={13} />
+                </div>
+              </div>
             </th>
-            <th scope="col" className="px-6 py-2 w-[10%]">
-              Code
+            <th scope="col" className="px-6 py-4 w-1/3">
+              <div className="flex items-center">
+                <span className="leading-3">Code</span>
+                <div className="cursor-pointer">
+                  <ChevronsUpDown size={13} />
+                </div>
+              </div>
             </th>
-            <th scope="col" className="px-6 py-2 w-1/3">
-              Libellé
+            <th scope="col" className="px-6 py-4 w-[300px]">
+              <div className="flex items-center">
+                <span className="leading-3">libellé</span>
+                <div className="cursor-pointer">
+                  <ChevronsUpDown size={13} />
+                </div>
+              </div>
+            </th>
+            <th scope="col" className="px-6 py-4 w-[50px]">
+              <div className="flex items-center">
+                <span className="leading-3">status</span>
+              </div>
             </th>
           </tr>
         </thead>
@@ -114,20 +133,35 @@ export default function DimensionPage({ onSelectDimension, shouldRefetch, highli
               <tr
                 key={dimension._id}
                 className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 whitespace-nowrap ${
-                  dimension._id === highlightedDimensionId ? "bg-orange-500 text-white" : ""
+                  dimension._id === highlightedDimensionId
+                    ? "bg-orange-500 text-white"
+                    : ""
                 }`}
                 onClick={() => onSelectDimension(dimension)}
               >
-                <td className={`px-6 py-2 ${
-                  dimension._id === highlightedDimensionId ? "text-white" : ""
-                }`}>
-                  {dimension.GDI_TYPEDIM in typeLabels
-                    ? typeLabels[dimension.GDI_TYPEDIM]
-                    : "Type inconnu"}
+                <td
+                  className={`px-6 py-2 ${
+                    dimension._id === highlightedDimensionId ? "text-white" : ""
+                  }`}
+                >
+                  {dimension.type}
                 </td>
-                <td className="px-6 py-2">{dimension.GDI_DIMORLI}</td>
-                <td className="px-6 py-2">{dimension.GDI_LIBELLE}</td>
-                {dimension._id === highlightedDimensionId && <td className="px-6 py-2">Nouveau</td>}
+                <td className="px-6 py-2">{dimension.code}</td>
+                <td className="px-6 py-2">{dimension.label}</td>
+                <td className="px-6 py-2 uppercase">
+                  {dimension.status === "A" ? (
+                    <div className="text-center bg-green-200 text-green-600 border border-green-400  py-1 rounded-md max-w-[60px]">
+                      <span>Actif</span>
+                    </div>
+                  ) : (
+                    <div className="text-center bg-gray-200 text-gray-600 border border-gray-400  py-1 rounded-md max-w-[60px]">
+                      <span>Innactif</span>
+                    </div>
+                  )}
+                </td>
+                {dimension._id === highlightedDimensionId && (
+                  <td className="px-6 py-2">Nouveau</td>
+                )}
               </tr>
             ))
           ) : (

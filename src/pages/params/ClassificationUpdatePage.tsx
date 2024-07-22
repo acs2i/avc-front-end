@@ -1,31 +1,37 @@
 import Card from "../../components/Shared/Card";
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import useFetch from "../../utils/hooks/usefetch";
 import Input from "../../components/FormElements/Input";
 import Button from "../../components/FormElements/Button";
 import { CircularProgress, Divider } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
 import Modal from "../../components/Shared/Modal";
-import { ChevronLeft, RotateCcw, X } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
+import { useSelector } from "react-redux";
 
-interface Family {
+interface Tag {
   _id: string;
-  YX_TYPE: string;
-  YX_CODE: any;
-  YX_LIBELLE: string;
+  code: string;
+  name: string;
+  level: string;
+  tag_grouping_id: any;
+  additional_fields?: any;
+  status: string;
 }
 
 interface ClassificationUpdatePageProps {
-  selectedFamily: Family;
+  selectedFamily: Tag;
   onUpdate: () => void;
   onClose: () => void;
 }
 
 interface FormData {
-  YX_TYPE: string;
-  YX_CODE: string;
-  YX_LIBELLE: string;
+  creator_id: any;
+  code: string;
+  name: string;
+  level: string;
+  tag_grouping_id: any;
+  status: string;
 }
 
 export default function ClassificationUpdatePage({
@@ -34,37 +40,30 @@ export default function ClassificationUpdatePage({
   onClose,
 }: ClassificationUpdatePageProps) {
   const id = selectedFamily._id;
-  const [classification, setClassification] = useState<Family | null>(null);
+  const user = useSelector((state: any) => state.auth.user);
+  const [classification, setClassification] = useState<Tag | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isModify, setIsModify] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
-  const { data: family } = useFetch<Family>(
-    `${process.env.REACT_APP_URL_DEV}/api/v1/family/${id}`
-  );
+  const [family, setFamily] = useState<Tag>();
   const [libelle, setLibelle] = useState("");
   const [type, setType] = useState("");
-  const [code, setCode] = useState();
+  const [code, setCode] = useState("");
   const [formData, setFormData] = useState<FormData>({
-    YX_TYPE: "",
-    YX_CODE: "",
-    YX_LIBELLE: "",
+    creator_id: user._id,
+    code: "",
+    name: "",
+    level: "",
+    tag_grouping_id: "",
+    status: "A",
   });
-  const options = [
-    { value: "Famille", label: "Famille", name: "Famille" },
-    { value: "Sous-famille", label: "Sous-famille", name: "Sous-famille" },
-    {
-      value: "Sous-sous-famille",
-      label: "Sous-sous-famille",
-      name: "Sous-sous-famille",
-    },
-  ];
 
   const handleLibelleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLibelle(e.target.value);
     setFormData((prevFormData) => ({
       ...prevFormData,
-      YX_LIBELLE: e.target.value,
+      name: e.target.value,
     }));
   };
 
@@ -72,45 +71,67 @@ export default function ClassificationUpdatePage({
     setType(e.target.value);
     setFormData((prevFormData) => ({
       ...prevFormData,
-      YX_TYPE: e.target.value,
+      level: e.target.value,
     }));
-  };
-
-  const handleSetType = (type: string) => {
-    if (type === "LA1") {
-      setType("Famille");
-    } else if (type === "LA2") {
-      setType("Sous-famille");
-    } else {
-      setType("Sous-sous-famille");
-    }
   };
 
   useEffect(() => {
     if (family) {
-      setLibelle(family.YX_LIBELLE);
-      setCode(family.YX_CODE);
-      handleSetType(family.YX_TYPE);
-      setFormData({
-        YX_TYPE: family.YX_TYPE,
-        YX_CODE: family.YX_CODE,
-        YX_LIBELLE: family.YX_LIBELLE,
-      });
+      setLibelle(family.name);
+      setCode(family.code);
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        level: family.level,
+        code: family.code,
+        name: family.name,
+        tag_grouping_id: family.tag_grouping_id,
+        status: family.status,
+      }));
     }
   }, [family]);
 
   useEffect(() => {
     if (selectedFamily) {
       setClassification(selectedFamily);
+      setFamily(selectedFamily);
     }
   }, [selectedFamily]);
+
+  const fetchFamily = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/${id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+      console.log("Fetched data:", data);
+      setFamily(data);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+      notifyError("Erreur lors de la récupération des données");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchFamily();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     try {
+      console.log("Submitting form data:", formData);
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/family/${id}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/${id}`,
         {
           method: "PUT",
           headers: {
@@ -120,21 +141,27 @@ export default function ClassificationUpdatePage({
         }
       );
       if (response.ok) {
+        const data = await response.json();
+        console.log("Updated data:", data);
         setTimeout(() => {
-          notifySuccess("Classification modifiée avec succés !");
+          notifySuccess("Classification modifiée avec succès !");
           setIsLoading(false);
           onUpdate();
           onClose();
         }, 1000);
       } else {
+        const errorData = await response.json();
+        console.error("Error response:", errorData);
         notifyError("Erreur lors de la modification");
+        setIsLoading(false);
       }
     } catch (error) {
-      console.error(error);
-    } finally {
+      console.error("Erreur lors de la soumission", error);
+      notifyError("Erreur lors de la soumission");
+      setIsLoading(false);
     }
   };
-
+console.log(formData)
   return (
     <section className="w-full p-4">
       <Modal
@@ -171,14 +198,13 @@ export default function ClassificationUpdatePage({
           </div>
         )}
       </Modal>
-      <form className="mb-[50px]">
+      <form className="mb-[50px]" onSubmit={handleSubmit}>
         <div className="flex items-center justify-between">
           <div onClick={onClose} className="cursor-pointer">
             <ChevronLeft />
           </div>
           <h1 className="text-[20px] font-bold text-gray-800">
-            Code de la <span className="font-bold">{type} :</span>{" "}
-            {family?.YX_CODE}
+            Code de la <span className="font-bold">{type} :</span> {family?.code}
           </h1>
           {!isModify && (
             <div onClick={() => setIsModify(true)} className="cursor-pointer">
@@ -197,8 +223,8 @@ export default function ClassificationUpdatePage({
                   element="input"
                   id="level"
                   label="Niveau"
-                  value={type}
-                  placeholder={type}
+                  value={family?.level}
+                  placeholder={family?.level}
                   disabled
                   validators={[]}
                   gray
@@ -224,8 +250,8 @@ export default function ClassificationUpdatePage({
                   element="input"
                   id="level"
                   label="Niveau"
-                  value={type}
-                  placeholder={type}
+                  value={family?.level}
+                  placeholder={family?.level}
                   disabled
                   validators={[]}
                   gray

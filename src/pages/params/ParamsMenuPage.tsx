@@ -21,46 +21,57 @@ import CollectionCreatePage from "./CollectionCreatePage";
 import BrandCreatePage from "./BrandCreatePage";
 import GridCreatePage from "./GridCreatePage";
 
-type DataType = "LA1" | "LA2" | "LA3";
-type DataTypeDimension = "DI1" | "DI2";
 
-interface Family {
+interface Tag {
   _id: string;
-  YX_CODE: string;
-  YX_TYPE: DataType;
-  YX_LIBELLE: string;
+  code: string;
+  name: string;
+  level: string;
+  tag_grouping_id: any[];
+  status: string;
+  additional_fields?: any;
+  creator_id: string;
 }
 
 interface Dimension {
   _id: string;
-  GDI_DIMORLI: string;
-  GDI_LIBELLE: string;
-  GDI_TYPEDIM: DataTypeDimension;
+  code: string;
+  label: string;
+  type: string;
+  status: string;
+  creator_id: any;
+  additional_fields?: any;
 }
 
 interface Collection {
   _id: string;
-  CODE: string;
-  LIBELLE: string;
+  code: string;
+  label: string[];
+  status: string;
+  creator_id: any;
+  additional_fields?: any;
 }
 
 interface Brand {
   _id: string;
-  YX_CODE: string;
-  YX_LIBELLE: string;
+  code: string;
+  label: string;
+  status: string;
+  creator_id: any;
+  additional_fields?: any;
 }
 interface Grid {
   _id: string;
-  TYPE: string;
-  LIBELLE: string;
-  DIMENSIONS: string[];
+  label: string;
+  type: string;
+  dimensions: string[];
 }
 
 function ParamsMenuPage() {
   const location = useLocation();
   const [page, setPage] = useState("classe");
   const [shouldRefetch, setShouldRefetch] = useState(false);
-  const [selectedFamily, setSelectedFamily] = useState<Family | null>(null);
+  const [selectedFamily, setSelectedFamily] = useState<Tag | null>(null);
   const [selectedGrid, setSelectedGrid] = useState<Grid | null>(null);
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [selectedCollection, setSelectedCollection] =
@@ -125,6 +136,7 @@ function ParamsMenuPage() {
           <button
             onClick={handleOpenCreatePanel}
             className="bg-blue-500 text-white text-[12px] font-[700] w-full py-2 rounded-md"
+            type="button"
           >
             Créer une {page === "classe" && "classe"}
             {page === "dimension" && "dimension"}

@@ -161,13 +161,13 @@ export const LINKS_Params: Params[] = [
     name: "Regime de taxe",
     link: "/parameters/brand",
     icon: HandCoins,
-    page: "tax",
+    page: "tax_1",
   },
   {
     name: "Taxes",
     link: "/parameters/brand",
     icon: HandCoins,
-    page: "tax",
+    page: "tax_2",
   },
 ];
 
