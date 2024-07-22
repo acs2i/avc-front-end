@@ -241,7 +241,9 @@ export default function SingleProductPage() {
                     setIsModalOpenConfirm(true);
                   }}
                 >
-                  Désactiver la référence
+                  {product?.status === "A"
+                    ? "Désactiver la référence"
+                    : "Réactiver la référence"}
                 </Button>
                 <Button
                   blue
@@ -251,6 +253,7 @@ export default function SingleProductPage() {
                     e.preventDefault();
                     setIsModify(true);
                   }}
+                  disabled={product?.status === "D"}
                 >
                   {isModify ? "Annuler modification" : "Modifier"}
                 </Button>
@@ -280,9 +283,11 @@ export default function SingleProductPage() {
               {/* Indentification */}
               <div className="flex flex-col-reverse lg:flex-row gap-7 mt-[50px] items-stretch">
                 <div className="w-full lg:w-[60%]">
-                  <div className="relative flex flex-col gap-3 bg-white border border-gray-300 p-4 shadow-md">
-                    <div className="absolute top-[-18px] px-1 bg-gradient-to-b from-slate-50 to-white">
-                      <h4 className="font-[700] text-[20px] text-gray-600">Identification</h4>
+                  <div className={`relative flex flex-col gap-3 bg-white border border-gray-300 p-4 shadow-md ${isModify ? "h-[420px]" : "h-[380px]"} rounded-md`}>
+                    <div className="absolute top-[-15px] px-1 bg-gradient-to-b from-slate-50 to-white">
+                      <h4 className="font-[600] text-[17px] text-gray-600">
+                        Identification
+                      </h4>
                     </div>
                     <div className="relative flex-1">
                       <div className="grid grid-cols-4 gap-2 py-2">
@@ -463,7 +468,7 @@ export default function SingleProductPage() {
                     </div>
                   </div>
                 </div>
-                <div className="w-[500px] mx-auto">
+                <div className="w-[480px] bg-white border border-gray-300 rounded-md">
                   {product.imgPath ? (
                     <div className="relative w-full h-0 pb-[75%]">
                       <img
@@ -490,11 +495,15 @@ export default function SingleProductPage() {
               <div className="flex gap-7 mt-[50px] items-stretch">
                 {/* Fournisseur */}
                 <div className="w-1/3 ">
-                  <h4 className="font-[700] mb-2">Fournisseur principal</h4>
-                  <div className="flex flex-col gap-3 bg-white shadow-md">
+                  <div className="relative flex flex-col gap-3 bg-white shadow-md rounded-md">
+                    <div className="absolute top-[-12px] left-[15px] px-1 bg-gradient-to-b from-slate-50 to-white z-10">
+                      <h4 className="font-[600] text-[17px] text-gray-600">
+                        Fournisseur principal
+                      </h4>
+                    </div>
                     <div
                       className={`relative border border-gray-300 p-3 ${
-                        isModify ? "h-[270px]" : "h-[250px]"
+                        isModify ? "h-[320px]" : "h-[250px]"
                       }`}
                     >
                       {!isModify && (
@@ -620,11 +629,15 @@ export default function SingleProductPage() {
                 </div>
                 {/* Caractéristiques produit */}
                 <div className="w-1/3">
-                  <h4 className="font-[700] mb-2">Caractéristiques produit</h4>
-                  <div className="flex flex-col gap-3 bg-white shadow-md">
+                  <div className="relative flex flex-col gap-3 bg-white shadow-md">
+                    <div className="absolute top-[-12px] left-[15px] px-1 bg-gradient-to-b from-slate-50 to-white z-10">
+                      <h4 className="font-[600] text-[17px] text-gray-600">
+                        Caractéristiques produit
+                      </h4>
+                    </div>
                     <div
                       className={`relative border border-gray-300 p-3 ${
-                        isModify ? "h-[270px]" : "h-[250px]"
+                        isModify ? "h-[320px]" : "h-[250px]"
                       }`}
                     >
                       <div className="grid grid-cols-12 gap-2 py-2">
@@ -686,11 +699,15 @@ export default function SingleProductPage() {
                 </div>
                 {/* Prix produit */}
                 <div className="w-1/3">
-                  <h4 className="font-[700] mb-2">Prix</h4>
-                  <div className="flex flex-col gap-3 bg-white shadow-md">
+                  <div className="relative flex flex-col gap-3 bg-white shadow-md">
+                    <div className="absolute top-[-12px] left-[15px] px-1 bg-gradient-to-b from-slate-50 to-white z-10">
+                      <h4 className="font-[600] text-[17px] text-gray-600">
+                        Prix
+                      </h4>
+                    </div>
                     <div
                       className={`relative border border-gray-300 p-3 ${
-                        isModify ? "h-[270px]" : "h-[250px]"
+                        isModify ? "h-[320px]" : "h-[250px]"
                       }`}
                     >
                       <div className="grid grid-cols-12 gap-2 py-2">
