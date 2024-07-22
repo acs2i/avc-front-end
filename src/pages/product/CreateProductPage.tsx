@@ -559,7 +559,7 @@ export default function CreateProductPage() {
 
       if (response.ok) {
         setTimeout(() => {
-          notifySuccess("Brouillon créé !");
+          notifySuccess("Fournisseur créé !");
           setIsLoading(false);
           navigate("/draft");
         }, 1000);
