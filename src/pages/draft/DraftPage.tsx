@@ -101,6 +101,7 @@ export default function DraftPage() {
       );
 
       const data = await response.json();
+      console.log(data)
       setDrafts(data);
     } catch (error) {
       console.error("Erreur lors de la requête", error);

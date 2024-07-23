@@ -204,9 +204,9 @@ export default function ClassificationUpdatePage({
             <div onClick={onClose} className="cursor-pointer">
               <ChevronLeft />
             </div>
-            <h1 className="text-[20px] font-bold text-gray-800">
-              Code de la <span className="font-bold">{type} :</span>{" "}
-              {family?.code}
+            <h1 className="text-[20px] font-[800] text-gray-800">
+              Code <span className="font-[300]">de la {family?.level} : {family?.code}</span>{" "}
+              
             </h1>
           </div>
           {!isModify && (

@@ -106,8 +106,6 @@ export default function CollectionUpdatePage({
     }
   };
 
-
-
   return (
     <section className="w-full p-4">
       <Modal
@@ -147,13 +145,17 @@ export default function CollectionUpdatePage({
 
       <form className="mb-[50px]">
         <div className="flex items-center justify-between">
-          <div onClick={onClose} className="cursor-pointer">
-            <ChevronLeft />
+          <div className="flex items-center gap-2">
+            <div onClick={onClose} className="cursor-pointer">
+              <ChevronLeft />
+            </div>
+            <h1 className="text-[20px] font-[800] text-gray-800">
+              Code {" "}
+              <span className="font-[300]">
+                de la collection : {collection?.code}
+              </span>
+            </h1>
           </div>
-          <h1 className="text-[20px] font-bold text-gray-800">
-            Code de la<span className="font-bold"> collection :</span>{" "}
-            {collection?.code}
-          </h1>
           {!isModify && (
             <div onClick={() => setIsModify(true)} className="cursor-pointer">
               <span className="text-[12px] text-blue-500">Modifier</span>

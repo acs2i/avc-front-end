@@ -605,7 +605,7 @@ export default function CreateProductPage() {
                     Annuler
                   </Button>
                   <Button size="small" blue type="submit">
-                    Enregistrer
+                    Créer une référence
                   </Button>
                 </div>
               </div>
@@ -948,19 +948,6 @@ export default function CreateProductPage() {
                         Ajouter un champ
                       </button>
                     </div>
-                    {/* 
-             
-                <Input
-                  element="textarea"
-                  id="discount"
-                  label="Remises applicables :"
-                  value={formData.discount}
-                  onChange={handleChange}
-                  validators={[]}
-                  placeholder="Indiquez les remises applicables (ex : 10% sur les commandes de plus de 100 unités)"
-                  create
-                  gray
-                /> */}
                   </div>
                 </div>
               </div>
@@ -986,6 +973,21 @@ export default function CreateProductPage() {
                   colors={colors}
                   uvcGrid={uvcGrid}
                 />
+              </div>
+              {/* Partie boutton */}
+              <div className="mt-[50px] flex gap-2">
+                <button
+                  className="w-full border border-gray-300 text-red-600 bg-slate-200 hover:bg-red-600 hover:text-white font-bold shadow-md rounded-md"
+                  type="button"
+                >
+                  Annuler
+                </button>
+                <button
+                  className="w-full bg-sky-600 text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
+                  type="submit"
+                >
+                  Créer la référence
+                </button>
               </div>
             </div>
 

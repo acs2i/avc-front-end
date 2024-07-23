@@ -294,7 +294,7 @@ export default function CreateSupplierPage() {
   };
 
   const removeContactField = (index: number) => {
-    if (formData.contacts.length === 1) return; // Ne pas permettre de supprimer si un seul champ
+    if (formData.contacts.length === 1) return;
     setFormData((prevData) => ({
       ...prevData,
       contacts: prevData.contacts.filter((_, i) => i !== index),
@@ -370,7 +370,7 @@ export default function CreateSupplierPage() {
 
           <div className="flex gap-4 mt-[80px]">
             <div className="relative w-[70%] flex flex-col gap-3">
-              <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
+              <h4 className="absolute top-[-12px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
                 Identification
               </h4>
               {/* Partie Infos */}
@@ -458,7 +458,7 @@ export default function CreateSupplierPage() {
               </div>
             </div>
             <div className="relative w-[30%] flex flex-col gap-3">
-              <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
+              <h4 className="absolute top-[-12px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
                 Adresse
               </h4>
               {/* Partie adresse */}
@@ -525,7 +525,7 @@ export default function CreateSupplierPage() {
           <div className="flex gap-4 mt-[50px]">
             <div className="relative w-[70%] flex flex-col gap-3">
               {/* Partie contacts */}
-              <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
+              <h4 className="absolute top-[-12px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
                 Contacts
               </h4>
               {formData.contacts.map((contact, index) => (
@@ -533,6 +533,9 @@ export default function CreateSupplierPage() {
                   className="border border-gray-300 p-3 rounded-md"
                   key={index}
                 >
+                  <div className="mt-5 flex items-center gap-2">
+                    <span className="italic text-gray-600 text-[12px] font-[700]">Contact {index + 1}</span>
+                  </div>
                   <div className="grid grid-cols-2 gap-2">
                     <Input
                       element="input"
@@ -624,7 +627,7 @@ export default function CreateSupplierPage() {
               </button>
               {/* Partie tarifs */}
               <div className="relative w-full flex flex-col gap-3 mt-[50px]">
-                <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
+                <h4 className="absolute top-[-12px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
                   Tarifs & conditions
                 </h4>
 
@@ -843,7 +846,7 @@ export default function CreateSupplierPage() {
               </div>
               {/* Partie infos additionelles */}
               <div className="relative w-full flex flex-col gap-3 mt-[50px]">
-                <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
+                <h4 className="absolute top-[-12px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
                   Informations additionelles
                 </h4>
 
@@ -912,7 +915,7 @@ export default function CreateSupplierPage() {
             </div>
             {/* Partie marques */}
             <div className="relative w-[30%] flex flex-col gap-3">
-              <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
+              <h4 className="absolute top-[-12px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
                 Marques
               </h4>
               <div className="border border-gray-300 p-3 rounded-md">
@@ -927,7 +930,6 @@ export default function CreateSupplierPage() {
                       placeholder="Selectionner une marque"
                       styles={customStyles}
                       className="block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                      required
                     />
                     <button
                       type="button"

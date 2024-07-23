@@ -225,11 +225,11 @@ export default function SingleProductPage() {
               <ChevronLeft />
             </div>
             <h1 className="text-[32px] font-[800]">
-              Page <span className="font-[600]">produit</span>
+              Page <span className="font-[300]">produit</span>
             </h1>
           </div>
           <div className="flex items-center justify-between">
-            {product && <h2 className="text-[25px]">{product.long_label}</h2>}
+            {product && <h2 className="text-[25px] font-[200]">{product.long_label}</h2>}
             {!isModify ? (
               <div className="flex items-center gap-2">
                 <Button
@@ -283,7 +283,7 @@ export default function SingleProductPage() {
               {/* Indentification */}
               <div className="flex flex-col-reverse lg:flex-row gap-7 mt-[50px] items-stretch">
                 <div className="w-full lg:w-[60%]">
-                  <div className={`relative flex flex-col gap-3 bg-white border border-gray-300 p-4 shadow-md ${isModify ? "h-[420px]" : "h-[380px]"} rounded-md`}>
+                  <div className={`relative flex flex-col gap-3 bg-white border border-gray-300 p-4 ${isModify ? "h-[420px]" : "h-[380px]"} rounded-md`}>
                     <div className="absolute top-[-15px] px-1 bg-gradient-to-b from-slate-50 to-white">
                       <h4 className="font-[600] text-[17px] text-gray-600">
                         Identification
@@ -495,14 +495,14 @@ export default function SingleProductPage() {
               <div className="flex gap-7 mt-[50px] items-stretch">
                 {/* Fournisseur */}
                 <div className="w-1/3 ">
-                  <div className="relative flex flex-col gap-3 bg-white shadow-md rounded-md">
+                  <div className="relative flex flex-col gap-3 bg-white">
                     <div className="absolute top-[-12px] left-[15px] px-1 bg-gradient-to-b from-slate-50 to-white z-10">
                       <h4 className="font-[600] text-[17px] text-gray-600">
                         Fournisseur principal
                       </h4>
                     </div>
                     <div
-                      className={`relative border border-gray-300 p-3 ${
+                      className={`relative border border-gray-300 rounded-md p-3 ${
                         isModify ? "h-[320px]" : "h-[250px]"
                       }`}
                     >
@@ -629,14 +629,14 @@ export default function SingleProductPage() {
                 </div>
                 {/* Caractéristiques produit */}
                 <div className="w-1/3">
-                  <div className="relative flex flex-col gap-3 bg-white shadow-md">
+                  <div className="relative flex flex-col gap-3 bg-white">
                     <div className="absolute top-[-12px] left-[15px] px-1 bg-gradient-to-b from-slate-50 to-white z-10">
                       <h4 className="font-[600] text-[17px] text-gray-600">
                         Caractéristiques produit
                       </h4>
                     </div>
                     <div
-                      className={`relative border border-gray-300 p-3 ${
+                      className={`relative border border-gray-300 p-3 rounded-md ${
                         isModify ? "h-[320px]" : "h-[250px]"
                       }`}
                     >
@@ -699,14 +699,14 @@ export default function SingleProductPage() {
                 </div>
                 {/* Prix produit */}
                 <div className="w-1/3">
-                  <div className="relative flex flex-col gap-3 bg-white shadow-md">
+                  <div className="relative flex flex-col gap-3 bg-white">
                     <div className="absolute top-[-12px] left-[15px] px-1 bg-gradient-to-b from-slate-50 to-white z-10">
                       <h4 className="font-[600] text-[17px] text-gray-600">
                         Prix
                       </h4>
                     </div>
                     <div
-                      className={`relative border border-gray-300 p-3 ${
+                      className={`relative border border-gray-300 p-3 rounded-md ${
                         isModify ? "h-[320px]" : "h-[250px]"
                       }`}
                     >

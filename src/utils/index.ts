@@ -104,14 +104,14 @@ export const LINKS: Link[] = [
                 name: "Liste des utilisateurs",
                 link: "/admin",
               },
-              {
-                name: "Créer un groupe",
-                link: "/admin/create-group",
-              },
-              {
-                name: "Groupes créés",
-                link: "/admin/created-group",
-              },
+              // {
+              //   name: "Créer un groupe",
+              //   link: "/admin/create-group",
+              // },
+              // {
+              //   name: "Groupes créés",
+              //   link: "/admin/created-group",
+              // },
             ],
             icon: User,
           },

@@ -172,7 +172,7 @@ function ParamsMenuPage() {
           {LINKS_Params.map((link) => (
             <div
               key={link.page}
-              className={`border-r-[1px] border-b-[1px] border-gray-300 py-3 flex items-center gap-3 cursor-pointer ${
+              className={`relative border-r-[1px] border-b-[1px] border-gray-300 py-3 flex items-center gap-3 cursor-pointer ${
                 page === link.page ? "text-blue-500" : "text-gray-500"
               } hover:text-blue-500`}
               onClick={() => setPage(link.page)}
@@ -183,6 +183,18 @@ function ParamsMenuPage() {
                   : 15,
               })}
               <span className="text-xs font-[600]">{link.name}</span>
+              {page === link.page && (
+                  <>
+                    <div
+                      className="absolute right-0 top-1/2 transform -translate-y-1/2 rotate-180 w-5 h-5 bg-gray-200"
+                      style={{ clipPath: "polygon(0 0, 100% 50%, 0 100%)" }}
+                    ></div>
+                    <div
+                      className="absolute right-[-1px] top-1/2 transform -translate-y-1/2 rotate-180 w-4 h-4 bg-slate-50"
+                      style={{ clipPath: "polygon(0 0, 100% 50%, 0 100%)" }}
+                    ></div>
+                  </>
+                )}
             </div>
           ))}
         </div>
