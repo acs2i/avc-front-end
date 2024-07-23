@@ -11,8 +11,11 @@ import { ChevronLeft, RotateCcw, X } from "lucide-react";
 
 interface Brand {
   _id: string;
-  YX_CODE: any;
-  YX_LIBELLE: any;
+  code: string;
+  label: string;
+  status: string;
+  creator_id: any;
+  additional_fields?: any;
 }
 
 interface BrandUpdatePageProps {
@@ -22,11 +25,11 @@ interface BrandUpdatePageProps {
 }
 
 interface FormData {
-  YX_CODE: string;
-  YX_LIBELLE: string;
+  code: string;
+  label: string;
 }
 
-export default function BranchUpdatePage({
+export default function BrandUpdatePage({
   selectedBrand,
   onUpdate,
   onClose,
@@ -41,28 +44,28 @@ export default function BranchUpdatePage({
     `${process.env.REACT_APP_URL_DEV}/api/v1/brand/${id}`
   );
   const [libelle, setLibelle] = useState("");
-  const [code, setCode] = useState();
+  const [code, setCode] = useState("");
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
-    YX_CODE: "",
-    YX_LIBELLE: "",
+    code: "",
+    label: "",
   });
 
   const handleLibelleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLibelle(e.target.value);
     setFormData((prevFormData) => ({
       ...prevFormData,
-      YX_LIBELLE: e.target.value,
+      label: e.target.value,
     }));
   };
 
   useEffect(() => {
     if (brand) {
-      setLibelle(brand.YX_LIBELLE);
-      setCode(brand.YX_CODE);
+      setLibelle(brand.label);
+      setCode(brand.code);
       setFormData({
-        YX_LIBELLE: brand.YX_LIBELLE,
-        YX_CODE: brand.YX_CODE,
+        label: brand.label,
+        code: brand.code,
       });
     }
   }, [brand]);
@@ -102,6 +105,8 @@ export default function BranchUpdatePage({
     } finally {
     }
   };
+
+  console.log(formData)
 
   return (
     <section className="w-full p-4">
@@ -147,7 +152,7 @@ export default function BranchUpdatePage({
           </div>
           <h1 className="text-[20px] font-bold text-gray-800">
             Code de la <span className="font-bold">marque :</span>{" "}
-            {brand?.YX_CODE}
+            {brand?.code}
           </h1>
           {!isModify && (
             <div onClick={() => setIsModify(true)} className="cursor-pointer">

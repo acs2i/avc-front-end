@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Collapse, Pagination, Stack } from "@mui/material";
 import Button from "../../components/FormElements/Button";
 import Spinner from "@/src/components/Shared/Spinner";
-import { Plus } from "lucide-react";
+import { ChevronsUpDown, Plus } from "lucide-react";
 import Header from "../../components/Navigation/Header";
 
 interface Grid {
@@ -11,6 +11,7 @@ interface Grid {
   label: string;
   type: string;
   dimensions: string[];
+  status: string;
 }
 
 interface GridPageProps {
@@ -96,14 +97,31 @@ export default function GridPage({
       <table className="w-full text-left">
         <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700 uppercase">
           <tr>
-            <th scope="col" className="px-6 py-2 w-1/3">
-              Type
+            <th scope="col" className="px-6 py-4 w-1/3">
+              <div className="flex items-center">
+                <span>type</span>
+                <div className="cursor-pointer">
+                  <ChevronsUpDown size={13} />
+                </div>
+              </div>
             </th>
-            <th scope="col" className="px-6 py-2 w-1/3">
-              Libellé
+            <th scope="col" className="px-6 py-4 w-1/3">
+              <div className="flex items-center">
+                <span>libellé</span>
+                <div className="cursor-pointer">
+                  <ChevronsUpDown size={13} />
+                </div>
+              </div>
             </th>
-            <th scope="col" className="px-6 py-2 w-1/3">
-              Dimensions
+            <th scope="col" className="px-6 py-4 w-1/3">
+              <div className="flex items-center">
+                <span>dimensions</span>
+              </div>
+            </th>
+            <th scope="col" className="px-6 py-4 w-[50px]">
+              <div className="flex items-center">
+                <span>status</span>
+              </div>
             </th>
           </tr>
         </thead>
@@ -163,6 +181,17 @@ export default function GridPage({
                       </>
                     )}
                   </td>
+                  <td className="px-6 py-2 uppercase">
+                    {grid.status === "A" ? (
+                      <div className="text-center bg-green-200 text-green-600 border border-green-400  py-1 rounded-md max-w-[60px]">
+                        <span>Actif</span>
+                      </div>
+                    ) : (
+                      <div className="text-center bg-gray-200 text-gray-600 border border-gray-400  py-1 rounded-md max-w-[60px]">
+                        <span>Innactif</span>
+                      </div>
+                    )}
+                  </td>
                   {grid._id === highlightedGridId && (
                     <td className="px-6 py-2">Nouveau</td>
                   )}
@@ -175,7 +204,7 @@ export default function GridPage({
         <div className="w-full flex justify-between items-center">
           <div className="flex items-center">
             <h4 className="text-sm whitespace-nowrap">
-              <span className="font-bold">{totalItem}</span> Dimensions
+              <span className="font-bold">{totalItem}</span> Grilles
             </h4>
             {prevSearchValue && (
               <span className="text-sm italic ml-2">{`"${prevSearchValue}"`}</span>

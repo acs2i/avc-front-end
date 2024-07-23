@@ -34,7 +34,7 @@ export default function Header({
         }}
       ></div>
       <div className="p-8 relative z-10">
-        <h3 className="text-[35px] font-[800] text-gray-800">{title} <span className="font-[600]">{light}</span></h3>
+        <h3 className="text-[35px] font-[800] text-gray-800">{title} <span className="font-[200]">{light}</span></h3>
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
             <div className="relative w-[400px]">

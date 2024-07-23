@@ -11,9 +11,12 @@ import { ChevronLeft, RotateCcw, X } from "lucide-react";
 
 interface Dimension {
   _id: string;
-  GDI_TYPEDIM: string;
-  GDI_DIMORLI: any;
-  GDI_LIBELLE: any;
+  code: string;
+  label: string;
+  type: string;
+  status: string;
+  creator_id: any;
+  additional_fields?: any;
 }
 
 interface DimensionUpdatePageProps {
@@ -23,9 +26,9 @@ interface DimensionUpdatePageProps {
 }
 
 interface FormData {
-  GDI_TYPEDIM: string;
-  GDI_DIMORLI: string;
-  GDI_LIBELLE: string;
+  type: string;
+  code: string;
+  label: string;
 }
 
 export default function DimensionUpdatePage({
@@ -49,16 +52,16 @@ export default function DimensionUpdatePage({
   const [type, setType] = useState("");
   const [code, setCode] = useState("");
   const [formData, setFormData] = useState<FormData>({
-    GDI_TYPEDIM: "",
-    GDI_DIMORLI: "",
-    GDI_LIBELLE: "",
+    type: "",
+    code: "",
+    label: "",
   });
 
   const handleLibelleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLibelle(e.target.value);
     setFormData((prevFormData) => ({
       ...prevFormData,
-      GDI_LIBELLE: e.target.value,
+      label: e.target.value,
     }));
   };
 
@@ -66,7 +69,7 @@ export default function DimensionUpdatePage({
     setType(e.target.value);
     setFormData((prevFormData) => ({
       ...prevFormData,
-      GDI_TYPEDIM: e.target.value,
+      type: e.target.value,
     }));
   };
 
@@ -80,13 +83,13 @@ export default function DimensionUpdatePage({
 
   useEffect(() => {
     if (dimension) {
-      setLibelle(dimension.GDI_LIBELLE);
-      setCode(dimension.GDI_DIMORLI);
-      handleSetType(dimension.GDI_TYPEDIM);
+      setLibelle(dimension.label);
+      setCode(dimension.code);
+      handleSetType(dimension.type);
       setFormData({
-        GDI_TYPEDIM: dimension.GDI_TYPEDIM,
-        GDI_DIMORLI: dimension.GDI_DIMORLI,
-        GDI_LIBELLE: dimension.GDI_LIBELLE,
+        type: dimension.type,
+        code: dimension.code,
+        label: dimension.label,
       });
     }
   }, [dimension]);
@@ -127,6 +130,8 @@ export default function DimensionUpdatePage({
     }
   };
 
+  console.log(formData);
+
   return (
     <section className="w-full p-4">
       <Modal
@@ -166,13 +171,15 @@ export default function DimensionUpdatePage({
 
       <form className="mb-[50px]">
         <div className="flex items-center justify-between">
-          <div onClick={onClose} className="cursor-pointer">
-            <ChevronLeft />
+          <div className="flex items-center gap-2">
+            <div onClick={onClose} className="cursor-pointer">
+              <ChevronLeft />
+            </div>
+            <h1 className="text-[20px] font-bold text-gray-800">
+              Code de la <span className="font-bold">{type} :</span>{" "}
+              {dimension?.code}
+            </h1>
           </div>
-          <h1 className="text-[20px] font-bold text-gray-800">
-            Code de la <span className="font-bold">{type} :</span>{" "}
-            {dimension?.GDI_DIMORLI}
-          </h1>
           {!isModify && (
             <div onClick={() => setIsModify(true)} className="cursor-pointer">
               <span className="text-[12px] text-blue-500">Modifier</span>

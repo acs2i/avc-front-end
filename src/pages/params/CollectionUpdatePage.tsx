@@ -11,8 +11,9 @@ import { ChevronLeft, RotateCcw, X } from "lucide-react";
 
 interface Collection {
   _id: string;
-  CODE: any;
-  LIBELLE: any;
+  code: string;
+  label: string;
+  status: string;
 }
 
 interface CollectionUpdatePageProps {
@@ -22,8 +23,8 @@ interface CollectionUpdatePageProps {
 }
 
 interface FormData {
-  CODE: string;
-  LIBELLE: string;
+  code: string;
+  label: string;
 }
 
 export default function CollectionUpdatePage({
@@ -43,28 +44,28 @@ export default function CollectionUpdatePage({
     `${process.env.REACT_APP_URL_DEV}/api/v1/collection/${id}`
   );
   const [libelle, setLibelle] = useState("");
-  const [code, setCode] = useState();
+  const [code, setCode] = useState("");
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
-    CODE: "",
-    LIBELLE: "",
+    code: "",
+    label: "",
   });
 
   const handleLibelleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLibelle(e.target.value);
     setFormData((prevFormData) => ({
       ...prevFormData,
-      LIBELLE: e.target.value,
+      label: e.target.value,
     }));
   };
 
   useEffect(() => {
     if (collection) {
-      setLibelle(collection.LIBELLE);
-      setCode(collection.CODE);
+      setLibelle(collection.label);
+      setCode(collection.code);
       setFormData({
-        LIBELLE: collection.LIBELLE,
-        CODE: collection.CODE,
+        label: collection.label,
+        code: collection.code,
       });
     }
   }, [collection]);
@@ -104,6 +105,8 @@ export default function CollectionUpdatePage({
     } finally {
     }
   };
+
+
 
   return (
     <section className="w-full p-4">
@@ -149,7 +152,7 @@ export default function CollectionUpdatePage({
           </div>
           <h1 className="text-[20px] font-bold text-gray-800">
             Code de la<span className="font-bold"> collection :</span>{" "}
-            {collection?.CODE}
+            {collection?.code}
           </h1>
           {!isModify && (
             <div onClick={() => setIsModify(true)} className="cursor-pointer">

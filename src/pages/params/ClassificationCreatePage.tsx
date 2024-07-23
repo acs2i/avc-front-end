@@ -166,11 +166,11 @@ function ClassificationCreatePage({
           <div onClick={onClose} className="cursor-pointer">
             <ChevronLeft />
           </div>
-          <h3 className="text-[32px] font-bold text-gray-800">
-            Créer une classification
-          </h3>
+          <h1 className="text-[20px] font-[800] text-gray-800">
+            Créer <span className="font-[300]">une classification</span>
+          </h1>
         </div>
-        <div className="mt-5 flex flex-col justify-between">
+        <div className="mt-[30px] flex flex-col justify-between">
           <div className="flex flex-col">
             <Input
               element="select"

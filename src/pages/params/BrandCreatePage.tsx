@@ -10,8 +10,10 @@ import { CircularProgress } from "@mui/material";
 import { ChevronLeft } from "lucide-react";
 
 interface FormData {
-  brand: { YX_CODE: string; YX_LIBELLE: string };
-  creatorId: string;
+  code: string;
+  label: string;
+  status: string;
+  creator_id: any;
 }
 
 interface BrandCreatePageProps {
@@ -28,18 +30,14 @@ export default function BrandCreatePage({
   const user = useSelector((state: any) => state.auth.user);
   const { notifySuccess, notifyError } = useNotify();
   const [formData, setFormData] = useState<FormData>({
-    brand: { YX_CODE: "", YX_LIBELLE: "" },
-    creatorId: user._id,
+    code: "",
+    label: "",
+    status: "A",
+    creator_id: user._id,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      brand: {
-        ...formData.brand,
-        [e.target.id]: e.target.value,
-      },
-    });
+    setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -74,6 +72,8 @@ export default function BrandCreatePage({
     }
   };
 
+  console.log(formData)
+
   return (
     <section className="w-full p-4">
       <form className="mb-[50px]" onSubmit={handleSubmit}>
@@ -81,15 +81,15 @@ export default function BrandCreatePage({
           <div onClick={onClose} className="cursor-pointer">
             <ChevronLeft />
           </div>
-          <h3 className="text-[32px] font-bold text-gray-800">
-            Créer une collection
-          </h3>
+          <h1 className="text-[20px] font-[800] text-gray-800">
+            Créer <span className="font-[300]">une marque</span>
+          </h1>
         </div>
-        <div className="mt-5 flex flex-col justify-between">
+        <div className="mt-[30px] flex flex-col justify-between">
           <div className="flex flex-col">
             <Input
               element="input"
-              id="YX_CODE"
+              id="code"
               label="Code"
               placeholder="ex: 456"
               onChange={handleChange}
@@ -100,7 +100,7 @@ export default function BrandCreatePage({
             />
             <Input
               element="input"
-              id="YX_LIBELLE"
+              id="label"
               type="text"
               placeholder="Nom de la collection"
               label="Libellé"

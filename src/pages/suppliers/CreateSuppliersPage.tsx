@@ -341,7 +341,7 @@ export default function CreateSupplierPage() {
           <div className="flex justify-between">
             <div>
               <h3 className="text-[32px] font-[800] text-gray-800">
-                Créer <span className="font-[600]">un fournisseur</span>
+                Créer <span className="font-[200]">un fournisseur</span>
               </h3>
               {creatorId && (
                 <p className="text-[17px] text-gray-600 italic">
@@ -525,12 +525,12 @@ export default function CreateSupplierPage() {
           <div className="flex gap-4 mt-[50px]">
             <div className="relative w-[70%] flex flex-col gap-3">
               {/* Partie contacts */}
-              <h4 className="absolute top-[-5px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
+              <h4 className="absolute top-[-15px] left-[20px] px-2 text-[20px] text-gray-600 bg-slate-50 font-[700]">
                 Contacts
               </h4>
               {formData.contacts.map((contact, index) => (
                 <div
-                  className="border border-gray-300 p-3 rounded-md mt-3"
+                  className="border border-gray-300 p-3 rounded-md"
                   key={index}
                 >
                   <div className="grid grid-cols-2 gap-2">

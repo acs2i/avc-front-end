@@ -191,7 +191,7 @@ export default function BrandPage({
         <div className="w-full flex justify-between items-center">
           <div className="flex items-center">
             <h4 className="text-sm whitespace-nowrap">
-              <span className="font-bold">{totalItem}</span> Dimensions
+              <span className="font-bold">{totalItem}</span> Marques
             </h4>
             {prevSearchValue && (
               <span className="text-md italic ml-2">{`"${prevSearchValue}"`}</span>

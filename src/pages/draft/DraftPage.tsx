@@ -149,9 +149,9 @@ export default function DraftPage() {
               </div>
             </div>
           </div>
-          <h3 className="text-[35px] font-[800] text-gray-800">
-            Références créées par{" "}
-            <span className="capitalize font-[600]">{selectedUsername}</span>
+          <h3 className="text-[32px] font-[800] text-gray-800">
+            Références {" "}
+            <span className="font-[200]">créées par {selectedUsername}</span>
           </h3>
           <div className="flex items-center gap-7 mt-[20px]">
             {DRAFT_CATEGORY.map((link, i) => (

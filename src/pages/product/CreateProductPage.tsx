@@ -589,7 +589,7 @@ export default function CreateProductPage() {
           <div className="flex justify-between">
             <div>
               <h3 className="text-[32px] font-[800] text-gray-800">
-                Créer <span className="font-[600]">une référence</span>
+                Créer <span className="font-[200]">une référence</span>
               </h3>
               {creatorId && (
                 <p className="text-[17px] text-gray-600 italic">
@@ -618,7 +618,7 @@ export default function CreateProductPage() {
 
           <div className="flex gap-7 mt-[80px]">
             <div className="relative w-[70%] flex flex-col gap-3">
-              <h4 className="absolute top-[-15px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[700]">
+              <h4 className="absolute top-[-15px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
                 Identification
               </h4>
               <div className="border border-gray-300 rounded-md p-3">
@@ -761,7 +761,7 @@ export default function CreateProductPage() {
               </div>
               <div className="flex gap-2 mt-[30px]">
                 <div className="relative w-1/3 flex flex-col gap-2">
-                  <h4 className="absolute top-[-15px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[700]">
+                  <h4 className="absolute top-[-15px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
                     Fournisseur principal
                   </h4>
                   <div className="border border-gray-300 rounded-md p-3">
@@ -810,7 +810,7 @@ export default function CreateProductPage() {
                   </div>
                 </div>
                 <div className="relative w-1/3 flex flex-col gap-2">
-                  <h4 className="absolute top-[-15px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[700]">
+                  <h4 className="absolute top-[-15px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
                     Caractéristiques du produit
                   </h4>
                   <div className="border border-gray-300 rounded-md p-3">
@@ -857,7 +857,7 @@ export default function CreateProductPage() {
                   </div>
                 </div>
                 <div className="relative w-1/3 flex flex-col gap-2">
-                  <h4 className="absolute top-[-15px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[700]">
+                  <h4 className="absolute top-[-15px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
                     Prix
                   </h4>
                   <div className="border border-gray-300 rounded-md p-3">
@@ -899,7 +899,7 @@ export default function CreateProductPage() {
               </div>
               <div className="flex gap-4 mt-[30px]">
                 <div className="relative w-full flex flex-col gap-3">
-                  <h4 className="absolute top-[-15px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[700]">
+                  <h4 className="absolute top-[-15px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
                     Informations additionelles
                   </h4>
                   {/* Partie tarifs */}

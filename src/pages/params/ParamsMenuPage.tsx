@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { LINKS_Params } from "../../utils/index";
-import Card from "../../components/Shared/Card";
-import { Info, Settings2 } from "lucide-react";
-import Modal from "../../components/Shared/Modal";
-import Button from "../../components/FormElements/Button";
-import { Divider } from "@mui/material";
+import { Settings2 } from "lucide-react";
 import ClassificationsPage from "./ClassificationsPage";
 import DimensionPage from "./DimensionPage";
 import GridPage from "./GridPage";
@@ -14,13 +10,12 @@ import BrandPage from "./BrandPage";
 import ClassificationUpdatePage from "./ClassificationUpdatePage";
 import DimensionUpdatePage from "./DimensionUpdatePage";
 import CollectionUpdatePage from "./CollectionUpdatePage";
-import BranchUpdatePage from "./BrandUpdatePage";
+import BrandUpdatePage from "./BrandUpdatePage";
 import ClassificationCreatePage from "./ClassificationCreatePage";
 import DimensionCreateItemPage from "./DimensionCreateItemPage";
 import CollectionCreatePage from "./CollectionCreatePage";
 import BrandCreatePage from "./BrandCreatePage";
 import GridCreatePage from "./GridCreatePage";
-
 
 interface Tag {
   _id: string;
@@ -46,7 +41,7 @@ interface Dimension {
 interface Collection {
   _id: string;
   code: string;
-  label: string[];
+  label: string;
   status: string;
   creator_id: any;
   additional_fields?: any;
@@ -126,10 +121,10 @@ function ParamsMenuPage() {
   }, [page]);
 
   return (
-    <section className="w-full h-screen bg-slate-50 p-7 relative overflow-hidden">
-      <div className="flex items-center gap-3">
+    <section className="w-full min-h-screen bg-slate-50 p-7 flex flex-col relative overflow-hidden">
+      <div className="flex items-center gap-3 mb-4">
         <Settings2 size={20}/>
-        <h3 className="text-[25px] font-[800]">Création <span className="font-[400]">et modification des paramètres</span></h3>
+        <h3 className="text-[25px] font-[800]">Création <span className="font-[200]">et modification des paramètres</span></h3>
       </div>
       <div className="h-[70px] mb-3 flex items-center gap-4 w-full relative z-10">
         <div className="w-[300px]">
@@ -156,9 +151,9 @@ function ParamsMenuPage() {
             >
               <path
                 stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
               />
             </svg>
@@ -172,8 +167,8 @@ function ParamsMenuPage() {
           />
         </div>
       </div>
-      <div className="flex gap-4 relative z-10">
-        <div className="w-[300px] h-[400px] border-t-[1px] border-gray-300">
+      <div className="flex gap-4 flex-grow relative z-10 overflow-hidden">
+        <div className="w-[300px] h-full border-t-[1px] border-gray-300 flex flex-col overflow-auto">
           {LINKS_Params.map((link) => (
             <div
               key={link.page}
@@ -191,7 +186,7 @@ function ParamsMenuPage() {
             </div>
           ))}
         </div>
-        <div className="w-full flex gap-7">
+        <div className="w-full flex gap-7 overflow-auto">
           <div className="w-full">
             {page === "classe" && (
               <ClassificationsPage
@@ -235,7 +230,7 @@ function ParamsMenuPage() {
             )}
           </div>
 
-          {/* Partie mise a jour composant */}
+          {/* Partie mise à jour composant */}
           {selectedFamily && (
             <div className="w-full bg-white rounded-lg border shadow-md">
               <ClassificationUpdatePage
@@ -265,7 +260,7 @@ function ParamsMenuPage() {
           )}
           {selectedBrand && (
             <div className="w-full bg-white rounded-lg border shadow-md">
-              <BranchUpdatePage
+              <BrandUpdatePage
                 selectedBrand={selectedBrand}
                 onClose={handleCloseBrand}
                 onUpdate={handleRefetch}

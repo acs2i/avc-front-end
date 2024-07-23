@@ -14,7 +14,7 @@ import Header from "../../components/Navigation/Header";
 interface Collection {
   _id: string;
   code: string;
-  label: string[];
+  label: string;
   status: string;
   creator_id: any;
   additional_fields?: any;
@@ -189,7 +189,7 @@ export default function CollectionPage({
         <div className="w-full flex justify-between items-center">
           <div className="flex items-center">
             <h4 className="text-sm whitespace-nowrap">
-              <span className="font-bold">{totalItem}</span> Dimensions
+              <span className="font-bold">{totalItem}</span> Collections
             </h4>
             {prevSearchValue && (
               <span className="text-sm italic ml-2">{`"${prevSearchValue}"`}</span>

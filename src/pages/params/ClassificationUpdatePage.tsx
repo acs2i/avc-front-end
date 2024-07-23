@@ -161,7 +161,7 @@ export default function ClassificationUpdatePage({
       setIsLoading(false);
     }
   };
-console.log(formData)
+  console.log(formData);
   return (
     <section className="w-full p-4">
       <Modal
@@ -200,12 +200,15 @@ console.log(formData)
       </Modal>
       <form className="mb-[50px]" onSubmit={handleSubmit}>
         <div className="flex items-center justify-between">
-          <div onClick={onClose} className="cursor-pointer">
-            <ChevronLeft />
+          <div className="flex items-center gap-2">
+            <div onClick={onClose} className="cursor-pointer">
+              <ChevronLeft />
+            </div>
+            <h1 className="text-[20px] font-bold text-gray-800">
+              Code de la <span className="font-bold">{type} :</span>{" "}
+              {family?.code}
+            </h1>
           </div>
-          <h1 className="text-[20px] font-bold text-gray-800">
-            Code de la <span className="font-bold">{type} :</span> {family?.code}
-          </h1>
           {!isModify && (
             <div onClick={() => setIsModify(true)} className="cursor-pointer">
               <span className="text-[12px] text-blue-500">Modifier</span>

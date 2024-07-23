@@ -1,26 +1,26 @@
-import Card from "../../components/Shared/Card";
-import Input from "../../components/FormElements/Input";
 import React, { useEffect, useState } from "react";
-import { MoveVertical, Plus, X } from "lucide-react";
-import { CircularProgress, Tooltip } from "@mui/material";
-import { Link } from "react-router-dom";
-import useNotify from "../../utils/hooks/useToast";
+import { ChevronLeft, Plus, X } from "lucide-react";
+import { CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import useNotify from "../../utils/hooks/useToast";
 import Button from "../../components/FormElements/Button";
+import Input from "../../components/FormElements/Input";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import getNumbersFromLabel from "../../utils/func/GetNumbersFromLabel";
 
 interface Dimension {
   _id: string;
-  GDI_TYPEDIM: string;
-  GDI_DIMORLI: string;
-  GDI_LIBELLE: string;
+  label: string;
+  code: string;
+  type: string;
+  status: string;
 }
 
 interface FormData {
-  LIBELLE: string;
-  TYPE: string;
-  DIMENSIONS: string[];
+  label: string;
+  type: string;
+  dimensions: string[];
+  status: string;
 }
 
 interface GridCreatePageProps {
@@ -28,32 +28,31 @@ interface GridCreatePageProps {
   onClose: () => void;
 }
 
-
 export default function GridCreatePage({
   onCreate,
   onClose,
 }: GridCreatePageProps) {
   const [searchValue, setSearchValue] = useState("");
+  const [code, setCode] = useState("");
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [dimensions, setDimensions] = useState<Dimension[]>([]);
   const [selectedDimensions, setSelectedDimensions] = useState<Dimension[]>([]);
   const { notifySuccess, notifyError } = useNotify();
-  const [type, setType] = useState("");
   const [label, setLabel] = useState("");
-  const [choiceValue, setChoiceValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 20;
   const [dropdownIsOpen, setDropdownIsOpen] = useState(false);
   const [formData, setFormData] = useState<FormData>({
-    LIBELLE: "",
-    TYPE: "",
-    DIMENSIONS: [],
+    label: "",
+    type: "",
+    dimensions: [],
+    status: "A"
   });
 
   const levelOptions = [
-    { value: "DI1", label: "Couleur", name: "Couleur" },
-    { value: "DI2", label: "Taille", name: "Taille" },
+    { value: "couleur", label: "Couleur", name: "Couleur" },
+    { value: "taille", label: "Taille", name: "Taille" },
   ];
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -61,7 +60,7 @@ export default function GridCreatePage({
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/grid`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/dimension-grid`,
         {
           method: "POST",
           headers: {
@@ -91,7 +90,7 @@ export default function GridCreatePage({
   const handleSearch = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/dimension/search?GDI_LIBELLE=${searchValue}&GDI_TYPEDIM=${type}&page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/dimension/search?label=${searchValue}&code=${code}&page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -100,7 +99,6 @@ export default function GridCreatePage({
         }
       );
       const data = await response.json();
-
       setDimensions(data.data);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
@@ -110,10 +108,9 @@ export default function GridCreatePage({
   const handleSetType = (e: any) => {
     const selectedOption = e.target.options[e.target.selectedIndex];
     const selectedOptionLabel = selectedOption.label;
-    setType(selectedOption.value);
     setFormData({
       ...formData,
-      TYPE: selectedOptionLabel,
+      type: selectedOption.value,
     });
   };
 
@@ -121,13 +118,17 @@ export default function GridCreatePage({
     setLabel(e.target.value);
     setFormData({
       ...formData,
-      LIBELLE: e.target.value,
+      label: e.target.value,
     });
   };
 
-  const handleDropdownOpen = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
-    setChoiceValue("");
+    setDropdownIsOpen(true);
+  };
+
+  const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCode(e.target.value);
     setDropdownIsOpen(true);
   };
 
@@ -139,9 +140,10 @@ export default function GridCreatePage({
       setSelectedDimensions([...selectedDimensions, dimension]);
       setFormData({
         ...formData,
-        DIMENSIONS: [...formData.DIMENSIONS, dimension.GDI_LIBELLE],
+        dimensions: [...formData.dimensions, dimension.label],
       });
     }
+    setDropdownIsOpen(false);
   };
 
   const handleDragAndDrop = (result: any) => {
@@ -161,22 +163,27 @@ export default function GridCreatePage({
   };
 
   useEffect(() => {
-    if (searchValue) {
+    if (searchValue || code) {
       handleSearch();
     }
-  }, [searchValue, type]);
+  }, [searchValue, code]);
 
   return (
     <section className="w-full p-4">
       <form className="mb-[50px]" onSubmit={handleSubmit}>
-        <h1 className="text-[32px] font-bold text-gray-800">
-          Créer une grille de dimension
-        </h1>
-        <div>
+        <div className="flex items-center gap-2">
+          <div onClick={onClose} className="cursor-pointer">
+            <ChevronLeft />
+          </div>
+          <h1 className="text-[20px] font-[800] text-gray-800">
+            Créer <span className="font-[300]">une grille de dimension</span>
+          </h1>
+        </div>
+        <div className="mt-[30px]">
           <div>
             <Input
               element="input"
-              id="LIBELLE"
+              id="label"
               label="Libellé de la grille"
               placeholder="Donnez un nom à la grille"
               validators={[]}
@@ -190,9 +197,9 @@ export default function GridCreatePage({
           <div className="flex-1">
             <Input
               element="select"
-              id="TYPE"
+              id="type"
               label="Type de dimension"
-              placeholder="Choississez un type de dimension"
+              placeholder="Choisissez un type de dimension"
               validators={[]}
               onChange={handleSetType}
               options={levelOptions}
@@ -206,27 +213,27 @@ export default function GridCreatePage({
             <div className="relative w-[50%]">
               <Input
                 element="input"
-                id="DIMENSION"
-                label="Ajouter des dimensions"
-                placeholder="Choississez vos dimensions"
+                id="dimensionSearch"
+                label="Rechercher par libellé"
+                placeholder="Cherchez par code ou libellé"
                 validators={[]}
                 gray
                 create
-                onChange={handleDropdownOpen}
-                onClick={() => setDropdownIsOpen(true)}
+                onChange={handleSearchChange}
+                value={searchValue}
               />
-              {choiceValue && (
-                <div className="absolute bottom-[3px] bg-orange-400 py-2 px-4 rounded-md">
-                  <div
-                    className="absolute flex items-center justify-center h-[18px] w-[18px] top-[-2px] right-[-4px] rounded-full bg-red-600 text-white cursor-pointer"
-                    onClick={() => setChoiceValue("")}
-                  >
-                    <X />
-                  </div>
-                  <p className="text-white font-bold text-sm">{choiceValue}</p>
-                </div>
-              )}
-              {dropdownIsOpen && dimensions && searchValue && (
+              <Input
+                element="input"
+                id="dimensionCode"
+                label="Rechercher par code"
+                placeholder="Cherchez par code"
+                validators={[]}
+                gray
+                create
+                onChange={handleCodeChange}
+                value={code}
+              />
+              {dropdownIsOpen && dimensions && (searchValue || code) && (
                 <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md">
                   <div
                     className="h-[30px] flex justify-end cursor-pointer px-3"
@@ -243,21 +250,16 @@ export default function GridCreatePage({
                           selectedDimensions.includes(dimension)
                             ? "bg-orange-400 text-white font-bold hover:bg-orange-300"
                             : ""
-                        } hover:bg-gray-200 text-lg px-4 py-2 border-b`}
+                        } hover:bg-gray-200 text-sm px-4 py-2 border-b`}
                         onClick={() => handleDropdownClose(dimension)}
                       >
-                        {dimension.GDI_LIBELLE}
+                        {dimension.label}
                       </li>
                     </ul>
                   ))}
                 </div>
               )}
             </div>
-            {/* {selectedDimensions.length > 1 && (
-              <div className="absolute right-[-50px] top-[50%] translate-y-[-50%] text-orange-400">
-                <MoveVertical size={40} />
-              </div>
-            )} */}
             <div className="w-[50%] border rounded-sm p-1">
               {selectedDimensions && (
                 <DragDropContext onDragEnd={handleDragAndDrop}>
@@ -286,7 +288,7 @@ export default function GridCreatePage({
                                     handleDeleteDimension(dimension._id)
                                   }
                                 >
-                                  {getNumbersFromLabel(dimension.GDI_LIBELLE)}
+                                  {dimension.code}
                                 </div>
                               </li>
                             )}
@@ -303,11 +305,11 @@ export default function GridCreatePage({
         </div>
         {!isLoading ? (
           <div className="mt-4 flex items-center gap-2">
-            <Button size="small" cancel type="button">
+            <Button size="small" cancel type="button" onClick={onClose}>
               Annuler
             </Button>
             <Button size="small" blue type="submit">
-              Enregister ma grille
+              Enregistrer ma grille
             </Button>
           </div>
         ) : (
