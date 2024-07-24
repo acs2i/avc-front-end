@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Input from "../../components/FormElements/Input";
 import { useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Card from "../../components/Shared/Card";
 import {
   ArrowBigRight,
@@ -10,51 +10,86 @@ import {
   ChevronDown,
   ChevronUp,
   ImageUp,
+  Maximize2,
+  Minimize2,
   MinusCircle,
   Plus,
   Trash,
+  Trash2,
 } from "lucide-react";
 import Button from "../../components/FormElements/Button";
 import useNotify from "../../utils/hooks/useToast";
-import { CircularProgress, Collapse, Divider } from "@mui/material";
-import { useFamilies } from "../../utils/hooks/useFamilies";
+import { CircularProgress, Divider } from "@mui/material";
 import { ActionMeta, SingleValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
-import useFetch from "../../utils/hooks/usefetch";
 import UVCGrid from "../../components/UVCGrid";
+import CountrySelector from "../../components/Shared/CountrySelect";
+import { LINKS_Product, LINKS_UVC } from "../../utils/index";
+import UVCInfosTable from "../../components/UVCInfosTable";
+import UVCPriceTable from "../../components/UVCPricesTable";
+import UVCSupplierTable from "../../components/UVCSupplierTable";
+import UVCGrid2 from "../../components/UVCGrid_2";
+
+interface PriceItemSchema {
+  peau: number;
+  tbeu_pb: number;
+  tbeu_pmeu: number;
+}
+
+interface Price {
+  tarif_id: any;
+  currency: string;
+  supplier_id: any;
+  price: PriceItemSchema;
+  store: string;
+}
+
+interface Uvc {
+  code: string;
+  dimensions: string[];
+  prices: Price[];
+  eans: string[];
+  status: string;
+  additional_fields: any;
+}
+
+interface Supplier {
+  supplier_id: string;
+  supplier_ref: string;
+  pcb: string;
+  custom_cat: string;
+  made_in: string;
+}
 
 interface FormData {
   creator_id: any;
-  description_ref: string;
   reference: string;
-  nom_appel: string;
-  designation_longue: string;
-  designation_courte: string;
-  supplier_code: string;
-  supplier_name: string;
-  supplier_ref: string;
-  family: string[];
-  subFamily: string[];
-  dimension_type: string;
-  product_type: string;
-  dimension: string[];
-  brand: string;
-  ref_collection: string;
-  composition: string;
-  description_brouillon: string;
+  name: string;
+  short_label: string;
+  long_label: string;
+  type: string;
+  tag_ids: any[];
+  suppliers: Supplier[];
+  dimension_types: string;
+  brand_ids: any[];
+  collection_ids: any[];
+  imgPath: string;
+  status: string;
+  additional_fields: any;
+  uvc: Uvc[];
   initialSizes: any[];
   initialColors: any[];
   initialGrid: any[];
 }
 
-type Family = {
+type Tag = {
   _id: string;
-  YX_TYPE: string;
-  YX_CODE: string;
-  YX_LIBELLE: string;
+  level: string;
+  code: string;
+  name: string;
 };
 
-type FamilyOption = {
+type TagOption = {
   value: string;
   label: string;
 };
@@ -66,24 +101,24 @@ type ClasificationOption = {
 };
 
 type BrandOption = {
+  _id: string;
   value: string;
   label: string;
-  YX_CODE: string;
-  YX_LIBELLE: string;
-};
-
-type CollectionOption = {
-  value: string;
-  label: string;
-  CODE: string;
-  LIBELLE: string;
+  code: string;
 };
 
 type SuppliersOption = {
+  _id: string;
   value: string;
   label: string;
+  company_name: string;
+};
 
-  T_LIBELLE: string;
+type CollectionOption = {
+  _id: string;
+  value: string;
+  label: string;
+  code: string;
 };
 
 const customStyles = {
@@ -119,6 +154,11 @@ export default function CreateProductPage() {
     { name: "", value: "" },
   ]);
   const { notifySuccess, notifyError } = useNotify();
+  const location = useLocation();
+  const [page, setPage] = useState("dimension");
+  const [onglet, setOnglet] = useState("infos");
+  const [brandLabel, setBrandLabel] = useState("")
+  const [isFullScreen, setIsFullScreen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [classificationValue, setClassificationValue] =
     useState("Au vieux campeur");
@@ -131,17 +171,17 @@ export default function CreateProductPage() {
   const [inputValueCollection, setInputValueCollection] = useState("");
   const [inputValueSupplier, setInputValueSupplier] = useState("");
   const [selectedOptionFamily, setSelectedOptionFamily] =
-    useState<SingleValue<FamilyOption> | null>(null);
+    useState<SingleValue<TagOption> | null>(null);
   const [selectedOptionSubFamily, setSelectedOptionSubFamily] =
-    useState<SingleValue<FamilyOption> | null>(null);
+    useState<SingleValue<TagOption> | null>(null);
   const [selectedOptionBrand, setSelectedOptionBrand] =
     useState<SingleValue<BrandOption> | null>(null);
   const [selectedOptionCollection, setSelectedOptionCollection] =
     useState<SingleValue<CollectionOption> | null>(null);
   const [selectedOptionSupplier, setSelectedOptionSupplier] =
     useState<SingleValue<SuppliersOption> | null>(null);
-  const [optionsFamily, setOptionsFamily] = useState<FamilyOption[]>([]);
-  const [optionsSubFamily, setOptionsSubFamily] = useState<FamilyOption[]>([]);
+  const [optionsFamily, setOptionsFamily] = useState<TagOption[]>([]);
+  const [optionsSubFamily, setOptionsSubFamily] = useState<TagOption[]>([]);
   const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
   const [optionsCollection, setOptionsCollection] = useState<
     CollectionOption[]
@@ -160,27 +200,54 @@ export default function CreateProductPage() {
 
   const [formData, setFormData] = useState<FormData>({
     creator_id: creatorId._id,
-    description_ref: "",
-    nom_appel: "",
     reference: "",
-    designation_longue: "",
-    designation_courte: "",
-    supplier_code: "",
-    supplier_name: "",
-    supplier_ref: "",
-    family: [],
-    subFamily: [],
-    dimension_type: "Couleur/Taille",
-    product_type: "Marchandise",
-    brand: "",
-    ref_collection: "",
-    description_brouillon: "",
-    dimension: [],
-    composition: "",
-    initialSizes: [],
-    initialColors: [],
-    initialGrid: [],
+    name: "",
+    short_label: "",
+    long_label: "",
+    type: "Marchandise",
+    tag_ids: [],
+    suppliers: [
+      {
+        supplier_id: "",
+        supplier_ref: "",
+        pcb: "",
+        custom_cat: "",
+        made_in: "",
+      },
+    ],
+    dimension_types: "Couleur/Taille",
+    brand_ids: [],
+    collection_ids: [],
+    imgPath: "",
+    status: "",
+    additional_fields: "",
+    uvc: [
+      {
+        code: "",
+        dimensions: ["000", "000"],
+        prices: [
+          {
+            tarif_id: "",
+            currency: "",
+            supplier_id: "",
+            price: {
+              peau: 0,
+              tbeu_pb: 0,
+              tbeu_pmeu: 0,
+            },
+            store: "",
+          },
+        ],
+        eans: [],
+        status: "",
+        additional_fields: {},
+      },
+    ],
+    initialSizes: ["000"], // Example initial sizes
+    initialColors: ["000"], // Example initial colors
+    initialGrid: [[true]], // Example initial grid
   });
+  
   const [sizes, setSizes] = useState<string[]>([]);
   const [colors, setColors] = useState<string[]>([]);
   const [uvcGrid, setUvcGrid] = useState<boolean[][]>([]);
@@ -189,83 +256,94 @@ export default function CreateProductPage() {
     setFormData({
       ...formData,
       [e.target.id]: e.target.value,
-      designation_courte:
-        e.target.id === "designation_longue"
+      short_label:
+        e.target.id === "long_label"
           ? e.target.value.substring(0, 15)
-          : formData.designation_courte,
+          : formData.short_label,
     });
   };
 
   const handleChangeBrand = (selectedOption: SingleValue<BrandOption>) => {
-    const brandLabel = selectedOption ? selectedOption.label : "";
+    const brandId = selectedOption ? selectedOption.value : "";
     setSelectedOptionBrand(selectedOption);
     setFormData((prevFormData) => ({
       ...prevFormData,
-      brand: brandLabel,
+      brand_ids: [brandId],
     }));
+    const brandLabel = selectedOption ? selectedOption.label : "";
+    setBrandLabel(brandLabel)
   };
+
+  console.log(brandLabel)
 
   const handleChangeCollection = (
     selectedOption: SingleValue<CollectionOption>
   ) => {
-    const collectionLabel = selectedOption ? selectedOption.label : "";
+    const collectionId = selectedOption ? selectedOption.value : "";
     setSelectedOptionCollection(selectedOption);
     setFormData((prevFormData) => ({
       ...prevFormData,
-      ref_collection: collectionLabel,
+      collection_ids: [collectionId],
     }));
   };
 
-  const handleChangeSupplier = (
-    selectedOption: SingleValue<SuppliersOption>
-  ) => {
-    const supplierLabel = selectedOption ? selectedOption.label : "";
-    setSelectedOptionSupplier(selectedOption);
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      supplier_name: supplierLabel,
-    }));
-  };
-
-  const handleChangeFamily = (newValue: SingleValue<FamilyOption> | null) => {
+  const handleChangeFamily = (newValue: SingleValue<TagOption> | null) => {
     setSelectedOptionFamily(newValue);
 
     if (newValue) {
       setFormData({
         ...formData,
-        family: [newValue.value],
+        tag_ids: [newValue.value],
       });
     } else {
       setFormData({
         ...formData,
-        family: [],
+        tag_ids: [],
       });
     }
   };
 
-  const handleChangeSubFamily = (
-    newValue: SingleValue<FamilyOption> | null
-  ) => {
+  const handleChangeSubFamily = (newValue: SingleValue<TagOption> | null) => {
     setSelectedOptionSubFamily(newValue);
 
     if (newValue) {
       setFormData({
         ...formData,
-        subFamily: [newValue.value],
+        tag_ids: [newValue.value],
       });
     } else {
       setFormData({
         ...formData,
-        subFamily: [],
+        tag_ids: [],
       });
     }
   };
 
-  const handleGridChange = (grid: string[][]) => {
-    const flattenedGrid = grid.flat();
+  const handleDimensionsChange = (newDimensions: string[][]) => {
+    const newUVCs = newDimensions.map((dimensions) => ({
+      code: "",
+      dimensions,
+      prices: [
+        {
+          tarif_id: "",
+          currency: "",
+          supplier_id: "",
+          price: {
+            peau: 0,
+            tbeu_pb: 0,
+            tbeu_pmeu: 0,
+          },
+          store: "",
+        },
+      ],
+      eans: [],
+      status: "",
+      additional_fields: {},
+    }));
+
     setFormData((prevFormData) => ({
       ...prevFormData,
-      dimension: flattenedGrid,
+      uvc: newUVCs,
     }));
   };
 
@@ -286,8 +364,8 @@ export default function CreateProductPage() {
         const data = await response.json();
 
         const optionsBrand = data.data?.map((brand: BrandOption) => ({
-          value: brand.YX_LIBELLE,
-          label: brand.YX_LIBELLE,
+          value: brand._id, // Assurez-vous que cette valeur est l'ID de la marque
+          label: brand.label,
         }));
 
         setOptionsBrand(optionsBrand);
@@ -299,7 +377,7 @@ export default function CreateProductPage() {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/brand/search?YX_LIBELLE=${inputValueBrand}&page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/brand/search?label=${inputValueBrand}&page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -310,8 +388,8 @@ export default function CreateProductPage() {
       const data = await response.json();
 
       const optionsBrand = data.data?.map((brand: BrandOption) => ({
-        value: brand.YX_LIBELLE,
-        label: brand.YX_LIBELLE,
+        value: brand._id, // Assurez-vous que cette valeur est l'ID de la marque
+        label: brand.label,
       }));
 
       setOptionsBrand(optionsBrand);
@@ -339,8 +417,8 @@ export default function CreateProductPage() {
 
         const optionsCollection = data.data?.map(
           (collection: CollectionOption) => ({
-            value: collection.LIBELLE,
-            label: collection.LIBELLE,
+            value: collection._id,
+            label: collection.label,
           })
         );
 
@@ -353,7 +431,7 @@ export default function CreateProductPage() {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/collection/search?LIBELLE=${inputValueCollection}&page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/collection/search?label=${inputValueCollection}&page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -365,8 +443,8 @@ export default function CreateProductPage() {
 
       const optionsCollection = data.data?.map(
         (collection: CollectionOption) => ({
-          value: collection.LIBELLE,
-          label: collection.LIBELLE,
+          value: collection._id,
+          label: collection.label,
         })
       );
 
@@ -394,8 +472,8 @@ export default function CreateProductPage() {
         const data = await response.json();
 
         const optionsSupplier = data.data?.map((supplier: SuppliersOption) => ({
-          value: supplier.T_LIBELLE,
-          label: supplier.T_LIBELLE,
+          value: supplier._id,
+          label: supplier.company_name,
         }));
 
         setOptionsSupplier(optionsSupplier);
@@ -418,8 +496,8 @@ export default function CreateProductPage() {
       const data = await response.json();
 
       const optionsSupplier = data.data?.map((supplier: SuppliersOption) => ({
-        value: supplier.T_LIBELLE,
-        label: supplier.T_LIBELLE,
+        value: supplier._id,
+        label: supplier.company_name,
       }));
 
       setOptionsSupplier(optionsSupplier);
@@ -429,8 +507,8 @@ export default function CreateProductPage() {
   };
 
   const handleClassificationChange = (
-    newValue: SingleValue<FamilyOption>,
-    actionMeta: ActionMeta<FamilyOption>
+    newValue: SingleValue<TagOption>,
+    actionMeta: ActionMeta<TagOption>
   ) => {
     setClassificationValue(newValue ? newValue.value : "");
   };
@@ -445,7 +523,7 @@ export default function CreateProductPage() {
     if (inputValueFamily === "") {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_URL_DEV}/api/v1/family`,
+          `${process.env.REACT_APP_URL_DEV}/api/v1/tag`,
           {
             method: "GET",
             headers: {
@@ -455,9 +533,9 @@ export default function CreateProductPage() {
         );
         const data = await response.json();
 
-        const optionsFamily = data.data?.map((family: Family) => ({
-          value: family.YX_LIBELLE,
-          label: family.YX_LIBELLE,
+        const optionsFamily = data.data?.map((tag: Tag) => ({
+          value: tag._id,
+          label: tag.name,
         }));
 
         setOptionsFamily(optionsFamily);
@@ -469,7 +547,7 @@ export default function CreateProductPage() {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/family/search?YX_LIBELLE=${inputValueFamily}&page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?name=${inputValueFamily}&page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -479,9 +557,9 @@ export default function CreateProductPage() {
       );
       const data = await response.json();
 
-      const optionsFamily = data.data?.map((family: Family) => ({
-        value: family.YX_LIBELLE,
-        label: family.YX_LIBELLE,
+      const optionsFamily = data.data?.map((tag: Tag) => ({
+        value: tag._id,
+        label: tag.name,
       }));
 
       setOptionsFamily(optionsFamily);
@@ -506,9 +584,9 @@ export default function CreateProductPage() {
         );
         const data = await response.json();
 
-        const optionsSubFamily = data.data?.map((family: Family) => ({
-          value: family.YX_LIBELLE,
-          label: family.YX_LIBELLE,
+        const optionsSubFamily = data.data?.map((tag: Tag) => ({
+          value: tag._id,
+          label: tag.name,
         }));
 
         setOptionsSubFamily(optionsSubFamily);
@@ -530,9 +608,9 @@ export default function CreateProductPage() {
       );
       const data = await response.json();
 
-      const optionsSubFamily = data.data?.map((family: Family) => ({
-        value: family.YX_LIBELLE,
-        label: family.YX_LIBELLE,
+      const optionsSubFamily = data.data?.map((tag: Tag) => ({
+        value: tag._id,
+        label: tag.name,
       }));
 
       setOptionsSubFamily(optionsSubFamily);
@@ -540,6 +618,78 @@ export default function CreateProductPage() {
       console.error("Erreur lors de la requête", error);
     }
   };
+
+  const handleSupplierChange = (
+    index: number,
+    field: string,
+    value: string
+  ) => {
+    setFormData((prevFormData) => {
+      const newSuppliers = [...prevFormData.suppliers];
+      newSuppliers[index] = { ...newSuppliers[index], [field]: value };
+      return {
+        ...prevFormData,
+        suppliers: newSuppliers,
+      };
+    });
+  };
+
+  const handleSupplierSelectChange = (
+    index: number,
+    option: SingleValue<SuppliersOption>
+  ) => {
+    setFormData((prevFormData) => {
+      const newSuppliers = [...prevFormData.suppliers];
+      newSuppliers[index] = {
+        ...newSuppliers[index],
+        supplier_id: option ? option.value : "",
+      };
+      return {
+        ...prevFormData,
+        suppliers: newSuppliers,
+      };
+    });
+  };
+
+  const handleChangePrice = (
+    uvcIndex: number,
+    priceIndex: number,
+    field: string,
+    value: string
+  ) => {
+    const parsedValue = parseFloat(value);
+    setFormData((prevFormData) => {
+      const newUvc = [...prevFormData.uvc];
+      const newPrices = [...newUvc[uvcIndex].prices];
+      newPrices[priceIndex] = {
+        ...newPrices[priceIndex],
+        price: {
+          ...newPrices[priceIndex].price,
+          [field]: isNaN(parsedValue) ? 0 : parsedValue,
+        },
+      };
+      newUvc[uvcIndex] = {
+        ...newUvc[uvcIndex],
+        prices: newPrices,
+      };
+      return {
+        ...prevFormData,
+        uvc: newUvc,
+      };
+    });
+  };
+
+  // const handleChangePriceUVC = (uvcIndex: number, priceIndex: number, field: string, value: number) => {
+  //   setFormData(prevFormData => {
+  //     const updatedUvc = [...prevFormData.uvc];
+  //     updatedUvc[uvcIndex].prices[priceIndex].price[field] = value;
+
+  //     return {
+  //       ...prevFormData,
+  //       uvc: updatedUvc
+  //     };
+  //   });
+  // };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -581,6 +731,37 @@ export default function CreateProductPage() {
     const updatedFields = additionalFields.filter((_, i) => i !== index);
     setAdditionalFields(updatedFields);
   };
+
+  const addSupplier = () => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      suppliers: [
+        ...prevFormData.suppliers,
+        {
+          supplier_id: "",
+          supplier_ref: "",
+          pcb: "",
+          custom_cat: "",
+          made_in: "",
+        },
+      ],
+    }));
+  };
+
+  const removeSupplier = (index: number) => {
+    setFormData((prevFormData) => {
+      const newSuppliers = prevFormData.suppliers.filter((_, i) => i !== index);
+      return {
+        ...prevFormData,
+        suppliers: newSuppliers,
+      };
+    });
+  };
+
+  const toggleFullScreen = () => {
+    setIsFullScreen((prevState) => !prevState);
+  };
+
   console.log(formData);
   return (
     <section className="w-full bg-slate-50 p-7">
@@ -635,9 +816,9 @@ export default function CreateProductPage() {
                 />
                 <Input
                   element="input"
-                  id="nom_appel"
+                  id="name"
                   label="Nom d'appel :"
-                  value={formData.nom_appel}
+                  value={formData.name}
                   onChange={handleChange}
                   validators={[]}
                   placeholder="Ajouter le nom d'appel du produit"
@@ -646,9 +827,9 @@ export default function CreateProductPage() {
                 />
                 <Input
                   element="input"
-                  id="designation_longue"
+                  id="long_label"
                   label="Désignation longue :"
-                  value={formData.designation_longue}
+                  value={formData.long_label}
                   onChange={handleChange}
                   validators={[]}
                   placeholder="Ajouter la designation du produit"
@@ -657,9 +838,9 @@ export default function CreateProductPage() {
                 />
                 <Input
                   element="input"
-                  id="designation_courte"
+                  id="short_label"
                   label="Désignation Courte :"
-                  value={formData.designation_courte}
+                  value={formData.short_label}
                   onChange={handleChange}
                   validators={[]}
                   placeholder=""
@@ -760,54 +941,117 @@ export default function CreateProductPage() {
                 </div>
               </div>
               <div className="flex gap-2 mt-[30px]">
-                <div className="relative w-1/3 flex flex-col gap-2">
-                  <h4 className="absolute top-[-15px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
-                    Fournisseur principal
-                  </h4>
-                  <div className="border border-gray-300 rounded-md p-3">
-                    <div>
-                      <Input
-                        element="input"
-                        id="supplier_code"
-                        label="Code :"
-                        value={formData.supplier_ref}
-                        onChange={handleChange}
-                        validators={[]}
-                        placeholder="Renseigner le code du fournisseur"
-                        create
-                        gray
-                      />
+                <div className="w-1/3 flex flex-col">
+                  {formData.suppliers.map((supplier, index) => (
+                    <div
+                      key={index}
+                      className={`relative flex flex-col gap-2 ${
+                        index > 0 && "mt-5"
+                      }`}
+                    >
+                      <h4 className="absolute top-[-15px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
+                        Fournisseur {index === 0 ? "principal" : `${index + 1}`}
+                      </h4>
+                      <div className="border border-gray-300 rounded-md p-3">
+                        <div>
+                          <label className="text-sm font-medium text-gray-600">
+                            Nom
+                          </label>
+                          <CreatableSelect<SuppliersOption>
+                            value={optionsSupplier.find(
+                              (option) => option.value === supplier.supplier_id
+                            )}
+                            onChange={(option) =>
+                              handleSupplierSelectChange(index, option)
+                            }
+                            onInputChange={handleInputChangeSupplier}
+                            inputValue={inputValueSupplier}
+                            options={optionsSupplier}
+                            placeholder="Selectionner un fournisseur"
+                            styles={customStyles}
+                            className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Input
+                            element="input"
+                            id={`supplier_ref-${index}`}
+                            label="Référence produit :"
+                            value={supplier.supplier_ref}
+                            onChange={(e) =>
+                              handleSupplierChange(
+                                index,
+                                "supplier_ref",
+                                e.target.value
+                              )
+                            }
+                            validators={[]}
+                            placeholder="Ajouter la référence produit"
+                            create
+                            gray
+                          />
+                        </div>
+                        <div>
+                          <Input
+                            element="input"
+                            id={`pcb-${index}`}
+                            label="PCB :"
+                            value={supplier.pcb}
+                            onChange={(e) =>
+                              handleSupplierChange(index, "pcb", e.target.value)
+                            }
+                            validators={[]}
+                            placeholder="Ajouter le PCB"
+                            create
+                            gray
+                          />
+                        </div>
+                        <div>
+                          <Input
+                            element="input"
+                            id={`custom_cat-${index}`}
+                            label="Catégorie douanière :"
+                            value={supplier.custom_cat}
+                            onChange={(e) =>
+                              handleSupplierChange(
+                                index,
+                                "custom_cat",
+                                e.target.value
+                              )
+                            }
+                            validators={[]}
+                            placeholder="Ajouter la catégorie douanière"
+                            create
+                            gray
+                          />
+                        </div>
+                        <div>
+                          <CountrySelector
+                            index={index}
+                            value={supplier.made_in}
+                            onChange={handleSupplierChange}
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeSupplier(index)}
+                          className="mt-2 text-red-600 flex items-center gap-2 text-[12px]"
+                        >
+                          <Trash2 size={13} />
+                          Supprimer ce fournisseur
+                        </button>
+                      </div>
                     </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">
-                        Nom
-                      </label>
-                      <CreatableSelect<SuppliersOption>
-                        value={selectedOptionSupplier}
-                        onChange={handleChangeSupplier}
-                        onInputChange={handleInputChangeSupplier}
-                        inputValue={inputValueSupplier}
-                        options={optionsSupplier}
-                        placeholder="Selectionner un fournisseur"
-                        styles={customStyles}
-                        className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Input
-                        element="input"
-                        id="supplier_ref"
-                        label="Référence produit :"
-                        value={formData.supplier_ref}
-                        onChange={handleChange}
-                        validators={[]}
-                        placeholder="Ajouter la designation du produit"
-                        create
-                        gray
-                      />
-                    </div>
-                  </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={addSupplier}
+                    className="flex items-center gap-2 text-[12px] text-orange-400 mt-3"
+                  >
+                    <Plus size={17} />
+                    Ajouter un fournisseur
+                  </button>
                 </div>
                 <div className="relative w-1/3 flex flex-col gap-2">
                   <h4 className="absolute top-[-15px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
@@ -818,7 +1062,7 @@ export default function CreateProductPage() {
                       element="input"
                       id="product_type"
                       label="Type :"
-                      value={formData.product_type}
+                      value={formData.type}
                       onChange={handleChange}
                       validators={[]}
                       placeholder="Selectionnez un type de dimension"
@@ -830,7 +1074,7 @@ export default function CreateProductPage() {
                       element="input"
                       id="dimension_type"
                       label="Type de dimension :"
-                      value={formData.dimension_type}
+                      value={formData.dimension_types}
                       onChange={handleChange}
                       validators={[]}
                       placeholder="Selectionnez un type de dimension"
@@ -861,39 +1105,68 @@ export default function CreateProductPage() {
                     Prix
                   </h4>
                   <div className="border border-gray-300 rounded-md p-3">
-                    <Input
-                      element="input"
-                      id="PAEU"
-                      label="Prix achat :"
-                      value=""
-                      onChange={handleChange}
-                      validators={[]}
-                      placeholder=""
-                      create
-                      gray
-                    />
-                    <Input
-                      element="input"
-                      id="PB"
-                      label="Prix Vente :"
-                      value=""
-                      onChange={handleChange}
-                      validators={[]}
-                      placeholder=""
-                      create
-                      gray
-                    />
-                    <Input
-                      element="input"
-                      id="/PMEU"
-                      label="Prix Modulé :"
-                      value=""
-                      onChange={handleChange}
-                      validators={[]}
-                      placeholder=""
-                      create
-                      gray
-                    />
+                    {formData.uvc.map((uvc, uvcIndex) => (
+                      <div key={uvcIndex}>
+                        {uvc.prices.map((price, priceIndex) => (
+                          <div key={priceIndex}>
+                            <Input
+                              element="input"
+                              id={`peau-${uvcIndex}-${priceIndex}`}
+                              label="Prix achat :"
+                              value={price.price.peau.toString()}
+                              onChange={(e) =>
+                                handleChangePrice(
+                                  uvcIndex,
+                                  priceIndex,
+                                  "peau",
+                                  e.target.value
+                                )
+                              }
+                              validators={[]}
+                              placeholder=""
+                              create
+                              gray
+                            />
+                            <Input
+                              element="input"
+                              id={`tbeu_pb-${uvcIndex}-${priceIndex}`}
+                              label="Prix Vente :"
+                              value={price.price.tbeu_pb.toString()}
+                              onChange={(e) =>
+                                handleChangePrice(
+                                  uvcIndex,
+                                  priceIndex,
+                                  "tbeu_pb",
+                                  e.target.value
+                                )
+                              }
+                              validators={[]}
+                              placeholder=""
+                              create
+                              gray
+                            />
+                            <Input
+                              element="input"
+                              id={`tbeu_pmeu-${uvcIndex}-${priceIndex}`}
+                              label="Prix Modulé :"
+                              value={price.price.tbeu_pmeu.toString()}
+                              onChange={(e) =>
+                                handleChangePrice(
+                                  uvcIndex,
+                                  priceIndex,
+                                  "tbeu_pmeu",
+                                  e.target.value
+                                )
+                              }
+                              validators={[]}
+                              placeholder=""
+                              create
+                              gray
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -954,25 +1227,133 @@ export default function CreateProductPage() {
               <div className="mt-3">
                 <Divider />
               </div>
-              <div className="mt-3">
-                <h4 className="font-[700]">
-                  Création UVC -{" "}
-                  <span className="font-[500] text-[15px] italic">
-                    {formData.dimension_type}
-                  </span>
-                </h4>
-                <UVCGrid
-                  onDimensionsChange={handleGridChange}
-                  initialSizes={formData.initialSizes}
-                  initialColors={formData.initialColors}
-                  initialGrid={formData.initialGrid}
-                  setSizes={setSizes}
-                  setColors={setColors}
-                  setUvcGrid={setUvcGrid}
-                  sizes={sizes}
-                  colors={colors}
-                  uvcGrid={uvcGrid}
-                />
+              {/* Partie onglets */}
+              <div className="mt-[30px] flex mb-[500px]">
+                <div className="w-[30%] border-t-[1px] border-gray-300">
+                  {LINKS_Product.map((link) => (
+                    <div
+                      key={link.page}
+                      className={`relative border-r-[1px] border-b-[1px] border-gray-300 py-4 flex items-center gap-3 cursor-pointer ${
+                        page === link.page ? "text-blue-500" : "text-gray-500"
+                      } hover:text-blue-500`}
+                      onClick={() => setPage(link.page)}
+                    >
+                      {React.createElement(link.icon, {
+                        size: new RegExp(`^${link.link}(/.*)?$`).test(
+                          location.pathname
+                        )
+                          ? 20
+                          : 15,
+                      })}
+                      <span className="text-xs font-[600]">{link.name}</span>
+                      {page === link.page && (
+                        <>
+                          <div
+                            className="absolute right-0 top-1/2 transform -translate-y-1/2 rotate-180 w-5 h-5 bg-gray-300"
+                            style={{
+                              clipPath: "polygon(0 0, 100% 50%, 0 100%)",
+                            }}
+                          ></div>
+                          <div
+                            className="absolute right-[-1px] top-1/2 transform -translate-y-1/2 rotate-180 w-4 h-4 bg-gray-100"
+                            style={{
+                              clipPath: "polygon(0 0, 100% 50%, 0 100%)",
+                            }}
+                          ></div>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                {page === "dimension" && (
+                  <div
+                    className={`border-t-[1px] border-gray-300 px-5 py-2 overflow-y-auto ${
+                      isFullScreen
+                        ? "fixed right-0 top-0 h-full w-full z-[9999] bg-gray-100 h-[300px]"
+                        : "w-[70%]"
+                    }`}
+                  >
+                    <UVCGrid2
+                      onDimensionsChange={handleDimensionsChange}
+                      initialSizes={formData.initialSizes}
+                      initialColors={formData.initialColors}
+                      initialGrid={formData.initialGrid}
+                      setSizes={setSizes}
+                      setColors={setColors}
+                      setUvcGrid={setUvcGrid}
+                      sizes={sizes}
+                      colors={colors}
+                      uvcGrid={uvcGrid}
+                      isFullScreen={toggleFullScreen}
+                    />
+                  </div>
+                )}
+                {page === "uvc" && (
+                  <div
+                    className={`border-t-[1px] border-gray-300 px-5 py-2 ${
+                      isFullScreen
+                        ? "fixed right-0 top-0 h-full w-full z-[9999] bg-gray-100"
+                        : "w-[70%] h-[300px]"
+                    } overflow-y-auto`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <ul className="flex items-center py-3 gap-3">
+                        {LINKS_UVC.map((link) => (
+                          <li
+                            key={link.page}
+                            className={`text-[13px] font-[700] cursor-pointer ${
+                              onglet === link.page
+                                ? "text-blue-500"
+                                : "text-gray-500"
+                            } hover:text-blue-500`}
+                            onClick={() => setOnglet(link.page)}
+                          >
+                            {link.name}
+                          </li>
+                        ))}
+                      </ul>
+                      <div
+                        className="cursor-pointer hover:text-gray-400"
+                        onClick={toggleFullScreen}
+                      >
+                        {isFullScreen ? (
+                          <Minimize2 size={17} />
+                        ) : (
+                          <Maximize2 size={17} />
+                        )}
+                      </div>
+                    </div>
+                    {formData.uvc.map((uvc, index) => (
+                      <div key={index}>
+                        {onglet === "infos" && (
+                          <UVCInfosTable
+                            uvcDimension={uvc.dimensions || []}
+                            productReference={formData.reference || ""}
+                            brandLabel={brandLabel}
+                          />
+                        )}
+                        {/* {onglet === "price" && (
+                          <UVCPriceTable
+                            uvcPrices={uvc.prices}
+                            productReference={formData.reference || ""}
+                            handleChangePrice={(priceIndex, field, value) =>
+                              handleChangePriceUVC(index, priceIndex, field, value)
+                            }
+                          />
+                        )} */}
+                        {/* {onglet === "supplier" && (
+                          <UVCSupplierTable
+                            uvcDimensions={uvc.dimensions || []}
+                            productReference={formData.reference || ""}
+                            productSupplier={
+                              formData.suppliers[0]?.supplier_id || ""
+                            }
+                          />
+                        )} */}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               {/* Partie boutton */}
               <div className="mt-[50px] flex gap-2">

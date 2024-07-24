@@ -3,16 +3,13 @@ import React, { useState } from "react";
 interface UVCInfosTableProps {
   uvcDimension: string[];
   productReference: string;
-  productBrands: {
-    _id: string;
-    label: string;
-  }[];
+  brandLabel: string;
 }
 
 const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
   uvcDimension,
   productReference,
-  productBrands
+  brandLabel
 }) => {
   const [brands, setBrands] = useState<{ [key: string]: string }>(
     uvcDimension.reduce((acc, dimension) => {
@@ -47,11 +44,7 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
               <td className="border px-4 py-1 text-center">{codeUVC}</td>
               <td className="border px-4 py-1 text-center">{couleur}</td>
               <td className="border px-4 py-1 text-center">{taille}</td>
-              <td className="border px-4 py-1 text-center">{productBrands.map((band) => (
-                <div>
-                  {band.label}
-                </div>
-              ))}</td>
+              <td className="border px-4 py-1 text-center">{brandLabel}</td>
             </tr>
           );
         })}

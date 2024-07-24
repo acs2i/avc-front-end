@@ -699,14 +699,14 @@ export default function SingleProductPage() {
                 </div>
                 {/* Prix produit */}
                 <div className="w-1/3">
-                  <div className="relative flex flex-col gap-3 bg-white">
+                  <div className="relative flex flex-col gap-3 bg-white shadow-md">
                     <div className="absolute top-[-12px] left-[15px] px-1 bg-gradient-to-b from-slate-50 to-white z-10">
                       <h4 className="font-[600] text-[17px] text-gray-600">
                         Prix
                       </h4>
                     </div>
                     <div
-                      className={`relative border border-gray-300 p-3 rounded-md ${
+                      className={`relative border border-gray-300 p-3 ${
                         isModify ? "h-[320px]" : "h-[250px]"
                       }`}
                     >
@@ -801,7 +801,7 @@ export default function SingleProductPage() {
             <div
               className={`border-t-[1px] border-gray-300 px-5 py-2 overflow-y-auto ${
                 isFullScreen
-                  ? "fixed right-0 top-0 h-full w-full z-[9999] bg-gray-100 h-[300px]"
+                  ? "fixed right-0 top-0 w-full z-[9999] bg-gray-100"
                   : "w-[70%]"
               }`}
             >
@@ -824,8 +824,8 @@ export default function SingleProductPage() {
             <div
               className={`border-t-[1px] border-gray-300 px-5 py-2 ${
                 isFullScreen
-                  ? "fixed right-0 top-0 h-full w-full z-[9999] bg-gray-100"
-                  : "w-[70%] h-[300px]"
+                  ? "fixed right-0 top-0 w-full z-[9999] bg-gray-100"
+                  : "w-[70%]"
               } overflow-y-auto`}
             >
               <div className="flex items-center justify-between">
@@ -857,7 +857,7 @@ export default function SingleProductPage() {
                 <UVCInfosTable
                   uvcDimension={formData.dimension}
                   productReference={product.reference || ""}
-                  productBrands={product.brand_ids || ""}
+                  brandLabel=""
                 />
               )}
               {onglet === "price" && product && (
