@@ -1,5 +1,8 @@
 import React, { useReducer } from "react";
 import { validate } from "../../utils/validator";
+import PhoneInput from "react-phone-number-input"
+import "react-phone-number-input/style.css";
+
 
 type Validator = {
   type: string;
@@ -7,7 +10,7 @@ type Validator = {
 };
 
 type InputProps = {
-  element: "input" | "textarea" | "select";
+  element: "input" | "textarea" | "select" | "phone";
   id: string;
   type?: string;
   placeholder?: string;
@@ -72,6 +75,21 @@ const Input: React.FC<InputProps> = (props) => {
     });
   };
 
+  const phoneChangeHandler = (value: string | undefined) => {
+    if (props.onChange) {
+      props.onChange({
+        target: { value: value || '', name: props.id }
+      } as React.ChangeEvent<HTMLInputElement>);
+    }
+  
+    dispatch({
+      type: "CHANGE",
+      val: value || '',
+      validators: props.validators,
+    });
+  };
+  
+
   const touchHandler = () => {
     dispatch({
       type: "TOUCH",
@@ -79,11 +97,11 @@ const Input: React.FC<InputProps> = (props) => {
   };
 
   const InputClasses = `
-    w-full h-[40px] focus:outline-none ${
+    w-full h-[40px] focus:outline-none mt-1 ${
       props.orange ? "border-b-2 border-orange-400" : ""
     }
     ${props.gray ? "border-b-[1px] border-gray-300" : ""}
-    ${props.create ? "border border-gray-300 rounded-lg px-2 focus:ring-blue-500 focus:border-blue-500" : ""}
+    ${props.create ? "border border-gray-300 rounded-lg px-2 focus:ring-blue-500 transition-all focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]" : ""}
     ${
       props.disabled
         ? " bg-gray-200 rounded-md border border-white text-gray-500 italic px-3 cursor-not-allowed"
@@ -122,7 +140,7 @@ const Input: React.FC<InputProps> = (props) => {
         onBlur={props.onBlur}
         value={props.value}
         maxLength={props.maxLength}
-        className="border p-2 resize-none focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+        className="border p-2 resize-none focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)] mt-1"
       />
     ) : props.element === "select" ? (
       <select
@@ -131,7 +149,7 @@ const Input: React.FC<InputProps> = (props) => {
         onBlur={props.onBlur}
         required={props.required}
         value={props.value}
-        className="bg-gray-50 border border-gray-300 text-gray-900 text-md rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2 mt-2"
+        className="bg-white border border-gray-300 text-gray-900 text-md rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)] block w-full p-2 mt-1 capitalize"
       >
         <option value="" selected>
           {props.placeholder}
@@ -142,6 +160,15 @@ const Input: React.FC<InputProps> = (props) => {
           </option>
         ))}
       </select>
+    ) : props.element === "phone" ? (
+      <PhoneInput
+        defaultCountry="FR"
+        value={inputState.value}
+        onChange={phoneChangeHandler}
+        international
+        withCountryCallingCode
+        className="input-phone"
+      />
     ) : null;
 
   return (
@@ -149,7 +176,7 @@ const Input: React.FC<InputProps> = (props) => {
       <div>
         <label
           htmlFor={props.id}
-          className="relative mb-6 text-sm font-medium text-gray-800"
+          className="relative text-sm font-medium text-gray-800"
         >
           {props.label}
           {props.required && (

@@ -1,25 +1,25 @@
 import React, { useState } from "react";
 
 interface UVCInfosTableProps {
-  uvcPrices: string[];
+  uvcDimension: string[];
   productReference: string;
-  productBrand: string;
+  brandLabel: string;
 }
 
 const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
-  uvcPrices,
+  uvcDimension,
   productReference,
-  productBrand
+  brandLabel
 }) => {
-  const [collections, setCollections] = useState<{ [key: string]: string }>(
-    uvcPrices.reduce((acc, dimension) => {
+  const [brands, setBrands] = useState<{ [key: string]: string }>(
+    uvcDimension.reduce((acc, dimension) => {
       acc[dimension] = "";
       return acc;
     }, {} as { [key: string]: string })
   );
 
-  const handleCollectionChange = (dimension: string, value: string) => {
-    setCollections((prevCollections) => ({
+  const handlebrandChange = (dimension: string, value: string) => {
+    setBrands((prevCollections) => ({
       ...prevCollections,
       [dimension]: value,
     }));
@@ -32,11 +32,11 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
           <th className="border px-4 py-2 w-[50px]">Code UVC</th>
           <th className="border px-4 py-2 w-[50px]">Couleur</th>
           <th className="border px-4 py-2 w-[50px]">Taille</th>
-          <th className="border px-4 py-2 w-[50px]">Collection</th>
+          <th className="border px-4 py-2 w-[50px]">Marque</th>
         </tr>
       </thead>
       <tbody>
-        {uvcPrices.map((dimension, index) => {
+        {uvcDimension.map((dimension, index) => {
           const [couleur, taille] = dimension.split(",");
           const codeUVC = `${productReference}${couleur}${taille}`;
           return (
@@ -44,7 +44,7 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
               <td className="border px-4 py-1 text-center">{codeUVC}</td>
               <td className="border px-4 py-1 text-center">{couleur}</td>
               <td className="border px-4 py-1 text-center">{taille}</td>
-              <td className="border px-4 py-1 text-center">{productBrand}</td>
+              <td className="border px-4 py-1 text-center">{brandLabel}</td>
             </tr>
           );
         })}

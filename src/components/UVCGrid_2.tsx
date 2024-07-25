@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Maximize, Maximize2, Palette, Plus, Ruler } from "lucide-react";
+import { Maximize2, Palette, Plus, Ruler } from "lucide-react";
 import Modal from "./Shared/Modal";
 
-interface UVCGridProps {
+interface UVCGrid2Props {
   onDimensionsChange: (dimensions: string[][]) => void;
   initialSizes?: string[];
   initialColors?: string[];
@@ -13,7 +13,7 @@ interface UVCGridProps {
   sizes: string[];
   colors: string[];
   uvcGrid: boolean[][];
-  isFullScreen?: any
+  isFullScreen?: any;
 }
 
 interface Grid {
@@ -23,7 +23,7 @@ interface Grid {
   DIMENSIONS: string[];
 }
 
-const UVCGrid: React.FC<UVCGridProps> = ({
+const UVCGrid2: React.FC<UVCGrid2Props> = ({
   onDimensionsChange,
   initialSizes = ["000"],
   initialColors = ["000"],
@@ -46,8 +46,11 @@ const UVCGrid: React.FC<UVCGridProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    updateDimensions(uvcGrid);
-  }, [sizes, colors, uvcGrid]);
+    setSizes(initialSizes);
+    setColors(initialColors);
+    setUvcGrid(initialGrid);
+    updateDimensions(initialGrid);
+  }, [initialSizes, initialColors, initialGrid]);
 
   const toggleCheckbox = (colorIndex: number, sizeIndex: number) => {
     const newGrid = uvcGrid.map((row, i) =>
@@ -278,34 +281,34 @@ const UVCGrid: React.FC<UVCGridProps> = ({
         )}
       </Modal>
       <div className="flex items-center justify-between">
-      <div className="flex gap-4 mb-3 mt-3">
-        <button
-          onClick={displaySizeGridOptions}
-          type="button"
-          className="flex items-center gap-2 text-[12px] text-blue-500"
-        >
-          <Ruler size={17} />
-          Associer une grille de tailles
-        </button>
-        <button
-          onClick={displayColorGridOptions}
-          type="button"
-          className="flex items-center gap-2 text-[12px] text-blue-500"
-        >
-          <Palette size={17} />
-          Associer une grille de couleurs
-        </button>
-        <div className="h-[30px] w-[2px] bg-gray-300"></div>
-        <button onClick={addNewSize} type="button" className="flex items-center gap-2 text-[12px] text-green-500">
-          <Plus size={17} />
-          Ajouter une taille
-        </button>
-        <button onClick={addNewColor} type="button" className="flex items-center gap-2 text-[12px] text-green-500">
-          <Plus size={17} />
-          Ajouter une couleur
-        </button>
-      </div>
-        <div onClick={isFullScreen}  className="cursor-pointer hover:text-gray-400">
+        <div className="flex gap-4 mb-3 mt-3">
+          <button
+            onClick={displaySizeGridOptions}
+            type="button"
+            className="flex items-center gap-2 text-[12px] text-blue-500"
+          >
+            <Ruler size={17} />
+            Associer une grille de tailles
+          </button>
+          <button
+            onClick={displayColorGridOptions}
+            type="button"
+            className="flex items-center gap-2 text-[12px] text-blue-500"
+          >
+            <Palette size={17} />
+            Associer une grille de couleurs
+          </button>
+          <div className="h-[30px] w-[2px] bg-gray-300"></div>
+          <button onClick={addNewSize} type="button" className="flex items-center gap-2 text-[12px] text-green-500">
+            <Plus size={17} />
+            Ajouter une taille
+          </button>
+          <button onClick={addNewColor} type="button" className="flex items-center gap-2 text-[12px] text-green-500">
+            <Plus size={17} />
+            Ajouter une couleur
+          </button>
+        </div>
+        <div onClick={isFullScreen} className="cursor-pointer hover:text-gray-400">
           <Maximize2 size={17}/>
         </div>
       </div>
@@ -372,4 +375,4 @@ const UVCGrid: React.FC<UVCGridProps> = ({
   );
 };
 
-export default UVCGrid;
+export default UVCGrid2;

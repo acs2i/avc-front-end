@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { LINKS_Params } from "../../utils/index";
-import Card from "../../components/Shared/Card";
-import { Info, Settings2 } from "lucide-react";
-import Modal from "../../components/Shared/Modal";
-import Button from "../../components/FormElements/Button";
-import { Divider } from "@mui/material";
+import { Settings2 } from "lucide-react";
 import ClassificationsPage from "./ClassificationsPage";
 import DimensionPage from "./DimensionPage";
 import GridPage from "./GridPage";
@@ -14,53 +10,63 @@ import BrandPage from "./BrandPage";
 import ClassificationUpdatePage from "./ClassificationUpdatePage";
 import DimensionUpdatePage from "./DimensionUpdatePage";
 import CollectionUpdatePage from "./CollectionUpdatePage";
-import BranchUpdatePage from "./BrandUpdatePage";
+import BrandUpdatePage from "./BrandUpdatePage";
 import ClassificationCreatePage from "./ClassificationCreatePage";
 import DimensionCreateItemPage from "./DimensionCreateItemPage";
 import CollectionCreatePage from "./CollectionCreatePage";
 import BrandCreatePage from "./BrandCreatePage";
 import GridCreatePage from "./GridCreatePage";
 
-type DataType = "LA1" | "LA2" | "LA3";
-type DataTypeDimension = "DI1" | "DI2";
-
-interface Family {
+interface Tag {
   _id: string;
-  YX_CODE: string;
-  YX_TYPE: DataType;
-  YX_LIBELLE: string;
+  code: string;
+  name: string;
+  level: string;
+  tag_grouping_id: any[];
+  status: string;
+  additional_fields?: any;
+  creator_id: string;
 }
 
 interface Dimension {
   _id: string;
-  GDI_DIMORLI: string;
-  GDI_LIBELLE: string;
-  GDI_TYPEDIM: DataTypeDimension;
+  code: string;
+  label: string;
+  type: string;
+  status: string;
+  creator_id: any;
+  additional_fields?: any;
 }
 
 interface Collection {
   _id: string;
-  CODE: string;
-  LIBELLE: string;
+  code: string;
+  label: string;
+  status: string;
+  creator_id: any;
+  additional_fields?: any;
 }
 
 interface Brand {
   _id: string;
-  YX_CODE: string;
-  YX_LIBELLE: string;
+  code: string;
+  label: string;
+  status: string;
+  creator_id: any;
+  additional_fields?: any;
 }
 interface Grid {
   _id: string;
-  TYPE: string;
-  LIBELLE: string;
-  DIMENSIONS: string[];
+  label: string;
+  type: string;
+  dimensions: string[];
 }
 
 function ParamsMenuPage() {
   const location = useLocation();
   const [page, setPage] = useState("classe");
   const [shouldRefetch, setShouldRefetch] = useState(false);
-  const [selectedFamily, setSelectedFamily] = useState<Family | null>(null);
+  const [selectedFamily, setSelectedFamily] = useState<Tag | null>(null);
   const [selectedGrid, setSelectedGrid] = useState<Grid | null>(null);
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [selectedCollection, setSelectedCollection] =
@@ -115,16 +121,17 @@ function ParamsMenuPage() {
   }, [page]);
 
   return (
-    <section className="w-full h-screen bg-gray-100 p-7 relative overflow-hidden">
-      <div className="flex items-center gap-3">
+    <section className="w-full min-h-screen bg-slate-50 p-7 flex flex-col relative overflow-hidden">
+      <div className="flex items-center gap-3 mb-4">
         <Settings2 size={20}/>
-        <h3 className="text-[25px]">Codifications</h3>
+        <h3 className="text-[25px] font-[800]">Création <span className="font-[200]">et modification des paramètres</span></h3>
       </div>
       <div className="h-[70px] mb-3 flex items-center gap-4 w-full relative z-10">
         <div className="w-[300px]">
           <button
             onClick={handleOpenCreatePanel}
             className="bg-blue-500 text-white text-[12px] font-[700] w-full py-2 rounded-md"
+            type="button"
           >
             Créer une {page === "classe" && "classe"}
             {page === "dimension" && "dimension"}
@@ -144,9 +151,9 @@ function ParamsMenuPage() {
             >
               <path
                 stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
               />
             </svg>
@@ -160,12 +167,12 @@ function ParamsMenuPage() {
           />
         </div>
       </div>
-      <div className="flex gap-4 relative z-10">
-        <div className="w-[300px] h-[400px] border-t-[1px] border-gray-300">
+      <div className="flex gap-4 flex-grow relative z-10 overflow-hidden">
+        <div className="w-[300px] h-full border-t-[1px] border-gray-300 flex flex-col overflow-auto">
           {LINKS_Params.map((link) => (
             <div
               key={link.page}
-              className={`border-r-[1px] border-b-[1px] border-gray-300 py-3 flex items-center gap-3 cursor-pointer ${
+              className={`relative border-r-[1px] border-b-[1px] border-gray-300 py-3 flex items-center gap-3 cursor-pointer ${
                 page === link.page ? "text-blue-500" : "text-gray-500"
               } hover:text-blue-500`}
               onClick={() => setPage(link.page)}
@@ -176,10 +183,22 @@ function ParamsMenuPage() {
                   : 15,
               })}
               <span className="text-xs font-[600]">{link.name}</span>
+              {page === link.page && (
+                  <>
+                    <div
+                      className="absolute right-0 top-1/2 transform -translate-y-1/2 rotate-180 w-5 h-5 bg-gray-200"
+                      style={{ clipPath: "polygon(0 0, 100% 50%, 0 100%)" }}
+                    ></div>
+                    <div
+                      className="absolute right-[-1px] top-1/2 transform -translate-y-1/2 rotate-180 w-4 h-4 bg-slate-50"
+                      style={{ clipPath: "polygon(0 0, 100% 50%, 0 100%)" }}
+                    ></div>
+                  </>
+                )}
             </div>
           ))}
         </div>
-        <div className="w-full flex gap-7">
+        <div className="w-full flex gap-7 overflow-auto">
           <div className="w-full">
             {page === "classe" && (
               <ClassificationsPage
@@ -223,7 +242,7 @@ function ParamsMenuPage() {
             )}
           </div>
 
-          {/* Partie mise a jour composant */}
+          {/* Partie mise à jour composant */}
           {selectedFamily && (
             <div className="w-full bg-white rounded-lg border shadow-md">
               <ClassificationUpdatePage
@@ -253,7 +272,7 @@ function ParamsMenuPage() {
           )}
           {selectedBrand && (
             <div className="w-full bg-white rounded-lg border shadow-md">
-              <BranchUpdatePage
+              <BrandUpdatePage
                 selectedBrand={selectedBrand}
                 onClose={handleCloseBrand}
                 onUpdate={handleRefetch}

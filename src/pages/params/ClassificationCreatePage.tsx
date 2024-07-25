@@ -8,11 +8,18 @@ import useNotify from "../../utils/hooks/useToast";
 import Button from "../../components/FormElements/Button";
 import { CircularProgress } from "@mui/material";
 
-interface Family {
+interface Tag {
   _id: string;
-  YX_TYPE: string;
-  YX_CODE: any;
-  YX_LIBELLE: string;
+  code: string;
+  name: string;
+  level: string;
+  tag_grouping_id: any;
+}
+
+interface TagGrouping {
+  _id: string;
+  name: string;
+  level: string[];
 }
 
 interface ClassificationCreatePageProps {
@@ -21,8 +28,18 @@ interface ClassificationCreatePageProps {
 }
 
 interface FormData {
-  family: { YX_CODE: string; YX_LIBELLE: string; YX_TYPE: string };
-  creatorId: string;
+  creator_id: any;
+  code: string;
+  name: string;
+  level: string;
+  tag_grouping_id: any;
+  status: string;
+}
+
+interface Option {
+  value: string;
+  label: string;
+  name: string;
 }
 
 function ClassificationCreatePage({
@@ -30,64 +47,26 @@ function ClassificationCreatePage({
   onClose,
 }: ClassificationCreatePageProps) {
   const user = useSelector((state: any) => state.auth.user);
-  const [classificationValue, setClassificationValue] = useState("Au vieux campeur");
-  const [type, setType] = useState("");
-  const navigate = useNavigate();
+  const [classificationValue, setClassificationValue] = useState("");
+  const [levelOptions, setLevelOptions] = useState<Option[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
-  const [searchValue, setSearchValue] = useState("");
-  const [familyCodeValue, setFamilyCodeValue] = useState("");
-  const [choiceValue, setChoiceValue] = useState("");
-  const [dropdownIsOpen, setDropdownIsOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const limit = 20;
-  const [families, setFamilies] = useState<Family[]>([]);
+  const [tagGrouping, setTagGrouping] = useState<TagGrouping[]>([]);
   const [formData, setFormData] = useState<FormData>({
-    family: { YX_CODE: "", YX_LIBELLE: "", YX_TYPE: "" },
-    creatorId: user._id,
+    creator_id: user._id,
+    code: "",
+    name: "",
+    level: "",
+    tag_grouping_id: "",
+    status: "A",
   });
 
-  const levelOptions = [
-    { value: "LA1", label: "Famille", name: "Famille" },
-    { value: "LA2", label: "Sous-famille", name: "Sous-Famille" },
-    {
-      value: "LA3",
-      label: "Sous-sous-famille",
-      name: "Sous-sous-famille",
-    },
-  ];
+  const navigate = useNavigate();
 
-  const classificationOptions = [
-    {
-      value: "Au vieux campeur",
-      label: "Au vieux campeur",
-      name: "Au vieux campeur",
-    },
-  ];
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.id === "YX_TYPE") {
-      const selectedLevel = e.target.value;
-      const numericLevel = parseInt(selectedLevel.substring(2), 10);
-      const previousNumericLevel = numericLevel - 1;
-      const fetchLevel = `LA${previousNumericLevel}`;
-
-      setType(fetchLevel);
-    }
-
-    setFormData({
-      ...formData,
-      family: {
-        ...formData.family,
-        [e.target.id]: e.target.value,
-      },
-    });
-  };
-
-  const handleSearch = async () => {
+  const fetchTagGrouping = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/family/YX_TYPE?value=${searchValue}&page=${currentPage}&limit=${limit}&YX_TYPE=${type}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tag-grouping`,
         {
           method: "GET",
           headers: {
@@ -95,56 +74,13 @@ function ClassificationCreatePage({
           },
         }
       );
-      const data = await response.json();
 
-      setFamilies(data.data);
-      console.log(data);
+      const data = await response.json();
+      setTagGrouping(data.data);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
-    }
-  };
-
-  const handleDropdownOpen = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValue(e.target.value);
-    setChoiceValue("");
-    setDropdownIsOpen(true);
-  };
-
-  const handleDropdownClose = (family: Family | null) => {
-    setDropdownIsOpen(false);
-    if (family) {
-      setChoiceValue(family.YX_LIBELLE);
-      setFamilyCodeValue(family.YX_CODE);
-
-      // Vérifier si le code saisi contient déjà un code de famille
-      const codeSaisi = formData.family.YX_CODE;
-      const codeFamillePrecedent = familyCodeValue;
-      const codeSansFamillePrecedente = codeSaisi.startsWith(
-        codeFamillePrecedent
-      )
-        ? codeSaisi.substring(codeFamillePrecedent.length)
-        : codeSaisi;
-
-      // Concaténer le nouveau code de famille avec le code saisi sans le code de famille précédent
-      setFormData({
-        ...formData,
-        family: {
-          ...formData.family,
-          YX_CODE: family.YX_CODE + codeSansFamillePrecedente,
-        },
-      });
-    } else {
-      setChoiceValue("");
-      setFamilyCodeValue("");
-
-      // Réinitialiser le code saisi
-      setFormData({
-        ...formData,
-        family: {
-          ...formData.family,
-          YX_CODE: "",
-        },
-      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -153,7 +89,7 @@ function ClassificationCreatePage({
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/family`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tag`,
         {
           method: "POST",
           headers: {
@@ -167,11 +103,11 @@ function ClassificationCreatePage({
         const data = await response.json();
         const newFamilyId = data._id;
         setTimeout(() => {
-          notifySuccess("Marque crée avec succés !");
+          notifySuccess("Classification créée avec succès !");
           setIsLoading(false);
           onCreate(newFamilyId);
           onClose();
-        }, 1000);
+        }, 100);
       } else {
         notifyError("Erreur lors de la création");
       }
@@ -180,11 +116,48 @@ function ClassificationCreatePage({
     }
   };
 
-  useEffect(() => {
-    if (searchValue) {
-      handleSearch();
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { id, value } = e.target;
+    setFormData({
+      ...formData,
+      [id]: value,
+    });
+  };
+
+  const handleClassificationChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const { value } = e.target;
+    setClassificationValue(value);
+
+    const selectedTagGrouping = tagGrouping.find(
+      (group) => group._id === value
+    );
+    if (selectedTagGrouping) {
+      setLevelOptions(
+        selectedTagGrouping.level.map((level) => ({
+          value: level,
+          label: level,
+          name: level, // Ajouter la propriété name
+        }))
+      );
+      setFormData({
+        ...formData,
+        tag_grouping_id: selectedTagGrouping._id,
+        level: "", // Reset level when classification changes
+      });
+    } else {
+      setLevelOptions([]);
     }
-  }, [searchValue]);
+  };
+
+  useEffect(() => {
+    fetchTagGrouping();
+  }, []);
+
+  console.log(formData);
 
   return (
     <section className="w-full p-4">
@@ -193,95 +166,55 @@ function ClassificationCreatePage({
           <div onClick={onClose} className="cursor-pointer">
             <ChevronLeft />
           </div>
-          <h3 className="text-[32px] font-bold text-gray-800">
-            Créer une classe
-          </h3>
+          <h1 className="text-[20px] font-[800] text-gray-800">
+            Créer <span className="font-[300]">une classification</span>
+          </h1>
         </div>
-        <div className="mt-5 flex flex-col justify-between">
+        <div className="mt-[30px] flex flex-col justify-between">
           <div className="flex flex-col">
             <Input
               element="select"
               id="classification"
               label="Classification"
-              placeholder="Choississez une classification"
+              placeholder="Choisissez une classification"
               validators={[]}
-              onChange={(e) => setClassificationValue(e.target.value)}
+              onChange={handleClassificationChange}
               value={classificationValue}
-              options={classificationOptions}
+              options={tagGrouping.map((group) => ({
+                value: group._id,
+                label: group.name,
+                name: group.name,
+              }))}
               create
               gray
             />
+
             <Input
               element="select"
-              id="YX_TYPE"
+              id="level"
               label="Niveau"
-              placeholder="Choississez un niveau"
+              placeholder="Choisissez un niveau"
               validators={[]}
               onChange={handleChange}
+              value={formData.level}
               options={levelOptions}
               create
               gray
             />
+
             <Input
               element="input"
-              id="YX_CODE"
+              id="code"
               label="Code"
-              placeholder="Code de la class"
+              placeholder="Code de la classification"
               onChange={handleChange}
               validators={[]}
               create
               gray
             />
-            {type !== "" && type !== "LA0" && type !== "LANaN" && (
-              <div className="relative">
-                <Input
-                  element="input"
-                  id="family"
-                  label="Lien avec un parent"
-                  placeholder="Choississez une famille / sous-famille"
-                  validators={[]}
-                  gray
-                  create
-                  onChange={handleDropdownOpen}
-                />
-                {choiceValue && (
-                  <div className="absolute bottom-[3px] bg-orange-400 py-2 px-4 rounded-md">
-                    <div
-                      className="absolute flex items-center justify-center h-[18px] w-[18px] top-[-2px] right-[-4px] rounded-full bg-red-600 text-white cursor-pointer"
-                      onClick={() => setChoiceValue("")}
-                    >
-                      <X />
-                    </div>
-                    <p className="text-white font-bold text-sm">
-                      {choiceValue}
-                    </p>
-                  </div>
-                )}
-                {dropdownIsOpen && families && searchValue && (
-                  <div className="absolute w-[100%] bg-gray-50 z-[20000] py-4 rounded-b-md shadow-md">
-                    <div
-                      className="h-[30px] flex justify-end cursor-pointer"
-                      onClick={() => setDropdownIsOpen(false)}
-                    >
-                      <span className="text-xl px-4">X</span>
-                    </div>
-                    {families.map((family) => (
-                      <ul>
-                        <li
-                          className="cursor-pointer py-1 hover:bg-gray-200 text-lg px-4 py-2 border-b"
-                          onClick={() => handleDropdownClose(family)}
-                        >
-                          {family.YX_LIBELLE}
-                        </li>
-                      </ul>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
             <Input
               element="input"
-              id="YX_LIBELLE"
+              id="name"
               type="text"
               placeholder="Modifier le libellé"
               label="Libellé"

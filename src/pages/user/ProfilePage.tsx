@@ -13,7 +13,7 @@ interface User {
   username: string;
   email: string;
   imgPath: string;
-  products: string[];
+  products: any[];
   authorization: string;
 }
 
@@ -285,7 +285,7 @@ export default function ProfilePage() {
         <div
           className={`w-full bg-white h-auto rounded-lg border border-gray-300 shadow-md mt-7`}
         >
-          <form onSubmit={handleSubmit}>
+        
             <div className="p-5">
               <div className="flex items-center gap-3 mb-3">
                 <Avatar
@@ -336,7 +336,7 @@ export default function ProfilePage() {
                 </div>
               </div>
             </div>
-          </form>
+       
         </div>
       </section>
     </>

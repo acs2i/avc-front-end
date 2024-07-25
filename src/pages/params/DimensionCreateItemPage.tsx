@@ -10,9 +10,10 @@ import { CircularProgress } from "@mui/material";
 import { ChevronLeft, Plus, X } from "lucide-react";
 
 interface FormData {
-  GDI_TYPEDIM: string;
-  GDI_DIMORLI: string;
-  GDI_LIBELLE: string;
+  type: string;
+  code: string;
+  label: string;
+  status: string;
 }
 
 interface DimensionCreatePageProps {
@@ -29,14 +30,15 @@ export default function DimensionCreateItemPage({
   const user = useSelector((state: any) => state.auth.user);
   const { notifySuccess, notifyError } = useNotify();
   const [formData, setFormData] = useState<FormData>({
-    GDI_TYPEDIM: "",
-    GDI_DIMORLI: "",
-    GDI_LIBELLE: "",
+    type: "",
+    code: "",
+    label: "",
+    status: "A"
   });
 
   const levelOptions = [
-    { value: "DI1", label: "Couleur", name: "Couleur" },
-    { value: "DI2", label: "Taille", name: "Taille" },
+    { value: "couleur", label: "Couleur", name: "Couleur" },
+    { value: "taille", label: "Taille", name: "Taille" },
   ];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,7 +68,7 @@ export default function DimensionCreateItemPage({
           setIsLoading(false);
           onCreate(newDimenesionId);
           onClose();
-        }, 1000);
+        }, 100);
       } else {
         notifyError("Erreur lors de la création");
       }
@@ -75,6 +77,7 @@ export default function DimensionCreateItemPage({
     }
   };
 
+  console.log(formData)
   return (
     <section className="w-full p-4">
       <form className="mb-[50px]" onSubmit={handleSubmit}>
@@ -82,15 +85,15 @@ export default function DimensionCreateItemPage({
           <div onClick={onClose} className="cursor-pointer">
             <ChevronLeft />
           </div>
-          <h3 className="text-[32px] font-bold text-gray-800">
-            Créer une dimension
-          </h3>
+          <h1 className="text-[20px] font-[800] text-gray-800">
+            Créer <span className="font-[300]">une dimension</span>
+          </h1>
         </div>
-        <div className="mt-5 flex flex-col justify-between">
+        <div className="mt-[30px] flex flex-col justify-between">
           <div className="flex flex-col">
             <Input
               element="select"
-              id="GDI_TYPEDIM"
+              id="type"
               label="Type de dimension"
               placeholder="Choississez un type de dimension"
               validators={[]}
@@ -102,7 +105,7 @@ export default function DimensionCreateItemPage({
             />
             <Input
               element="input"
-              id="GDI_DIMORLI"
+              id="code"
               label="Code"
               placeholder="ex: 456"
               onChange={handleChange}
@@ -113,7 +116,7 @@ export default function DimensionCreateItemPage({
             />
             <Input
               element="input"
-              id="GDI_LIBELLE"
+              id="label"
               type="text"
               placeholder="Nom de la collection"
               label="Libellé"

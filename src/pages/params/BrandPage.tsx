@@ -5,7 +5,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Info, Plus, SquarePen } from "lucide-react";
+import { ArrowLeft, ChevronsUpDown, Info, Plus, SquarePen } from "lucide-react";
 import Spinner from "../../components/Shared/Spinner";
 import { Divider, Tooltip } from "@mui/material";
 import ScrollToTop from "../../components/ScrollToTop";
@@ -14,8 +14,11 @@ import Header from "../../components/Navigation/Header";
 
 interface Brand {
   _id: string;
-  YX_CODE: string;
-  YX_LIBELLE: string;
+  code: string;
+  label: string;
+  status: string;
+  creator_id: any;
+  additional_fields?: any;
 }
 
 interface BrandPageProps {
@@ -114,13 +117,28 @@ export default function BrandPage({
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left">
-        <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
+        <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700 uppercase">
           <tr>
-            <th scope="col" className="px-6 py-2 w-1/3">
-              Code
+            <th scope="col" className="px-6 py-4 w-1/3">
+              <div className="flex items-center">
+                <span className="leading-3">Code</span>
+                <div className="cursor-pointer">
+                  <ChevronsUpDown size={13} />
+                </div>
+              </div>
             </th>
-            <th scope="col" className="px-6 py-2 w-1/3">
-              Libellé
+            <th scope="col" className="px-6 py-4 w-[300px]">
+              <div className="flex items-center">
+                <span className="leading-3">Libellé</span>
+                <div className="cursor-pointer">
+                  <ChevronsUpDown size={13} />
+                </div>
+              </div>
+            </th>
+            <th scope="col" className="px-6 py-4 w-[50px]">
+              <div className="flex items-center">
+                <span className="leading-3">status</span>
+              </div>
             </th>
           </tr>
         </thead>
@@ -131,14 +149,27 @@ export default function BrandPage({
                 key={brand._id}
                 className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 whitespace-nowrap ${
                   brand._id === highlightedBrandId
-                    ? "bg-orange-500 text-white"
+                    ? "bg-orange-300 text-white"
                     : ""
                 }`}
                 onClick={() => onSelectBrand(brand)}
               >
-                <td className="px-6 py-2">{brand.YX_CODE}</td>
-                <td className="px-6 py-2">{brand.YX_LIBELLE}</td>
-                {brand._id === highlightedBrandId && <td className="px-6 py-2">Nouveau</td>}
+                <td className="px-6 py-2">{brand.code}</td>
+                <td className="px-6 py-2">{brand.label}</td>
+                <td className="px-6 py-2 uppercase">
+                  {brand.status === "A" ? (
+                    <div className="text-center bg-green-200 text-green-600 border border-green-400  py-1 rounded-md max-w-[60px]">
+                      <span>Actif</span>
+                    </div>
+                  ) : (
+                    <div className="text-center bg-gray-200 text-gray-600 border border-gray-400  py-1 rounded-md max-w-[60px]">
+                      <span>Innactif</span>
+                    </div>
+                  )}
+                </td>
+                {brand._id === highlightedBrandId && (
+                  <td className="px-6 py-2">Nouveau</td>
+                )}
               </tr>
             ))
           ) : (
@@ -160,7 +191,7 @@ export default function BrandPage({
         <div className="w-full flex justify-between items-center">
           <div className="flex items-center">
             <h4 className="text-sm whitespace-nowrap">
-              <span className="font-bold">{totalItem}</span> Dimensions
+              <span className="font-bold">{totalItem}</span> Marques
             </h4>
             {prevSearchValue && (
               <span className="text-md italic ml-2">{`"${prevSearchValue}"`}</span>

@@ -10,8 +10,10 @@ import { CircularProgress } from "@mui/material";
 import { ChevronLeft, Plus, X } from "lucide-react";
 
 interface FormData {
-  collection: { CODE: string; LIBELLE: string };
-  creatorId: string;
+  code: string;
+  label: string;
+  status: string;
+  creator_id: any;
 }
 
 interface CollectionCreatePageProps {
@@ -28,18 +30,14 @@ export default function CollectionCreatePage({
   const user = useSelector((state: any) => state.auth.user);
   const { notifySuccess, notifyError } = useNotify();
   const [formData, setFormData] = useState<FormData>({
-    collection: { CODE: "", LIBELLE: "" },
-    creatorId: user._id,
+    creator_id: user._id,
+    code: "",
+    label: "",
+    status: "A"
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      collection: {
-        ...formData.collection,
-        [e.target.id]: e.target.value,
-      },
-    });
+    setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -65,7 +63,7 @@ export default function CollectionCreatePage({
           setIsLoading(false);
           onCreate(newCollectionId);
           onClose();
-        }, 1000);
+        }, 100);
       } else {
         notifyError("Erreur lors de la création");
       }
@@ -74,6 +72,8 @@ export default function CollectionCreatePage({
     }
   };
 
+
+
   return (
     <section className="w-full p-4">
       <form className="mb-[50px]" onSubmit={handleSubmit}>
@@ -81,15 +81,15 @@ export default function CollectionCreatePage({
           <div onClick={onClose} className="cursor-pointer">
             <ChevronLeft />
           </div>
-          <h3 className="text-[32px] font-bold text-gray-800">
-            Créer une collection
-          </h3>
+          <h1 className="text-[20px] font-[800] text-gray-800">
+            Créer <span className="font-[300]">une collection</span>
+          </h1>
         </div>
-        <div className="mt-5 flex flex-col justify-between">
+        <div className="mt-[30px] flex flex-col justify-between">
           <div className="flex flex-col">
             <Input
               element="input"
-              id="CODE"
+              id="code"
               label="Code"
               placeholder="ex: 456"
               onChange={handleChange}
@@ -100,7 +100,7 @@ export default function CollectionCreatePage({
             />
             <Input
               element="input"
-              id="LIBELLE"
+              id="label"
               type="text"
               placeholder="Nom de la collection"
               label="Libellé"

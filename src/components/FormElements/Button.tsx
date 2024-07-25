@@ -25,7 +25,7 @@ interface ButtonProps {
 
 const Button: React.FC<ButtonProps> = (props) => {
   const buttonClasses = `
-    font-inherit text-center py-4 px-6 rounded-md flex items-center justify-center gap-2
+    font-inherit text-center py-4 px-6 rounded-md flex items-center justify-center gap-2 transition-all
     ${props.size === "small" ? "text-xs py-[8px] px-[10px]" : ""}
     ${props.size === "medium" ? "text-md py-[10px] px-[25px]" : ""}
     ${props.size === "xs" ? "text-xs py-[5px] px-[5px]" : ""}
@@ -35,11 +35,11 @@ const Button: React.FC<ButtonProps> = (props) => {
     ${props.blue ? "bg-sky-600 border border-sky-600 text-white hover:brightness-125 font-bold" : ""}
     ${props.inverseBlue ? "bg-transparent border border-sky-600 text-gray-700 font-bold hover:bg-sky-700 hover:text-white" : ""}
     ${props.inverse ? "bg-transparent border border-emerald-500 text-gray-700 hover:brightness-125" : ""}
-    ${props.cancel ? "border border-gray-300 text-sky-600 hover:brightness-125 font-bold" : ""}
+    ${props.cancel ? "border border-gray-300 text-red-600 bg-slate-200 hover:bg-red-600 hover:text-white font-bold" : ""}
     ${props.warning ? "bg-yellow-500 text-white hover:bg-yellow-400" : ""}
     ${props.danger ? "bg-red-600 border border-red-500 text-white hover:brightness-125" : ""}
     ${props.gray ? "bg-[#3B3B3C] border border-black text-white hover:brightness-125" : ""}
-    ${props.disabled ? "bg-gray-200 border border-gray-500 text-gray-400 cursor-not-allowed" : ""}
+    ${props.disabled ? "bg-gray-500 border border-gray-500 text-gray-400 cursor-not-allowed" : ""}
 
   `;
 

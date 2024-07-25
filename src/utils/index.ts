@@ -45,11 +45,11 @@ export const LINKS: Link[] = [
             name: "Articles",
             linksGroup: [
               {
-                name: "Liste des articles",
+                name: "Liste des références",
                 link: "/product",
               },
               {
-                name: "Créer un article",
+                name: "Créer une référence",
                 link: "/product/edit",
               },
               {
@@ -59,24 +59,33 @@ export const LINKS: Link[] = [
             ],
             icon: Shirt,
           },
+         
           {
-            name: "Codifications",
+            name: "Fournisseurs",
+            linksGroup: [
+              {
+                name: "Liste des fournisseurs",
+                link: "/suppliers/suppliers-list",
+              },
+              {
+                name: "Créer un fournisseur",
+                link: "/suppliers/create",
+              },
+            ],
+            icon: Factory,
+          },
+          {
+            name: "Paramètres",
             link: "/parameters",
             linksGroup: [],
             icon: Settings2,
           },
-          {
-            name: "Fournisseurs",
-            link: "/suppliers/suppliers-list",
-            linksGroup: [],
-            icon: Factory,
-          },
-          {
-            name: "Calendrier",
-            link: "/calendar",
-            linksGroup: [],
-            icon: CalendarDays,
-          },
+          // {
+          //   name: "Calendrier",
+          //   link: "/calendar",
+          //   linksGroup: [],
+          //   icon: CalendarDays,
+          // },
           {
             name: "Chat",
             link: "/chat",
@@ -95,14 +104,14 @@ export const LINKS: Link[] = [
                 name: "Liste des utilisateurs",
                 link: "/admin",
               },
-              {
-                name: "Créer un groupe",
-                link: "/admin/create-group",
-              },
-              {
-                name: "Groupes créés",
-                link: "/admin/created-group",
-              },
+              // {
+              //   name: "Créer un groupe",
+              //   link: "/admin/create-group",
+              // },
+              // {
+              //   name: "Groupes créés",
+              //   link: "/admin/created-group",
+              // },
             ],
             icon: User,
           },
@@ -142,6 +151,24 @@ export const LINKS_Params: Params[] = [
     icon: Captions,
     page: "brand",
   },
+  {
+    name: "Tarifs",
+    link: "/parameters/brand",
+    icon: Tag,
+    page: "tarif",
+  },
+  {
+    name: "Regime de taxe",
+    link: "/parameters/brand",
+    icon: HandCoins,
+    page: "tax_1",
+  },
+  {
+    name: "Taxes",
+    link: "/parameters/brand",
+    icon: HandCoins,
+    page: "tax_2",
+  },
 ];
 
 export const LINKS_Product: Params[] = [
@@ -156,18 +183,6 @@ export const LINKS_Product: Params[] = [
     link: "",
     icon: Tag,
     page: "uvc",
-  },
-  {
-    name: "Taxes",
-    link: "",
-    icon: HandCoins,
-    page: "fee",
-  },
-  {
-    name: "Prix UVC",
-    link: "",
-    icon: Euro,
-    page: "uvc price",
   },
 ];
 
@@ -534,6 +549,21 @@ export const LINKCARD_DRAFT: LinkCard[] = [
   {
     name: "Validée",
     page: "done",
+  },
+];
+
+export const DRAFT_CATEGORY: LinkCard[] = [
+  {
+    name: "Créés",
+    page: "created",
+  },
+  {
+    name: "Extraits",
+    page: "extract",
+  },
+  {
+    name: "Importés",
+    page: "import",
   },
 ];
 

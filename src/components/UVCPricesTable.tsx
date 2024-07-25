@@ -23,6 +23,12 @@ const UVCPriceTable: React.FC<UVCPriceTableProps> = ({ uvcPrices,  productRefere
     }));
   };
 
+  const handleKeyPress = (e: any) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
+  };
+
   return (
     <table className="w-full border">
       <thead>
@@ -50,6 +56,7 @@ const UVCPriceTable: React.FC<UVCPriceTableProps> = ({ uvcPrices,  productRefere
                   type="text"
                   value={priceData.pa}
                   onChange={(e) => handlePriceChange(dimension, "pa", e.target.value)}
+                  onKeyDown={handleKeyPress}
                   className="w-1/2 text-center border-[2px] focus:outline-none focus:border-blue-200 rounded-md"
                 />
               </td>
@@ -58,6 +65,7 @@ const UVCPriceTable: React.FC<UVCPriceTableProps> = ({ uvcPrices,  productRefere
                   type="text"
                   value={priceData.pv}
                   onChange={(e) => handlePriceChange(dimension, "pv", e.target.value)}
+                  onKeyDown={handleKeyPress}
                   className="w-1/2 text-center border-[2px] focus:outline-none focus:border-blue-200 rounded-md"
                 />
               </td>
@@ -66,6 +74,7 @@ const UVCPriceTable: React.FC<UVCPriceTableProps> = ({ uvcPrices,  productRefere
                   type="text"
                   value={priceData.pm}
                   onChange={(e) => handlePriceChange(dimension, "pm", e.target.value)}
+                  onKeyDown={handleKeyPress}
                   className="w-1/2 text-center border-[2px] focus:outline-none focus:border-blue-200 rounded-md"
                 />
               </td>

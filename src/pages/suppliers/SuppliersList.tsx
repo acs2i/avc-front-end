@@ -6,24 +6,41 @@ import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../components/Shared/Spinner";
-import { Plus } from "lucide-react";
+import { ChevronsUpDown, CircleSlash2, Plus } from "lucide-react";
 import Header from "../../components/Navigation/Header";
 
-interface Suppliers {
+interface Supplier {
   _id: string;
-  T_TIERS: string;
-  T_LIBELLE: string;
-  T_JURIDIQUE: string;
+  code: string;
+  company_name: string;
+  siret: string;
+  tva: string;
+  web_url: string;
+  email: string;
+  phone: string;
+  address_1: string;
+  address_2: string;
+  address_3: string;
+  postal: string;
+  country: string;
+  contacts?: any[];
+  conditions?: any[];
+  brand_id: any[];
+  status: string;
+  creator: any; // it's an object
+  additional_fields?: any;
 }
 
 export default function SuppliersList() {
   const [prevSearchValue, setPrevSearchValue] = useState("");
+  const [codeValue, setCodeValue] = useState("");
+  const [labelValue, setLabelValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItem, setTotalItem] = useState(null);
   const limit = 20;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
-  const [suppliers, setSuppliers] = useState<Suppliers[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const navigate = useNavigate();
 
   const handlePageChange = (
@@ -52,6 +69,7 @@ export default function SuppliersList() {
       const data = await response.json();
       setSuppliers(data.data);
       setTotalItem(data.total);
+      console.log(data)
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     } finally {
@@ -62,44 +80,90 @@ export default function SuppliersList() {
   return (
     <section>
       <Header
-        title="Liste des fournisseurs"
-        link="/parameters/dimension/create/item"
+        title="Liste"
+        light="des fournisseurs"
+        link="/suppliers/create"
         btnTitle="Créer un fournisseur"
         placeholder="Rechercher un fournisseur"
-        height="250px"
-        button
+        height="300px"
       >
-        <div className="flex items-center gap-4 py-4">
-          <div className="flex items-center gap-4">
-            <label className="w-[60px] text-sm font-bold">Libellé :</label>
+        <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 text-gray-600">
+          <div className="flex flex-col">
+            <label className="text-sm font-bold mb-1">Code :</label>
             <input
               type="text"
-              id="GDI_LIBELLE"
-              className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
-              placeholder="Rechercher par libellé"
+              id="code"
+              className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
+              placeholder="Rechercher par code fournisseur"
+              value={codeValue}
+              onChange={(e) => setCodeValue(e.target.value)}
+              autoComplete="off"
             />
           </div>
-          <div className="flex items-center gap-4">
-            <label className="w-[60px] text-sm font-bold">Code :</label>
+
+          <div className="flex flex-col">
+            <label className="text-sm font-bold mb-1">Raison social :</label>
             <input
               type="text"
-              id="GDI_DIMORLI"
-              className="block p-1.5 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-sm"
-              placeholder="Rechercher par code"
+              id="label"
+              className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
+              placeholder="Rechercher par nom du fournisseur"
+              value={labelValue}
+              onChange={(e) => setLabelValue(e.target.value)}
+              autoComplete="off"
             />
+          </div>
+
+          <div className="flex items-center">
+            {!isLoading ? (
+              <Button type="submit" size="small" blue>
+                Lancer la Recherche
+              </Button>
+            ) : (
+              <Spinner
+                width="50px"
+                height="40px"
+                logoSize="90%"
+                progressSize={50}
+              />
+            )}
           </div>
         </div>
       </Header>
       <div className="relative overflow-x-auto bg-white">
-        
         <table className="w-full text-left">
-          <thead className="border-y-[1px] border-gray-200 text-sm text-gray-500">
+          <thead className="border-y-[2px] border-slate-100 text-sm font-[900] text-black uppercase">
             <tr>
-              <th scope="col" className="px-6 py-2 w-1/3">
-                Code
+              <th scope="col" className="px-6 py-4">
+                <div className="flex items-center">
+                  <span className="leading-3">Code</span>
+                  <div className="cursor-pointer">
+                    <ChevronsUpDown size={13} />
+                  </div>
+                </div>
               </th>
-              <th scope="col" className="px-6 py-2 w-1/3">
-                Libellé
+              <th scope="col" className="px-6">
+                <div className="flex items-center">
+                  <span>Raison Social</span>
+                  <div className="cursor-pointer">
+                    <ChevronsUpDown size={13} />
+                  </div>
+                </div>
+              </th>
+              <th scope="col" className="px-6">
+                <div className="flex items-center">
+                  <span>Email</span>
+                </div>
+              </th>
+              <th scope="col" className="px-6">
+                <div className="flex items-center">
+                  <span>Adresse</span>
+                </div>
+              </th>
+              <th scope="col" className="px-6">
+                <div className="flex items-center">
+                  <span>Code postal</span>
+                </div>
               </th>
             </tr>
           </thead>
@@ -108,13 +172,16 @@ export default function SuppliersList() {
               suppliers.map((supplier) => (
                 <tr
                   key={supplier._id}
-                  className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 whitespace-nowrap"
+                  className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-[11px] text-gray-500 whitespace-nowrap"
                   onClick={() =>
                     navigate(`/parameters/dimension/${supplier._id}`)
                   }
                 >
-                  <td className="px-6 py-2">{supplier.T_TIERS}</td>
-                  <td className="px-6 py-2">{supplier.T_LIBELLE}</td>
+                  <td className="px-6 py-2">{supplier.code}</td>
+                  <td className="px-6 py-2">{supplier.company_name}</td>
+                  <td className="px-6 py-2">{supplier.email ? supplier.email : <CircleSlash2 size={15} />}</td>
+                  <td className="px-6 py-2">{supplier.address_1 ? supplier.address_1 : <CircleSlash2 size={15} />}</td>
+                  <td className="px-6 py-2">{supplier.postal ? supplier.postal : <CircleSlash2 size={15} />}</td>
                 </tr>
               ))
             ) : (

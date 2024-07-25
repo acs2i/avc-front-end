@@ -1,18 +1,22 @@
 import React, { useState } from "react";
 
 interface UVCInfosTableProps {
-  uvcPrices: string[];
+  uvcDimensions: string[];
   productReference: string;
-  productSupplier: string;
+  productSupplier: {
+    _id: string;
+    code: string;
+    company_name: string;
+  };
 }
 
 const UVCSupplierTable: React.FC<UVCInfosTableProps> = ({
-  uvcPrices,
+  uvcDimensions,
   productReference,
-  productSupplier
+  productSupplier,
 }) => {
   const [collections, setCollections] = useState<{ [key: string]: string }>(
-    uvcPrices.reduce((acc, dimension) => {
+    uvcDimensions.reduce((acc, dimension) => {
       acc[dimension] = "";
       return acc;
     }, {} as { [key: string]: string })
@@ -36,7 +40,7 @@ const UVCSupplierTable: React.FC<UVCInfosTableProps> = ({
         </tr>
       </thead>
       <tbody>
-        {uvcPrices.map((dimension, index) => {
+        {uvcDimensions.map((dimension, index) => {
           const [couleur, taille] = dimension.split(",");
           const codeUVC = `${productReference}${couleur}${taille}`;
           return (
@@ -44,7 +48,13 @@ const UVCSupplierTable: React.FC<UVCInfosTableProps> = ({
               <td className="border px-4 py-1 text-center">{codeUVC}</td>
               <td className="border px-4 py-1 text-center">{couleur}</td>
               <td className="border px-4 py-1 text-center">{taille}</td>
-              <td className="border px-4 py-1 text-center">{productSupplier}</td>
+              <td className="border px-4 py-1 text-center">
+                <div>
+                  <span>{productSupplier.code}</span>
+                  <span className="mx-1">-</span>
+                  <span>{productSupplier.company_name}</span>
+                </div>
+              </td>
             </tr>
           );
         })}

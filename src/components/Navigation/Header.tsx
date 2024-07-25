@@ -2,7 +2,8 @@ import React from "react";
 import Button from "../FormElements/Button";
 
 interface headerProps {
-  title: string;
+  light?: string;
+  title?: string;
   link: string;
   btnTitle: string;
   placeholder: string;
@@ -12,6 +13,7 @@ interface headerProps {
 }
 
 export default function Header({
+  light,
   title,
   children,
   link,
@@ -21,18 +23,18 @@ export default function Header({
   height
 }: headerProps) {
   return (
-    <div className="w-full bg-gray-100 p-4 relative overflow-hidden" style={{ height: height || 'auto' }}>
+    <div className="w-full bg-slate-100 p-4 relative overflow-hidden" style={{ height: height || 'auto' }}>
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage: `url(${"/img/background_forest.jpg"})`,
-          opacity: 0.2,
+          opacity: 0.05,
           filter: "grayscale(10%)",
           backgroundPosition: "center bottom -50px",
         }}
       ></div>
       <div className="p-8 relative z-10">
-        <h3 className="text-[35px] font-[800] text-gray-800">{title}</h3>
+        <h3 className="text-[35px] font-[800] text-gray-800">{title} <span className="font-[200]">{light}</span></h3>
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
             <div className="relative w-[400px]">
@@ -56,7 +58,7 @@ export default function Header({
               <input
                 type="search"
                 id="default-search"
-                className="block w-full px-[10px] py-[8px] ps-10 text-sm text-gray-900 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="block w-full px-[10px] py-[8px] ps-10 text-sm text-gray-900 border border-gray-300 rounded-md focus:outline-none focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
                 placeholder={placeholder}
                 required
               />

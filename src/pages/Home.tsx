@@ -11,27 +11,46 @@ import { useProducts } from "../utils/hooks/useProducts";
 import { useNavigate } from "react-router-dom";
 import { CARD, GRAPH } from "../utils";
 
-interface Suppliers {
+interface Supplier {
   _id: string;
-  T_TIERS: string;
-  T_LIBELLE: string;
-  T_JURIDIQUE: string;
+  code: string;
+  company_name: string;
+  siret: string;
+  tva: string;
+  web_url: string;
+  email: string;
+  phone: string;
+  address_1: string;
+  address_2: string;
+  address_3: string;
+  postal: string;
+  country: string;
+  contacts?: any[];
+  conditions?: any[];
+  brand_id: any[];
+  status: string;
+  creator: any; // it's an object
+  additional_fields?: any;
 }
 
 interface Product {
   _id: string;
-  GA_CODEARTICLE: number;
-  GA_FERME: string;
-  GA_FOURNPRINC: number;
-  GA_LIBCOMPL: string;
-  GA_LIBELLE: string;
-  GA_LIBREART1: any;
-  GA_LIBREART2: any;
-  GA_LIBREART4: any;
-  family: any;
-  subFamily: any;
-  brand: any;
-  productCollection: string;
+  creator_id: any;
+  reference: string;
+  name: string;
+  short_label: string;
+  long_label: string;
+  type: string;
+  tag_ids: any[];
+  princ_supplier_id: any;
+  supplier_ids: any[];
+  dimension_types: string[];
+  uvc_ids: any[];
+  brand_ids: any[];
+  collection_ids: any[];
+  imgPath: string;
+  status: string;
+  additional_fields: any;
 }
 
 interface SearchParams {
@@ -63,7 +82,7 @@ export default function Home() {
   const [totalItem, setTotalItem] = useState<number | null>(null);
   const limit = 10;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
-  const [suppliers, setSuppliers] = useState<Suppliers[]>([]);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [submittedSearchParams, setSubmittedSearchParams] =
     useState<SearchParams>({});
   const { data: products, refetch: refetchProducts } = useProducts(
@@ -122,9 +141,7 @@ export default function Home() {
         <div className="w-1/2">
           <div className="flex flex-col gap-8">
             <div className="text-gray-800 dark:text-white">
-              <h3 className="text-[35px] font-bold">
-                Tableau de bord
-              </h3>
+              <h3 className="text-[35px] font-bold">Tableau de bord</h3>
               <p className="text-[15px]">
                 Vue globale des articles enregistrés
               </p>
@@ -247,37 +264,33 @@ export default function Home() {
                   >
                     <td className="p-4">
                       <div className="flex items-center gap-2 dark:text-white">
-                        <span className="text-xs">
-                          {product.GA_CODEARTICLE}
-                        </span>
+                        <span className="text-xs">{product.reference}</span>
                       </div>
                     </td>
                     <td className="p-4">
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-blue-600 dark:text-yellow-300">
-                          {product.GA_LIBELLE}
+                          {product.long_label}
                         </span>
                       </div>
                     </td>
                     <td className="p-4 text-xs">
-                      {product.family ? (
+                      {product.tag_ids ? (
                         <div className="dark:text-white">
-                          <span>{product.family?.YX_CODE}</span>
+                          <span>{product.tag_ids[0].code}</span>
                           <span className="mx-1">-</span>
-                          <span>{product.family?.YX_LIBELLE}</span>
+                          <span>{product.tag_ids[0].name}</span>
                         </div>
                       ) : (
                         <span>-</span>
                       )}
                     </td>
                     <td className="p-4 text-xs">
-                      {product.subFamily ? (
+                      {product.tag_ids ? (
                         <div className="dark:text-white">
-                          <span>{product?.subFamily?.YX_CODE}</span>
+                          <span>{product.tag_ids[1].code}</span>
                           <span className="mx-1">-</span>
-                          {product?.subFamily.YX_LIBELLE && (
-                            <span>{product?.subFamily?.YX_LIBELLE}</span>
-                          )}
+                          <span>{product.tag_ids[1].name}</span>
                         </div>
                       ) : (
                         <span>-</span>
@@ -292,7 +305,9 @@ export default function Home() {
                     </td>
                     <td>
                       <div className="text-center">
-                        <span className="text-xs dark:text-white">24/06/2024</span>
+                        <span className="text-xs dark:text-white">
+                          24/06/2024
+                        </span>
                       </div>
                     </td>
                   </tr>
@@ -316,11 +331,11 @@ export default function Home() {
             <table className="w-full text-left">
               <thead className="text-sm text-gray-500 dark:text-white border-t border-b dark:border-gray-500">
                 <tr>
-                  <th scope="col" className="px-6 py-2 w-[300px]">
-                    Libellé
+                  <th scope="col" className="px-é py-2 w-[100px]">
+                    Code
                   </th>
                   <th scope="col" className="px-6 py-2 w-[300px] text-center">
-                   Code
+                    Libellé
                   </th>
                 </tr>
               </thead>
@@ -328,15 +343,18 @@ export default function Home() {
                 {suppliers &&
                   suppliers.length > 0 &&
                   suppliers.map((supplier, i) => (
-                    <tr className="border-b dark:border-gray-500" key={supplier._id}>
+                    <tr
+                      className="border-b dark:border-gray-500"
+                      key={supplier._id}
+                    >
                       <td className="p-2">
                         <span className="text-xs text-blue-600 dark:text-yellow-400">
-                          {supplier.T_LIBELLE}
+                          {supplier.code}
                         </span>
                       </td>
                       <td className="text-center">
                         <span className="text-sm font-bold text-gray-600 dark:text-white">
-                          {supplier.T_TIERS}
+                          {supplier.company_name}
                         </span>
                       </td>
                     </tr>

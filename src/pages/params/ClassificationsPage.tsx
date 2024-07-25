@@ -5,7 +5,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { Link, useNavigate } from "react-router-dom";
-import { Info, Plus } from "lucide-react";
+import { ChevronsUpDown, Info, Plus } from "lucide-react";
 import Spinner from "../../components/Shared/Spinner";
 import { Divider } from "@mui/material";
 import ScrollToTop from "../../components/ScrollToTop";
@@ -14,15 +14,19 @@ import Header from "../../components/Navigation/Header";
 
 type DataType = "LA1" | "LA2" | "LA3";
 
-interface Family {
+interface Tag {
   _id: string;
-  YX_CODE: string;
-  YX_TYPE: DataType;
-  YX_LIBELLE: string;
+  code: string;
+  name: string;
+  level: string;
+  tag_grouping_id: any[];
+  status: string;
+  additional_fields?: any;
+  creator_id: string;
 }
 
 interface ClassificationsPageProps {
-  onSelectFamily: (family: Family) => void;
+  onSelectFamily: (family: Tag) => void;
   shouldRefetch: boolean;
   highlightedFamilyId: string | null;
   resetHighlightedFamilyId: () => void;
@@ -43,7 +47,7 @@ function ClassificationsPage({
   const [totalItem, setTotalItem] = useState(null);
   const limit = 20;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
-  const [families, setFamilies] = useState<Family[]>([]);
+  const [families, setFamilies] = useState<Tag[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -79,7 +83,7 @@ function ClassificationsPage({
   const fetchFamily = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/family?page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tag?page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -102,7 +106,7 @@ function ClassificationsPage({
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/family/search?YX_TYPE=${typeValue}&YX_CODE=${codeValue}&YX_LIBELLE=${labelValue}&page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tag?page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -112,6 +116,7 @@ function ClassificationsPage({
       );
 
       const data = await response.json();
+      console.log(data);
       setFamilies(data.data);
       setTotalItem(data.total);
       setPrevSearchValue(typeValue);
@@ -120,7 +125,6 @@ function ClassificationsPage({
       console.error("Erreur lors de la requête", error);
     }
   };
-
 
   useEffect(() => {
     if (highlightedFamilyId) {
@@ -132,7 +136,6 @@ function ClassificationsPage({
     }
   }, [highlightedFamilyId, resetHighlightedFamilyId]);
 
-
   useEffect(() => {
     fetchFamily();
   }, [shouldRefetch]);
@@ -140,16 +143,36 @@ function ClassificationsPage({
   return (
     <div className="relative overflow-x-auto w-full">
       <table className="w-full text-left">
-        <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
+        <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700 uppercase">
           <tr>
-            <th scope="col" className="px-6 py-2 w-1/3">
-              Niveau
+            <th scope="col" className="px-6 py-4 w-1/3">
+              <div className="flex items-center">
+                <span className="leading-3">Niveau</span>
+                <div className="cursor-pointer">
+                  <ChevronsUpDown size={13} />
+                </div>
+              </div>
             </th>
-            <th scope="col" className="px-6 py-2 w-1/3">
-              Code
+            <th scope="col" className="px-6 py-4 w-1/3">
+              <div className="flex items-center">
+                <span className="leading-3">Code</span>
+                <div className="cursor-pointer">
+                  <ChevronsUpDown size={13} />
+                </div>
+              </div>
             </th>
-            <th scope="col" className="px-6 py-2 w-1/3">
-              Libellé
+            <th scope="col" className="px-6 py-4 w-[300px]">
+              <div className="flex items-center">
+                <span className="leading-3">Libellé</span>
+                <div className="cursor-pointer">
+                  <ChevronsUpDown size={13} />
+                </div>
+              </div>
+            </th>
+            <th scope="col" className="px-6 py-4 w-[50px]">
+              <div className="flex items-center">
+                <span className="leading-3">Status</span>
+              </div>
             </th>
           </tr>
         </thead>
@@ -159,18 +182,35 @@ function ClassificationsPage({
               <tr
                 key={family._id}
                 className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 whitespace-nowrap ${
-                  family._id === highlightedFamilyId ? "bg-orange-500 text-white" : ""
+                  family._id === highlightedFamilyId
+                    ? "bg-orange-300 text-white"
+                    : ""
                 }`}
                 onClick={() => onSelectFamily(family)}
               >
-                <td className={`px-6 py-2 flex items-center gap-2 ${
-                  family._id === highlightedFamilyId ? "text-white" : ""
-                } `}>
-                  {typeLabels[family.YX_TYPE]}
+                <td
+                  className={`px-6 py-2 flex items-center gap-2 ${
+                    family._id === highlightedFamilyId ? "text-white" : ""
+                  } `}
+                >
+                  {family.level}
                 </td>
-                <td className="px-6 py-2">{family.YX_CODE}</td>
-                <td className="px-6 py-2">{family.YX_LIBELLE}</td>
-                {family._id === highlightedFamilyId && <td className="px-6 py-2">Nouveau</td>}
+                <td className="px-6 py-2">{family.code}</td>
+                <td className="px-6 py-2">{family.name}</td>
+                <td className="px-6 py-2 uppercase">
+                    {family.status === "A" ? (
+                      <div className="text-center bg-green-200 text-green-600 border border-green-400  py-1 rounded-md max-w-[60px]">
+                        <span>Actif</span>
+                      </div>
+                    ) : (
+                      <div className="text-center bg-gray-200 text-gray-600 border border-gray-400  py-1 rounded-md max-w-[60px]">
+                        <span>Innactif</span>
+                      </div>
+                    )}
+                  </td>
+                {family._id === highlightedFamilyId && (
+                  <td className="px-6 py-2">Nouveau</td>
+                )}
               </tr>
             ))
           ) : (
