@@ -134,7 +134,7 @@ export default function DimensionPage({
                 key={dimension._id}
                 className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 whitespace-nowrap ${
                   dimension._id === highlightedDimensionId
-                    ? "bg-orange-500 text-white"
+                    ? "bg-orange-300 text-white"
                     : ""
                 }`}
                 onClick={() => onSelectDimension(dimension)}

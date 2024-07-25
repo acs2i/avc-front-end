@@ -78,7 +78,7 @@ export default function GridCreatePage({
           setIsLoading(false);
           onCreate(newGridId);
           onClose();
-        }, 1000);
+        }, 100);
       } else {
         notifyError("Erreur lors de la création");
       }

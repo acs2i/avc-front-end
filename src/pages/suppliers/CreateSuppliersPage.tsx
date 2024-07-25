@@ -44,6 +44,7 @@ interface FormData {
   address_1: string;
   address_2: string;
   address_3: string;
+  city: string;
   postal: string;
   country: string;
   currency: string;
@@ -114,6 +115,7 @@ export default function CreateSupplierPage() {
     address_1: "",
     address_2: "",
     address_3: "",
+    city: "",
     postal: "",
     country: "",
     currency: "",
@@ -322,7 +324,7 @@ export default function CreateSupplierPage() {
           notifySuccess("Brouillon créé !");
           setIsLoading(false);
           navigate("/suppliers/suppliers-list");
-        }, 1000);
+        }, 100);
       } else {
         notifyError("Erreur lors de la création !");
         setIsLoading(false);
@@ -374,7 +376,7 @@ export default function CreateSupplierPage() {
                 Identification
               </h4>
               {/* Partie Infos */}
-              <div className="border border-gray-300 h-[450px] p-3 rounded-md">
+              <div className="border border-gray-300 h-[550px] p-3 rounded-md">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   <Input
                     element="input"
@@ -462,7 +464,7 @@ export default function CreateSupplierPage() {
                 Adresse
               </h4>
               {/* Partie adresse */}
-              <div className="border border-gray-300 h-[450px] p-3 rounded-md">
+              <div className="border border-gray-300 h-[550px] p-3 rounded-md">
                 <Input
                   element="input"
                   id="address_1"
@@ -496,7 +498,17 @@ export default function CreateSupplierPage() {
                   create
                   gray
                 />
-
+                <Input
+                  element="input"
+                  id="city"
+                  label="Ville :"
+                  value={formData.city}
+                  onChange={handleChange}
+                  validators={[]}
+                  placeholder="Ajouter la ville"
+                  create
+                  gray
+                />
                 <Input
                   element="input"
                   id="postal"
@@ -534,7 +546,9 @@ export default function CreateSupplierPage() {
                   key={index}
                 >
                   <div className="mt-5 flex items-center gap-2">
-                    <span className="italic text-gray-600 text-[12px] font-[700]">Contact {index + 1}</span>
+                    <span className="italic text-gray-600 text-[12px] font-[700]">
+                      Contact {index + 1}
+                    </span>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <Input
@@ -898,20 +912,33 @@ export default function CreateSupplierPage() {
                 </div>
               </div>
               {/* Partie buttons */}
-              <div className="mt-[50px] flex gap-2">
-                <button
-                  className="w-full bg-gray-300 text-red-500 py-2 rounded-md font-[600] hover:bg-red-500 hover:text-white shadow-md"
-                  type="button"
-                >
-                  Annuler
-                </button>
-                <button
-                  className="w-full bg-sky-600 text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
-                  type="submit"
-                >
-                  Créer le fournisseur
-                </button>
-              </div>
+              {!isLoading ? (
+                <div className="mt-[50px] flex gap-2">
+                  <button
+                    className="w-full bg-gray-300 text-red-500 py-2 rounded-md font-[600] hover:bg-red-500 hover:text-white shadow-md"
+                    type="button"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    className="w-full bg-sky-600 text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
+                    type="submit"
+                  >
+                    Créer le fournisseur
+                  </button>
+                </div>
+              ) : (
+                <div className="relative flex justify-center mt-7 px-7 gap-2">
+                  <CircularProgress size={100} />
+                  <div className="absolute h-[60px] w-[80px] top-[50%] translate-y-[-50%]">
+                    <img
+                      src="/img/logo.png"
+                      alt="logo"
+                      className="w-full h-full animate-pulse"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
             {/* Partie marques */}
             <div className="relative w-[30%] flex flex-col gap-3">

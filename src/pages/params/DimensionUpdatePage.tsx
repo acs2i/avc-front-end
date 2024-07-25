@@ -120,7 +120,7 @@ export default function DimensionUpdatePage({
           setIsLoading(false);
           onUpdate();
           onClose();
-        }, 1000);
+        }, 100);
       } else {
         notifyError("Erreur lors de la modification");
       }
@@ -130,7 +130,6 @@ export default function DimensionUpdatePage({
     }
   };
 
-  console.log(formData);
 
   return (
     <section className="w-full p-4">

@@ -96,7 +96,7 @@ export default function CollectionUpdatePage({
           setIsLoading(false);
           onUpdate();
           onClose();
-        }, 1000);
+        }, 100);
       } else {
         notifyError("Erreur lors de la modif !");
       }

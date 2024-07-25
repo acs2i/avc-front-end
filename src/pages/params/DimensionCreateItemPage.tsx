@@ -68,7 +68,7 @@ export default function DimensionCreateItemPage({
           setIsLoading(false);
           onCreate(newDimenesionId);
           onClose();
-        }, 1000);
+        }, 100);
       } else {
         notifyError("Erreur lors de la création");
       }

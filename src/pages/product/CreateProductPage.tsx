@@ -1228,7 +1228,7 @@ export default function CreateProductPage() {
                 <Divider />
               </div>
               {/* Partie onglets */}
-              <div className="mt-[30px] flex mb-[500px]">
+              <div className="mt-[30px] flex mb-[50px]">
                 <div className="w-[30%] border-t-[1px] border-gray-300">
                   {LINKS_Product.map((link) => (
                     <div
@@ -1269,7 +1269,7 @@ export default function CreateProductPage() {
                   <div
                     className={`border-t-[1px] border-gray-300 px-5 py-2 overflow-y-auto ${
                       isFullScreen
-                        ? "fixed right-0 top-0 h-full w-full z-[9999] bg-gray-100 h-[300px]"
+                        ? "fixed right-0 top-0 h-full w-full z-[9999] bg-gray-100"
                         : "w-[70%]"
                     }`}
                   >
@@ -1293,7 +1293,7 @@ export default function CreateProductPage() {
                     className={`border-t-[1px] border-gray-300 px-5 py-2 ${
                       isFullScreen
                         ? "fixed right-0 top-0 h-full w-full z-[9999] bg-gray-100"
-                        : "w-[70%] h-[300px]"
+                        : "w-[70%]"
                     } overflow-y-auto`}
                   >
                     <div className="flex items-center justify-between">

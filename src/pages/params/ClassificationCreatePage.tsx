@@ -107,7 +107,7 @@ function ClassificationCreatePage({
           setIsLoading(false);
           onCreate(newFamilyId);
           onClose();
-        }, 1000);
+        }, 100);
       } else {
         notifyError("Erreur lors de la création");
       }

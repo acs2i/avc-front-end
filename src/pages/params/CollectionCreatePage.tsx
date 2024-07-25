@@ -63,7 +63,7 @@ export default function CollectionCreatePage({
           setIsLoading(false);
           onCreate(newCollectionId);
           onClose();
-        }, 1000);
+        }, 100);
       } else {
         notifyError("Erreur lors de la création");
       }
@@ -73,7 +73,6 @@ export default function CollectionCreatePage({
   };
 
 
-  console.log(formData)
 
   return (
     <section className="w-full p-4">

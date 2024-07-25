@@ -111,7 +111,6 @@ export default function ClassificationUpdatePage({
       );
 
       const data = await response.json();
-      console.log("Fetched data:", data);
       setFamily(data);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
@@ -148,7 +147,7 @@ export default function ClassificationUpdatePage({
           setIsLoading(false);
           onUpdate();
           onClose();
-        }, 1000);
+        }, 100);
       } else {
         const errorData = await response.json();
         console.error("Error response:", errorData);

@@ -63,7 +63,7 @@ export default function BrandCreatePage({
           setIsLoading(false);
           onCreate(newBrandId);
           onClose();
-        }, 1000);
+        }, 100);
       } else {
         notifyError("Erreur lors de la création");
       }
@@ -71,8 +71,6 @@ export default function BrandCreatePage({
       console.error("Erreur lors de la requête", error);
     }
   };
-
-  console.log(formData)
 
   return (
     <section className="w-full p-4">
