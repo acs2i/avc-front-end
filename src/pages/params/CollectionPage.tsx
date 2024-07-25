@@ -119,7 +119,7 @@ export default function CollectionPage({
           <tr>
             <th scope="col" className="px-6 py-4 w-1/3">
               <div className="flex items-center">
-                <span className="leading-3">Code</span>
+                <span>Code</span>
                 <div className="cursor-pointer">
                   <ChevronsUpDown size={13} />
                 </div>
@@ -127,7 +127,7 @@ export default function CollectionPage({
             </th>
             <th scope="col" className="px-6 py-4 w-[300px]">
               <div className="flex items-center">
-                <span className="leading-3">Libellé</span>
+                <span>Libellé</span>
                 <div className="cursor-pointer">
                   <ChevronsUpDown size={13} />
                 </div>
@@ -135,7 +135,7 @@ export default function CollectionPage({
             </th>
             <th scope="col" className="px-6 py-4 w-[50px]">
               <div className="flex items-center">
-                <span className="leading-3">status</span>
+                <span>status</span>
               </div>
             </th>
           </tr>

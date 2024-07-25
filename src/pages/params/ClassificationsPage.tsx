@@ -147,7 +147,7 @@ function ClassificationsPage({
           <tr>
             <th scope="col" className="px-6 py-4 w-1/3">
               <div className="flex items-center">
-                <span className="leading-3">Niveau</span>
+                <span >Niveau</span>
                 <div className="cursor-pointer">
                   <ChevronsUpDown size={13} />
                 </div>
@@ -155,7 +155,7 @@ function ClassificationsPage({
             </th>
             <th scope="col" className="px-6 py-4 w-1/3">
               <div className="flex items-center">
-                <span className="leading-3">Code</span>
+                <span>Code</span>
                 <div className="cursor-pointer">
                   <ChevronsUpDown size={13} />
                 </div>
@@ -163,7 +163,7 @@ function ClassificationsPage({
             </th>
             <th scope="col" className="px-6 py-4 w-[300px]">
               <div className="flex items-center">
-                <span className="leading-3">Libellé</span>
+                <span >Libellé</span>
                 <div className="cursor-pointer">
                   <ChevronsUpDown size={13} />
                 </div>

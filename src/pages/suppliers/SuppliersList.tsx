@@ -6,7 +6,7 @@ import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../components/Shared/Spinner";
-import { ChevronsUpDown, CircleSlash2, Plus } from "lucide-react";
+import { ChevronsUpDown, CircleSlash2, FileDown, Plus } from "lucide-react";
 import Header from "../../components/Navigation/Header";
 
 interface Supplier {
@@ -69,13 +69,41 @@ export default function SuppliersList() {
       const data = await response.json();
       setSuppliers(data.data);
       setTotalItem(data.total);
-      console.log(data)
+      console.log(data);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const handleGeneratePdf = async (supplier: Supplier) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/generate-pdf`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(supplier),
+        }
+      );
+  
+      if (response.ok) {
+        const data = await response.json();
+        window.open(data.filePath);
+      } else {
+        console.error("Erreur lors de la génération du PDF");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
 
   return (
     <section>
@@ -160,9 +188,14 @@ export default function SuppliersList() {
                   <span>Adresse</span>
                 </div>
               </th>
-              <th scope="col" className="px-6">
+              <th scope="col" className="px-2">
                 <div className="flex items-center">
                   <span>Code postal</span>
+                </div>
+              </th>
+              <th scope="col" className="px-1">
+                <div className="flex items-center justify-center">
+                  <span>Action</span>
                 </div>
               </th>
             </tr>
@@ -173,15 +206,41 @@ export default function SuppliersList() {
                 <tr
                   key={supplier._id}
                   className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-[11px] text-gray-500 whitespace-nowrap"
-                  onClick={() =>
-                    navigate(`/parameters/dimension/${supplier._id}`)
-                  }
+                  // onClick={() =>
+                  //   navigate(`/parameters/dimension/${supplier._id}`)
+                  // }
                 >
                   <td className="px-6 py-2">{supplier.code}</td>
                   <td className="px-6 py-2">{supplier.company_name}</td>
-                  <td className="px-6 py-2">{supplier.email ? supplier.email : <CircleSlash2 size={15} />}</td>
-                  <td className="px-6 py-2">{supplier.address_1 ? supplier.address_1 : <CircleSlash2 size={15} />}</td>
-                  <td className="px-6 py-2">{supplier.postal ? supplier.postal : <CircleSlash2 size={15} />}</td>
+                  <td className="px-6 py-2">
+                    {supplier.email ? (
+                      supplier.email
+                    ) : (
+                      <CircleSlash2 size={15} />
+                    )}
+                  </td>
+                  <td className="px-6 py-2">
+                    {supplier.address_1 ? (
+                      supplier.address_1
+                    ) : (
+                      <CircleSlash2 size={15} />
+                    )}
+                  </td>
+                  <td className="px-2 py-2">
+                    {supplier.postal ? (
+                      supplier.postal
+                    ) : (
+                      <CircleSlash2 size={15} />
+                    )}
+                  </td>
+                  <td className="flex justify-center">
+                    <div
+                      className="w-[30px] h-[30px] flex items-center justify-center text-sky-600 cursor-pointer"
+                      onClick={() => handleGeneratePdf(supplier)}
+                    >
+                      <FileDown size={17} />
+                    </div>
+                  </td>
                 </tr>
               ))
             ) : (
