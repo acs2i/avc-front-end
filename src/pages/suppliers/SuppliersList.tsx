@@ -93,8 +93,19 @@ export default function SuppliersList() {
   
       if (response.ok) {
         const data = await response.json();
-        console.log(data.filePath);
-        window.open(data.filePath, '_blank');
+        // console.log(data.filePath);
+        // window.open(data.filePath, '_blank');
+        const fileName = data.filePath.substring(
+          data.filePath.lastIndexOf('/') + 1, 
+          data.filePath.indexOf('.pdf')
+        );
+        const link = document.createElement('a');
+        link.href = 'http://'+data.filePath;
+        link.target = '_blank';
+        link.download = `${fileName}.pdf`; // Vous pouvez spécifier un nom de fichier pour le téléchargement
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
       } else {
         console.error("Erreur lors de la génération du PDF");
       }
