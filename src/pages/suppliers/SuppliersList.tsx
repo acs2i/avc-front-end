@@ -94,7 +94,7 @@ export default function SuppliersList() {
       if (response.ok) {
         const data = await response.json();
         console.log(data.filePath);
-        window.open(data.filePath);
+        window.open(data.filePath, '_blank');
       } else {
         console.error("Erreur lors de la génération du PDF");
       }
