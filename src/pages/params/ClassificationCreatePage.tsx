@@ -77,6 +77,22 @@ function ClassificationCreatePage({
 
       const data = await response.json();
       setTagGrouping(data.data);
+      
+      if (data.data.length > 0) {
+        const firstTagGrouping = data.data[0];
+        setClassificationValue(firstTagGrouping._id);
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          tag_grouping_id: firstTagGrouping._id,
+        }));
+        setLevelOptions(
+          firstTagGrouping.level.map((level: any) => ({
+            value: level,
+            label: level,
+            name: level,
+          }))
+        );
+      }
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     } finally {
@@ -140,13 +156,13 @@ function ClassificationCreatePage({
         selectedTagGrouping.level.map((level) => ({
           value: level,
           label: level,
-          name: level, // Ajouter la propriété name
+          name: level,
         }))
       );
       setFormData({
         ...formData,
         tag_grouping_id: selectedTagGrouping._id,
-        level: "", // Reset level when classification changes
+        level: "",
       });
     } else {
       setLevelOptions([]);

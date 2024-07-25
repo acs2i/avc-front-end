@@ -133,7 +133,7 @@ function ParamsMenuPage() {
             className="bg-blue-500 text-white text-[12px] font-[700] w-full py-2 rounded-md"
             type="button"
           >
-            Créer une {page === "classe" && "classe"}
+            Créer une {page === "classe" && "classification"}
             {page === "dimension" && "dimension"}
             {page === "grid" && "grille"}
             {page === "collection" && "collection"}

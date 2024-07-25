@@ -151,11 +151,11 @@ const Input: React.FC<InputProps> = (props) => {
         value={props.value}
         className="bg-white border border-gray-300 text-gray-900 text-md rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)] block w-full p-2 mt-1 capitalize"
       >
-        <option value="" selected>
+        <option value="" disabled hidden>
           {props.placeholder}
         </option>
         {props.options?.map((option, i) => (
-          <option key={i} value={option.value} >
+          <option key={i} value={option.value}>
             {option.name}
           </option>
         ))}

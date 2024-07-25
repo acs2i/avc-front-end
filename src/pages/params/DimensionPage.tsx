@@ -98,7 +98,7 @@ export default function DimensionPage({
           <tr>
             <th scope="col" className="px-6 py-4 w-1/3">
               <div className="flex items-center">
-                <span className="leading-3">type</span>
+                <span>type</span>
                 <div className="cursor-pointer">
                   <ChevronsUpDown size={13} />
                 </div>
@@ -106,7 +106,7 @@ export default function DimensionPage({
             </th>
             <th scope="col" className="px-6 py-4 w-1/3">
               <div className="flex items-center">
-                <span className="leading-3">Code</span>
+                <span>Code</span>
                 <div className="cursor-pointer">
                   <ChevronsUpDown size={13} />
                 </div>
@@ -114,7 +114,7 @@ export default function DimensionPage({
             </th>
             <th scope="col" className="px-6 py-4 w-[300px]">
               <div className="flex items-center">
-                <span className="leading-3">libellé</span>
+                <span>libellé</span>
                 <div className="cursor-pointer">
                   <ChevronsUpDown size={13} />
                 </div>
