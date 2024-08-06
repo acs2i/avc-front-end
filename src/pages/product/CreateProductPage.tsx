@@ -1264,7 +1264,7 @@ export default function CreateProductPage() {
                       )}
                     </div>
                   ))}
-                </div>
+                </div>        
                 {page === "dimension" && (
                   <div
                     className={`border-t-[1px] border-gray-300 px-5 py-2 overflow-y-auto ${
