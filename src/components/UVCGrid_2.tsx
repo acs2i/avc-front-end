@@ -18,9 +18,9 @@ interface UVCGrid2Props {
 
 interface Grid {
   _id: string;
-  TYPE: string;
-  LIBELLE: string;
-  DIMENSIONS: string[];
+  type: string;
+  label: string;
+  dimensions: string[];
 }
 
 const UVCGrid2: React.FC<UVCGrid2Props> = ({
@@ -137,10 +137,9 @@ const UVCGrid2: React.FC<UVCGrid2Props> = ({
   }, [currentPage]);
 
   const fetchGrids = async () => {
-    setIsLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/grid?page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/dimension-grid?page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -151,6 +150,7 @@ const UVCGrid2: React.FC<UVCGrid2Props> = ({
 
       const data = await response.json();
       setGrids(data.data);
+      console.log(data.data)
       setTotalItem(data.total);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
@@ -158,11 +158,10 @@ const UVCGrid2: React.FC<UVCGrid2Props> = ({
       setIsLoading(false);
     }
   };
-
   const handleImportSizes = (gridId: string) => {
     const sizeGrid = grids.find((grid) => grid._id === gridId);
     if (sizeGrid) {
-      importSizes(sizeGrid.DIMENSIONS);
+      importSizes(sizeGrid.dimensions);
       setShowSizeGridOptions(false);
     }
     setIsModalOpen(false);
@@ -171,7 +170,7 @@ const UVCGrid2: React.FC<UVCGrid2Props> = ({
   const handleImportColors = (gridId: string) => {
     const colorGrid = grids.find((grid) => grid._id === gridId);
     if (colorGrid) {
-      importColors(colorGrid.DIMENSIONS);
+      importColors(colorGrid.dimensions);
       setShowColorGridOptions(false);
     }
     setIsModalOpen(false);
@@ -216,17 +215,17 @@ const UVCGrid2: React.FC<UVCGrid2Props> = ({
                 </thead>
                 <tbody>
                   {grids
-                    .filter((grid) => grid.TYPE === "Taille")
+                    .filter((grid) => grid.type === "Taille")
                     .map((grid) => (
                       <tr
                         key={grid._id}
                         className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap"
                         onClick={() => handleImportSizes(grid._id)}
                       >
-                        <td className="px-6 py-4">{grid.LIBELLE}</td>
+                        <td className="px-6 py-4">{grid.label}</td>
                         <td className="px-6 py-4">
                           <div className="flex items-center flex-wrap gap-2">
-                            {grid.DIMENSIONS.map((dimension) => (
+                            {grid.dimensions.map((dimension) => (
                               <span className="bg-orange-200 w-[30px] h-[30px] rounded-full flex items-center justify-center text-gray-800">{removePrefix([dimension], "Taille")}</span>
                             ))}
                           </div>
@@ -257,17 +256,17 @@ const UVCGrid2: React.FC<UVCGrid2Props> = ({
                 </thead>
                 <tbody>
                   {grids
-                    .filter((grid) => grid.TYPE === "Couleur")
+                    .filter((grid) => grid.type === "Couleur")
                     .map((grid) => (
                       <tr
                         key={grid._id}
                         className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap"
                         onClick={() => handleImportColors(grid._id)}
                       >
-                        <td className="px-6 py-4">{grid.LIBELLE}</td>
+                        <td className="px-6 py-4">{grid.label}</td>
                         <td className="px-6 py-4">
                           <div className="flex items-center flex-wrap gap-2">
-                            {grid.DIMENSIONS.map((dimension) => (
+                            {grid.dimensions.map((dimension) => (
                               <span className="bg-orange-200 w-[30px] h-[30px] rounded-full flex items-center justify-center text-gray-800">{removePrefix([dimension], "Couleur")}</span>
                             ))}
                           </div>
