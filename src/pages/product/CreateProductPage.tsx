@@ -157,7 +157,7 @@ export default function CreateProductPage() {
   const location = useLocation();
   const [page, setPage] = useState("dimension");
   const [onglet, setOnglet] = useState("infos");
-  const [brandLabel, setBrandLabel] = useState("")
+  const [brandLabel, setBrandLabel] = useState("");
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [classificationValue, setClassificationValue] =
@@ -224,7 +224,7 @@ export default function CreateProductPage() {
     uvc: [
       {
         code: "",
-        dimensions: ["000", "000"],
+        dimensions: [],
         prices: [
           {
             tarif_id: "",
@@ -243,11 +243,11 @@ export default function CreateProductPage() {
         additional_fields: {},
       },
     ],
-    initialSizes: ["000"], // Example initial sizes
-    initialColors: ["000"], // Example initial colors
-    initialGrid: [[true]], // Example initial grid
+    initialSizes: ["000"],
+    initialColors: ["000"],
+    initialGrid: [[true]],
   });
-  
+
   const [sizes, setSizes] = useState<string[]>([]);
   const [colors, setColors] = useState<string[]>([]);
   const [uvcGrid, setUvcGrid] = useState<boolean[][]>([]);
@@ -271,10 +271,8 @@ export default function CreateProductPage() {
       brand_ids: [brandId],
     }));
     const brandLabel = selectedOption ? selectedOption.label : "";
-    setBrandLabel(brandLabel)
+    setBrandLabel(brandLabel);
   };
-
-  console.log(brandLabel)
 
   const handleChangeCollection = (
     selectedOption: SingleValue<CollectionOption>
@@ -319,10 +317,12 @@ export default function CreateProductPage() {
     }
   };
 
-  const handleDimensionsChange = (newDimensions: string[][]) => {
-    const newUVCs = newDimensions.map((dimensions) => ({
+  const handleDimensionsChange = (
+    newDimensions: { color: string; size: string }[]
+  ) => {
+    const newUVCs = newDimensions.map((dim) => ({
       code: "",
-      dimensions,
+      dimensions: [`${dim.color}/${dim.size}`],
       prices: [
         {
           tarif_id: "",
@@ -345,6 +345,7 @@ export default function CreateProductPage() {
       ...prevFormData,
       uvc: newUVCs,
     }));
+    console.log(newUVCs);
   };
 
   const handleInputChangeBrand = async (inputValueBrand: string) => {
@@ -652,29 +653,25 @@ export default function CreateProductPage() {
   };
 
   const handleChangePrice = (
-    uvcIndex: number,
-    priceIndex: number,
-    field: string,
+    field: keyof PriceItemSchema,
     value: string
   ) => {
     const parsedValue = parseFloat(value);
     setFormData((prevFormData) => {
-      const newUvc = [...prevFormData.uvc];
-      const newPrices = [...newUvc[uvcIndex].prices];
-      newPrices[priceIndex] = {
-        ...newPrices[priceIndex],
-        price: {
-          ...newPrices[priceIndex].price,
-          [field]: isNaN(parsedValue) ? 0 : parsedValue,
-        },
-      };
-      newUvc[uvcIndex] = {
-        ...newUvc[uvcIndex],
-        prices: newPrices,
-      };
+      const updatedUvc = prevFormData.uvc.map((uvc) => ({
+        ...uvc,
+        prices: uvc.prices.map((price) => ({
+          ...price,
+          price: {
+            ...price.price,
+            [field]: isNaN(parsedValue) ? 0 : parsedValue,
+          },
+        })),
+      }));
+
       return {
         ...prevFormData,
-        uvc: newUvc,
+        uvc: updatedUvc,
       };
     });
   };
@@ -1105,68 +1102,53 @@ export default function CreateProductPage() {
                     Prix
                   </h4>
                   <div className="border border-gray-300 rounded-md p-3">
-                    {formData.uvc.map((uvc, uvcIndex) => (
-                      <div key={uvcIndex}>
-                        {uvc.prices.map((price, priceIndex) => (
-                          <div key={priceIndex}>
-                            <Input
-                              element="input"
-                              id={`peau-${uvcIndex}-${priceIndex}`}
-                              label="Prix achat :"
-                              value={price.price.peau.toString()}
-                              onChange={(e) =>
-                                handleChangePrice(
-                                  uvcIndex,
-                                  priceIndex,
-                                  "peau",
-                                  e.target.value
-                                )
-                              }
-                              validators={[]}
-                              placeholder=""
-                              create
-                              gray
-                            />
-                            <Input
-                              element="input"
-                              id={`tbeu_pb-${uvcIndex}-${priceIndex}`}
-                              label="Prix Vente :"
-                              value={price.price.tbeu_pb.toString()}
-                              onChange={(e) =>
-                                handleChangePrice(
-                                  uvcIndex,
-                                  priceIndex,
-                                  "tbeu_pb",
-                                  e.target.value
-                                )
-                              }
-                              validators={[]}
-                              placeholder=""
-                              create
-                              gray
-                            />
-                            <Input
-                              element="input"
-                              id={`tbeu_pmeu-${uvcIndex}-${priceIndex}`}
-                              label="Prix Modulé :"
-                              value={price.price.tbeu_pmeu.toString()}
-                              onChange={(e) =>
-                                handleChangePrice(
-                                  uvcIndex,
-                                  priceIndex,
-                                  "tbeu_pmeu",
-                                  e.target.value
-                                )
-                              }
-                              validators={[]}
-                              placeholder=""
-                              create
-                              gray
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    ))}
+                    <Input
+                      element="input"
+                      id="default-peau"
+                      label="Prix achat :"
+                      value={
+                        formData.uvc[0]?.prices[0]?.price.peau.toString() || ""
+                      }
+                      onChange={(e) =>
+                        handleChangePrice("peau", e.target.value)
+                      }
+                      validators={[]}
+                      placeholder=""
+                      create
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      id="default-tbeu_pb"
+                      label="Prix Vente :"
+                      value={
+                        formData.uvc[0]?.prices[0]?.price.tbeu_pb.toString() ||
+                        ""
+                      }
+                      onChange={(e) =>
+                        handleChangePrice("tbeu_pb", e.target.value)
+                      }
+                      validators={[]}
+                      placeholder=""
+                      create
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      id="default-tbeu_pmeu"
+                      label="Prix Modulé :"
+                      value={
+                        formData.uvc[0]?.prices[0]?.price.tbeu_pmeu.toString() ||
+                        ""
+                      }
+                      onChange={(e) =>
+                        handleChangePrice("tbeu_pmeu", e.target.value)
+                      }
+                      validators={[]}
+                      placeholder=""
+                      create
+                      gray
+                    />
                   </div>
                 </div>
               </div>
@@ -1264,7 +1246,7 @@ export default function CreateProductPage() {
                       )}
                     </div>
                   ))}
-                </div>        
+                </div>
                 {page === "dimension" && (
                   <div
                     className={`border-t-[1px] border-gray-300 px-5 py-2 overflow-y-auto ${

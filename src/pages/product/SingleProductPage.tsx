@@ -135,7 +135,7 @@ export default function SingleProductPage() {
     fetchProduct();
   }, [id]);
 
-  console.log(product);
+
 
   useEffect(() => {
     if (product) {
@@ -163,7 +163,6 @@ export default function SingleProductPage() {
     setDesactivationInput(event.target.value);
   };
 
-  console.log(product);
 
   return (
     <section className="w-full bg-slate-50 p-8 max-w-[2000px] mx-auto">

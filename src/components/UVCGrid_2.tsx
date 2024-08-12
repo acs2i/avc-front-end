@@ -3,7 +3,7 @@ import { Maximize2, Palette, Plus, Ruler } from "lucide-react";
 import Modal from "./Shared/Modal";
 
 interface UVCGrid2Props {
-  onDimensionsChange: (dimensions: string[][]) => void;
+  onDimensionsChange: (dimensions: { color: string, size: string }[]) => void;
   initialSizes?: string[];
   initialColors?: string[];
   initialGrid?: boolean[][];
@@ -46,10 +46,12 @@ const UVCGrid2: React.FC<UVCGrid2Props> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    setSizes(initialSizes);
-    setColors(initialColors);
-    setUvcGrid(initialGrid);
-    updateDimensions(initialGrid);
+    if (initialSizes && initialColors && initialGrid) {
+      setSizes(initialSizes);
+      setColors(initialColors);
+      setUvcGrid(initialGrid);
+      updateDimensions(initialGrid, initialColors, initialSizes);
+    }
   }, [initialSizes, initialColors, initialGrid]);
 
   const toggleCheckbox = (colorIndex: number, sizeIndex: number) => {
@@ -57,15 +59,19 @@ const UVCGrid2: React.FC<UVCGrid2Props> = ({
       row.map((col, j) => (i === colorIndex && j === sizeIndex ? !col : col))
     );
     setUvcGrid(newGrid);
-    updateDimensions(newGrid);
+    updateDimensions(newGrid, colors, sizes);
   };
 
-  const updateDimensions = (grid: boolean[][]) => {
-    const dimensions = grid.map((row, i) =>
-      row
-        .map((col, j) => (col ? `${colors[i]},${sizes[j]}` : ""))
-        .filter(Boolean)
-    );
+  const updateDimensions = (grid: boolean[][], colors: string[], sizes: string[]) => {
+    const dimensions: { color: string, size: string }[] = [];
+    grid.forEach((row, i) => {
+      row.forEach((col, j) => {
+        if (col) {
+          dimensions.push({ color: colors[i], size: sizes[j] });
+        }
+      });
+    });
+    console.log('Updated dimensions:', dimensions); // Log dimensions
     onDimensionsChange(dimensions);
   };
 
@@ -87,7 +93,7 @@ const UVCGrid2: React.FC<UVCGrid2Props> = ({
       )
     );
     setUvcGrid(newGrid);
-    updateDimensions(newGrid);
+    updateDimensions(newGrid, colors, uniqueSizes);
   };
 
   const importColors = (newColors: string[]) => {
@@ -101,7 +107,7 @@ const UVCGrid2: React.FC<UVCGrid2Props> = ({
       sizes.map((size, sizeIndex) => uvcGrid[colorIndex]?.[sizeIndex] ?? true)
     );
     setUvcGrid(newGrid);
-    updateDimensions(newGrid);
+    updateDimensions(newGrid, uniqueColors, sizes);
   };
 
   const addNewColor = () => {
@@ -109,7 +115,7 @@ const UVCGrid2: React.FC<UVCGrid2Props> = ({
     const newGrid = [...uvcGrid, sizes.map(() => true)];
     setColors(newColors);
     setUvcGrid(newGrid);
-    updateDimensions(newGrid);
+    updateDimensions(newGrid, newColors, sizes);
   };
 
   const addNewSize = () => {
@@ -117,19 +123,19 @@ const UVCGrid2: React.FC<UVCGrid2Props> = ({
     const newGrid = uvcGrid.map((row) => [...row, true]);
     setSizes(newSizes);
     setUvcGrid(newGrid);
-    updateDimensions(newGrid);
+    updateDimensions(newGrid, colors, newSizes);
   };
 
   const handleColorChange = (index: number, value: string) => {
     const newColors = colors.map((color, i) => (i === index ? value : color));
     setColors(newColors);
-    updateDimensions(uvcGrid);
+    updateDimensions(uvcGrid, newColors, sizes);
   };
 
   const handleSizeChange = (index: number, value: string) => {
     const newSizes = sizes.map((size, i) => (i === index ? value : size));
     setSizes(newSizes);
-    updateDimensions(uvcGrid);
+    updateDimensions(uvcGrid, colors, newSizes);
   };
 
   useEffect(() => {
@@ -150,7 +156,6 @@ const UVCGrid2: React.FC<UVCGrid2Props> = ({
 
       const data = await response.json();
       setGrids(data.data);
-      console.log(data.data)
       setTotalItem(data.total);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
@@ -158,6 +163,7 @@ const UVCGrid2: React.FC<UVCGrid2Props> = ({
       setIsLoading(false);
     }
   };
+
   const handleImportSizes = (gridId: string) => {
     const sizeGrid = grids.find((grid) => grid._id === gridId);
     if (sizeGrid) {
