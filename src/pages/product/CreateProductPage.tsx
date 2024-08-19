@@ -167,12 +167,15 @@ export default function CreateProductPage() {
   const [inputValueClassification, setInputValueClassification] = useState("");
   const [addFieldIsVisible, setaddFieldIsVisible] = useState(false);
   const [inputSubValueFamily, setInputSubValueFamily] = useState("");
+  const [inputValueSubSubFamily, setInputValueSubSubFamily] = useState("");
   const [inputValueBrand, setInputValueBrand] = useState("");
   const [inputValueCollection, setInputValueCollection] = useState("");
   const [inputValueSupplier, setInputValueSupplier] = useState("");
   const [selectedOptionFamily, setSelectedOptionFamily] =
     useState<SingleValue<TagOption> | null>(null);
   const [selectedOptionSubFamily, setSelectedOptionSubFamily] =
+    useState<SingleValue<TagOption> | null>(null);
+  const [selectedOptionSubSubFamily, setSelectedOptionSubSubFamily] =
     useState<SingleValue<TagOption> | null>(null);
   const [selectedOptionBrand, setSelectedOptionBrand] =
     useState<SingleValue<BrandOption> | null>(null);
@@ -182,10 +185,9 @@ export default function CreateProductPage() {
     useState<SingleValue<SuppliersOption> | null>(null);
   const [optionsFamily, setOptionsFamily] = useState<TagOption[]>([]);
   const [optionsSubFamily, setOptionsSubFamily] = useState<TagOption[]>([]);
+  const [optionsSubSubFamily, setOptionsSubSubFamily] = useState<TagOption[]>([]);
   const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
-  const [optionsCollection, setOptionsCollection] = useState<
-    CollectionOption[]
-  >([]);
+  const [optionsCollection, setOptionsCollection] = useState<CollectionOption[]>([]);
   const [optionsSupplier, setOptionsSupplier] = useState<SuppliersOption[]>([]);
 
   const classificationOptions = [
@@ -219,7 +221,7 @@ export default function CreateProductPage() {
     brand_ids: [],
     collection_ids: [],
     imgPath: "",
-    status: "",
+    status: "A",
     additional_fields: "",
     uvc: [
       {
@@ -287,34 +289,53 @@ export default function CreateProductPage() {
 
   const handleChangeFamily = (newValue: SingleValue<TagOption> | null) => {
     setSelectedOptionFamily(newValue);
-
-    if (newValue) {
-      setFormData({
-        ...formData,
-        tag_ids: [newValue.value],
-      });
-    } else {
-      setFormData({
-        ...formData,
-        tag_ids: [],
-      });
-    }
+  
+    setFormData((prevFormData) => {
+      let newTagIds = [...prevFormData.tag_ids];
+      if (newValue) {
+        newTagIds[0] = newValue.value; // Place le Family ID à l'index 0
+      } else {
+        newTagIds[0] = ""; // Retire la famille si aucun n'est sélectionné
+      }
+      return {
+        ...prevFormData,
+        tag_ids: newTagIds.filter(Boolean), // Supprime les valeurs vides
+      };
+    });
   };
 
   const handleChangeSubFamily = (newValue: SingleValue<TagOption> | null) => {
     setSelectedOptionSubFamily(newValue);
+  
+    setFormData((prevFormData) => {
+      let newTagIds = [...prevFormData.tag_ids];
+      if (newValue) {
+        newTagIds[1] = newValue.value; // Place le SubFamily ID à l'index 1
+      } else {
+        newTagIds[1] = ""; // Retire la sous-famille si aucun n'est sélectionné
+      }
+      return {
+        ...prevFormData,
+        tag_ids: newTagIds.filter(Boolean), // Supprime les valeurs vides
+      };
+    });
+  };
 
-    if (newValue) {
-      setFormData({
-        ...formData,
-        tag_ids: [newValue.value],
-      });
-    } else {
-      setFormData({
-        ...formData,
-        tag_ids: [],
-      });
-    }
+  const handleChangeSubSubFamily = (newValue: SingleValue<TagOption> | null) => {
+    setSelectedOptionSubSubFamily(newValue);
+  
+    setFormData((prevFormData) => {
+      let newTagIds = [...prevFormData.tag_ids];
+      if (newValue) {
+        newTagIds[2] = newValue.value; // Place le SubSubFamily ID à l'index 2
+      } else {
+        newTagIds[2] = ""; // Retire la sous-sous-famille si aucun n'est sélectionné
+      }
+      return {
+        ...prevFormData,
+        tag_ids: newTagIds.filter(Boolean), // Supprime les valeurs vides
+      };
+    });
   };
 
   const handleDimensionsChange = (
@@ -402,7 +423,6 @@ export default function CreateProductPage() {
   const handleInputChangeCollection = async (inputValueCollection: string) => {
     setInputValueCollection(inputValueCollection);
 
-    // console.log(inputValue);
     if (inputValueCollection === "") {
       try {
         const response = await fetch(
@@ -455,10 +475,9 @@ export default function CreateProductPage() {
     }
   };
 
-  const handleInputChangeSupplier = async (inputValueCollection: string) => {
-    setInputValueSupplier(inputValueCollection);
+  const handleInputChangeSupplier = async (inputValueSupplier: string) => {
+    setInputValueSupplier(inputValueSupplier);
 
-    // console.log(inputValue);
     if (inputValueSupplier === "") {
       try {
         const response = await fetch(
@@ -486,7 +505,7 @@ export default function CreateProductPage() {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/supplier?page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/supplier/search?company_name=${inputValueSupplier}&page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -506,6 +525,8 @@ export default function CreateProductPage() {
       console.error("Erreur lors de la requête", error);
     }
   };
+
+
 
   const handleClassificationChange = (
     newValue: SingleValue<TagOption>,
@@ -575,7 +596,7 @@ export default function CreateProductPage() {
     if (inputValueSubFamily === "") {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_URL_DEV}/api/v1/family/search?YX_LIBELLE=""&page=${currentPage}&limit=${limit}&YX_TYPE=LA2`,
+          `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?level=sous-famille`,
           {
             method: "GET",
             headers: {
@@ -599,7 +620,7 @@ export default function CreateProductPage() {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/family/search?YX_LIBELLE=${inputValueSubFamily}&page=${currentPage}&limit=${limit}&YX_TYPE=LA2`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?name=${inputValueSubFamily}&level=sous-famille&page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -620,6 +641,57 @@ export default function CreateProductPage() {
     }
   };
 
+  const handleInputChangeSubSubFamily = async (inputValueSubSubFamily: string) => {
+    setInputValueSubSubFamily(inputValueSubSubFamily);
+
+    if (inputValueSubSubFamily === "") {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?level=sous-sous-famille`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+
+        const optionsSubSubFamily = data.data?.map((tag: Tag) => ({
+          value: tag._id,
+          label: tag.name,
+        }));
+
+        setOptionsSubSubFamily(optionsSubSubFamily);
+      } catch (error) {
+        console.error("Erreur lors de la requête", error);
+      }
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?name=${inputValueSubSubFamily}&level=sous-sous-famille&page=${currentPage}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+
+      const optionsSubSubFamily = data.data?.map((tag: Tag) => ({
+        value: tag._id,
+        label: tag.name,
+      }));
+
+      setOptionsSubSubFamily(optionsSubSubFamily);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
   const handleSupplierChange = (
     index: number,
     field: string,
@@ -635,27 +707,21 @@ export default function CreateProductPage() {
     });
   };
 
-  const handleSupplierSelectChange = (
-    index: number,
-    option: SingleValue<SuppliersOption>
-  ) => {
+  const handleSupplierSelectChange = (index: number, option: SingleValue<SuppliersOption>) => {
     setFormData((prevFormData) => {
-      const newSuppliers = [...prevFormData.suppliers];
-      newSuppliers[index] = {
-        ...newSuppliers[index],
-        supplier_id: option ? option.value : "",
-      };
-      return {
-        ...prevFormData,
-        suppliers: newSuppliers,
-      };
+        const newSuppliers = [...(prevFormData.suppliers || [])];
+        newSuppliers[index] = {
+            ...newSuppliers[index],
+            supplier_id: option ? option.value : "",
+        };
+        return {
+            ...prevFormData,
+            suppliers: newSuppliers,
+        };
     });
-  };
+};
 
-  const handleChangePrice = (
-    field: keyof PriceItemSchema,
-    value: string
-  ) => {
+  const handleChangePrice = (field: keyof PriceItemSchema, value: string) => {
     const parsedValue = parseFloat(value);
     setFormData((prevFormData) => {
       const updatedUvc = prevFormData.uvc.map((uvc) => ({
@@ -676,18 +742,6 @@ export default function CreateProductPage() {
     });
   };
 
-  // const handleChangePriceUVC = (uvcIndex: number, priceIndex: number, field: string, value: number) => {
-  //   setFormData(prevFormData => {
-  //     const updatedUvc = [...prevFormData.uvc];
-  //     updatedUvc[uvcIndex].prices[priceIndex].price[field] = value;
-
-  //     return {
-  //       ...prevFormData,
-  //       uvc: updatedUvc
-  //     };
-  //   });
-  // };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -698,7 +752,7 @@ export default function CreateProductPage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+           
           },
           body: JSON.stringify(formData),
         }
@@ -923,11 +977,11 @@ export default function CreateProductPage() {
                         Sous-sous-famille
                       </label>
                       <CreatableSelect
-                        value={selectedOptionSubFamily}
-                        onChange={handleChangeSubFamily}
-                        onInputChange={handleInputChangeSubFamily}
-                        inputValue={inputSubValueFamily}
-                        options={optionsSubFamily}
+                        value={selectedOptionSubSubFamily}
+                        onChange={handleChangeSubSubFamily}
+                        onInputChange={handleInputChangeSubSubFamily}
+                        inputValue={inputValueSubSubFamily}
+                        options={optionsSubSubFamily}
                         placeholder="Selectionner une sous-sous-famille"
                         styles={customStyles}
                         className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
@@ -955,7 +1009,7 @@ export default function CreateProductPage() {
                             Nom
                           </label>
                           <CreatableSelect<SuppliersOption>
-                            value={optionsSupplier.find(
+                            value={optionsSupplier?.find(
                               (option) => option.value === supplier.supplier_id
                             )}
                             onChange={(option) =>

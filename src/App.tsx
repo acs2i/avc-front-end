@@ -21,6 +21,7 @@ import ChatPage from "./pages/chat/ChatPage";
 import Chat from "./components/Shared/Chat";
 import DraftUpdatePage from "./pages/draft/DraftUpdatePage";
 import CreateSupplierPage from "./pages/suppliers/CreateSuppliersPage";
+import SingleSupplierPage from "./pages/suppliers/SingleSupplierPage";
 
 // Types
 interface PrivateRouteProps {
@@ -85,6 +86,7 @@ function App() {
             <Route path="/parameters" element={<ParamsMenuPage />} />
             <Route path="/product" element={<ProductList />} />
             <Route path="/product/:id" element={<SingleProductPage />} />
+            <Route path="/suppliers/:id" element={<SingleSupplierPage />} />
             <Route path="/suppliers/suppliers-list" element={<SuppliersList />} />
             <Route path="/suppliers/create" element={<CreateSupplierPage />} />
             <Route path="/draft" element={<DraftPage />} />

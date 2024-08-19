@@ -125,13 +125,13 @@ export default function AdminPage() {
           </div>
         </div>
       </Header>
-      <div className="relative w-[95%] mx-auto mt-4">
-        <div className="grid grid-cols-3 gap-5">
+      <div className="relative px-[20px] mt-4">
+        <div className="grid grid-cols-4 gap-5">
           {users && users.length > 0 ? (
             users.map((user) => (
               <div
                 key={user._id}
-                className="border-[1px] border-slate-100 bg-white cursor-pointer w-[400px] h-[400px] rounded-md shadow-[0_0_15px_rgba(0,0,0,0.2)] flex flex-col justify-between"
+                className="border-[1px] border-slate-100 bg-white cursor-pointer w-[300px] h-[300px] rounded-md shadow-[0_0_20px_rgba(0,0,0,0.1)] flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-center py-3">
@@ -152,7 +152,23 @@ export default function AdminPage() {
                   </div>
                 </div>
                 <div className="p-3 border-t-[1px]">
-                  <p className="text-gray-500 capitalize font-[600]">{user.authorization}</p>
+                  <p
+                    className={`inline-block capitalize text-sm ${
+                      user.authorization === "admin" &&
+                      "bg-green-200 border border-green-500 text-green-700"
+                    } ${
+                      user.authorization === "guest" &&
+                      "bg-red-200 border border-red-500 text-red-700"
+                    } ${
+                      user.authorization === "user" &&
+                      "bg-orange-200 border border-orange-500 text-orange-700"
+                    } ${
+                      !user.authorization &&
+                      "bg-gray-200 border border-gray-500 text-gray-700"
+                    } px-1 rounded-[3px]`}
+                  >
+                    {user.authorization}
+                  </p>
                 </div>
               </div>
             ))
