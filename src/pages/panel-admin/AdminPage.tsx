@@ -5,9 +5,9 @@ import truncateText from "../../utils/func/Formattext";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../components/Shared/Spinner";
 import ScrollToTop from "../../components/ScrollToTop";
-import { Info, Plus } from "lucide-react";
+import { Info, Mail, Plus } from "lucide-react";
 import Modal from "../../components/Shared/Modal";
-import { Divider, Tooltip } from "@mui/material";
+import { Avatar, Divider, Tooltip } from "@mui/material";
 import Header from "../../components/Navigation/Header";
 import { useSelector } from "react-redux";
 
@@ -17,6 +17,7 @@ interface User {
   email: string;
   authorization: string;
   comment: string;
+  imgPath: string;
 }
 
 export default function AdminPage() {
@@ -124,76 +125,51 @@ export default function AdminPage() {
           </div>
         </div>
       </Header>
-      <div className="relative overflow-x-auto">
-        <table className="w-full text-left">
-          <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
+      <div className="relative w-[95%] mx-auto mt-4">
+        <div className="grid grid-cols-3 gap-5">
+          {users && users.length > 0 ? (
+            users.map((user) => (
+              <div
+                key={user._id}
+                className="border-[1px] border-slate-100 bg-white cursor-pointer w-[400px] h-[400px] rounded-md shadow-[0_0_15px_rgba(0,0,0,0.2)] flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-center py-3">
+                    <Avatar
+                      alt={user.username}
+                      src={user.imgPath ? user.imgPath : user.username}
+                      sx={{ width: 80, height: 80 }}
+                    />
+                  </div>
+                  <div className="flex flex-col items-center justify-center">
+                    <p className="text-2xl font-[600] text-gray-700">
+                      {user.username}
+                    </p>
+                    <div className="flex items-center gap-2 text-slate-400">
+                      <Mail size={15} />
+                      <p className="text-md font-[600]">{user.email}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-3 border-t-[1px]">
+                  <p className="text-gray-500 capitalize font-[600]">{user.authorization}</p>
+                </div>
+              </div>
+            ))
+          ) : (
             <tr>
-              <th scope="col" className="px-6 py-2 w-[10%]">
-                Nom d'utilisateur
-              </th>
-              <th scope="col" className="px-6 py-2 w-[15%]">
-                Email
-              </th>
-              <th scope="col" className="px-6 py-2 w-[5%]">
-                Autorisations
-              </th>
-              <th scope="col" className="px-6 py-2 w-[15%]">
-                Commentaires
-              </th>
+              <td colSpan={6} className="px-6 py-7 text-center">
+                {totalItem === null ? (
+                  <div className="flex justify-center overflow-hidden p-[30px]">
+                    <Spinner />
+                  </div>
+                ) : (
+                  "Aucun Résultat"
+                )}
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {users && users.length > 0 ? (
-              users.map((user) => (
-                <tr
-                  key={user._id}
-                  className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 text-[12px] text-gray-800 even:bg-slate-50 whitespace-nowrap"
-                >
-                  <td className="px-6 py-4 text-blue-600">{user.username}</td>
-                  <td className="px-6 py-4">{user.email}</td>
-                  <td className="px-6 py-4">
-                    <div
-                      className={`inline-block uppercase ${
-                        user.authorization === "admin" && "bg-green-200 border border-green-500 text-green-700"
-                      } ${
-                        user.authorization === "guest" && "bg-red-200 border border-red-500 text-red-700"
-                      } ${
-                        user.authorization === "user" && "bg-orange-200 border border-orange-500 text-orange-700"
-                      } ${
-                        !user.authorization && "bg-gray-200 border border-gray-500 text-gray-700"
-                      } px-1 rounded-[3px]`}
-                    >
-                      <span className="text-[8px]">
-                        {user.authorization ? user.authorization : "NC"}
-                      </span>
-                    </div>
-                  </td>
-                  <Tooltip
-                    title={user.comment ? user.comment : "Pas de commentaire"}
-                  >
-                    <td className="px-6 py-4">
-                      {user.comment
-                        ? truncateText(user.comment, 50)
-                        : "Pas de commentaire"}
-                    </td>
-                  </Tooltip>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={6} className="px-6 py-7 text-center">
-                  {totalItem === null ? (
-                    <div className="flex justify-center overflow-hidden p-[30px]">
-                      <Spinner />
-                    </div>
-                  ) : (
-                    "Aucun Résultat"
-                  )}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+          )}
+        </div>
       </div>
     </div>
   );
