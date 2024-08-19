@@ -760,7 +760,7 @@ export default function CreateProductPage() {
 
       if (response.ok) {
         setTimeout(() => {
-          notifySuccess("Fournisseur créé !");
+          notifySuccess("Référence créée !");
           setIsLoading(false);
           navigate("/draft");
         }, 1000);
