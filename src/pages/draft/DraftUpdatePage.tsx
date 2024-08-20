@@ -134,13 +134,6 @@ export default function DraftUpdatePage() {
     fetchDraft();
   }, []);
 
-  useEffect(() => {
-    if (draft && !isDetailsFetched) {
-      fetchDetails();
-      setIsDetailsFetched(true);
-    }
-  }, [draft]);
-
   const fetchDraft = async () => {
     try {
       const response = await fetch(
@@ -341,40 +334,50 @@ export default function DraftUpdatePage() {
     }
   };
 
-  const fetchDetails = async () => {
-    if (!draft) return;
-
-    try {
-      const tagDetails = await Promise.all(
-        draft.tag_ids.map((tagId) => fetchTagDetails(tagId))
-      );
-      const brandDetails = await Promise.all(
-        draft.brand_ids.map((brandId) => fetchBrandDetails(brandId))
-      );
-      const collectionDetails = await Promise.all(
-        draft.collection_ids.map((collectionId) =>
-          fetchCollectionDetails(collectionId)
-        )
-      );
-      const supplierDetails = await Promise.all(
-        draft.suppliers.map((supplier) =>
-          fetchSupplierDetails(supplier.supplier_id)
-        )
-      );
-
-      setDraft((prevDraft) => ({
-        ...prevDraft!,
-        tag_details: tagDetails.filter(Boolean) as TagDetail[],
-        brand_details: brandDetails.filter(Boolean) as BrandDetail[],
-        collection_details: collectionDetails.filter(
-          Boolean
-        ) as CollectionDetail[],
-        suppliers: supplierDetails.filter(Boolean) as SupplierDetail[],
-      }));
-    } catch (error) {
-      console.error("Erreur lors de la récupération des détails", error);
+  useEffect(() => {
+    const fetchDetails = async () => {
+      if (!draft) return;
+  
+      try {
+        const tagDetails = await Promise.all(
+          draft.tag_ids.map((tagId) => fetchTagDetails(tagId))
+        );
+        const brandDetails = await Promise.all(
+          draft.brand_ids.map((brandId) => fetchBrandDetails(brandId))
+        );
+        const collectionDetails = await Promise.all(
+          draft.collection_ids.map((collectionId) =>
+            fetchCollectionDetails(collectionId)
+          )
+        );
+        const supplierDetails = await Promise.all(
+          draft.suppliers.map((supplier) =>
+            fetchSupplierDetails(supplier.supplier_id)
+          )
+        );
+  
+        setDraft((prevDraft) => ({
+          ...prevDraft!,
+          tag_details: tagDetails.filter(Boolean) as TagDetail[],
+          brand_details: brandDetails.filter(Boolean) as BrandDetail[],
+          collection_details: collectionDetails.filter(
+            Boolean
+          ) as CollectionDetail[],
+          suppliers: draft.suppliers.map((supplier, index) => ({
+            ...supplier,
+            ...supplierDetails[index],
+          })),
+        }));
+      } catch (error) {
+        console.error("Erreur lors de la récupération des détails", error);
+      }
+    };
+  
+    if (draft && !isDetailsFetched) {
+      fetchDetails();
+      setIsDetailsFetched(true);
     }
-  };
+  }, [draft, isDetailsFetched]);
 
   return (
     <>
@@ -498,7 +501,7 @@ export default function DraftUpdatePage() {
                 <div className="flex flex-col-reverse lg:flex-row gap-7 mt-[50px] items-stretch">
                   <div className="w-full lg:w-[60%]">
                     <div
-                      className={`relative flex flex-col gap-3 bg-white border border-slate-200 p-4 ${
+                      className={`relative flex flex-col gap-3 bg-white border border-slate-200 p-4 shadow-[0_0_20px_rgba(0,0,0,0.05)] ${
                         isModify ? "h-[420px]" : "h-[380px]"
                       } rounded-md`}
                     >
@@ -689,7 +692,7 @@ export default function DraftUpdatePage() {
                       </div>
                     </div>
                   </div>
-                  <div className="w-[480px] bg-white border border-slate-200 rounded-md">
+                  <div className="w-[480px] bg-white border border-slate-200 shadow-[0_0_20px_rgba(0,0,0,0.05)]">
                     {draft.imgPath ? (
                       <div className="relative w-full h-0 pb-[75%]">
                         <img
@@ -723,7 +726,7 @@ export default function DraftUpdatePage() {
                         </h4>
                       </div>
                       <div
-                        className={`relative border border-slate-200 rounded-md p-3 ${
+                        className={`relative border border-slate-200 rounded-md p-3 shadow-[0_0_20px_rgba(0,0,0,0.05)] ${
                           isModify ? "h-[320px]" : "h-[250px]"
                         }`}
                       >
@@ -784,13 +787,14 @@ export default function DraftUpdatePage() {
                             Ref. produit :
                           </span>
                           {!isModify ? (
-                            <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                              {draft ? (
-                                draft.reference
-                              ) : (
-                                <CircleSlash2 size={15} />
-                              )}
-                            </span>
+                           <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                           {draft?.suppliers &&
+                           draft.suppliers.length > 0 ? (
+                             draft.suppliers[0].supplier_ref
+                           ) : (
+                             <CircleSlash2 size={15} />
+                           )}
+                         </span>
                           ) : (
                             <input
                               type="text"
@@ -855,7 +859,7 @@ export default function DraftUpdatePage() {
                         </h4>
                       </div>
                       <div
-                        className={`relative border border-slate-200 p-3 rounded-md ${
+                        className={`relative border border-slate-200 p-3 shadow-[0_0_20px_rgba(0,0,0,0.05)] rounded-md ${
                           isModify ? "h-[320px]" : "h-[250px]"
                         }`}
                       >
@@ -929,7 +933,7 @@ export default function DraftUpdatePage() {
                         </h4>
                       </div>
                       <div
-                        className={`relative border border-slate-200 p-3 ${
+                        className={`relative border border-slate-200 p-3 shadow-[0_0_20px_rgba(0,0,0,0.05)] ${
                           isModify ? "h-[320px]" : "h-[250px]"
                         }`}
                       >

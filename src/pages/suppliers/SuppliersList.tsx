@@ -218,10 +218,10 @@ export default function SuppliersList() {
                 <tr
                   key={supplier._id}
                   className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-[11px] text-gray-500 whitespace-nowrap"
-                  onClick={() => {
-                    console.log('Navigating to:', `/suppliers/${supplier._id}`);
-                    navigate(`/suppliers/${supplier._id}`);
-                  }}
+                  // onClick={() => {
+                  //   console.log('Navigating to:', `/suppliers/${supplier._id}`);
+                  //   navigate(`/suppliers/${supplier._id}`);
+                  // }}
                 >
                   <td className="px-6 py-2">{supplier.code}</td>
                   <td className="px-6 py-2">{supplier.company_name}</td>
