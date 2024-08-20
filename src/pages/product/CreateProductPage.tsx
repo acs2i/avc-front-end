@@ -185,9 +185,13 @@ export default function CreateProductPage() {
     useState<SingleValue<SuppliersOption> | null>(null);
   const [optionsFamily, setOptionsFamily] = useState<TagOption[]>([]);
   const [optionsSubFamily, setOptionsSubFamily] = useState<TagOption[]>([]);
-  const [optionsSubSubFamily, setOptionsSubSubFamily] = useState<TagOption[]>([]);
+  const [optionsSubSubFamily, setOptionsSubSubFamily] = useState<TagOption[]>(
+    []
+  );
   const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
-  const [optionsCollection, setOptionsCollection] = useState<CollectionOption[]>([]);
+  const [optionsCollection, setOptionsCollection] = useState<
+    CollectionOption[]
+  >([]);
   const [optionsSupplier, setOptionsSupplier] = useState<SuppliersOption[]>([]);
 
   const classificationOptions = [
@@ -289,7 +293,7 @@ export default function CreateProductPage() {
 
   const handleChangeFamily = (newValue: SingleValue<TagOption> | null) => {
     setSelectedOptionFamily(newValue);
-  
+
     setFormData((prevFormData) => {
       let newTagIds = [...prevFormData.tag_ids];
       if (newValue) {
@@ -306,7 +310,7 @@ export default function CreateProductPage() {
 
   const handleChangeSubFamily = (newValue: SingleValue<TagOption> | null) => {
     setSelectedOptionSubFamily(newValue);
-  
+
     setFormData((prevFormData) => {
       let newTagIds = [...prevFormData.tag_ids];
       if (newValue) {
@@ -321,9 +325,11 @@ export default function CreateProductPage() {
     });
   };
 
-  const handleChangeSubSubFamily = (newValue: SingleValue<TagOption> | null) => {
+  const handleChangeSubSubFamily = (
+    newValue: SingleValue<TagOption> | null
+  ) => {
     setSelectedOptionSubSubFamily(newValue);
-  
+
     setFormData((prevFormData) => {
       let newTagIds = [...prevFormData.tag_ids];
       if (newValue) {
@@ -526,8 +532,6 @@ export default function CreateProductPage() {
     }
   };
 
-
-
   const handleClassificationChange = (
     newValue: SingleValue<TagOption>,
     actionMeta: ActionMeta<TagOption>
@@ -641,7 +645,9 @@ export default function CreateProductPage() {
     }
   };
 
-  const handleInputChangeSubSubFamily = async (inputValueSubSubFamily: string) => {
+  const handleInputChangeSubSubFamily = async (
+    inputValueSubSubFamily: string
+  ) => {
     setInputValueSubSubFamily(inputValueSubSubFamily);
 
     if (inputValueSubSubFamily === "") {
@@ -707,19 +713,22 @@ export default function CreateProductPage() {
     });
   };
 
-  const handleSupplierSelectChange = (index: number, option: SingleValue<SuppliersOption>) => {
+  const handleSupplierSelectChange = (
+    index: number,
+    option: SingleValue<SuppliersOption>
+  ) => {
     setFormData((prevFormData) => {
-        const newSuppliers = [...(prevFormData.suppliers || [])];
-        newSuppliers[index] = {
-            ...newSuppliers[index],
-            supplier_id: option ? option.value : "",
-        };
-        return {
-            ...prevFormData,
-            suppliers: newSuppliers,
-        };
+      const newSuppliers = [...(prevFormData.suppliers || [])];
+      newSuppliers[index] = {
+        ...newSuppliers[index],
+        supplier_id: option ? option.value : "",
+      };
+      return {
+        ...prevFormData,
+        suppliers: newSuppliers,
+      };
     });
-};
+  };
 
   const handleChangePrice = (field: keyof PriceItemSchema, value: string) => {
     const parsedValue = parseFloat(value);
@@ -752,7 +761,6 @@ export default function CreateProductPage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-           
           },
           body: JSON.stringify(formData),
         }
@@ -763,7 +771,7 @@ export default function CreateProductPage() {
           notifySuccess("Référence créée !");
           setIsLoading(false);
           navigate("/draft");
-        }, 1000);
+        }, 100);
       } else {
         notifyError("Erreur lors de la création !");
         setIsLoading(false);
@@ -1392,20 +1400,33 @@ export default function CreateProductPage() {
                 )}
               </div>
               {/* Partie boutton */}
-              <div className="mt-[50px] flex gap-2">
-                <button
-                  className="w-full border border-gray-300 text-red-600 bg-slate-200 hover:bg-red-600 hover:text-white font-bold shadow-md rounded-md"
-                  type="button"
-                >
-                  Annuler
-                </button>
-                <button
-                  className="w-full bg-sky-600 text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
-                  type="submit"
-                >
-                  Créer la référence
-                </button>
-              </div>
+              {!isLoading ? (
+                <div className="mt-[50px] flex gap-2">
+                  <button
+                    className="w-full border border-gray-300 text-red-600 bg-slate-200 hover:bg-red-600 hover:text-white font-bold shadow-md rounded-md"
+                    type="button"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    className="w-full bg-sky-600 text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
+                    type="submit"
+                  >
+                    Créer la référence
+                  </button>
+                </div>
+              ) : (
+                <div className="relative flex justify-center mt-7 px-7 gap-2">
+                  <CircularProgress size={100} />
+                  <div className="absolute h-[60px] w-[80px] top-[50%] translate-y-[-50%]">
+                    <img
+                      src="/img/logo.png"
+                      alt="logo"
+                      className="w-full h-full animate-pulse"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="w-[30%] flex flex-col gap-5">
