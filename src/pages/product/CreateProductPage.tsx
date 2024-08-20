@@ -532,6 +532,7 @@ export default function CreateProductPage() {
     }
   };
 
+
   const handleClassificationChange = (
     newValue: SingleValue<TagOption>,
     actionMeta: ActionMeta<TagOption>
