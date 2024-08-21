@@ -181,14 +181,14 @@ export default function GridPage({
                       </>
                     )}
                   </td>
-                  <td className="px-6 py-2 uppercase">
+                  <td className="px-6 py-2 uppercase text-[10px]">
                     {grid.status === "A" ? (
-                      <div className="text-center bg-green-200 text-green-600 border border-green-400  py-1 rounded-md max-w-[60px]">
-                        <span>Actif</span>
+                      <div className="text-center bg-green-200 text-green-600 border border-green-400  py-1 rounded-md max-w-[50px]">
+                        <span>Active</span>
                       </div>
                     ) : (
                       <div className="text-center bg-gray-200 text-gray-600 border border-gray-400  py-1 rounded-md max-w-[60px]">
-                        <span>Innactif</span>
+                        <span>Innactive</span>
                       </div>
                     )}
                   </td>

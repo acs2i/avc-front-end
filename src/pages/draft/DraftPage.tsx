@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { DRAFT_CATEGORY, LINKCARD_DRAFT, PRODUCTS } from "../../utils/index";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -6,25 +6,56 @@ import { format } from "date-fns";
 import Input from "../../components/FormElements/Input";
 import { ChevronRight, ChevronsUpDown } from "lucide-react";
 
+interface PriceItem {
+  peau: number;
+  tbeu_pb: number;
+  tbeu_pmeu: number;
+}
+
+interface Price {
+  tarif_id: any;
+  currency: string;
+  supplier_id: any;
+  price: PriceItem[];
+  store: string;
+}
+
+interface Uvc {
+  code: string;
+  dimensions: string[];
+  prices: Price[];
+  eans: string[];
+  status: number;
+  additional_fields: any;
+}
+
+interface Supplier {
+  supplier_id: any;
+  supplier_ref: string;
+  pcb: string;
+  custom_cat: string;
+  made_in: string;
+}
+
 interface Draft {
   _id: string;
   creator_id: any;
-  description_ref: string;
   reference: string;
-  designation_longue: string;
-  designation_courte: string;
-  supplier_name: string;
-  supplier_ref: string;
-  family: string[];
-  subFamily: string[];
-  dimension_type: string;
-  dimension: string[];
-  brand: string;
-  ref_collection: string;
-  composition: string;
-  description_brouillon: string;
-  status: number;
-  createdAt: any;
+  name: string;
+  short_label: string;
+  long_label: string;
+  type: string;
+  tag_ids: any[];
+  suppliers: Supplier[];
+  dimension_types: string[];
+  brand_ids: any[];
+  collection_ids: any[];
+  imgPath: string;
+  status: string;
+  additional_fields: any;
+  uvc: Uvc[];
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface User {
@@ -35,18 +66,27 @@ interface User {
   comment: string;
 }
 
+interface EnrichedDraft extends Draft {
+  brandName: string;
+  supplierName: string;
+  familyName: string;
+  subFamilyName: string;
+}
+
 export default function DraftPage() {
   const user = useSelector((state: any) => state.auth.user._id);
   const token = useSelector((state: any) => state.auth.token);
   const [page, setPage] = useState("draft");
   const [onglet, setOnglet] = useState("created");
-  const [drafts, setDrafts] = useState<Draft[]>([]);
+  const [drafts, setDrafts] = useState<EnrichedDraft[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [userId, setUserId] = useState(user);
   const [selectedUsername, setSelectedUsername] = useState("");
+  const draftsEnriched = useRef(false);
   const navigate = useNavigate();
-  const filteredDrafts = drafts.filter((draft) => draft.status === 0);
-  const filteredInProgress = drafts.filter((draft) => draft.status === 1);
+
+  const filteredDrafts = drafts.filter((draft) => draft.status === "A");
+  const filteredInProgress = drafts.filter((draft) => draft.status === "I");
 
   const formatDate = (timestamp: any) => {
     return format(new Date(timestamp), "dd/MM/yyyy HH:mm:ss");
@@ -101,13 +141,127 @@ export default function DraftPage() {
       );
 
       const data = await response.json();
-      console.log(data)
       setDrafts(data);
+      draftsEnriched.current = false;  // Reset the enriched flag
     } catch (error) {
       console.error("Erreur lors de la requête", error);
-    } finally {
     }
   };
+
+  const fetchBrandDetails = async (brandId: string) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/brand/${brandId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error(`Erreur HTTP: ${response.status}`);
+        return null;
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(
+        "Erreur lors de la requête pour récupérer les détails de la marque",
+        error
+      );
+      return null;
+    }
+  };
+
+  const fetchSupplierDetails = async (supplierId: string) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/supplier/${supplierId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error(`Erreur HTTP: ${response.status}`);
+        return null;
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(
+        "Erreur lors de la requête pour récupérer les détails du fournisseur",
+        error
+      );
+      return null;
+    }
+  };
+
+  const fetchTagDetails = async (tagId: string) => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/${tagId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error(`Erreur HTTP: ${response.status}`);
+        return null;
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(
+        "Erreur lors de la requête pour récupérer les détails du fournisseur",
+        error
+      );
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    async function enrichDrafts() {
+      const enrichedDrafts = await Promise.all(
+        drafts.map(async (draft) => {
+          const brandDetails = await fetchBrandDetails(draft.brand_ids[0]);
+          const familyDetails = await fetchTagDetails(draft.tag_ids[0]);
+          const subFamilyDetails = await fetchTagDetails(draft.tag_ids[1]);
+          const supplierDetails = await fetchSupplierDetails(
+            draft.suppliers[0]?.supplier_id
+          );
+
+          return {
+            ...draft,
+            brandName: brandDetails ? brandDetails.label : "Marque inconnue",
+            familyName: familyDetails ? familyDetails.name : "Famille inconnue",
+            subFamilyName: familyDetails ? familyDetails.name : "Famille inconnue",
+            supplierName: supplierDetails
+              ? supplierDetails.company_name
+              : "Fournisseur inconnu",
+          };
+        })
+      );
+      setDrafts(enrichedDrafts);
+      draftsEnriched.current = true;
+    }
+
+    if (drafts.length > 0 && !draftsEnriched.current) {
+      enrichDrafts();
+    }
+  }, [drafts]);
 
   const handleUserChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setUserId(event.target.value);
@@ -151,7 +305,7 @@ export default function DraftPage() {
             </div>
           </div>
           <h3 className="text-[32px] font-[800] text-gray-800">
-            Références {" "}
+            Références{" "}
             <span className="font-[200]">créées par {selectedUsername}</span>
           </h3>
           <div className="flex items-center gap-7 mt-[20px]">
@@ -282,11 +436,13 @@ export default function DraftPage() {
                     <td className="px-6 py-2 text-blue-500">
                       {product.reference}
                     </td>
-                    <td className="px-6 py-2">{product.designation_longue}</td>
-                    <td className="px-6 py-2">{product.brand}</td>
-                    <td className="px-6 py-2">{product.supplier_name}</td>
-                    <td className="px-6 py-2">{product.family}</td>
-                    <td className="px-6 py-2">{product.subFamily}</td>
+                    <td className="px-6 py-2">{product.long_label}</td>
+                    <td className="px-6 py-2">{product.brandName}</td>
+                    <td className="px-6 py-2">
+                      {product.supplierName}
+                    </td>
+                    <td className="px-6 py-2">{product.familyName}</td>
+                    <td className="px-6 py-2">{product.subFamilyName}</td>
                     <td className="px-6 py-2 text-blue-600">
                       {formatDate(product.createdAt)}
                     </td>
@@ -319,11 +475,8 @@ export default function DraftPage() {
                     <td className="px-6 py-2 text-blue-500">
                       {product.reference}
                     </td>
-                    <td className="px-6 py-2">{product.designation_longue}</td>
-                    <td className="px-6 py-2">{product.brand}</td>
-                    <td className="px-6 py-2">{product.supplier_name}</td>
-                    <td className="px-6 py-2">{product.family}</td>
-                    <td className="px-6 py-2">{product.subFamily}</td>
+                    <td className="px-6 py-2">{product.long_label}</td>
+                    <td className="px-6 py-2">{product.brand_ids}</td>
                     <td className="px-6 py-2 text-blue-600">
                       {formatDate(product.createdAt)}
                     </td>
@@ -342,11 +495,6 @@ export default function DraftPage() {
                   >
                     <td className="px-6 py-4">{product.code}</td>
                     <td className="px-6 py-4">{product.name}</td>
-                    <td className="px-6 py-4">{product.brand}</td>
-                    <td className="px-6 py-4">{product.supplier}</td>
-                    <td className="px-6 py-4">{product.family}</td>
-                    <td className="px-6 py-4">{product.subFamily}</td>
-                    <td className="px-6 py-4">{product.creatorName}</td>
                     <td className="px-6 py-4">
                       <span className="bg-green-500 p-2 text-white rounded-md">
                         Validé
