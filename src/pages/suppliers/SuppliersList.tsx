@@ -79,6 +79,7 @@ export default function SuppliersList() {
 
   const handleGeneratePdf = async (supplier: Supplier) => {
     setIsLoading(true);
+    console.log(supplier);
     try {
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/generate-pdf`,
