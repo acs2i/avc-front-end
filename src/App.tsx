@@ -18,6 +18,7 @@ import CreateGroupPage from "./pages/panel-admin/CreateGroup";
 import CreatedGroupPage from "./pages/panel-admin/CreatedGroup";
 import CalendarPage from "./pages/calendar/CalendarPage";
 import ChatPage from "./pages/chat/ChatPage";
+import ForgotPage from "./pages/forgot-password/ForgotPassword";
 import Chat from "./components/Shared/Chat";
 import DraftUpdatePage from "./pages/draft/DraftUpdatePage";
 import CreateSupplierPage from "./pages/suppliers/CreateSuppliersPage";
@@ -78,6 +79,8 @@ function App() {
               </PublicRoute>
             }
           />
+
+          <Route path="/forgot-password" element={<ForgotPage />} />
 
           {/* Routes privées */}
           <Route element={<PrivateRoute isAuth={isAuth} />}>

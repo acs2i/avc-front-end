@@ -1,60 +1,41 @@
 import React, { useState } from "react";
-import { Avatar } from "@mui/material";
-import Input from "../../components/FormElements/Input";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
-import { setLogin } from "../../store/authSlice";
 
-interface FormData {
-  username: string;
-  password: string;
-}
-
-export default function LoginPage() {
+export default function ForgotPasswordPage() {
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [formData, setFormData] = useState<FormData>({
-    username: "",
-    password: "",
-  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    setEmail(e.target.value);
     setError(null);
+    setMessage(null);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/auth/login`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/auth/forgot-password`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({ email }),
         }
       );
 
       if (response.ok) {
-        const data = await response.json();
-        dispatch(
-          setLogin({
-            user: data.user,
-            token: data.token,
-          })
-        );
-        navigate("/");
+        setMessage("Un e-mail a été envoyé avec les instructions pour réinitialiser votre mot de passe.");
+        setEmail("");
       } else {
         const errorData = await response.json();
         setError(errorData.error || "Une erreur est survenue.");
       }
     } catch (error) {
       console.error("Erreur lors de la requête", error);
-      setError("Une erreur est survenue lors de la tentative de connexion.");
+      setError("Une erreur est survenue lors de la tentative de récupération du mot de passe.");
     }
   };
 
@@ -67,6 +48,11 @@ export default function LoginPage() {
           </h1>
 
           <form onSubmit={handleSubmit} className="mt-5">
+            {message && (
+              <div className="alert alert-success mt-5" role="alert">
+                <i className="fa-regular fa-check-circle"></i> {message}
+              </div>
+            )}
             {error && (
               <div className="alert alert-warning mt-5" role="alert">
                 <i className="fa-regular fa-triangle-exclamation"></i> {error}
@@ -76,32 +62,11 @@ export default function LoginPage() {
               <label className="form-label block mb-2">Email</label>
               <input
                 className={`block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm ${error ? 'border-red-600' : ''}`}
-                type="text"
-                placeholder="Email"
-                value={formData.username}
+                type="email"
+                placeholder="Votre email"
+                value={email}
                 onChange={handleChange}
-                id="username"
-                name="email"
-                autoComplete="username"
-              />
-              {error && <div className="text-red-600 mt-2">{error}</div>}
-            </div>
-            <div className="form-group mb-4">
-              <div className="flex justify-between">
-                <label className="form-label block mb-2">Mot de passe</label>
-                <Link to="/forgot-password" className="text-sm text-muted cursor-pointer">
-                  Mot de passe oublié ?
-                </Link>
-              </div>
-              <input
-                className={`block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm ${error ? 'border-red-600' : ''}`}
-                type="password"
-                placeholder="Mot de passe"
-                value={formData.password}
-                onChange={handleChange}
-                id="password"
-                name="password"
-                autoComplete="current-password"
+                required
               />
               {error && <div className="text-red-600 mt-2">{error}</div>}
             </div>
@@ -109,9 +74,12 @@ export default function LoginPage() {
               type="submit"
               className="w-full bg-primary text-white py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary mb-3 bg-green-900"
             >
-              Se connecter
+              Envoyer
             </button>
           </form>
+          <Link to="/login" className="text-sm text-muted mt-3 block text-center">
+            Retour à la connexion
+          </Link>
         </div>
       </div>
       <div className="hidden md:block md:w-1/2 lg:w-1/2 xl:w-2/3">
