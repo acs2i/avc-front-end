@@ -27,6 +27,7 @@ import {
   Tag,
   HandCoins,
   Euro,
+  RectangleEllipsis,
 } from "lucide-react";
 
 export const LINKS: Link[] = [
@@ -48,8 +49,14 @@ export const LINKS: Link[] = [
                 name: "Liste des références",
                 link: "/product",
               },
+            ],
+            icon: Shirt,
+          },
+          {
+            name: "Brouillons",
+            linksGroup: [
               {
-                name: "Créer une référence",
+                name: "Création d'une référence",
                 link: "/product/edit",
               },
               {
@@ -57,7 +64,7 @@ export const LINKS: Link[] = [
                 link: "/draft",
               },
             ],
-            icon: Shirt,
+            icon: SquarePen,
           },
          
           {
@@ -151,23 +158,29 @@ export const LINKS_Params: Params[] = [
     icon: Captions,
     page: "brand",
   },
+  // {
+  //   name: "Tarifs",
+  //   link: "/parameters/brand",
+  //   icon: Tag,
+  //   page: "tarif",
+  // },
+  // {
+  //   name: "Regime de taxe",
+  //   link: "/parameters/brand",
+  //   icon: HandCoins,
+  //   page: "tax_1",
+  // },
+  // {
+  //   name: "Taxes",
+  //   link: "/parameters/brand",
+  //   icon: HandCoins,
+  //   page: "tax_2",
+  // },
   {
-    name: "Tarifs",
+    name: "Champs utilisateur",
     link: "/parameters/brand",
-    icon: Tag,
-    page: "tarif",
-  },
-  {
-    name: "Regime de taxe",
-    link: "/parameters/brand",
-    icon: HandCoins,
-    page: "tax_1",
-  },
-  {
-    name: "Taxes",
-    link: "/parameters/brand",
-    icon: HandCoins,
-    page: "tax_2",
+    icon: RectangleEllipsis,
+    page: "field",
   },
 ];
 

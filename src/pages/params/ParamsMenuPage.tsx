@@ -16,6 +16,8 @@ import DimensionCreateItemPage from "./DimensionCreateItemPage";
 import CollectionCreatePage from "./CollectionCreatePage";
 import BrandCreatePage from "./BrandCreatePage";
 import GridCreatePage from "./GridCreatePage";
+import UserFieldCreatePage from "./UserFieldCreatePage";
+import UserFieldPage from "./UserFieldPage";
 
 interface Tag {
   _id: string;
@@ -55,6 +57,18 @@ interface Brand {
   creator_id: any;
   additional_fields?: any;
 }
+
+
+interface UserField {
+  _id: string;
+  code: string;
+  label: string;
+  apply_to: string;
+  status: string;
+  creator_id: any;
+  additional_fields?: any;
+}
+
 interface Grid {
   _id: string;
   label: string;
@@ -133,11 +147,12 @@ function ParamsMenuPage() {
             className="bg-blue-500 text-white text-[12px] font-[700] w-full py-2 rounded-md"
             type="button"
           >
-            Créer une {page === "classe" && "classification"}
-            {page === "dimension" && "dimension"}
-            {page === "grid" && "grille"}
-            {page === "collection" && "collection"}
-            {page === "brand" && "marque"}
+            Créer {page === "classe" && "une classification"}
+            {page === "dimension" && "une dimension"}
+            {page === "grid" && "une grille"}
+            {page === "collection" && "une collection"}
+            {page === "brand" && "une marque"}
+            {page === "field" && "un champs utilisateur"}
           </button>
         </div>
         <div className="relative w-full">
@@ -240,6 +255,14 @@ function ParamsMenuPage() {
                 resetHighlightedBrandId={resetHighlightedId}
               />
             )}
+            {page === "field" && (
+              <UserFieldPage
+              onSelectUserField={setSelectedBrand}
+                shouldRefetch={shouldRefetch}
+                highlightedUserFieldId={highlightedId}
+                resetHighlightedUserFieldId={resetHighlightedId}
+              />
+            )}
           </div>
 
           {/* Partie mise à jour composant */}
@@ -309,6 +332,12 @@ function ParamsMenuPage() {
               )}
               {page === "brand" && (
                 <BrandCreatePage
+                  onClose={handleCloseCreatePanel}
+                  onCreate={handleCreate}
+                />
+              )}
+              {page === "field" && (
+                <UserFieldCreatePage
                   onClose={handleCloseCreatePanel}
                   onCreate={handleCreate}
                 />

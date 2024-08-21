@@ -1215,60 +1215,6 @@ export default function CreateProductPage() {
                   </div>
                 </div>
               </div>
-              <div className="flex gap-4 mt-[30px]">
-                <div className="relative w-full flex flex-col gap-3">
-                  <h4 className="absolute top-[-15px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
-                    Informations additionelles
-                  </h4>
-                  {/* Partie tarifs */}
-                  <div className="border border-gray-300 p-3">
-                    <div className="py-[5px] w-[90%] mx-auto">
-                      {additionalFields.map((field, index) => (
-                        <div
-                          key={index}
-                          className="relative grid grid-cols-2 gap-2"
-                        >
-                          <Input
-                            element="input"
-                            id={`name-${index}`}
-                            label="Nom du champ :"
-                            value={field.name}
-                            validators={[]}
-                            placeholder=""
-                            create
-                            gray
-                          />
-                          <Input
-                            element="input"
-                            id={`value-${index}`}
-                            label="Valeur du champ :"
-                            value={field.value}
-                            validators={[]}
-                            placeholder=""
-                            create
-                            gray
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeField(index)}
-                            className="absolute top-[50%] translate-y-[50%] right-[-25px] text-red-500 hover:text-red-300"
-                          >
-                            <Trash size={15} />
-                          </button>
-                        </div>
-                      ))}
-                      <button
-                        type="button"
-                        onClick={addField}
-                        className="flex items-center gap-2 text-[12px] text-orange-400 mt-3"
-                      >
-                        <Plus size={17} />
-                        Ajouter un champ
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
               <div className="mt-3">
                 <Divider />
               </div>

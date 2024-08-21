@@ -78,7 +78,7 @@ export default function Sidebar() {
               <h2 className="font-bold text-gray-500 dark:text-white uppercase hidden md:block">
                 {category.name}
               </h2>
-              <ul className="flex flex-col mt-2 md:mt-6">
+              <ul className="flex flex-col mt-1">
                 {category.linksGroup.map((link, i) => (
                   <li key={i} className="cursor-pointer dark:text-white">
                     {link.link ? (
