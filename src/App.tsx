@@ -19,6 +19,7 @@ import CreatedGroupPage from "./pages/panel-admin/CreatedGroup";
 import CalendarPage from "./pages/calendar/CalendarPage";
 import ChatPage from "./pages/chat/ChatPage";
 import ForgotPage from "./pages/forgot-password/ForgotPassword";
+import ResetPage from "./pages/reset-password/ResetPassword";
 import Chat from "./components/Shared/Chat";
 import DraftUpdatePage from "./pages/draft/DraftUpdatePage";
 import CreateSupplierPage from "./pages/suppliers/CreateSuppliersPage";
@@ -81,6 +82,7 @@ function App() {
           />
 
           <Route path="/forgot-password" element={<ForgotPage />} />
+          <Route path="/reset-password" element={<ResetPage />} />
 
           {/* Routes privées */}
           <Route element={<PrivateRoute isAuth={isAuth} />}>
