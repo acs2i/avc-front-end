@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import Card from "../../components/Shared/Card";
+import React, { useState } from "react";
 import Input from "../../components/FormElements/Input";
 import Button from "../../components/FormElements/Button";
 import { useNavigate } from "react-router-dom";
@@ -7,24 +6,33 @@ import { useSelector } from "react-redux";
 import useNotify from "../../utils/hooks/useToast";
 import { VALIDATOR_REQUIRE } from "../../utils/validator";
 import { CircularProgress } from "@mui/material";
-import { ChevronLeft } from "lucide-react";
+import { Binary, CalendarRange, ChevronLeft, CircleDot, Plus, Space } from "lucide-react";
+
+interface CustomField {
+  field_name: string;
+  field_type: string;
+  options?: string[];
+  value?: string;
+}
 
 interface FormData {
   code: string;
   label: string;
-  status: string;
+  apply_to: string;
+  additional_fields: CustomField[];
   creator_id: any;
+  status: string;
 }
 
-interface BrandCreatePageProps {
-  onCreate: (newBrandId: string) => void;
+interface UserFieldCreatePageProps {
+  onCreate: (newFieldId: string) => void;
   onClose: () => void;
 }
 
 export default function UserFieldCreatePage({
   onCreate,
   onClose,
-}: BrandCreatePageProps) {
+}: UserFieldCreatePageProps) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const user = useSelector((state: any) => state.auth.user);
@@ -32,12 +40,66 @@ export default function UserFieldCreatePage({
   const [formData, setFormData] = useState<FormData>({
     code: "",
     label: "",
-    status: "A",
+    apply_to: "",
+    additional_fields: [
+      { field_name: "", field_type: "text", options: [], value: "" }
+    ],
     creator_id: user._id,
+    status: "A",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleAdditionalFieldChange = (
+    index: number,
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const updatedFields = [...formData.additional_fields];
+    updatedFields[index] = {
+      ...updatedFields[index],
+      [e.target.id]: e.target.value,
+    };
+    setFormData({ ...formData, additional_fields: updatedFields });
+  };
+
+  const handleFieldTypeSelection = (index: number, type: string) => {
+    const updatedFields = [...formData.additional_fields];
+    updatedFields[index].field_type = type;
+
+    if (type === "boolean") {
+      updatedFields[index].options = ["", ""];
+    } else if (type === "multiple_choice") {
+      updatedFields[index].options = [""];
+    } else {
+      updatedFields[index].options = [];
+    }
+
+    updatedFields[index].value = updatedFields[index].value || "";
+    setFormData({ ...formData, additional_fields: updatedFields });
+  };
+
+  const handleOptionChange = (
+    fieldIndex: number,
+    optionIndex: number,
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const updatedFields = [...formData.additional_fields];
+    updatedFields[fieldIndex].options![optionIndex] = e.target.value;
+    setFormData({ ...formData, additional_fields: updatedFields });
+  };
+
+  const addOption = (fieldIndex: number) => {
+    const updatedFields = [...formData.additional_fields];
+    updatedFields[fieldIndex].options!.push("");
+    setFormData({ ...formData, additional_fields: updatedFields });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -45,7 +107,7 @@ export default function UserFieldCreatePage({
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/brand`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/user-field`,
         {
           method: "POST",
           headers: {
@@ -57,11 +119,11 @@ export default function UserFieldCreatePage({
 
       if (response.ok) {
         const data = await response.json();
-        const newBrandId = data._id;
+        const newFieldId = data._id;
         setTimeout(() => {
-          notifySuccess("Marque crée avec succés !");
+          notifySuccess("Champ utilisateur créé avec succès !");
           setIsLoading(false);
-          onCreate(newBrandId);
+          onCreate(newFieldId);
           onClose();
         }, 100);
       } else {
@@ -69,6 +131,7 @@ export default function UserFieldCreatePage({
       }
     } catch (error) {
       console.error("Erreur lors de la requête", error);
+      setIsLoading(false);
     }
   };
 
@@ -80,7 +143,7 @@ export default function UserFieldCreatePage({
             <ChevronLeft />
           </div>
           <h1 className="text-[20px] font-[800] text-gray-800">
-            Créer <span className="font-[300]">un champs utilisateur</span>
+            Créer <span className="font-[300]">un champ utilisateur</span>
           </h1>
         </div>
         <div className="mt-[30px] flex flex-col justify-between">
@@ -100,7 +163,7 @@ export default function UserFieldCreatePage({
               element="input"
               id="label"
               type="text"
-              placeholder="Nom de la collection"
+              placeholder="Nom du champ"
               label="Libellé"
               onChange={handleChange}
               validators={[VALIDATOR_REQUIRE()]}
@@ -108,6 +171,155 @@ export default function UserFieldCreatePage({
               create
               gray
             />
+           <Input
+              element="select"
+              id="apply_to"
+              label="S'applique à"
+              onChange={handleChange}
+              validators={[VALIDATOR_REQUIRE()]}
+              placeholder="Choisir la liaison"
+              options={[
+                { value: "Produit", label: "Produit", name: "Produit" },
+                { value: "Fournisseur", label: "Fournisseur", name: "Fournisseur" }
+              ]}
+              required
+              create
+              gray
+            />
+
+            <h3 className="text-[16px] font-[700] text-gray-800 mt-4">
+              Champs additionnels
+            </h3>
+            {formData.additional_fields.map((field, index) => (
+              <div key={index} className="mt-2">
+                <Input
+                  element="input"
+                  id="field_name"
+                  label="Nom du champ"
+                  placeholder="ex: Frais de douane"
+                  onChange={(e) => handleAdditionalFieldChange(index, e)}
+                  validators={[]}
+                  value={field.field_name}
+                  required
+                  create
+                  gray
+                />
+                <div className="mt-2">
+                  <label className="text-sm font-semibold text-gray-700">
+                    Type de champ
+                  </label>
+                  <div className="grid grid-cols-2 gap-4 mt-1">
+                    <div
+                      className={`cursor-pointer p-4 border rounded-lg ${
+                        field.field_type === "text"
+                          ? "bg-blue-500 text-white"
+                          : "bg-white text-gray-800"
+                      }`}
+                      onClick={() => handleFieldTypeSelection(index, "text")}
+                    >
+                      <h3 className="text-md font-bold text-center">
+                        Texte libre
+                      </h3>
+                      <div className="flex items-center justify-center">
+                        <Space />
+                      </div>
+                    </div>
+
+                    <div
+                      className={`cursor-pointer p-4 border rounded-lg ${
+                        field.field_type === "multiple_choice"
+                          ? "bg-blue-500 text-white"
+                          : "bg-white text-gray-800"
+                      }`}
+                      onClick={() =>
+                        handleFieldTypeSelection(index, "multiple_choice")
+                      }
+                    >
+                      <h3 className="text-md font-bold text-center">
+                        Choix multiple
+                      </h3>
+                      <div className="flex items-center justify-center">
+                        <CircleDot />
+                      </div>
+                    </div>
+
+                    <div
+                      className={`cursor-pointer p-4 border rounded-lg ${
+                        field.field_type === "boolean"
+                          ? "bg-blue-500 text-white"
+                          : "bg-white text-gray-800"
+                      }`}
+                      onClick={() =>
+                        handleFieldTypeSelection(index, "boolean")
+                      }
+                    >
+                      <h3 className="text-md font-bold text-center">
+                        Boolean
+                      </h3>
+                      <div className="flex items-center justify-center">
+                        <Binary />
+                      </div>
+                    </div>
+
+                    <div
+                      className={`cursor-pointer p-4 border rounded-lg ${
+                        field.field_type === "date"
+                          ? "bg-blue-500 text-white"
+                          : "bg-white text-gray-800"
+                      }`}
+                      onClick={() =>
+                        handleFieldTypeSelection(index, "date")
+                      }
+                    >
+                      <h3 className="text-md font-bold text-center">
+                        Date
+                      </h3>
+                      <div className="flex items-center justify-center">
+                        <CalendarRange />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {(field.field_type === "multiple_choice" || field.field_type === "boolean") && (
+                  <div className="mt-4">
+                    {field.options!.map((option, optionIndex) => (
+                      <Input
+                        key={optionIndex}
+                        element="input"
+                        id={`option_${optionIndex}`}
+                        label={`Option ${optionIndex + 1}`}
+                        placeholder={`Option ${optionIndex + 1}`}
+                        onChange={(e) =>
+                          handleOptionChange(
+                            index,
+                            optionIndex,
+                            e as React.ChangeEvent<HTMLInputElement>
+                          )
+                        }
+                        validators={[]}
+                        value={option}
+                        required
+                        create
+                        gray
+                      />
+                    ))}
+                    {field.field_type === "multiple_choice" && (
+                      <div
+                        className="mt-3 flex items-center gap-2 text-orange-400 cursor-pointer hover:text-orange-300"
+                        onClick={() => addOption(index)}
+                      >
+                        <Plus size={15} />
+                        <span className="font-bold text-[13px]">
+                          Ajouter une option
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+
             {!isLoading ? (
               <div className="flex items-center gap-2 mt-5">
                 <Button
@@ -119,7 +331,7 @@ export default function UserFieldCreatePage({
                   Annuler
                 </Button>
                 <Button size="small" blue type="submit">
-                  Créer la marque
+                  Créer le champ utilisateur
                 </Button>
               </div>
             ) : (

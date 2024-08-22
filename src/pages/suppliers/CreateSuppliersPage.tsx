@@ -4,11 +4,16 @@ import { useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { ChevronDown, ChevronUp, Plus, Trash } from "lucide-react";
+import FormSection from "../../components/Formulaires/FormSection";
 import CreatableSelect from "react-select/creatable";
 import { ActionMeta, SingleValue } from "react-select";
 import Button from "../../components/FormElements/Button";
 import useNotify from "../../utils/hooks/useToast";
 import { CircularProgress, Collapse } from "@mui/material";
+import BrandSection from "../../components/Formulaires/BrandSection";
+import ContactSection from "../../components/Formulaires/ContactSection";
+import ConditionSection from "../../components/Formulaires/ConditionsSection";
+import DynamicField from "../../components/FormElements/DynamicField";
 
 interface Contact {
   firstname: string;
@@ -61,6 +66,23 @@ type BrandOption = {
   label: string;
 };
 
+interface CustomField {
+  field_name: string;
+  field_type: string;
+  options?: string[];
+  value?: string;
+}
+
+interface UserField {
+  _id: string;
+  code: string;
+  label: string;
+  apply_to: string;
+  status: string;
+  creator_id: any;
+  additional_fields: CustomField[];
+}
+
 const customStyles = {
   control: (provided: any) => ({
     ...provided,
@@ -99,9 +121,11 @@ export default function CreateSupplierPage() {
   const [inputValueBrand, setInputValueBrand] = useState("");
   const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
   const [brands, setBrands] = useState<SingleValue<BrandOption>[]>([null]);
+  const [userFields, setUserFields] = useState<UserField[]>([]);
   const { notifySuccess, notifyError } = useNotify();
   const [isLoading, setIsLoading] = useState(false);
   const [addFieldIsVisible, setaddFieldIsVisible] = useState(false);
+  const [fieldValues, setFieldValues] = useState<{ [key: string]: any }>({});
   const [formData, setFormData] = useState<FormData>({
     creator_id: creatorId._id,
     code: "",
@@ -303,6 +327,38 @@ export default function CreateSupplierPage() {
     }));
   };
 
+  const fetchField = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/user-field`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+      setUserFields(data.data);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFieldChange = (id: string, newValue: string) => {
+    setFieldValues((prevValues) => ({
+        ...prevValues,
+        [id]: newValue,
+    }));
+};
+
+  useEffect(() => {
+    fetchField();
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -371,562 +427,264 @@ export default function CreateSupplierPage() {
           </div>
 
           <div className="flex gap-4 mt-[80px]">
-            <div className="relative w-[70%] flex flex-col gap-3">
-              <h4 className="absolute top-[-12px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
-                Identification
-              </h4>
-              {/* Partie Infos */}
-              <div className="border border-gray-300 h-[550px] p-3 rounded-md">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  <Input
-                    element="input"
-                    id="code"
-                    label="Code fournisseur :"
-                    value={formData.code}
-                    onChange={handleChange}
-                    validators={[]}
-                    placeholder="Ajouter le code fournisseur"
-                    create
-                    gray
-                  />
-                  <Input
-                    element="input"
-                    id="company_name"
-                    label="Raison sociale :"
-                    value={formData.company_name}
-                    onChange={handleChange}
-                    validators={[]}
-                    placeholder="Ajouter la raison sociale"
-                    create
-                    gray
-                  />
-                  <Input
-                    element="input"
-                    id="siret"
-                    label="Siret :"
-                    value={formData.siret}
-                    onChange={handleChange}
-                    validators={[]}
-                    placeholder="Entrer le numéro SIRET (14 chiffres)"
-                    create
-                    gray
-                  />
-                  <Input
-                    element="input"
-                    id="tva"
-                    label="N°TVA intracom :"
-                    value={formData.tva}
-                    onChange={handleChange}
-                    validators={[]}
-                    placeholder="Ajouter le numero tva intracom"
-                    create
-                    gray
-                  />
-                </div>
+            <FormSection title="Identification" size="h-[550px]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <Input
                   element="input"
-                  id="web_url"
-                  label="Site web :"
-                  value={formData.web_url}
+                  id="code"
+                  label="Code fournisseur :"
+                  value={formData.code}
                   onChange={handleChange}
                   validators={[]}
-                  placeholder="www.monsite.com"
+                  placeholder="Ajouter le code fournisseur"
                   create
                   gray
                 />
                 <Input
                   element="input"
-                  type="email"
-                  id="email"
-                  label="Email :"
-                  value={formData.email}
+                  id="company_name"
+                  label="Raison sociale :"
+                  value={formData.company_name}
                   onChange={handleChange}
                   validators={[]}
-                  placeholder="ex: email@email.fr"
+                  placeholder="Ajouter la raison sociale"
                   create
                   gray
                 />
                 <Input
-                  element="phone"
-                  id="phone"
-                  label="Téléphone :"
-                  value={formData.phone}
-                  onChange={(e) => handlePhoneChange(e.target.value)}
+                  element="input"
+                  id="siret"
+                  label="Siret :"
+                  value={formData.siret}
+                  onChange={handleChange}
                   validators={[]}
-                  placeholder="0142391456"
+                  placeholder="Entrer le numéro SIRET (14 chiffres)"
+                  create
+                  gray
+                />
+                <Input
+                  element="input"
+                  id="tva"
+                  label="N°TVA intracom :"
+                  value={formData.tva}
+                  onChange={handleChange}
+                  validators={[]}
+                  placeholder="Ajouter le numero tva intracom"
                   create
                   gray
                 />
               </div>
-            </div>
-            <div className="relative w-[30%] flex flex-col gap-3">
-              <h4 className="absolute top-[-12px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
-                Adresse
-              </h4>
-              {/* Partie adresse */}
-              <div className="border border-gray-300 h-[550px] p-3 rounded-md">
-                <Input
-                  element="input"
-                  id="address_1"
-                  label="Adresse 1 :"
-                  value={formData.address_1}
-                  onChange={handleChange}
-                  validators={[]}
-                  placeholder="14 rue mon adresse"
-                  create
-                  gray
-                />
-                <Input
-                  element="input"
-                  id="address_2"
-                  label="Adresse 2 :"
-                  value={formData.address_2}
-                  onChange={handleChange}
-                  validators={[]}
-                  placeholder="Complément d'adresse"
-                  create
-                  gray
-                />
-                <Input
-                  element="input"
-                  id="address_3"
-                  label="Adresse 3 :"
-                  value={formData.address_3}
-                  onChange={handleChange}
-                  validators={[]}
-                  placeholder="Complément d'adresse"
-                  create
-                  gray
-                />
-                <Input
-                  element="input"
-                  id="city"
-                  label="Ville :"
-                  value={formData.city}
-                  onChange={handleChange}
-                  validators={[]}
-                  placeholder="Ajouter la ville"
-                  create
-                  gray
-                />
-                <Input
-                  element="input"
-                  id="postal"
-                  label="Code postal :"
-                  value={formData.postal}
-                  onChange={handleChange}
-                  validators={[]}
-                  placeholder="75019"
-                  create
-                  gray
-                />
-                <Input
-                  element="input"
-                  id="country"
-                  label="Pays :"
-                  value={formData.country}
-                  onChange={handleChange}
-                  validators={[]}
-                  placeholder="France"
-                  create
-                  gray
-                />
-              </div>
-            </div>
+              <Input
+                element="input"
+                id="web_url"
+                label="Site web :"
+                value={formData.web_url}
+                onChange={handleChange}
+                validators={[]}
+                placeholder="www.monsite.com"
+                create
+                gray
+              />
+              <Input
+                element="input"
+                type="email"
+                id="email"
+                label="Email :"
+                value={formData.email}
+                onChange={handleChange}
+                validators={[]}
+                placeholder="ex: email@email.fr"
+                create
+                gray
+              />
+              <Input
+                element="phone"
+                id="phone"
+                label="Téléphone :"
+                value={formData.phone}
+                onChange={(e) => handlePhoneChange(e.target.value)}
+                validators={[]}
+                placeholder="0142391456"
+                create
+                gray
+              />
+            </FormSection>
+
+            <FormSection title="Adresse" size="h-[550px]">
+              <Input
+                element="input"
+                id="address_1"
+                label="Adresse 1 :"
+                value={formData.address_1}
+                onChange={handleChange}
+                validators={[]}
+                placeholder="14 rue mon adresse"
+                create
+                gray
+              />
+              <Input
+                element="input"
+                id="address_2"
+                label="Adresse 2 :"
+                value={formData.address_2}
+                onChange={handleChange}
+                validators={[]}
+                placeholder="Complément d'adresse"
+                create
+                gray
+              />
+              <Input
+                element="input"
+                id="address_3"
+                label="Adresse 3 :"
+                value={formData.address_3}
+                onChange={handleChange}
+                validators={[]}
+                placeholder="Complément d'adresse"
+                create
+                gray
+              />
+              <Input
+                element="input"
+                id="city"
+                label="Ville :"
+                value={formData.city}
+                onChange={handleChange}
+                validators={[]}
+                placeholder="Ajouter la ville"
+                create
+                gray
+              />
+              <Input
+                element="input"
+                id="postal"
+                label="Code postal :"
+                value={formData.postal}
+                onChange={handleChange}
+                validators={[]}
+                placeholder="75019"
+                create
+                gray
+              />
+              <Input
+                element="input"
+                id="country"
+                label="Pays :"
+                value={formData.country}
+                onChange={handleChange}
+                validators={[]}
+                placeholder="France"
+                create
+                gray
+              />
+            </FormSection>
           </div>
-          <div className="flex gap-4 mt-[50px]">
-            <div className="relative w-[70%] flex flex-col gap-3">
-              {/* Partie contacts */}
-              <h4 className="absolute top-[-12px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
-                Contacts
-              </h4>
+
+          <div className="flex gap-4 mt-[30px]">
+            <FormSection title="Contacts">
               {formData.contacts.map((contact, index) => (
-                <div
-                  className="border border-gray-300 p-3 rounded-md"
+                <ContactSection
                   key={index}
-                >
-                  <div className="mt-5 flex items-center gap-2">
-                    <span className="italic text-gray-600 text-[12px] font-[700]">
-                      Contact {index + 1}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Input
-                      element="input"
-                      id="lastname"
-                      label="Nom :"
-                      value={contact.lastname}
-                      onChange={handleContactChange(index)}
-                      validators={[]}
-                      placeholder="Nom"
-                      create
-                      gray
-                    />
-                    <Input
-                      element="input"
-                      id="firstname"
-                      label="Prénom :"
-                      value={contact.firstname}
-                      onChange={handleContactChange(index)}
-                      validators={[]}
-                      placeholder="Prénom"
-                      create
-                      gray
-                    />
-                  </div>
-                  <Input
-                    element="input"
-                    id="function"
-                    label="Fonction :"
-                    value={contact.function}
-                    onChange={handleContactChange(index)}
-                    validators={[]}
-                    placeholder="Fonction"
-                    create
-                    gray
-                  />
-                  <div className="grid grid-cols-2 gap-2">
-                    <Input
-                      element="input"
-                      id="phone"
-                      label="Téléphone :"
-                      value={contact.phone}
-                      onChange={handleContactChange(index)}
-                      validators={[]}
-                      placeholder="0142391456"
-                      create
-                      gray
-                    />
-                    <Input
-                      element="input"
-                      id="mobile"
-                      label="Mobile :"
-                      value={contact.mobile}
-                      onChange={handleContactChange(index)}
-                      validators={[]}
-                      placeholder="Mobile"
-                      create
-                      gray
-                    />
-                  </div>
-                  <Input
-                    element="input"
-                    type="email"
-                    id="email"
-                    label="Email :"
-                    value={contact.email}
-                    onChange={handleContactChange(index)}
-                    validators={[]}
-                    placeholder="ex: email@email.fr"
-                    create
-                    gray
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeContactField(index)}
-                    className="flex items-center gap-2 text-[12px] text-red-500 mt-3"
-                  >
-                    <Trash size={17} />
-                    Supprimer ce contact
-                  </button>
-                </div>
+                  contact={contact}
+                  index={index}
+                  handleContactChange={handleContactChange}
+                  removeContactField={removeContactField}
+                />
               ))}
               <button
                 type="button"
                 onClick={addContactField}
-                className="flex items-center gap-2 text-[12px] text-orange-400 mt-1"
+                className="flex items-center gap-2 text-[12px] text-orange-400 mt-5"
               >
                 <Plus size={17} />
                 Ajouter un contact
               </button>
-              {/* Partie tarifs */}
-              <div className="relative w-full flex flex-col gap-3 mt-[50px]">
-                <h4 className="absolute top-[-12px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
-                  Tarifs & conditions
-                </h4>
+            </FormSection>
 
-                <div className="border border-gray-300 p-3 rounded-md">
-                  <div className="grid grid-cols-2 gap-2">
-                    <Input
-                      element="input"
-                      id="tarif"
-                      label="Tarif :"
-                      value={formData.conditions[0].tarif}
-                      onChange={handleConditionChange(0)}
-                      validators={[]}
-                      placeholder="Tapez un tarif"
-                      create
-                      gray
-                    />
-                    <Input
-                      element="select"
-                      id="currency"
-                      label="Devise :"
-                      value={formData.conditions[0].currency}
-                      onChange={handleConditionChange(0)}
-                      validators={[]}
-                      options={currencies}
-                      placeholder="Choississez une devise"
-                      create
-                      gray
-                    />
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-5">
-                    <fieldset className="flex justify-center">
-                      <legend className="text-sm font-medium text-gray-800 text-center">
-                        RFA :
-                      </legend>
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="radio"
-                            id="rfa"
-                            name="rfa"
-                            value="oui"
-                            checked={formData.conditions[0].rfa === "oui"}
-                            onChange={handleConditionChange(0)}
-                          />
-                          <label htmlFor="rfa-oui">Oui</label>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="radio"
-                            id="rfa"
-                            name="rfa"
-                            value="non"
-                            checked={formData.conditions[0].rfa === "non"}
-                            onChange={handleConditionChange(0)}
-                          />
-                          <label htmlFor="rfa-non">Non</label>
-                        </div>
-                      </div>
-                    </fieldset>
-                    <fieldset className="flex justify-center">
-                      <legend className="text-sm font-medium text-gray-800 text-center">
-                        Prix nets :
-                      </legend>
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="radio"
-                            id="net_price"
-                            name="price-net"
-                            value="oui"
-                            checked={formData.conditions[0].net_price === "oui"}
-                            onChange={handleConditionChange(0)}
-                          />
-                          <label htmlFor="price-oui">Oui</label>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="radio"
-                            id="net_price"
-                            name="price-net"
-                            value="non"
-                            checked={formData.conditions[0].net_price === "non"}
-                            onChange={handleConditionChange(0)}
-                          />
-                          <label htmlFor="price-non">Non</label>
-                        </div>
-                      </div>
-                    </fieldset>
-                    <fieldset className="flex justify-center">
-                      <legend className="text-sm font-medium text-gray-800 text-center">
-                        Etiquetage :
-                      </legend>
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="radio"
-                            id="labeling"
-                            name="tag"
-                            value="oui"
-                            checked={formData.conditions[0].labeling === "oui"}
-                            onChange={handleConditionChange(0)}
-                          />
-                          <label htmlFor="tag-oui">Oui</label>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="radio"
-                            id="labeling"
-                            name="tag"
-                            value="non"
-                            checked={formData.conditions[0].labeling === "non"}
-                            onChange={handleConditionChange(0)}
-                          />
-                          <label htmlFor="tag-non">Non</label>
-                        </div>
-                      </div>
-                    </fieldset>
-                  </div>
-                  <div className="text-center mt-[30px]">
-                    <span className="text-sm font-medium text-gray-800">
-                      Condition de paiement :
-                    </span>
-                    <div className="flex items-center justify-center gap-[30px] font-[600] text-gray-700 mt-2">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          id="paiement_condition"
-                          name="paymentCondition"
-                          value="45 jours fin du mois"
-                          checked={
-                            formData.conditions[0].paiement_condition ===
-                            "45 jours fin du mois"
-                          }
-                          onChange={handleConditionChange(0)}
-                        />
-                        <label htmlFor="payment-45j" className="text-[13px]">
-                          45 jours fin du mois
-                        </label>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          id="paiement_condition"
-                          name="paymentCondition"
-                          value="10 jours réception facture avec escompte supplémentaire"
-                          checked={
-                            formData.conditions[0].paiement_condition ===
-                            "10 jours réception facture avec escompte supplémentaire"
-                          }
-                          onChange={handleConditionChange(0)}
-                        />
-                        <label htmlFor="payment-10j" className="text-[13px]">
-                          10 jours réception facture avec escompte
-                          supplémentaire
-                        </label>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          id="paiement_condition"
-                          name="paymentCondition"
-                          value="60 jours date facture"
-                          checked={
-                            formData.conditions[0].paiement_condition ===
-                            "60 jours date facture"
-                          }
-                          onChange={handleConditionChange(0)}
-                        />
-                        <label htmlFor="payment-60j" className="text-[13px]">
-                          60 jours date facture
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2 mt-4">
-                    <Input
-                      element="input"
-                      id="franco"
-                      label="Franco :"
-                      value={formData.conditions[0].franco}
-                      onChange={handleConditionChange(0)}
-                      validators={[]}
-                      placeholder="Ex: 500 EUR, 1000 USD..."
-                      create
-                      gray
-                    />
-                    <Input
-                      element="input"
-                      id="validate_tarif"
-                      label="Validité des tarifs :"
-                      value={formData.conditions[0].validate_tarif}
-                      onChange={handleConditionChange(0)}
-                      validators={[]}
-                      placeholder="Ex: 6 mois, 1 mois..."
-                      create
-                      gray
-                    />
-                    <Input
-                      element="input"
-                      id="budget"
-                      label="Budget marketing :"
-                      value={formData.conditions[0].budget}
-                      onChange={handleConditionChange(0)}
-                      validators={[]}
-                      placeholder="Ex: 5000 EUR par an"
-                      create
-                      gray
-                    />
-                  </div>
-                </div>
-              </div>
-              {/* Partie infos additionelles */}
-        
-              {/* Partie buttons */}
-              {!isLoading ? (
-                <div className="mt-[50px] flex gap-2">
-                  <button
-                    className="w-full bg-gray-300 text-red-500 py-2 rounded-md font-[600] hover:bg-red-500 hover:text-white shadow-md"
-                    type="button"
-                  >
-                    Annuler
-                  </button>
-                  <button
-                    className="w-full bg-sky-600 text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
-                    type="submit"
-                  >
-                    Créer le fournisseur
-                  </button>
-                </div>
-              ) : (
-                <div className="relative flex justify-center mt-7 px-7 gap-2">
-                  <CircularProgress size={100} />
-                  <div className="absolute h-[60px] w-[80px] top-[50%] translate-y-[-50%]">
-                    <img
-                      src="/img/logo.png"
-                      alt="logo"
-                      className="w-full h-full animate-pulse"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-            {/* Partie marques */}
-            <div className="relative w-[30%] flex flex-col gap-3">
-              <h4 className="absolute top-[-12px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
-                Marques
-              </h4>
-              <div className="border border-gray-300 p-3 rounded-md">
-                {brands.map((brand, index) => (
-                  <div key={index} className="flex items-center gap-2 mt-2">
-                    <CreatableSelect<BrandOption>
-                      value={brand}
-                      onChange={(option) => handleChangeBrand(option, index)}
-                      onInputChange={handleInputChangeBrand}
-                      inputValue={inputValueBrand}
-                      options={optionsBrand}
-                      placeholder="Selectionner une marque"
-                      styles={customStyles}
-                      className="block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeBrandField(index)}
-                      className="text-red-500 hover:text-red-300"
-                    >
-                      <Trash size={20} />
-                    </button>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={addBrandField}
-                  className="flex items-center gap-2 text-[12px] text-orange-400 mt-3"
-                >
-                  <Plus size={17} />
-                  Ajouter une marque
-                </button>
-              </div>
-            </div>
+            <FormSection title="Marques">
+              <BrandSection
+                brands={brands}
+                optionsBrand={optionsBrand}
+                handleChangeBrand={handleChangeBrand}
+                removeBrandField={removeBrandField}
+                addBrandField={addBrandField}
+                handleInputChangeBrand={handleInputChangeBrand}
+                inputValueBrand={inputValueBrand}
+                customStyles={customStyles}
+              />
+            </FormSection>
           </div>
+
+          <div className="flex gap-4 mt-[30px]">
+            <FormSection title="Tarifs & conditions">
+              {formData.conditions.map((condition, index) => (
+                <ConditionSection
+                  key={index}
+                  condition={condition}
+                  index={index}
+                  handleConditionChange={handleConditionChange}
+                  currencies={currencies}
+                />
+              ))}
+            </FormSection>
+            {userFields && userFields.length > 0 && (
+              <FormSection title="Champs additionnels">
+                <div className="mt-3">
+                  {userFields.filter((field) => field.apply_to === "Fournisseur").map((field) =>
+                    field.additional_fields.map((customField, index) => (
+                      <div key={`${field._id}-${index}`} className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          {customField.field_name}
+                        </label>
+                        <DynamicField
+                          id={`${field._id}-${index}`}
+                          name={customField.field_name}
+                          fieldType={customField.field_type}
+                          value={fieldValues[`${field._id}-${index}`] || ""}
+                          onChange={(e) =>
+                            handleFieldChange(
+                              `${field._id}-${index}`,
+                              e.target.value
+                            )
+                          }
+                          options={customField.options}
+                        />
+                      </div>
+                    ))
+                  )}
+                </div>
+              </FormSection>
+            )}
+          </div>
+
+          {/* Boutons de soumission */}
+          {!isLoading ? (
+            <div className="mt-[50px] flex gap-2">
+              <button
+                className="w-full bg-gray-300 text-red-500 py-2 rounded-md font-[600] hover:bg-red-500 hover:text-white shadow-md"
+                type="button"
+              >
+                Annuler
+              </button>
+              <button
+                className="w-full bg-sky-600 text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
+                type="submit"
+              >
+                Créer le fournisseur
+              </button>
+            </div>
+          ) : (
+            <div className="relative flex justify-center mt-7 px-7 gap-2">
+              <CircularProgress size={100} />
+              <div className="absolute h-[60px] w-[80px] top-[50%] translate-y-[-50%]">
+                <img
+                  src="/img/logo.png"
+                  alt="logo"
+                  className="w-full h-full animate-pulse"
+                />
+              </div>
+            </div>
+          )}
         </form>
       </div>
     </section>
