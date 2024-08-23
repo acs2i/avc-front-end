@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Input from "../../components/FormElements/Input";
 import Button from "../../components/FormElements/Button";
 import { useNavigate } from "react-router-dom";
@@ -16,7 +16,7 @@ interface CustomField {
 }
 
 interface FormData {
-  code: string;
+  code: number;  // Updated to number
   label: string;
   apply_to: string;
   additional_fields: CustomField[];
@@ -38,7 +38,7 @@ export default function UserFieldCreatePage({
   const user = useSelector((state: any) => state.auth.user);
   const { notifySuccess, notifyError } = useNotify();
   const [formData, setFormData] = useState<FormData>({
-    code: "",
+    code: 1,
     label: "",
     apply_to: "",
     additional_fields: [
@@ -47,6 +47,28 @@ export default function UserFieldCreatePage({
     creator_id: user._id,
     status: "A",
   });
+
+
+  useEffect(() => {
+    const fetchLastCode = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/user-field/last-code`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        const data = await response.json();
+        const lastCode = data.lastCode || 0; 
+        setFormData(prevFormData => ({ ...prevFormData, code: lastCode + 1 }));
+      } catch (error) {
+        console.error("Erreur lors de la récupération du dernier code", error);
+      }
+    };
+
+    fetchLastCode();
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -148,23 +170,18 @@ export default function UserFieldCreatePage({
         </div>
         <div className="mt-[30px] flex flex-col justify-between">
           <div className="flex flex-col">
-            <Input
-              element="input"
-              id="code"
-              label="Code"
-              placeholder="ex: 456"
-              onChange={handleChange}
-              validators={[VALIDATOR_REQUIRE()]}
-              required
-              create
-              gray
-            />
+            <div className="mt-2">
+              <label className="text-sm font-semibold text-gray-700">
+                Numéro
+              </label>
+              <p className="text-lg font-bold">{formData.code}</p> 
+            </div>
             <Input
               element="input"
               id="label"
               type="text"
               placeholder="Nom du champ"
-              label="Libellé"
+              label="Nom du champ"
               onChange={handleChange}
               validators={[VALIDATOR_REQUIRE()]}
               required
@@ -186,29 +203,13 @@ export default function UserFieldCreatePage({
               create
               gray
             />
-
-            <h3 className="text-[16px] font-[700] text-gray-800 mt-4">
-              Champs additionnels
-            </h3>
             {formData.additional_fields.map((field, index) => (
               <div key={index} className="mt-2">
-                <Input
-                  element="input"
-                  id="field_name"
-                  label="Nom du champ"
-                  placeholder="ex: Frais de douane"
-                  onChange={(e) => handleAdditionalFieldChange(index, e)}
-                  validators={[]}
-                  value={field.field_name}
-                  required
-                  create
-                  gray
-                />
                 <div className="mt-2">
                   <label className="text-sm font-semibold text-gray-700">
                     Type de champ
                   </label>
-                  <div className="grid grid-cols-2 gap-4 mt-1">
+                  <div className="grid grid-cols-2 gap-4 mt-3">
                     <div
                       className={`cursor-pointer p-4 border rounded-lg ${
                         field.field_type === "text"
@@ -272,7 +273,7 @@ export default function UserFieldCreatePage({
                       }
                     >
                       <h3 className="text-md font-bold text-center">
-                        Date
+                        Date <span className="text-[12px] italic">(Jour/Mois/Année)</span>
                       </h3>
                       <div className="flex items-center justify-center">
                         <CalendarRange />

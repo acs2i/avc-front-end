@@ -350,10 +350,10 @@ export default function CreateSupplierPage() {
 
   const handleFieldChange = (id: string, newValue: string) => {
     setFieldValues((prevValues) => ({
-        ...prevValues,
-        [id]: newValue,
+      ...prevValues,
+      [id]: newValue,
     }));
-};
+  };
 
   useEffect(() => {
     fetchField();
@@ -630,28 +630,33 @@ export default function CreateSupplierPage() {
             {userFields && userFields.length > 0 && (
               <FormSection title="Champs additionnels">
                 <div className="mt-3">
-                  {userFields.filter((field) => field.apply_to === "Fournisseur").map((field) =>
-                    field.additional_fields.map((customField, index) => (
-                      <div key={`${field._id}-${index}`} className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          {customField.field_name}
-                        </label>
-                        <DynamicField
-                          id={`${field._id}-${index}`}
-                          name={customField.field_name}
-                          fieldType={customField.field_type}
-                          value={fieldValues[`${field._id}-${index}`] || ""}
-                          onChange={(e) =>
-                            handleFieldChange(
-                              `${field._id}-${index}`,
-                              e.target.value
-                            )
-                          }
-                          options={customField.options}
-                        />
+                  {userFields
+                    .filter((field) => field.apply_to === "Fournisseur")
+                    .map((field) => (
+                      <div key={field._id} className="mb-6">
+                        {/* Affichage du label au niveau supérieur */}
+                        <h3 className="text-md font-semibold text-gray-800 mb-1">
+                          {field.label}
+                        </h3>
+                        {field.additional_fields.map((customField, index) => (
+                          <div key={`${field._id}-${index}`} className="mb-4">
+                            <DynamicField
+                              id={`${field._id}-${index}`}
+                              name={customField.field_name}
+                              fieldType={customField.field_type}
+                              value={fieldValues[`${field._id}-${index}`] || ""}
+                              onChange={(e) =>
+                                handleFieldChange(
+                                  `${field._id}-${index}`,
+                                  e.target.value
+                                )
+                              }
+                              options={customField.options}
+                            />
+                          </div>
+                        ))}
                       </div>
-                    ))
-                  )}
+                    ))}
                 </div>
               </FormSection>
             )}

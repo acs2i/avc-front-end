@@ -12,18 +12,26 @@ import ScrollToTop from "../../components/ScrollToTop";
 import Modal from "../../components/Shared/Modal";
 import Header from "../../components/Navigation/Header";
 
-interface UserField {
+interface CustomField {
+  field_name: string;
+  field_type: string;
+  options?: string[];
+  value?: string;
+}
+
+interface Field {
   _id: string;
   code: string;
   label: string;
-  apply_to: string;
   status: string;
+  apply_to: string;
   creator_id: any;
-  additional_fields?: any;
+  additional_fields: CustomField[];
 }
 
+
 interface UserFieldPageProps {
-  onSelectUserField: (userField: UserField) => void;
+  onSelectUserField: (userField: Field) => void;
   shouldRefetch: boolean;
   highlightedUserFieldId: string | null;
   resetHighlightedUserFieldId: () => void;
@@ -42,7 +50,7 @@ export default function UserFieldPage({
     const [totalItem, setTotalItem] = useState(null);
     const limit = 20;
     const totalPages = Math.ceil((totalItem ?? 0) / limit);
-    const [userFields, setUserFields] = useState<UserField[]>([]);
+    const [userFields, setUserFields] = useState<Field[]>([]);
     const navigate = useNavigate();
   
     const handlePageChange = (
@@ -121,7 +129,7 @@ export default function UserFieldPage({
             <tr>
               <th scope="col" className="px-6 py-4 w-1/3">
                 <div className="flex items-center">
-                  <span>Code</span>
+                  <span>Numéro</span>
                   <div className="cursor-pointer">
                     <ChevronsUpDown size={13} />
                   </div>

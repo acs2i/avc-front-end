@@ -18,6 +18,7 @@ import BrandCreatePage from "./BrandCreatePage";
 import GridCreatePage from "./GridCreatePage";
 import UserFieldCreatePage from "./UserFieldCreatePage";
 import UserFieldPage from "./UserFieldPage";
+import UserFieldUpdatePage from "./UserFieldUpdatePage";
 
 interface Tag {
   _id: string;
@@ -58,16 +59,22 @@ interface Brand {
   additional_fields?: any;
 }
 
+interface CustomField {
+  field_name: string;
+  field_type: string;
+  options?: string[];
+  value?: string;
+}
 
-interface UserField {
+interface Field {
   _id: string;
   code: string;
   label: string;
-  apply_to: string;
   status: string;
   creator_id: any;
-  additional_fields?: any;
+  additional_fields: CustomField[];
 }
+
 
 interface Grid {
   _id: string;
@@ -83,6 +90,7 @@ function ParamsMenuPage() {
   const [selectedFamily, setSelectedFamily] = useState<Tag | null>(null);
   const [selectedGrid, setSelectedGrid] = useState<Grid | null>(null);
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
+  const [selectedField, setSelectedField] = useState<Field | null>(null);
   const [selectedCollection, setSelectedCollection] =
     useState<Collection | null>(null);
   const [selectedDimension, setSelectedDimension] = useState<Dimension | null>(
@@ -111,6 +119,10 @@ function ParamsMenuPage() {
     setSelectedBrand(null);
   };
 
+  const handleCloseField = () => {
+    setSelectedField(null);
+  };
+
   const handleOpenCreatePanel = () => {
     setIsCreatePanelOpen(true);
   };
@@ -137,8 +149,11 @@ function ParamsMenuPage() {
   return (
     <section className="w-full min-h-screen bg-slate-50 p-7 flex flex-col relative overflow-hidden">
       <div className="flex items-center gap-3 mb-4">
-        <Settings2 size={20}/>
-        <h3 className="text-[25px] font-[800]">Création <span className="font-[200]">et modification des paramètres</span></h3>
+        <Settings2 size={20} />
+        <h3 className="text-[25px] font-[800]">
+          Création{" "}
+          <span className="font-[200]">et modification des paramètres</span>
+        </h3>
       </div>
       <div className="h-[70px] mb-3 flex items-center gap-4 w-full relative z-10">
         <div className="w-[300px]">
@@ -199,17 +214,17 @@ function ParamsMenuPage() {
               })}
               <span className="text-xs font-[600]">{link.name}</span>
               {page === link.page && (
-                  <>
-                    <div
-                      className="absolute right-0 top-1/2 transform -translate-y-1/2 rotate-180 w-5 h-5 bg-gray-200"
-                      style={{ clipPath: "polygon(0 0, 100% 50%, 0 100%)" }}
-                    ></div>
-                    <div
-                      className="absolute right-[-1px] top-1/2 transform -translate-y-1/2 rotate-180 w-4 h-4 bg-slate-50"
-                      style={{ clipPath: "polygon(0 0, 100% 50%, 0 100%)" }}
-                    ></div>
-                  </>
-                )}
+                <>
+                  <div
+                    className="absolute right-0 top-1/2 transform -translate-y-1/2 rotate-180 w-5 h-5 bg-gray-200"
+                    style={{ clipPath: "polygon(0 0, 100% 50%, 0 100%)" }}
+                  ></div>
+                  <div
+                    className="absolute right-[-1px] top-1/2 transform -translate-y-1/2 rotate-180 w-4 h-4 bg-slate-50"
+                    style={{ clipPath: "polygon(0 0, 100% 50%, 0 100%)" }}
+                  ></div>
+                </>
+              )}
             </div>
           ))}
         </div>
@@ -257,7 +272,7 @@ function ParamsMenuPage() {
             )}
             {page === "field" && (
               <UserFieldPage
-              onSelectUserField={setSelectedBrand}
+                onSelectUserField={setSelectedField}
                 shouldRefetch={shouldRefetch}
                 highlightedUserFieldId={highlightedId}
                 resetHighlightedUserFieldId={resetHighlightedId}
@@ -298,6 +313,15 @@ function ParamsMenuPage() {
               <BrandUpdatePage
                 selectedBrand={selectedBrand}
                 onClose={handleCloseBrand}
+                onUpdate={handleRefetch}
+              />
+            </div>
+          )}
+           {selectedField && (
+            <div className="w-full bg-white rounded-lg border shadow-md">
+              <UserFieldUpdatePage
+                selectedField={selectedField}
+                onClose={handleCloseField}
                 onUpdate={handleRefetch}
               />
             </div>
