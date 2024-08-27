@@ -18,6 +18,7 @@ import UVCPriceTable from "../../components/UVCPricesTable";
 import SupplierComponent from "../../components/SupplierComponent";
 import UVCInfosTable from "../../components/UVCInfosTable";
 import UVCSupplierTable from "../../components/UVCSupplierTable";
+import FormSection from "../../components/Formulaires/FormSection";
 
 interface Product {
   _id: string;
@@ -135,8 +136,6 @@ export default function SingleProductPage() {
     fetchProduct();
   }, [id]);
 
-
-
   useEffect(() => {
     if (product) {
       const initialSizes = [
@@ -162,7 +161,6 @@ export default function SingleProductPage() {
   const handleInputChange = (event: any) => {
     setDesactivationInput(event.target.value);
   };
-
 
   return (
     <section className="w-full bg-slate-50 p-8 max-w-[2000px] mx-auto">
@@ -228,7 +226,9 @@ export default function SingleProductPage() {
             </h1>
           </div>
           <div className="flex items-center justify-between">
-            {product && <h2 className="text-[25px] font-[200]">{product.long_label}</h2>}
+            {product && (
+              <h2 className="text-[25px] font-[200]">{product.long_label}</h2>
+            )}
             {!isModify ? (
               <div className="flex items-center gap-2">
                 <Button
@@ -281,14 +281,9 @@ export default function SingleProductPage() {
             <>
               {/* Indentification */}
               <div className="flex flex-col-reverse lg:flex-row gap-7 mt-[50px] items-stretch">
-                <div className="w-full lg:w-[60%]">
-                  <div className={`relative flex flex-col gap-3 bg-white border border-gray-300 p-4 ${isModify ? "h-[420px]" : "h-[380px]"} rounded-md`}>
-                    <div className="absolute top-[-15px] px-1 bg-gradient-to-b from-slate-50 to-white">
-                      <h4 className="font-[600] text-[17px] text-gray-600">
-                        Identification
-                      </h4>
-                    </div>
-                    <div className="relative flex-1">
+                <div className="w-[60%]">
+                  <FormSection title="Identification" size={`${!isModify ? "h-[400px]" : "h-[450px]"}`}>
+                    <div className="relative mt-3">
                       <div className="grid grid-cols-4 gap-2 py-2">
                         <span className="col-span-1 font-bold text-gray-700">
                           Référence :
@@ -465,46 +460,40 @@ export default function SingleProductPage() {
                         )}
                       </div>
                     </div>
-                  </div>
+                  </FormSection>
                 </div>
-                <div className="w-[480px] bg-white border border-gray-300 rounded-md">
-                  {product.imgPath ? (
-                    <div className="relative w-full h-0 pb-[75%]">
-                      <img
-                        src={product.imgPath}
-                        alt="Product"
-                        className="absolute top-0 left-0 w-full h-full object-contain"
-                      />
-                    </div>
-                  ) : (
-                    <div className="relative w-full h-0 pb-[75%]">
-                      <img
-                        src="/img/logo_2.png"
-                        alt="logo"
-                        className="absolute top-0 left-0 w-full h-full object-cover filter saturate-50 opacity-50"
-                      />
-                      <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xl font-bold bg-black bg-opacity-50 p-2 rounded rotate-[-20deg]">
-                        Pas d'image
-                      </span>
-                    </div>
-                  )}
+
+                <div className="w-[480px] bg-white">
+                  <FormSection size={`${!isModify ? "h-[400px]" : "h-[450px]"}`}>
+                    {product.imgPath ? (
+                      <div className="relative w-full h-0 pb-[75%]">
+                        <img
+                          src={product.imgPath}
+                          alt="Product"
+                          className="absolute top-0 left-0 w-full h-full object-contain"
+                        />
+                      </div>
+                    ) : (
+                      <div className="relative w-full h-0 pb-[75%]">
+                        <img
+                          src="/img/logo_2.png"
+                          alt="logo"
+                          className="absolute top-0 left-0 w-full h-full object-cover filter saturate-50 opacity-50"
+                        />
+                        <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xl font-bold bg-black bg-opacity-50 p-2 rounded rotate-[-20deg]">
+                          Pas d'image
+                        </span>
+                      </div>
+                    )}
+                  </FormSection>
                 </div>
               </div>
 
               <div className="flex gap-7 mt-[50px] items-stretch">
                 {/* Fournisseur */}
                 <div className="w-1/3 ">
-                  <div className="relative flex flex-col gap-3 bg-white">
-                    <div className="absolute top-[-12px] left-[15px] px-1 bg-gradient-to-b from-slate-50 to-white z-10">
-                      <h4 className="font-[600] text-[17px] text-gray-600">
-                        Fournisseur principal
-                      </h4>
-                    </div>
-                    <div
-                      className={`relative border border-gray-300 rounded-md p-3 ${
-                        isModify ? "h-[320px]" : "h-[250px]"
-                      }`}
-                    >
+                  <FormSection title="Fournisseur" size={`${!isModify ? "h-[300px]" : "h-[400px]"}`}>
+                    <div className="mt-3">
                       {!isModify && (
                         <div
                           className="absolute right-[10px] cursor-pointer text-gray-600"
@@ -537,7 +526,6 @@ export default function SingleProductPage() {
                           />
                         )}
                       </div>
-
                       <div className="grid grid-cols-12 gap-2 py-2">
                         <span className="col-span-6 font-bold text-gray-700 text-[13px]">
                           Raison sociale :
@@ -624,21 +612,15 @@ export default function SingleProductPage() {
                         )}
                       </div>
                     </div>
-                  </div>
+                  </FormSection>
                 </div>
                 {/* Caractéristiques produit */}
                 <div className="w-1/3">
-                  <div className="relative flex flex-col gap-3 bg-white">
-                    <div className="absolute top-[-12px] left-[15px] px-1 bg-gradient-to-b from-slate-50 to-white z-10">
-                      <h4 className="font-[600] text-[17px] text-gray-600">
-                        Caractéristiques produit
-                      </h4>
-                    </div>
-                    <div
-                      className={`relative border border-gray-300 p-3 rounded-md ${
-                        isModify ? "h-[320px]" : "h-[250px]"
-                      }`}
-                    >
+                  <FormSection
+                    title="Caractéristiques Produit"
+                    size={`${!isModify ? "h-[300px]" : "h-[400px]"}`}
+                  >
+                    <div className="mt-3">
                       <div className="grid grid-cols-12 gap-2 py-2">
                         <span className="col-span-4 font-bold text-gray-700 text-[13px]">
                           Type :
@@ -694,21 +676,15 @@ export default function SingleProductPage() {
                         )}
                       </div>
                     </div>
-                  </div>
+                  </FormSection>
                 </div>
                 {/* Prix produit */}
                 <div className="w-1/3">
-                  <div className="relative flex flex-col gap-3 bg-white shadow-md">
-                    <div className="absolute top-[-12px] left-[15px] px-1 bg-gradient-to-b from-slate-50 to-white z-10">
-                      <h4 className="font-[600] text-[17px] text-gray-600">
-                        Prix
-                      </h4>
-                    </div>
-                    <div
-                      className={`relative border border-gray-300 p-3 ${
-                        isModify ? "h-[320px]" : "h-[250px]"
-                      }`}
-                    >
+                  <FormSection
+                    title="Prix"
+                    size={`${!isModify ? "h-[300px]" : "h-[400px]"}`}
+                  >
+                    <div className="mt-3">
                       <div className="grid grid-cols-12 gap-2 py-2">
                         <span className="col-span-6 font-bold text-gray-700 text-[13px]">
                           Prix Achat (PAEU) :
@@ -755,7 +731,7 @@ export default function SingleProductPage() {
                         )}
                       </div>
                     </div>
-                  </div>
+                  </FormSection>
                 </div>
               </div>
             </>
@@ -800,7 +776,7 @@ export default function SingleProductPage() {
             <div
               className={`border-t-[1px] border-gray-300 px-5 py-2 overflow-y-auto ${
                 isFullScreen
-                  ? "fixed right-0 top-0 w-full z-[9999] bg-gray-100"
+                  ? "fixed right-0 top-0 w-full h-screen z-[9999] bg-gray-100"
                   : "w-[70%]"
               }`}
             >

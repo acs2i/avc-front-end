@@ -29,6 +29,8 @@ import UVCInfosTable from "../../components/UVCInfosTable";
 import UVCPriceTable from "../../components/UVCPricesTable";
 import UVCSupplierTable from "../../components/UVCSupplierTable";
 import UVCGrid2 from "../../components/UVCGrid_2";
+import FormSection from "../../components/Formulaires/FormSection";
+import Modal from "../../components/Shared/Modal";
 
 interface PriceItemSchema {
   peau: number;
@@ -155,6 +157,7 @@ export default function CreateProductPage() {
   ]);
   const { notifySuccess, notifyError } = useNotify();
   const location = useLocation();
+  const [supplierModalIsOpen, setsupplierModalIsOpen] = useState(false);
   const [page, setPage] = useState("dimension");
   const [onglet, setOnglet] = useState("infos");
   const [brandLabel, setBrandLabel] = useState("");
@@ -532,7 +535,6 @@ export default function CreateProductPage() {
     }
   };
 
-
   const handleClassificationChange = (
     newValue: SingleValue<TagOption>,
     actionMeta: ActionMeta<TagOption>
@@ -824,506 +826,523 @@ export default function CreateProductPage() {
 
   console.log(formData);
   return (
-    <section className="w-full bg-slate-50 p-7">
-      <div className="max-w-[2024px] mx-auto">
-        <form onSubmit={handleSubmit} className="mb-[400px]">
-          <div className="flex justify-between">
-            <div>
-              <h3 className="text-[32px] font-[800] text-gray-800">
-                Création <span className="font-[200]">d'une référence</span>
-              </h3>
-              {creatorId && (
-                <p className="text-[17px] text-gray-600 italic">
-                  Création par{" "}
-                  <span className="font-[600]">{creatorId.username}</span>
-                </p>
+    <>
+     <Modal
+        show={supplierModalIsOpen}
+        onCancel={() => setsupplierModalIsOpen(false)}
+        onClose={() => setsupplierModalIsOpen(false)}
+        onSubmit={handleSubmit}
+        header="Modifier mon adresse mail"
+      >
+        <div className="w-[70%] flex flex-col gap-3 mt-2 mx-auto">
+          Hello from modal
+        </div>
+      </Modal>
+      <section className="w-full bg-slate-50 p-7">
+        <div className="max-w-[2024px] mx-auto">
+          <form onSubmit={handleSubmit} className="mb-[400px]">
+            <div className="flex justify-between">
+              <div>
+                <h3 className="text-[32px] font-[800] text-gray-800">
+                  Création <span className="font-[200]">d'une référence</span>
+                </h3>
+                {creatorId && (
+                  <p className="text-[17px] text-gray-600 italic">
+                    Création par{" "}
+                    <span className="font-[600]">{creatorId.username}</span>
+                  </p>
+                )}
+              </div>
+              {!isLoading ? (
+                <div className="flex items-center justify-between gap-3 mt-[50px]">
+                  <div className="flex gap-3">
+                    <Button size="small" cancel type="button">
+                      Annuler
+                    </Button>
+                    <Button size="small" blue type="submit">
+                      Créer une référence
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-3">
+                  <CircularProgress />
+                </div>
               )}
             </div>
-            {!isLoading ? (
-              <div className="flex items-center justify-between gap-3 mt-[50px]">
-                <div className="flex gap-3">
-                  <Button size="small" cancel type="button">
-                    Annuler
-                  </Button>
-                  <Button size="small" blue type="submit">
-                    Créer une référence
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <div className="mt-3">
-                <CircularProgress />
-              </div>
-            )}
-          </div>
 
-          <div className="flex gap-7 mt-[80px]">
-            <div className="relative w-[70%] flex flex-col gap-3">
-              <h4 className="absolute top-[-15px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
-                Identification
-              </h4>
-              <div className="border border-gray-300 rounded-md p-3">
-                <Input
-                  element="input"
-                  id="reference"
-                  label="Référence :"
-                  value={formData.reference}
-                  onChange={handleChange}
-                  validators={[]}
-                  placeholder="Ajouter la référence du produit"
-                  create
-                  gray
-                />
-                <Input
-                  element="input"
-                  id="name"
-                  label="Nom d'appel :"
-                  value={formData.name}
-                  onChange={handleChange}
-                  validators={[]}
-                  placeholder="Ajouter le nom d'appel du produit"
-                  create
-                  gray
-                />
-                <Input
-                  element="input"
-                  id="long_label"
-                  label="Désignation longue :"
-                  value={formData.long_label}
-                  onChange={handleChange}
-                  validators={[]}
-                  placeholder="Ajouter la designation du produit"
-                  create
-                  gray
-                />
-                <Input
-                  element="input"
-                  id="short_label"
-                  label="Désignation Courte :"
-                  value={formData.short_label}
-                  onChange={handleChange}
-                  validators={[]}
-                  placeholder=""
-                  create
-                  gray
-                />
-                <div>
-                  <label className="text-sm font-medium text-gray-600">
-                    Marque
-                  </label>
-                  <CreatableSelect<BrandOption>
-                    value={selectedOptionBrand}
-                    onChange={handleChangeBrand}
-                    onInputChange={handleInputChangeBrand}
-                    inputValue={inputValueBrand}
-                    options={optionsBrand}
-                    placeholder="Selectionner une marque"
-                    styles={customStyles}
-                    className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                    required
-                  />
-                </div>
-                <div className="mt-[30px] grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="col-span-1">
-                    <label className="text-sm font-medium text-gray-600">
-                      Classification principale
-                    </label>
-                    <CreatableSelect
-                      value={classificationOptions.find(
-                        (option) => option.value === classificationValue
-                      )}
-                      onChange={handleClassificationChange}
-                      onInputChange={handleInputChangeClassification}
-                      inputValue=""
-                      options={classificationOptions}
-                      placeholder="Choisir une classification"
-                      styles={customStyles}
-                      className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                      required
+            <div className="flex gap-7 mt-[80px]">
+              <div className="relative w-[70%] flex flex-col gap-3">
+                <FormSection title="Identification">
+                  <div className="mt-3">
+                    <Input
+                      element="input"
+                      id="reference"
+                      label="Référence :"
+                      value={formData.reference}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder="Ajouter la référence du produit"
+                      create
+                      gray
                     />
-                  </div>
+                    <Input
+                      element="input"
+                      id="name"
+                      label="Nom d'appel :"
+                      value={formData.name}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder="Ajouter le nom d'appel du produit"
+                      create
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      id="long_label"
+                      label="Désignation longue :"
+                      value={formData.long_label}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder="Ajouter la designation du produit"
+                      create
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      id="short_label"
+                      label="Désignation Courte :"
+                      value={formData.short_label}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder=""
+                      create
+                      gray
+                    />
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">
+                        Marque
+                      </label>
+                      <CreatableSelect<BrandOption>
+                        value={selectedOptionBrand}
+                        onChange={handleChangeBrand}
+                        onInputChange={handleInputChangeBrand}
+                        inputValue={inputValueBrand}
+                        options={optionsBrand}
+                        placeholder="Selectionner une marque"
+                        styles={customStyles}
+                        className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                        required
+                      />
+                    </div>
+                    <div className="mt-[30px] grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="col-span-1">
+                        <label className="text-sm font-medium text-gray-600">
+                          Classification principale
+                        </label>
+                        <CreatableSelect
+                          value={classificationOptions.find(
+                            (option) => option.value === classificationValue
+                          )}
+                          onChange={handleClassificationChange}
+                          onInputChange={handleInputChangeClassification}
+                          inputValue=""
+                          options={classificationOptions}
+                          placeholder="Choisir une classification"
+                          styles={customStyles}
+                          className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                          required
+                        />
+                      </div>
 
-                  {classificationValue && (
-                    <div className="col-span-1">
-                      <label className="text-sm font-medium text-gray-600">
-                        Famille
-                      </label>
-                      <CreatableSelect
-                        value={selectedOptionFamily}
-                        onChange={handleChangeFamily}
-                        onInputChange={handleInputChangeFamily}
-                        inputValue={inputValueFamily}
-                        options={optionsFamily}
-                        placeholder="Selectionner une famille"
-                        styles={customStyles}
-                        className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                        required
-                      />
-                    </div>
-                  )}
-
-                  {classificationValue && (
-                    <div className="col-span-1">
-                      <label className="text-sm font-medium text-gray-600">
-                        Sous-famille
-                      </label>
-                      <CreatableSelect
-                        value={selectedOptionSubFamily}
-                        onChange={handleChangeSubFamily}
-                        onInputChange={handleInputChangeSubFamily}
-                        inputValue={inputSubValueFamily}
-                        options={optionsSubFamily}
-                        placeholder="Selectionner une sous-famille"
-                        styles={customStyles}
-                        className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                        required
-                      />
-                    </div>
-                  )}
-                  {classificationValue && (
-                    <div className="col-span-1">
-                      <label className="text-sm font-medium text-gray-600">
-                        Sous-sous-famille
-                      </label>
-                      <CreatableSelect
-                        value={selectedOptionSubSubFamily}
-                        onChange={handleChangeSubSubFamily}
-                        onInputChange={handleInputChangeSubSubFamily}
-                        inputValue={inputValueSubSubFamily}
-                        options={optionsSubSubFamily}
-                        placeholder="Selectionner une sous-sous-famille"
-                        styles={customStyles}
-                        className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                        required
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div className="flex gap-2 mt-[30px]">
-                <div className="w-1/3 flex flex-col">
-                  {formData.suppliers.map((supplier, index) => (
-                    <div
-                      key={index}
-                      className={`relative flex flex-col gap-2 ${
-                        index > 0 && "mt-5"
-                      }`}
-                    >
-                      <h4 className="absolute top-[-15px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
-                        Fournisseur {index === 0 ? "principal" : `${index + 1}`}
-                      </h4>
-                      <div className="border border-gray-300 rounded-md p-3">
-                        <div>
+                      {classificationValue && (
+                        <div className="col-span-1">
                           <label className="text-sm font-medium text-gray-600">
-                            Nom
+                            Famille
                           </label>
-                          <CreatableSelect<SuppliersOption>
-                            value={optionsSupplier?.find(
-                              (option) => option.value === supplier.supplier_id
-                            )}
-                            onChange={(option) =>
-                              handleSupplierSelectChange(index, option)
-                            }
-                            onInputChange={handleInputChangeSupplier}
-                            inputValue={inputValueSupplier}
-                            options={optionsSupplier}
-                            placeholder="Selectionner un fournisseur"
+                          <CreatableSelect
+                            value={selectedOptionFamily}
+                            onChange={handleChangeFamily}
+                            onInputChange={handleInputChangeFamily}
+                            inputValue={inputValueFamily}
+                            options={optionsFamily}
+                            placeholder="Selectionner une famille"
                             styles={customStyles}
                             className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
                             required
                           />
                         </div>
-                        <div>
-                          <Input
-                            element="input"
-                            id={`supplier_ref-${index}`}
-                            label="Référence produit :"
-                            value={supplier.supplier_ref}
-                            onChange={(e) =>
-                              handleSupplierChange(
-                                index,
-                                "supplier_ref",
-                                e.target.value
-                              )
-                            }
-                            validators={[]}
-                            placeholder="Ajouter la référence produit"
-                            create
-                            gray
+                      )}
+
+                      {classificationValue && (
+                        <div className="col-span-1">
+                          <label className="text-sm font-medium text-gray-600">
+                            Sous-famille
+                          </label>
+                          <CreatableSelect
+                            value={selectedOptionSubFamily}
+                            onChange={handleChangeSubFamily}
+                            onInputChange={handleInputChangeSubFamily}
+                            inputValue={inputSubValueFamily}
+                            options={optionsSubFamily}
+                            placeholder="Selectionner une sous-famille"
+                            styles={customStyles}
+                            className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                            required
                           />
                         </div>
-                        <div>
-                          <Input
-                            element="input"
-                            id={`pcb-${index}`}
-                            label="PCB :"
-                            value={supplier.pcb}
-                            onChange={(e) =>
-                              handleSupplierChange(index, "pcb", e.target.value)
-                            }
-                            validators={[]}
-                            placeholder="Ajouter le PCB"
-                            create
-                            gray
+                      )}
+                      {classificationValue && (
+                        <div className="col-span-1">
+                          <label className="text-sm font-medium text-gray-600">
+                            Sous-sous-famille
+                          </label>
+                          <CreatableSelect
+                            value={selectedOptionSubSubFamily}
+                            onChange={handleChangeSubSubFamily}
+                            onInputChange={handleInputChangeSubSubFamily}
+                            inputValue={inputValueSubSubFamily}
+                            options={optionsSubSubFamily}
+                            placeholder="Selectionner une sous-sous-famille"
+                            styles={customStyles}
+                            className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                            required
                           />
                         </div>
-                        <div>
-                          <Input
-                            element="input"
-                            id={`custom_cat-${index}`}
-                            label="Catégorie douanière :"
-                            value={supplier.custom_cat}
-                            onChange={(e) =>
-                              handleSupplierChange(
-                                index,
-                                "custom_cat",
-                                e.target.value
-                              )
-                            }
-                            validators={[]}
-                            placeholder="Ajouter la catégorie douanière"
-                            create
-                            gray
-                          />
-                        </div>
-                        <div>
-                          <CountrySelector
-                            index={index}
-                            value={supplier.made_in}
-                            onChange={handleSupplierChange}
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => removeSupplier(index)}
-                          className="mt-2 text-red-600 flex items-center gap-2 text-[12px]"
-                        >
-                          <Trash2 size={13} />
-                          Supprimer ce fournisseur
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={addSupplier}
-                    className="flex items-center gap-2 text-[12px] text-orange-400 mt-3"
-                  >
-                    <Plus size={17} />
-                    Ajouter un fournisseur
-                  </button>
-                </div>
-                <div className="relative w-1/3 flex flex-col gap-2">
-                  <h4 className="absolute top-[-15px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
-                    Caractéristiques du produit
-                  </h4>
-                  <div className="border border-gray-300 rounded-md p-3">
-                    <Input
-                      element="input"
-                      id="product_type"
-                      label="Type :"
-                      value={formData.type}
-                      onChange={handleChange}
-                      validators={[]}
-                      placeholder="Selectionnez un type de dimension"
-                      create
-                      disabled
-                      gray
-                    />
-                    <Input
-                      element="input"
-                      id="dimension_type"
-                      label="Type de dimension :"
-                      value={formData.dimension_types}
-                      onChange={handleChange}
-                      validators={[]}
-                      placeholder="Selectionnez un type de dimension"
-                      create
-                      disabled
-                      gray
-                    />
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">
-                        Collection
-                      </label>
-                      <CreatableSelect<CollectionOption>
-                        value={selectedOptionCollection}
-                        onChange={handleChangeCollection}
-                        onInputChange={handleInputChangeCollection}
-                        inputValue={inputValueCollection}
-                        options={optionsCollection}
-                        placeholder="Selectionner une collection"
-                        styles={customStyles}
-                        className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="relative w-1/3 flex flex-col gap-2">
-                  <h4 className="absolute top-[-15px] left-[20px] px-2 text-[17px] text-gray-600 bg-slate-50 font-[400]">
-                    Prix
-                  </h4>
-                  <div className="border border-gray-300 rounded-md p-3">
-                    <Input
-                      element="input"
-                      id="default-peau"
-                      label="Prix achat :"
-                      value={
-                        formData.uvc[0]?.prices[0]?.price.peau.toString() || ""
-                      }
-                      onChange={(e) =>
-                        handleChangePrice("peau", e.target.value)
-                      }
-                      validators={[]}
-                      placeholder=""
-                      create
-                      gray
-                    />
-                    <Input
-                      element="input"
-                      id="default-tbeu_pb"
-                      label="Prix Vente :"
-                      value={
-                        formData.uvc[0]?.prices[0]?.price.tbeu_pb.toString() ||
-                        ""
-                      }
-                      onChange={(e) =>
-                        handleChangePrice("tbeu_pb", e.target.value)
-                      }
-                      validators={[]}
-                      placeholder=""
-                      create
-                      gray
-                    />
-                    <Input
-                      element="input"
-                      id="default-tbeu_pmeu"
-                      label="Prix Modulé :"
-                      value={
-                        formData.uvc[0]?.prices[0]?.price.tbeu_pmeu.toString() ||
-                        ""
-                      }
-                      onChange={(e) =>
-                        handleChangePrice("tbeu_pmeu", e.target.value)
-                      }
-                      validators={[]}
-                      placeholder=""
-                      create
-                      gray
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="mt-3">
-                <Divider />
-              </div>
-              {/* Partie onglets */}
-              <div className="mt-[30px] flex mb-[50px]">
-                <div className="w-[30%] border-t-[1px] border-gray-300">
-                  {LINKS_Product.map((link) => (
-                    <div
-                      key={link.page}
-                      className={`relative border-r-[1px] border-b-[1px] border-gray-300 py-4 flex items-center gap-3 cursor-pointer ${
-                        page === link.page ? "text-blue-500" : "text-gray-500"
-                      } hover:text-blue-500`}
-                      onClick={() => setPage(link.page)}
-                    >
-                      {React.createElement(link.icon, {
-                        size: new RegExp(`^${link.link}(/.*)?$`).test(
-                          location.pathname
-                        )
-                          ? 20
-                          : 15,
-                      })}
-                      <span className="text-xs font-[600]">{link.name}</span>
-                      {page === link.page && (
-                        <>
-                          <div
-                            className="absolute right-0 top-1/2 transform -translate-y-1/2 rotate-180 w-5 h-5 bg-gray-300"
-                            style={{
-                              clipPath: "polygon(0 0, 100% 50%, 0 100%)",
-                            }}
-                          ></div>
-                          <div
-                            className="absolute right-[-1px] top-1/2 transform -translate-y-1/2 rotate-180 w-4 h-4 bg-gray-100"
-                            style={{
-                              clipPath: "polygon(0 0, 100% 50%, 0 100%)",
-                            }}
-                          ></div>
-                        </>
                       )}
                     </div>
-                  ))}
-                </div>
-                {page === "dimension" && (
-                  <div
-                    className={`border-t-[1px] border-gray-300 px-5 py-2 overflow-y-auto ${
-                      isFullScreen
-                        ? "fixed right-0 top-0 h-full w-full z-[9999] bg-gray-100"
-                        : "w-[70%]"
-                    }`}
-                  >
-                    <UVCGrid2
-                      onDimensionsChange={handleDimensionsChange}
-                      initialSizes={formData.initialSizes}
-                      initialColors={formData.initialColors}
-                      initialGrid={formData.initialGrid}
-                      setSizes={setSizes}
-                      setColors={setColors}
-                      setUvcGrid={setUvcGrid}
-                      sizes={sizes}
-                      colors={colors}
-                      uvcGrid={uvcGrid}
-                      isFullScreen={toggleFullScreen}
-                    />
                   </div>
-                )}
-                {page === "uvc" && (
-                  <div
-                    className={`border-t-[1px] border-gray-300 px-5 py-2 ${
-                      isFullScreen
-                        ? "fixed right-0 top-0 h-full w-full z-[9999] bg-gray-100"
-                        : "w-[70%]"
-                    } overflow-y-auto`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <ul className="flex items-center py-3 gap-3">
-                        {LINKS_UVC.map((link) => (
-                          <li
-                            key={link.page}
-                            className={`text-[13px] font-[700] cursor-pointer ${
-                              onglet === link.page
-                                ? "text-blue-500"
-                                : "text-gray-500"
-                            } hover:text-blue-500`}
-                            onClick={() => setOnglet(link.page)}
-                          >
-                            {link.name}
-                          </li>
-                        ))}
-                      </ul>
+                </FormSection>
+                <div className="flex gap-2 mt-[30px]">
+                  <div className="w-1/3 flex flex-col">
+                    {formData.suppliers.map((supplier, index) => (
                       <div
-                        className="cursor-pointer hover:text-gray-400"
-                        onClick={toggleFullScreen}
+                        key={index}
+                        className={`relative flex flex-col gap-2 ${
+                          index > 0 && "mt-5"
+                        }`}
                       >
-                        {isFullScreen ? (
-                          <Minimize2 size={17} />
-                        ) : (
-                          <Maximize2 size={17} />
+                        <FormSection title="Fournisseurs">
+                          <div className="mt-3">
+                            <div>
+                              <label className="text-sm font-medium text-gray-600">
+                                Nom
+                              </label>
+                              <CreatableSelect<SuppliersOption>
+                                value={optionsSupplier?.find(
+                                  (option) =>
+                                    option.value === supplier.supplier_id
+                                )}
+                                onChange={(option) =>
+                                  handleSupplierSelectChange(index, option)
+                                }
+                                onInputChange={handleInputChangeSupplier}
+                                inputValue={inputValueSupplier}
+                                options={optionsSupplier}
+                                placeholder="Selectionner un fournisseur"
+                                styles={customStyles}
+                                className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                                required
+                              />
+                            </div>
+                            <div>
+                              <Input
+                                element="input"
+                                id={`supplier_ref-${index}`}
+                                label="Référence produit :"
+                                value={supplier.supplier_ref}
+                                onChange={(e) =>
+                                  handleSupplierChange(
+                                    index,
+                                    "supplier_ref",
+                                    e.target.value
+                                  )
+                                }
+                                validators={[]}
+                                placeholder="Ajouter la référence produit"
+                                create
+                                gray
+                              />
+                            </div>
+                            <div>
+                              <Input
+                                element="input"
+                                id={`pcb-${index}`}
+                                label="PCB :"
+                                value={supplier.pcb}
+                                onChange={(e) =>
+                                  handleSupplierChange(
+                                    index,
+                                    "pcb",
+                                    e.target.value
+                                  )
+                                }
+                                validators={[]}
+                                placeholder="Ajouter le PCB"
+                                create
+                                gray
+                              />
+                            </div>
+                            <div>
+                              <Input
+                                element="input"
+                                id={`custom_cat-${index}`}
+                                label="Catégorie douanière :"
+                                value={supplier.custom_cat}
+                                onChange={(e) =>
+                                  handleSupplierChange(
+                                    index,
+                                    "custom_cat",
+                                    e.target.value
+                                  )
+                                }
+                                validators={[]}
+                                placeholder="Ajouter la catégorie douanière"
+                                create
+                                gray
+                              />
+                            </div>
+                            <div>
+                              <CountrySelector
+                                index={index}
+                                value={supplier.made_in}
+                                onChange={handleSupplierChange}
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => removeSupplier(index)}
+                              className="mt-2 text-red-600 flex items-center gap-2 text-[12px]"
+                            >
+                              <Trash2 size={13} />
+                              Supprimer ce fournisseur
+                            </button>
+                          </div>
+                        </FormSection>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setsupplierModalIsOpen(true)}
+                      className="flex items-center gap-2 text-[12px] text-orange-400 mt-3"
+                    >
+                      <Plus size={17} />
+                      Ajouter un fournisseur
+                    </button>
+                  </div>
+                  <div className="w-1/3 flex flex-col gap-2">
+                    <FormSection
+                      title="Caractéristiques Produit"
+                      size="h-[300px]"
+                    >
+                      <div className="mt-3">
+                        <Input
+                          element="input"
+                          id="product_type"
+                          label="Type :"
+                          value={formData.type}
+                          onChange={handleChange}
+                          validators={[]}
+                          placeholder="Selectionnez un type de dimension"
+                          create
+                          disabled
+                          gray
+                        />
+                        <Input
+                          element="input"
+                          id="dimension_type"
+                          label="Type de dimension :"
+                          value={formData.dimension_types}
+                          onChange={handleChange}
+                          validators={[]}
+                          placeholder="Selectionnez un type de dimension"
+                          create
+                          disabled
+                          gray
+                        />
+                        <div>
+                          <label className="text-sm font-medium text-gray-600">
+                            Collection
+                          </label>
+                          <CreatableSelect<CollectionOption>
+                            value={selectedOptionCollection}
+                            onChange={handleChangeCollection}
+                            onInputChange={handleInputChangeCollection}
+                            inputValue={inputValueCollection}
+                            options={optionsCollection}
+                            placeholder="Selectionner une collection"
+                            styles={customStyles}
+                            className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                            required
+                          />
+                        </div>
+                      </div>
+                    </FormSection>
+                  </div>
+                  <div className="w-1/3 flex flex-col gap-2">
+                    <FormSection title="Prix" size="h-[300px]">
+                      <div className="mt-3">
+                        <Input
+                          element="input"
+                          id="default-peau"
+                          label="Prix achat :"
+                          value={
+                            formData.uvc[0]?.prices[0]?.price.peau.toString() ||
+                            ""
+                          }
+                          onChange={(e) =>
+                            handleChangePrice("peau", e.target.value)
+                          }
+                          validators={[]}
+                          placeholder=""
+                          create
+                          gray
+                        />
+                        <Input
+                          element="input"
+                          id="default-tbeu_pb"
+                          label="Prix Vente :"
+                          value={
+                            formData.uvc[0]?.prices[0]?.price.tbeu_pb.toString() ||
+                            ""
+                          }
+                          onChange={(e) =>
+                            handleChangePrice("tbeu_pb", e.target.value)
+                          }
+                          validators={[]}
+                          placeholder=""
+                          create
+                          gray
+                        />
+                        <Input
+                          element="input"
+                          id="default-tbeu_pmeu"
+                          label="Prix Modulé :"
+                          value={
+                            formData.uvc[0]?.prices[0]?.price.tbeu_pmeu.toString() ||
+                            ""
+                          }
+                          onChange={(e) =>
+                            handleChangePrice("tbeu_pmeu", e.target.value)
+                          }
+                          validators={[]}
+                          placeholder=""
+                          create
+                          gray
+                        />
+                      </div>
+                    </FormSection>
+                  </div>
+                </div>
+                <div className="mt-3">
+                  <Divider />
+                </div>
+                {/* Partie onglets */}
+                <div className="mt-[30px] flex mb-[50px]">
+                  <div className="w-[30%] border-t-[1px] border-gray-300">
+                    {LINKS_Product.map((link) => (
+                      <div
+                        key={link.page}
+                        className={`relative border-r-[1px] border-b-[1px] border-gray-300 py-4 flex items-center gap-3 cursor-pointer ${
+                          page === link.page ? "text-blue-500" : "text-gray-500"
+                        } hover:text-blue-500`}
+                        onClick={() => setPage(link.page)}
+                      >
+                        {React.createElement(link.icon, {
+                          size: new RegExp(`^${link.link}(/.*)?$`).test(
+                            location.pathname
+                          )
+                            ? 20
+                            : 15,
+                        })}
+                        <span className="text-xs font-[600]">{link.name}</span>
+                        {page === link.page && (
+                          <>
+                            <div
+                              className="absolute right-0 top-1/2 transform -translate-y-1/2 rotate-180 w-5 h-5 bg-gray-300"
+                              style={{
+                                clipPath: "polygon(0 0, 100% 50%, 0 100%)",
+                              }}
+                            ></div>
+                            <div
+                              className="absolute right-[-1px] top-1/2 transform -translate-y-1/2 rotate-180 w-4 h-4 bg-gray-100"
+                              style={{
+                                clipPath: "polygon(0 0, 100% 50%, 0 100%)",
+                              }}
+                            ></div>
+                          </>
                         )}
                       </div>
+                    ))}
+                  </div>
+                  {page === "dimension" && (
+                    <div
+                      className={`border-t-[1px] border-gray-300 px-5 py-2 overflow-y-auto ${
+                        isFullScreen
+                          ? "fixed right-0 top-0 h-full w-full z-[9999] bg-gray-100"
+                          : "w-[70%]"
+                      }`}
+                    >
+                      <UVCGrid2
+                        onDimensionsChange={handleDimensionsChange}
+                        initialSizes={formData.initialSizes}
+                        initialColors={formData.initialColors}
+                        initialGrid={formData.initialGrid}
+                        setSizes={setSizes}
+                        setColors={setColors}
+                        setUvcGrid={setUvcGrid}
+                        sizes={sizes}
+                        colors={colors}
+                        uvcGrid={uvcGrid}
+                        isFullScreen={toggleFullScreen}
+                      />
                     </div>
-                    {formData.uvc.map((uvc, index) => (
-                      <div key={index}>
-                        {onglet === "infos" && (
-                          <UVCInfosTable
-                            uvcDimension={uvc.dimensions || []}
-                            productReference={formData.reference || ""}
-                            brandLabel={brandLabel}
-                          />
-                        )}
-                        {/* {onglet === "price" && (
+                  )}
+                  {page === "uvc" && (
+                    <div
+                      className={`border-t-[1px] border-gray-300 px-5 py-2 ${
+                        isFullScreen
+                          ? "fixed right-0 top-0 h-full w-full z-[9999] bg-gray-100"
+                          : "w-[70%]"
+                      } overflow-y-auto`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <ul className="flex items-center py-3 gap-3">
+                          {LINKS_UVC.map((link) => (
+                            <li
+                              key={link.page}
+                              className={`text-[13px] font-[700] cursor-pointer ${
+                                onglet === link.page
+                                  ? "text-blue-500"
+                                  : "text-gray-500"
+                              } hover:text-blue-500`}
+                              onClick={() => setOnglet(link.page)}
+                            >
+                              {link.name}
+                            </li>
+                          ))}
+                        </ul>
+                        <div
+                          className="cursor-pointer hover:text-gray-400"
+                          onClick={toggleFullScreen}
+                        >
+                          {isFullScreen ? (
+                            <Minimize2 size={17} />
+                          ) : (
+                            <Maximize2 size={17} />
+                          )}
+                        </div>
+                      </div>
+                      {formData.uvc.map((uvc, index) => (
+                        <div key={index}>
+                          {onglet === "infos" && (
+                            <UVCInfosTable
+                              uvcDimension={uvc.dimensions || []}
+                              productReference={formData.reference || ""}
+                              brandLabel={brandLabel}
+                            />
+                          )}
+                          {/* {onglet === "price" && (
                           <UVCPriceTable
                             uvcPrices={uvc.prices}
                             productReference={formData.reference || ""}
@@ -1332,7 +1351,7 @@ export default function CreateProductPage() {
                             }
                           />
                         )} */}
-                        {/* {onglet === "supplier" && (
+                          {/* {onglet === "supplier" && (
                           <UVCSupplierTable
                             uvcDimensions={uvc.dimensions || []}
                             productReference={formData.reference || ""}
@@ -1341,61 +1360,62 @@ export default function CreateProductPage() {
                             }
                           />
                         )} */}
-                      </div>
-                    ))}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                {/* Partie boutton */}
+                {!isLoading ? (
+                  <div className="mt-[50px] flex gap-2">
+                    <button
+                      className="w-full border border-gray-300 text-red-600 bg-slate-200 hover:bg-red-600 hover:text-white font-bold shadow-md rounded-md"
+                      type="button"
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      className="w-full bg-sky-600 text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
+                      type="submit"
+                    >
+                      Créer la référence
+                    </button>
+                  </div>
+                ) : (
+                  <div className="relative flex justify-center mt-7 px-7 gap-2">
+                    <CircularProgress size={100} />
+                    <div className="absolute h-[60px] w-[80px] top-[50%] translate-y-[-50%]">
+                      <img
+                        src="/img/logo.png"
+                        alt="logo"
+                        className="w-full h-full animate-pulse"
+                      />
+                    </div>
                   </div>
                 )}
               </div>
-              {/* Partie boutton */}
-              {!isLoading ? (
-                <div className="mt-[50px] flex gap-2">
-                  <button
-                    className="w-full border border-gray-300 text-red-600 bg-slate-200 hover:bg-red-600 hover:text-white font-bold shadow-md rounded-md"
-                    type="button"
-                  >
-                    Annuler
-                  </button>
-                  <button
-                    className="w-full bg-sky-600 text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
-                    type="submit"
-                  >
-                    Créer la référence
-                  </button>
-                </div>
-              ) : (
-                <div className="relative flex justify-center mt-7 px-7 gap-2">
-                  <CircularProgress size={100} />
-                  <div className="absolute h-[60px] w-[80px] top-[50%] translate-y-[-50%]">
-                    <img
-                      src="/img/logo.png"
-                      alt="logo"
-                      className="w-full h-full animate-pulse"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
 
-            <div className="w-[30%] flex flex-col gap-5">
-              <Card title=" Ajouter une image">
-                <div className="w-full h-[250px] border border-dashed border-2 border-gray-300 mt-3 flex justify-center items-center">
-                  <div className="flex flex-col items-center text-center">
-                    <p className="font-bold text-gray-600">
-                      Glissez déposez votre image ici ou{" "}
-                      <span className="text-blue-400">
-                        téléchargez depuis votre ordinateur
-                      </span>
-                    </p>
-                    <div className="text-gray-300">
-                      <ImageUp size={50} />
+              <div className="w-[30%] flex flex-col gap-5">
+                <Card title=" Ajouter une image">
+                  <div className="w-full h-[250px] border border-dashed border-2 border-gray-300 mt-3 flex justify-center items-center">
+                    <div className="flex flex-col items-center text-center">
+                      <p className="font-bold text-gray-600">
+                        Glissez déposez votre image ici ou{" "}
+                        <span className="text-blue-400">
+                          téléchargez depuis votre ordinateur
+                        </span>
+                      </p>
+                      <div className="text-gray-300">
+                        <ImageUp size={50} />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Card>
+                </Card>
+              </div>
             </div>
-          </div>
-        </form>
-      </div>
-    </section>
+          </form>
+        </div>
+      </section>
+    </>
   );
 }

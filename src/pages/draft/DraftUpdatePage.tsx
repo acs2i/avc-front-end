@@ -16,6 +16,7 @@ import UVCPriceTable from "../../components/UVCPricesTable";
 import UVCSupplierTable from "../../components/UVCSupplierTable";
 import SupplierComponent from "../../components/SupplierComponent";
 import UVCGrid from "../../components/UVCGrid";
+import FormSection from "../../components/Formulaires/FormSection";
 
 interface TagDetail {
   _id: string;
@@ -337,7 +338,7 @@ export default function DraftUpdatePage() {
   useEffect(() => {
     const fetchDetails = async () => {
       if (!draft) return;
-  
+
       try {
         const tagDetails = await Promise.all(
           draft.tag_ids.map((tagId) => fetchTagDetails(tagId))
@@ -355,7 +356,7 @@ export default function DraftUpdatePage() {
             fetchSupplierDetails(supplier.supplier_id)
           )
         );
-  
+
         setDraft((prevDraft) => ({
           ...prevDraft!,
           tag_details: tagDetails.filter(Boolean) as TagDetail[],
@@ -372,7 +373,7 @@ export default function DraftUpdatePage() {
         console.error("Erreur lors de la récupération des détails", error);
       }
     };
-  
+
     if (draft && !isDetailsFetched) {
       fetchDetails();
       setIsDetailsFetched(true);
@@ -499,370 +500,360 @@ export default function DraftUpdatePage() {
               <>
                 {/* Indentification */}
                 <div className="flex flex-col-reverse lg:flex-row gap-7 mt-[50px] items-stretch">
-                  <div className="w-full lg:w-[60%]">
-                    <div
-                      className={`relative flex flex-col gap-3 bg-white border border-slate-200 p-4 shadow-[0_0_20px_rgba(0,0,0,0.05)] ${
-                        isModify ? "h-[420px]" : "h-[380px]"
-                      } rounded-md`}
+                  <div className="w-[60%]">
+                    <FormSection
+                      title="Identification"
+                      size={`${!isModify ? "h-[400px]" : "h-[450px]"}`}
                     >
-                      <div className="absolute top-[-15px] px-1 bg-gradient-to-b from-slate-50 to-white">
-                        <h4 className="font-[900] text-[15px] text-gray-600">
-                          Identification
-                        </h4>
-                      </div>
-                      <div className="relative flex-1">
-                        <div className="grid grid-cols-4 gap-2 py-2">
-                          <span className="col-span-1 font-[700] text-slate-500 text-[13px]">
-                            Référence :
-                          </span>
-                          <span className="col-span-3 text-gray-600 text-[14px]">
-                            {draft.reference}
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-4 gap-2 py-2">
-                          <span className="col-span-1 font-[700] text-slate-500 text-[13px]">
-                            Nom d'appel :
-                          </span>
-                          {!isModify ? (
-                            <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
-                              {draft.name ? (
-                                draft.name
-                              ) : (
-                                <CircleSlash2 size={15} />
-                              )}
+                      <div className="mt-3">
+                        <div className="relative flex-1">
+                          <div className="grid grid-cols-4 gap-2 py-2">
+                            <span className="col-span-1 font-[700] text-slate-500 text-[13px]">
+                              Référence :
                             </span>
-                          ) : (
-                            <input
-                              type="text"
-                              className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                            />
-                          )}
-                        </div>
-                        <div className="grid grid-cols-4 gap-2 py-2">
-                          <span className="col-span-1 font-[700] text-slate-500 text-[13px]">
-                            Désignation longue :
-                          </span>
-                          {!isModify ? (
-                            <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
-                              {draft.long_label ? (
-                                draft.long_label
-                              ) : (
-                                <CircleSlash2 size={15} />
-                              )}
-                            </span>
-                          ) : (
-                            <input
-                              type="text"
-                              className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                              value={draft.long_label}
-                            />
-                          )}
-                        </div>
-                        <div className="grid grid-cols-4 gap-2 py-2">
-                          <span className="col-span-1 font-[700] text-slate-500 text-[13px]">
-                            Désignation courte :
-                          </span>
-                          {!isModify ? (
-                            <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
-                              {draft.short_label ? (
-                                draft.short_label
-                              ) : (
-                                <CircleSlash2 size={15} />
-                              )}
-                            </span>
-                          ) : (
-                            <input
-                              type="text"
-                              className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                              value={draft.short_label}
-                            />
-                          )}
-                        </div>
-                        <div className="grid grid-cols-4 gap-2 py-2">
-                          <span className="col-span-1 font-[700] text-slate-500 text-[13px]">
-                            Marque :
-                          </span>
-                          {!isModify ? (
                             <span className="col-span-3 text-gray-600 text-[14px]">
-                              {draft.brand_details &&
-                              draft.brand_details.length > 0 ? (
-                                draft.brand_details.map((brand, index) => (
-                                  <p key={index}>{brand.label}</p>
-                                ))
-                              ) : (
-                                <CircleSlash2 size={15} />
-                              )}
+                              {draft.reference}
                             </span>
-                          ) : (
-                            <div className="col-span-3">
-                              {draft.brand_ids && draft.brand_ids.length > 0
-                                ? draft.brand_ids.map((brand, index) => (
-                                    <input
-                                      key={index}
-                                      type="text"
-                                      className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500 mb-2"
-                                      value=""
-                                    />
+                          </div>
+                          <div className="grid grid-cols-4 gap-2 py-2">
+                            <span className="col-span-1 font-[700] text-slate-500 text-[13px]">
+                              Nom d'appel :
+                            </span>
+                            {!isModify ? (
+                              <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                                {draft.name ? (
+                                  draft.name
+                                ) : (
+                                  <CircleSlash2 size={15} />
+                                )}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                              />
+                            )}
+                          </div>
+                          <div className="grid grid-cols-4 gap-2 py-2">
+                            <span className="col-span-1 font-[700] text-slate-500 text-[13px]">
+                              Désignation longue :
+                            </span>
+                            {!isModify ? (
+                              <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                                {draft.long_label ? (
+                                  draft.long_label
+                                ) : (
+                                  <CircleSlash2 size={15} />
+                                )}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                                value={draft.long_label}
+                              />
+                            )}
+                          </div>
+                          <div className="grid grid-cols-4 gap-2 py-2">
+                            <span className="col-span-1 font-[700] text-slate-500 text-[13px]">
+                              Désignation courte :
+                            </span>
+                            {!isModify ? (
+                              <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                                {draft.short_label ? (
+                                  draft.short_label
+                                ) : (
+                                  <CircleSlash2 size={15} />
+                                )}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                                value={draft.short_label}
+                              />
+                            )}
+                          </div>
+                          <div className="grid grid-cols-4 gap-2 py-2">
+                            <span className="col-span-1 font-[700] text-slate-500 text-[13px]">
+                              Marque :
+                            </span>
+                            {!isModify ? (
+                              <span className="col-span-3 text-gray-600 text-[14px]">
+                                {draft.brand_details &&
+                                draft.brand_details.length > 0 ? (
+                                  draft.brand_details.map((brand, index) => (
+                                    <p key={index}>{brand.label}</p>
                                   ))
-                                : "N/A"}
-                            </div>
-                          )}
-                        </div>
+                                ) : (
+                                  <CircleSlash2 size={15} />
+                                )}
+                              </span>
+                            ) : (
+                              <div className="col-span-3">
+                                {draft.brand_ids && draft.brand_ids.length > 0
+                                  ? draft.brand_ids.map((brand, index) => (
+                                      <input
+                                        key={index}
+                                        type="text"
+                                        className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500 mb-2"
+                                        value=""
+                                      />
+                                    ))
+                                  : "N/A"}
+                              </div>
+                            )}
+                          </div>
 
-                        <div className="grid grid-cols-4 gap-2 py-2">
-                          <span className="col-span-1 font-[700] text-slate-500 text-[13px]">
-                            Famille :
-                          </span>
-                          {!isModify ? (
-                            <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
-                              {draft.tag_details &&
-                              draft.tag_details.length > 0 ? (
-                                `${draft.tag_details[0].code} - ${draft.tag_details[0].name}`
-                              ) : (
-                                <CircleSlash2 size={15} />
-                              )}
+                          <div className="grid grid-cols-4 gap-2 py-2">
+                            <span className="col-span-1 font-[700] text-slate-500 text-[13px]">
+                              Famille :
                             </span>
-                          ) : (
-                            <input
-                              type="text"
-                              className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                              value={
-                                draft.tag_details &&
-                                draft.tag_details.length > 0
-                                  ? draft.tag_details[0].name
-                                  : "N/A"
-                              }
-                            />
-                          )}
-                        </div>
+                            {!isModify ? (
+                              <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                                {draft.tag_details &&
+                                draft.tag_details.length > 0 ? (
+                                  `${draft.tag_details[0].code} - ${draft.tag_details[0].name}`
+                                ) : (
+                                  <CircleSlash2 size={15} />
+                                )}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                                value={
+                                  draft.tag_details &&
+                                  draft.tag_details.length > 0
+                                    ? draft.tag_details[0].name
+                                    : "N/A"
+                                }
+                              />
+                            )}
+                          </div>
 
-                        <div className="grid grid-cols-4 gap-2 py-2">
-                          <span className="col-span-1 font-[700] text-slate-500 text-[13px]">
-                            Sous-famille :
-                          </span>
-                          {!isModify ? (
-                            <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
-                              {draft.tag_details &&
-                              draft.tag_details.length > 0 ? (
-                                `${draft.tag_details[1].code} - ${draft.tag_details[1].name}`
-                              ) : (
-                                <CircleSlash2 size={15} />
-                              )}
+                          <div className="grid grid-cols-4 gap-2 py-2">
+                            <span className="col-span-1 font-[700] text-slate-500 text-[13px]">
+                              Sous-famille :
                             </span>
-                          ) : (
-                            <input
-                              type="text"
-                              className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                              value={
-                                draft.tag_details &&
-                                draft.tag_details.length > 0
-                                  ? draft.tag_details[1].name
-                                  : "N/A"
-                              }
-                            />
-                          )}
-                        </div>
+                            {!isModify ? (
+                              <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                                {draft.tag_details &&
+                                draft.tag_details.length > 0 ? (
+                                  `${draft.tag_details[1].code} - ${draft.tag_details[1].name}`
+                                ) : (
+                                  <CircleSlash2 size={15} />
+                                )}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                                value={
+                                  draft.tag_details &&
+                                  draft.tag_details.length > 0
+                                    ? draft.tag_details[1].name
+                                    : "N/A"
+                                }
+                              />
+                            )}
+                          </div>
 
-                        <div className="grid grid-cols-4 gap-2 py-2">
-                          <span className="col-span-1 font-[700] text-slate-500 text-[13px]">
-                            Sous-sous-famille :
-                          </span>
-                          {!isModify ? (
-                            <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
-                              {draft.tag_details &&
-                              draft.tag_details.length > 0 ? (
-                                `${draft.tag_details[2].code} - ${draft.tag_details[2].name}`
-                              ) : (
-                                <CircleSlash2 size={15} />
-                              )}
+                          <div className="grid grid-cols-4 gap-2 py-2">
+                            <span className="col-span-1 font-[700] text-slate-500 text-[13px]">
+                              Sous-sous-famille :
                             </span>
-                          ) : (
-                            <input
-                              type="text"
-                              className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                              value={
-                                draft.tag_details &&
-                                draft.tag_details.length > 0
-                                  ? draft.tag_details[2].name
-                                  : "N/A"
-                              }
-                            />
-                          )}
+                            {!isModify ? (
+                              <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                                {draft.tag_details &&
+                                draft.tag_details.length > 0 ? (
+                                  `${draft.tag_details[2].code} - ${draft.tag_details[2].name}`
+                                ) : (
+                                  <CircleSlash2 size={15} />
+                                )}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                                value={
+                                  draft.tag_details &&
+                                  draft.tag_details.length > 0
+                                    ? draft.tag_details[2].name
+                                    : "N/A"
+                                }
+                              />
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    </FormSection>
                   </div>
-                  <div className="w-[480px] bg-white border border-slate-200 shadow-[0_0_20px_rgba(0,0,0,0.05)]">
-                    {draft.imgPath ? (
-                      <div className="relative w-full h-0 pb-[75%]">
-                        <img
-                          src={draft.imgPath}
-                          alt="Product"
-                          className="absolute top-0 left-0 w-full h-full object-contain"
-                        />
-                      </div>
-                    ) : (
-                      <div className="relative w-full h-0 pb-[75%]">
-                        <img
-                          src="/img/logo_2.png"
-                          alt="logo"
-                          className="absolute top-0 left-0 w-full h-full object-cover filter saturate-50 opacity-50"
-                        />
-                        <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xl font-bold bg-black bg-opacity-50 p-2 rounded rotate-[-20deg]">
-                          Pas d'image
-                        </span>
-                      </div>
-                    )}
+                  <div className="w-[480px] bg-white">
+                    <FormSection
+                      size={`${!isModify ? "h-[400px]" : "h-[450px]"}`}
+                    >
+                      {draft.imgPath ? (
+                        <div className="relative w-full h-0 pb-[75%]">
+                          <img
+                            src={draft.imgPath}
+                            alt="Product"
+                            className="absolute top-0 left-0 w-full h-full object-contain"
+                          />
+                        </div>
+                      ) : (
+                        <div className="relative w-full h-0 pb-[75%]">
+                          <img
+                            src="/img/logo_2.png"
+                            alt="logo"
+                            className="absolute top-0 left-0 w-full h-full object-cover filter saturate-50 opacity-50"
+                          />
+                          <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xl font-bold bg-black bg-opacity-50 p-2 rounded rotate-[-20deg]">
+                            Pas d'image
+                          </span>
+                        </div>
+                      )}
+                    </FormSection>
                   </div>
                 </div>
 
                 <div className="flex gap-7 mt-[50px] items-stretch">
                   {/* Fournisseur */}
                   <div className="w-1/3 ">
-                    <div className="relative flex flex-col gap-3 bg-white">
-                      <div className="absolute top-[-12px] left-[15px] px-1 bg-gradient-to-b from-slate-50 to-white z-10">
-                        <h4 className="font-[900] text-[15px] text-gray-600">
-                          Fournisseur principal
-                        </h4>
-                      </div>
-                      <div
-                        className={`relative border border-slate-200 rounded-md p-3 shadow-[0_0_20px_rgba(0,0,0,0.05)] ${
-                          isModify ? "h-[320px]" : "h-[250px]"
-                        }`}
-                      >
-                        {!isModify && (
-                          <div
-                            className="absolute right-[10px] cursor-pointer text-gray-600"
-                            onClick={() => setIsModalOpen(true)}
-                          >
-                            <Pen size={17} />
+                    <FormSection
+                      title="Fournisseur"
+                      size={`${!isModify ? "h-[250px]" : "h-[400px]"}`}
+                    >
+                      <div className="relative flex flex-col gap-3">
+                        <div className="mt-3">
+                          {!isModify && (
+                            <div
+                              className="absolute right-[10px] cursor-pointer text-gray-600"
+                              onClick={() => setIsModalOpen(true)}
+                            >
+                              <Pen size={17} />
+                            </div>
+                          )}
+                          <div className="grid grid-cols-12 gap-2 py-2">
+                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                              Code :
+                            </span>
+                            {!isModify ? (
+                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                {draft?.suppliers &&
+                                draft.suppliers.length > 0 ? (
+                                  draft.suppliers[0].code
+                                ) : (
+                                  <CircleSlash2 size={15} />
+                                )}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                                value=""
+                              />
+                            )}
                           </div>
-                        )}
-                        <div className="grid grid-cols-12 gap-2 py-2">
-                          <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                            Code :
-                          </span>
-                          {!isModify ? (
-                            <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                              {draft?.suppliers &&
-                              draft.suppliers.length > 0 ? (
-                                draft.suppliers[0].code
-                              ) : (
-                                <CircleSlash2 size={15} />
-                              )}
-                            </span>
-                          ) : (
-                            <input
-                              type="text"
-                              className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                              value=""
-                            />
-                          )}
-                        </div>
 
-                        <div className="grid grid-cols-12 gap-2 py-2">
-                          <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                            Raison sociale :
-                          </span>
-                          {!isModify ? (
-                            <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                              {draft?.suppliers &&
-                              draft.suppliers.length > 0 ? (
-                                draft.suppliers[0].company_name
-                              ) : (
-                                <CircleSlash2 size={15} />
-                              )}
+                          <div className="grid grid-cols-12 gap-2 py-2">
+                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                              Raison sociale :
                             </span>
-                          ) : (
-                            <input
-                              type="text"
-                              className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                              value=""
-                            />
-                          )}
-                        </div>
+                            {!isModify ? (
+                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                {draft?.suppliers &&
+                                draft.suppliers.length > 0 ? (
+                                  draft.suppliers[0].company_name
+                                ) : (
+                                  <CircleSlash2 size={15} />
+                                )}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                                value=""
+                              />
+                            )}
+                          </div>
 
-                        <div className="grid grid-cols-12 gap-2 py-2">
-                          <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                            Ref. produit :
-                          </span>
-                          {!isModify ? (
-                           <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                           {draft?.suppliers &&
-                           draft.suppliers.length > 0 ? (
-                             draft.suppliers[0].supplier_ref
-                           ) : (
-                             <CircleSlash2 size={15} />
-                           )}
-                         </span>
-                          ) : (
-                            <input
-                              type="text"
-                              className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                            />
-                          )}
-                        </div>
-                        <div className="grid grid-cols-12 gap-2 py-2">
-                          <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                            Multiple achat :
-                          </span>
-                          {!isModify ? (
-                            <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                              <CircleSlash2 size={15} />
+                          <div className="grid grid-cols-12 gap-2 py-2">
+                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                              Ref. produit :
                             </span>
-                          ) : (
-                            <input
-                              type="text"
-                              className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                            />
-                          )}
-                        </div>
-                        <div className="grid grid-cols-12 gap-2 py-2">
-                          <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                            Origine :
-                          </span>
-                          {!isModify ? (
-                            <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                              <CircleSlash2 size={15} />
+                            {!isModify ? (
+                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                {draft?.suppliers &&
+                                draft.suppliers.length > 0 ? (
+                                  draft.suppliers[0].supplier_ref
+                                ) : (
+                                  <CircleSlash2 size={15} />
+                                )}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                              />
+                            )}
+                          </div>
+                          <div className="grid grid-cols-12 gap-2 py-2">
+                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                              Multiple achat :
                             </span>
-                          ) : (
-                            <input
-                              type="text"
-                              className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                            />
-                          )}
-                        </div>
-                        <div className="grid grid-cols-12 gap-2 py-2">
-                          <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                            Catégorie douanière :
-                          </span>
-                          {!isModify ? (
-                            <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                              <CircleSlash2 size={15} />
+                            {!isModify ? (
+                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                <CircleSlash2 size={15} />
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                              />
+                            )}
+                          </div>
+                          <div className="grid grid-cols-12 gap-2 py-2">
+                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                              Origine :
                             </span>
-                          ) : (
-                            <input
-                              type="text"
-                              className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                            />
-                          )}
+                            {!isModify ? (
+                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                <CircleSlash2 size={15} />
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                              />
+                            )}
+                          </div>
+                          <div className="grid grid-cols-12 gap-2 py-2">
+                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                              Catégorie douanière :
+                            </span>
+                            {!isModify ? (
+                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                <CircleSlash2 size={15} />
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                              />
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    </FormSection>
                   </div>
                   {/* Caractéristiques produit */}
                   <div className="w-1/3">
-                    <div className="relative flex flex-col gap-3 bg-white">
-                      <div className="absolute top-[-12px] left-[15px] px-1 bg-gradient-to-b from-slate-50 to-white z-10">
-                        <h4 className="font-[900] text-[15px] text-gray-600">
-                          Caractéristiques produit
-                        </h4>
-                      </div>
-                      <div
-                        className={`relative border border-slate-200 p-3 shadow-[0_0_20px_rgba(0,0,0,0.05)] rounded-md ${
-                          isModify ? "h-[320px]" : "h-[250px]"
-                        }`}
-                      >
+                    <FormSection
+                      title="Caractéristiques Produit"
+                      size={`${!isModify ? "h-[250px]" : "h-[400px]"}`}
+                    >
+                      <div className="mt-3">
                         <div className="grid grid-cols-12 gap-2 py-2">
                           <span className="col-span-4 font-[700] text-slate-500 text-[13px]">
                             Type :
@@ -922,21 +913,15 @@ export default function DraftUpdatePage() {
                           )}
                         </div>
                       </div>
-                    </div>
+                    </FormSection>
                   </div>
                   {/* Prix produit */}
                   <div className="w-1/3">
-                    <div className="relative flex flex-col gap-3 bg-white">
-                      <div className="absolute top-[-12px] left-[15px] px-1 bg-gradient-to-b from-slate-50 to-white z-10">
-                        <h4 className="font-[900] text-[15px] text-gray-600">
-                          Prix
-                        </h4>
-                      </div>
-                      <div
-                        className={`relative border border-slate-200 p-3 shadow-[0_0_20px_rgba(0,0,0,0.05)] ${
-                          isModify ? "h-[320px]" : "h-[250px]"
-                        }`}
-                      >
+                    <FormSection
+                      title="Prix"
+                      size={`${!isModify ? "h-[250px]" : "h-[400px]"}`}
+                    >
+                      <div className="mt-3">
                         <div className="grid grid-cols-12 gap-2 py-2">
                           <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
                             Prix Achat (PAEU) :
@@ -983,7 +968,7 @@ export default function DraftUpdatePage() {
                           )}
                         </div>
                       </div>
-                    </div>
+                    </FormSection>
                   </div>
                 </div>
               </>
