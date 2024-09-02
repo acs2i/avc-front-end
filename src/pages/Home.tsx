@@ -205,7 +205,7 @@ export default function Home() {
             </Stack>
           </div>
         </div>
-        <div className="w-1/2 flex flex-wrap justify-end gap-6">
+        <div className="w-[70%] flex flex-wrap justify-end gap-6">
           {CARD.map((card) => (
             <CardHome
               key={card.title}

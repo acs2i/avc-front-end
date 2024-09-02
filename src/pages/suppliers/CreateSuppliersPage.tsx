@@ -666,13 +666,13 @@ export default function CreateSupplierPage() {
           {!isLoading ? (
             <div className="mt-[50px] flex gap-2">
               <button
-                className="w-full bg-gray-300 text-red-500 py-2 rounded-md font-[600] hover:bg-red-500 hover:text-white shadow-md"
+                className="w-full bg-[#9FA6B2] text-white py-2 rounded-md font-[600] hover:bg-[#bac3d4] hover:text-white shadow-md"
                 type="button"
               >
                 Annuler
               </button>
               <button
-                className="w-full bg-sky-600 text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
+                className="w-full bg-[#3B71CA] text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
                 type="submit"
               >
                 Créer le fournisseur

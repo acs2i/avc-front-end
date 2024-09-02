@@ -17,6 +17,11 @@ import UVCSupplierTable from "../../components/UVCSupplierTable";
 import SupplierComponent from "../../components/SupplierComponent";
 import UVCGrid from "../../components/UVCGrid";
 import FormSection from "../../components/Formulaires/FormSection";
+import CreatableSelect from "react-select/creatable";
+import { SingleValue } from "react-select";
+import Input from "../../components/FormElements/Input";
+import useNotify from "../../utils/hooks/useToast";
+import { CircularProgress } from "@mui/material";
 
 interface TagDetail {
   _id: string;
@@ -66,37 +71,98 @@ interface Draft {
   collection_details?: CollectionDetail[];
 }
 
+interface PriceItemSchema {
+  peau: number;
+  tbeu_pb: number;
+  tbeu_pmeu: number;
+}
+
+interface Price {
+  tarif_id: any;
+  currency: string;
+  supplier_id: any;
+  price: PriceItemSchema;
+  store: string;
+}
+
+interface Uvc {
+  code: string;
+  dimensions: string[];
+  prices: Price[];
+  eans: string[];
+  status: string;
+  additional_fields: any;
+}
+
+interface Supplier {
+  supplier_id: string;
+  supplier_ref: string;
+  pcb: string;
+  custom_cat: string;
+  made_in: string;
+}
+
 interface FormData {
   creator_id: any;
-  description_ref: string;
   reference: string;
-  designation_longue: string;
-  designation_courte: string;
-  call_name: string;
-  supplier_name: string;
-  supplier_ref: string;
-  family: string[];
-  subFamily: string[];
-  dimension_type: string;
-  dimension: string[];
-  brand: string;
-  ref_collection: string;
-  composition: string;
-  description_brouillon: string;
+  name: string;
+  short_label: string;
+  long_label: string;
+  type: string;
+  tag_ids: any[];
+  suppliers: Supplier[];
+  dimension_types: string;
+  brand_ids: any[];
+  collection_ids: any[];
+  imgPath: string;
+  status: string;
+  additional_fields: any;
+  uvc: Uvc[];
   initialSizes: any[];
   initialColors: any[];
   initialGrid: any[];
 }
 
+type Tag = {
+  _id: string;
+  level: string;
+  code: string;
+  name: string;
+};
+
+type TagOption = {
+  _id: string;
+  name: string;
+  value: string;
+  label: string;
+};
+
+type BrandOption = {
+  _id: string;
+  value: string;
+  label: string;
+};
+
+type CollectionOption = {
+  _id: string;
+  value: string;
+  label: string;
+};
+
 export default function DraftUpdatePage() {
   const token = useSelector((state: any) => state.auth.token);
+  const creatorId = useSelector((state: any) => state.auth.user);
+  const { notifySuccess, notifyError } = useNotify();
+  const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
   const [isSend, setisSned] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const limit = 10;
   const [error, setError] = useState("");
   const [page, setPage] = useState("dimension");
   const navigate = useNavigate();
   const [draft, setDraft] = useState<Draft>();
-  const [isDetailsFetched, setIsDetailsFetched] = useState(false); // Nouveau drapeau pour éviter la boucle infinie
+  const [isDetailsFetched, setIsDetailsFetched] = useState(false);
   const [isModify, setIsModify] = useState(false);
   const { id } = useParams();
   const [product, setProduct] = useState<Draft>();
@@ -106,26 +172,52 @@ export default function DraftUpdatePage() {
   const [isModalOpenConfirm, setIsModalOpenConfirm] = useState(false);
   const [onglet, setOnglet] = useState("infos");
   const [formData, setFormData] = useState<FormData>({
-    creator_id: "",
-    description_ref: "",
-    reference: "",
-    designation_longue: "",
-    designation_courte: "",
-    call_name: "",
-    supplier_name: "",
-    supplier_ref: "",
-    family: [],
-    subFamily: [],
-    dimension_type: "",
-    brand: "",
-    ref_collection: "",
-    description_brouillon: "",
-    dimension: [],
-    composition: "",
-    initialSizes: [],
-    initialColors: [],
-    initialGrid: [],
+    creator_id: creatorId._id,
+    reference: draft?.reference || "",
+    name: draft?.name || "",
+    short_label: draft?.short_label || "",
+    long_label: draft?.long_label || "",
+    type: "Marchandise",
+    tag_ids: [],
+    suppliers: draft?.suppliers || [],
+    dimension_types: draft?.dimension_types?.[0] || "Couleur/Taille",
+    brand_ids: [],
+    collection_ids: [],
+    imgPath: "",
+    status: "A",
+    additional_fields: "",
+    uvc: draft?.uvc || [],
+    initialSizes: ["000"],
+    initialColors: ["000"],
+    initialGrid: [[true]],
   });
+
+  // State for CreatableSelect options
+  const [selectedOptionBrand, setSelectedOptionBrand] =
+    useState<SingleValue<BrandOption> | null>(null);
+  const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
+  const [inputValueBrand, setInputValueBrand] = useState("");
+  const [brandLabel, setBrandLabel] = useState("");
+  const [selectedOptionFamily, setSelectedOptionFamily] =
+    useState<SingleValue<TagOption> | null>(null);
+  const [selectedOptionSubFamily, setSelectedOptionSubFamily] =
+    useState<SingleValue<TagOption> | null>(null);
+  const [selectedOptionSubSubFamily, setSelectedOptionSubSubFamily] =
+    useState<SingleValue<TagOption> | null>(null);
+  const [optionsFamily, setOptionsFamily] = useState<TagOption[]>([]);
+  const [optionsSubFamily, setOptionsSubFamily] = useState<TagOption[]>([]);
+  const [optionsSubSubFamily, setOptionsSubSubFamily] = useState<TagOption[]>(
+    []
+  );
+  const [inputValueSubSubFamily, setInputValueSubSubFamily] = useState("");
+  const [inputValueFamily, setInputValueFamily] = useState("");
+  const [inputSubValueFamily, setInputSubValueFamily] = useState("");
+  const [selectedOptionCollection, setSelectedOptionCollection] =
+    useState<SingleValue<CollectionOption> | null>(null);
+  const [optionsCollection, setOptionsCollection] = useState<
+    CollectionOption[]
+  >([]);
+  const [inputValueCollection, setInputValueCollection] = useState("");
 
   const [sizes, setSizes] = useState<string[]>(formData.initialSizes);
   const [colors, setColors] = useState<string[]>(formData.initialColors);
@@ -134,6 +226,17 @@ export default function DraftUpdatePage() {
   useEffect(() => {
     fetchDraft();
   }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+      short_label:
+        e.target.id === "long_label"
+          ? e.target.value.substring(0, 15)
+          : formData.short_label,
+    });
+  };
 
   const fetchDraft = async () => {
     try {
@@ -155,55 +258,35 @@ export default function DraftUpdatePage() {
     }
   };
 
-  const handleSend = async () => {
-    if (!draft) return;
-
+  const handleUpdateDraft = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/draft/draft/${id}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/draft/${id}`,
         {
-          method: "POST",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ status: 1 }),
+          body: JSON.stringify(formData),
         }
       );
 
       if (response.ok) {
-        const updatedDraft = await response.json();
-        setDraft(updatedDraft);
-        navigate(-1);
+        setTimeout(() => {
+          notifySuccess("Brouillon modifié avec succés !");
+          setIsLoading(false);
+          navigate("/draft");
+        }, 100);
       } else {
-        setError("Erreur lors de la transmission du brouillon");
+        notifyError("Erreur lors de la modification !");
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Erreur lors de la requête", error);
-      setError("Erreur lors de la transmission du brouillon");
-    }
-  };
-
-  const handleDelete = async () => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/draft/draft/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        navigate(-1);
-      } else {
-        setError("Erreur lors de la suppresion du brouillon");
-      }
-    } catch (error) {
-      setError("Erreur lors de la suppression du brouillon");
+      setError("Erreur lors de la mise à jour du brouillon");
     }
   };
 
@@ -216,13 +299,41 @@ export default function DraftUpdatePage() {
   };
 
   const handleGridChange = (grid: string[][]) => {
-    const flattenedGrid = grid.flat();
+    const updatedUVCs: Uvc[] = [];
+
+    grid.forEach((row, colorIndex) => {
+      row.forEach((dimension, sizeIndex) => {
+        if (dimension) {
+          const [color, size] = dimension.split(",");
+          updatedUVCs.push({
+            code: `${color}/${size}`,
+            dimensions: [`${color}/${size}`],
+            prices: [
+              {
+                tarif_id: "",
+                currency: "",
+                supplier_id: "",
+                price: {
+                  peau: 0,
+                  tbeu_pb: 0,
+                  tbeu_pmeu: 0,
+                },
+                store: "",
+              },
+            ],
+            eans: [],
+            status: "",
+            additional_fields: {},
+          });
+        }
+      });
+    });
+
     setFormData((prevFormData) => ({
       ...prevFormData,
-      dimension: flattenedGrid,
+      uvc: updatedUVCs,
     }));
   };
-
   const fetchTagDetails = async (tagId: any) => {
     try {
       const response = await fetch(
@@ -380,6 +491,379 @@ export default function DraftUpdatePage() {
     }
   }, [draft, isDetailsFetched]);
 
+  useEffect(() => {
+    if (draft) {
+      setFormData({
+        creator_id: draft.creator_id,
+        reference: draft.reference || "",
+        name: draft.name || "",
+        short_label: draft.short_label || "",
+        long_label: draft.long_label || "",
+        type: draft.type || "Marchandise",
+        tag_ids: draft.tag_ids || [],
+        suppliers: draft.suppliers || [],
+        dimension_types: draft.dimension_types[0] || "Couleur/Taille",
+        brand_ids: draft.brand_ids || [],
+        collection_ids: draft.collection_ids || [],
+        imgPath: draft.imgPath || "",
+        status: draft.status || "A",
+        additional_fields: draft.additional_fields || {},
+        uvc: draft.uvc || [],
+        initialSizes: formData.initialSizes,
+        initialColors: formData.initialColors,
+        initialGrid: formData.initialGrid,
+      });
+    }
+  }, [draft]);
+
+  useEffect(() => {
+    if (draft && draft.uvc) {
+      // Extraire les tailles et les couleurs
+      const extractedColors = draft?.uvc
+        ? [
+            ...new Set(
+              draft.uvc.map((uvc) => uvc.dimensions?.[0]?.split("/")[0])
+            ),
+          ]
+        : [];
+
+      const extractedSizes = draft?.uvc
+        ? [
+            ...new Set(
+              draft.uvc.map((uvc) => uvc.dimensions?.[0]?.split("/")[1])
+            ),
+          ]
+        : [];
+
+      // Construire la grille initiale
+      const initialGrid = extractedColors.map((color) =>
+        extractedSizes.map(
+          (size) =>
+            draft?.uvc?.some((uvc) => {
+              const [uvcColor, uvcSize] = uvc.dimensions[0].split("/");
+              return uvcColor === color && uvcSize === size;
+            }) || false // Si la valeur est undefined, elle sera remplacée par false
+        )
+      );
+
+      // Mettre à jour les états
+      setSizes(extractedSizes);
+      setColors(extractedColors);
+      setUvcGrid(initialGrid);
+    }
+  }, [draft]);
+
+  // Handle CreatableSelect for Brand
+  const handleChangeBrand = (selectedOption: SingleValue<BrandOption>) => {
+    const brandId = selectedOption ? selectedOption.value : "";
+    setSelectedOptionBrand(selectedOption);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      brand_ids: [brandId],
+    }));
+    const brandLabel = selectedOption ? selectedOption.label : "";
+    setBrandLabel(brandLabel);
+  };
+
+  const handleInputChangeBrand = async (inputValueBrand: string) => {
+    setInputValueBrand(inputValueBrand);
+
+    if (inputValueBrand === "") {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/brand`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+
+        const optionsBrand = data.data?.map((brand: BrandOption) => ({
+          value: brand._id, // Assurez-vous que cette valeur est l'ID de la marque
+          label: brand.label,
+        }));
+
+        setOptionsBrand(optionsBrand);
+      } catch (error) {
+        console.error("Erreur lors de la requête", error);
+      }
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/brand/search?label=${inputValueBrand}&page=${currentPage}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+
+      const optionsBrand = data.data?.map((brand: BrandOption) => ({
+        value: brand._id, // Assurez-vous que cette valeur est l'ID de la marque
+        label: brand.label,
+      }));
+
+      setOptionsBrand(optionsBrand);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
+  const handleChangeFamily = (newValue: SingleValue<TagOption> | null) => {
+    setSelectedOptionFamily(newValue);
+
+    setFormData((prevFormData) => {
+      let newTagIds = [...prevFormData.tag_ids];
+      if (newValue) {
+        newTagIds[0] = newValue.value;
+      } else {
+        newTagIds[0] = "";
+      }
+      return {
+        ...prevFormData,
+        tag_ids: newTagIds.filter(Boolean),
+      };
+    });
+  };
+
+  const handleInputChangeFamily = async (inputValueFamily: string) => {
+    setInputValueFamily(inputValueFamily);
+
+    if (inputValueFamily === "") {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/tag`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+
+        const optionsFamily = data.data?.map((tag: Tag) => ({
+          value: tag._id,
+          label: tag.name,
+        }));
+
+        setOptionsFamily(optionsFamily);
+      } catch (error) {
+        console.error("Erreur lors de la requête", error);
+      }
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?name=${inputValueFamily}&page=${currentPage}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+
+      const optionsFamily = data.data?.map((tag: Tag) => ({
+        value: tag._id,
+        label: tag.name,
+      }));
+
+      setOptionsFamily(optionsFamily);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
+  const handleChangeSubFamily = (newValue: SingleValue<TagOption> | null) => {
+    setSelectedOptionSubFamily(newValue);
+
+    setFormData((prevFormData) => {
+      let newTagIds = [...prevFormData.tag_ids];
+      if (newValue) {
+        newTagIds[1] = newValue.value; // Place le SubFamily ID à l'index 1
+      } else {
+        newTagIds[1] = ""; // Retire la sous-famille si aucun n'est sélectionné
+      }
+      return {
+        ...prevFormData,
+        tag_ids: newTagIds.filter(Boolean), // Supprime les valeurs vides
+      };
+    });
+  };
+
+  const handleInputChangeSubFamily = async (inputValueSubFamily: string) => {
+    setInputSubValueFamily(inputValueSubFamily);
+
+    if (inputValueSubFamily === "") {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?level=sous-famille`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+
+        const optionsSubFamily = data.data?.map((tag: Tag) => ({
+          value: tag._id,
+          label: tag.name,
+        }));
+
+        setOptionsSubFamily(optionsSubFamily);
+      } catch (error) {
+        console.error("Erreur lors de la requête", error);
+      }
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?name=${inputValueSubFamily}&level=sous-famille&page=${currentPage}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+
+      const optionsSubFamily = data.data?.map((tag: Tag) => ({
+        value: tag._id,
+        label: tag.name,
+      }));
+
+      setOptionsSubFamily(optionsSubFamily);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
+  const handleChangeSubSubFamily = (
+    newValue: SingleValue<TagOption> | null
+  ) => {
+    setSelectedOptionSubSubFamily(newValue);
+
+    setFormData((prevFormData) => {
+      let newTagIds = [...prevFormData.tag_ids];
+      if (newValue) {
+        newTagIds[2] = newValue.value; // Place le SubSubFamily ID à l'index 2
+      } else {
+        newTagIds[2] = ""; // Retire la sous-sous-famille si aucun n'est sélectionné
+      }
+      return {
+        ...prevFormData,
+        tag_ids: newTagIds.filter(Boolean), // Supprime les valeurs vides
+      };
+    });
+  };
+
+  const handleInputChangeSubSubFamily = async (
+    inputValueSubSubFamily: string
+  ) => {
+    setInputValueSubSubFamily(inputValueSubSubFamily);
+
+    if (inputValueSubSubFamily === "") {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?level=sous-sous-famille`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+
+        const optionsSubSubFamily = data.data?.map((tag: Tag) => ({
+          value: tag._id,
+          label: tag.name,
+        }));
+
+        setOptionsSubSubFamily(optionsSubSubFamily);
+      } catch (error) {
+        console.error("Erreur lors de la requête", error);
+      }
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?name=${inputValueSubSubFamily}&level=sous-sous-famille&page=${currentPage}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+
+      const optionsSubSubFamily = data.data?.map((tag: Tag) => ({
+        value: tag._id,
+        label: tag.name,
+      }));
+
+      setOptionsSubSubFamily(optionsSubSubFamily);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
+  const handleChangeCollection = (
+    selectedOption: SingleValue<CollectionOption>
+  ) => {
+    const collectionId = selectedOption ? selectedOption.value : "";
+    setSelectedOptionCollection(selectedOption);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      ref_collection: collectionId,
+    }));
+  };
+
+  const handleInputChangeCollection = async (inputValueCollection: string) => {
+    setInputValueCollection(inputValueCollection);
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/collection/search?label=${inputValueCollection}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+
+      const optionsCollection = data.map((collection: CollectionOption) => ({
+        value: collection._id,
+        label: collection.label,
+      }));
+
+      setOptionsCollection(optionsCollection);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
+  console.log(formData);
+
   return (
     <>
       <section className="w-full bg-slate-50 p-8 max-w-[2000px] mx-auto">
@@ -434,7 +918,7 @@ export default function DraftUpdatePage() {
             )}
           </div>
         </Modal>
-        <form>
+        <form onSubmit={handleUpdateDraft}>
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-2">
               <div onClick={() => navigate(-1)} className="cursor-pointer">
@@ -476,19 +960,25 @@ export default function DraftUpdatePage() {
                     {isModify ? "Annuler modification" : "Modifier"}
                   </Button>
                 </div>
+              ) : !isLoading ? (
+                <div className="flex items-center justify-between gap-3 mt-[50px]">
+                  <div className="flex gap-3">
+                    <Button
+                      size="small"
+                      cancel
+                      type="button"
+                      onClick={() => setIsModify(false)}
+                    >
+                      Annuler
+                    </Button>
+                    <Button size="small" blue type="submit">
+                      Valider
+                    </Button>
+                  </div>
+                </div>
               ) : (
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="small"
-                    cancel
-                    type="button"
-                    onClick={() => setIsModify(false)}
-                  >
-                    Annuler
-                  </Button>
-                  <Button size="small" blue>
-                    Valider
-                  </Button>
+                <div className="mt-3">
+                  <CircularProgress />
                 </div>
               )}
             </div>
@@ -509,11 +999,26 @@ export default function DraftUpdatePage() {
                         <div className="relative flex-1">
                           <div className="grid grid-cols-4 gap-2 py-2">
                             <span className="col-span-1 font-[700] text-slate-500 text-[13px]">
-                              Référence :
+                              Reférence :
                             </span>
-                            <span className="col-span-3 text-gray-600 text-[14px]">
-                              {draft.reference}
-                            </span>
+                            {!isModify ? (
+                              <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                                {draft.reference ? (
+                                  draft.reference
+                                ) : (
+                                  <CircleSlash2 size={15} />
+                                )}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                id="reference"
+                                onChange={handleChange}
+                                placeholder={draft?.reference}
+                                value={formData.reference}
+                                className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                              />
+                            )}
                           </div>
                           <div className="grid grid-cols-4 gap-2 py-2">
                             <span className="col-span-1 font-[700] text-slate-500 text-[13px]">
@@ -530,6 +1035,10 @@ export default function DraftUpdatePage() {
                             ) : (
                               <input
                                 type="text"
+                                id="name"
+                                onChange={handleChange}
+                                placeholder={draft?.name}
+                                value={formData.name}
                                 className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
                               />
                             )}
@@ -549,8 +1058,11 @@ export default function DraftUpdatePage() {
                             ) : (
                               <input
                                 type="text"
+                                id="long_label"
+                                onChange={handleChange}
+                                placeholder={draft?.long_label}
+                                value={formData.long_label}
                                 className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                                value={draft.long_label}
                               />
                             )}
                           </div>
@@ -569,8 +1081,11 @@ export default function DraftUpdatePage() {
                             ) : (
                               <input
                                 type="text"
+                                id="short_label"
+                                onChange={handleChange}
+                                placeholder={draft?.short_label}
+                                value={formData.short_label}
                                 className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                                value={draft.short_label}
                               />
                             )}
                           </div>
@@ -590,18 +1105,15 @@ export default function DraftUpdatePage() {
                                 )}
                               </span>
                             ) : (
-                              <div className="col-span-3">
-                                {draft.brand_ids && draft.brand_ids.length > 0
-                                  ? draft.brand_ids.map((brand, index) => (
-                                      <input
-                                        key={index}
-                                        type="text"
-                                        className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500 mb-2"
-                                        value=""
-                                      />
-                                    ))
-                                  : "N/A"}
-                              </div>
+                              <CreatableSelect
+                                className="col-span-3"
+                                value={selectedOptionBrand}
+                                onChange={handleChangeBrand}
+                                onInputChange={handleInputChangeBrand}
+                                options={optionsBrand}
+                                inputValue={inputValueBrand}
+                                isClearable
+                              />
                             )}
                           </div>
 
@@ -619,15 +1131,14 @@ export default function DraftUpdatePage() {
                                 )}
                               </span>
                             ) : (
-                              <input
-                                type="text"
-                                className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                                value={
-                                  draft.tag_details &&
-                                  draft.tag_details.length > 0
-                                    ? draft.tag_details[0].name
-                                    : "N/A"
-                                }
+                              <CreatableSelect
+                                className="col-span-3"
+                                value={selectedOptionFamily}
+                                onChange={handleChangeFamily}
+                                onInputChange={handleInputChangeFamily}
+                                options={optionsFamily}
+                                inputValue={inputValueFamily}
+                                isClearable
                               />
                             )}
                           </div>
@@ -646,15 +1157,14 @@ export default function DraftUpdatePage() {
                                 )}
                               </span>
                             ) : (
-                              <input
-                                type="text"
-                                className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                                value={
-                                  draft.tag_details &&
-                                  draft.tag_details.length > 0
-                                    ? draft.tag_details[1].name
-                                    : "N/A"
-                                }
+                              <CreatableSelect
+                                className="col-span-3"
+                                value={selectedOptionSubFamily}
+                                onChange={handleChangeSubFamily}
+                                onInputChange={handleInputChangeSubFamily}
+                                options={optionsSubFamily}
+                                inputValue={inputSubValueFamily}
+                                isClearable
                               />
                             )}
                           </div>
@@ -673,15 +1183,14 @@ export default function DraftUpdatePage() {
                                 )}
                               </span>
                             ) : (
-                              <input
-                                type="text"
-                                className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                                value={
-                                  draft.tag_details &&
-                                  draft.tag_details.length > 0
-                                    ? draft.tag_details[2].name
-                                    : "N/A"
-                                }
+                              <CreatableSelect
+                                className="col-span-3"
+                                value={selectedOptionSubSubFamily}
+                                onChange={handleChangeSubSubFamily}
+                                onInputChange={handleInputChangeSubSubFamily}
+                                options={optionsSubSubFamily}
+                                inputValue={inputValueSubSubFamily}
+                                isClearable
                               />
                             )}
                           </div>
@@ -900,15 +1409,14 @@ export default function DraftUpdatePage() {
                               )}
                             </span>
                           ) : (
-                            <input
-                              type="text"
-                              className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                              value={
-                                draft.tag_details &&
-                                draft.tag_details.length > 0
-                                  ? draft.tag_details[1].name
-                                  : "N/A"
-                              }
+                            <CreatableSelect
+                              className="col-span-6"
+                              value={selectedOptionCollection}
+                              onChange={handleChangeCollection}
+                              onInputChange={handleInputChangeCollection}
+                              options={optionsCollection}
+                              inputValue={inputValueCollection}
+                              isClearable
                             />
                           )}
                         </div>
@@ -1013,15 +1521,15 @@ export default function DraftUpdatePage() {
               <div
                 className={`border-t-[1px] border-gray-300 px-5 py-2 overflow-y-auto ${
                   isFullScreen
-                    ? "fixed right-0 top-0 w-full z-[9999] bg-gray-100"
+                    ? "fixed right-0 top-0 w-full h-screen z-[9999] bg-gray-100"
                     : "w-[70%]"
                 }`}
               >
                 <UVCGrid
                   onDimensionsChange={handleGridChange}
-                  initialSizes={formData.initialSizes}
-                  initialColors={formData.initialColors}
-                  initialGrid={formData.initialGrid}
+                  initialSizes={sizes}
+                  initialColors={colors}
+                  initialGrid={uvcGrid}
                   setSizes={setSizes}
                   setColors={setColors}
                   setUvcGrid={setUvcGrid}
@@ -1029,6 +1537,7 @@ export default function DraftUpdatePage() {
                   colors={colors}
                   uvcGrid={uvcGrid}
                   isFullScreen={toggleFullScreen}
+                  isModify={isModify}
                 />
               </div>
             )}
@@ -1067,7 +1576,7 @@ export default function DraftUpdatePage() {
                     )}
                   </div>
                 </div>
-                {onglet === "infos" && draft && (
+                {/* {onglet === "infos" && draft && (
                   <UVCInfosTable
                     uvcDimension={formData.dimension}
                     productReference={draft.reference || ""}
@@ -1079,7 +1588,7 @@ export default function DraftUpdatePage() {
                     uvcPrices={formData.dimension}
                     productReference={draft.reference || ""}
                   />
-                )}
+                )} */}
                 {/* {onglet === "supplier" && draft && (
                   <UVCSupplierTable
                     uvcDimensions={formData.dimension}

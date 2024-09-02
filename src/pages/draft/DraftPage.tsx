@@ -76,6 +76,8 @@ interface EnrichedDraft extends Draft {
 export default function DraftPage() {
   const user = useSelector((state: any) => state.auth.user._id);
   const token = useSelector((state: any) => state.auth.token);
+  const [currentStep, setCurrentStep] = useState(1);
+  const steps = [1, 2, 3];
   const [page, setPage] = useState("draft");
   const [onglet, setOnglet] = useState("created");
   const [drafts, setDrafts] = useState<EnrichedDraft[]>([]);
@@ -87,9 +89,14 @@ export default function DraftPage() {
 
   const filteredDrafts = drafts.filter((draft) => draft.status === "A");
   const filteredInProgress = drafts.filter((draft) => draft.status === "I");
+  const filteredDone = drafts.filter((draft) => draft.status === "D");
 
   const formatDate = (timestamp: any) => {
     return format(new Date(timestamp), "dd/MM/yyyy HH:mm:ss");
+  };
+
+  const handleStepClick = (step: number) => {
+    setCurrentStep(step);
   };
 
   useEffect(() => {
@@ -142,7 +149,7 @@ export default function DraftPage() {
 
       const data = await response.json();
       setDrafts(data);
-      draftsEnriched.current = false;  // Reset the enriched flag
+      draftsEnriched.current = false; // Reset the enriched flag
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     }
@@ -247,7 +254,9 @@ export default function DraftPage() {
             ...draft,
             brandName: brandDetails ? brandDetails.label : "Marque inconnue",
             familyName: familyDetails ? familyDetails.name : "Famille inconnue",
-            subFamilyName: familyDetails ? familyDetails.name : "Famille inconnue",
+            subFamilyName: familyDetails
+              ? familyDetails.name
+              : "Famille inconnue",
             supplierName: supplierDetails
               ? supplierDetails.company_name
               : "Fournisseur inconnu",
@@ -270,7 +279,7 @@ export default function DraftPage() {
   return (
     <section>
       {/* Partie Header */}
-      <div className="w-full h-[250px] bg-slate-100 p-8 relative overflow-hidden">
+      <div className="w-full h-[300px] bg-slate-100 p-8 relative overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
@@ -281,50 +290,72 @@ export default function DraftPage() {
           }}
         ></div>
         <div className="relative z-10">
-          <div className="mt-4 mb-[5px]">
-            <div className="flex justify-between">
-              <div className="flex items-center gap-2">
-                {LINKCARD_DRAFT.map((link, i) => (
-                  <React.Fragment key={i}>
-                    <button
-                      className={`text-sm font-[600] ${
-                        page === link.page ? "text-blue-600" : "text-gray-800"
-                      }`}
-                      onClick={() => setPage(link.page)}
-                    >
-                      {link.name}
-                    </button>
-                    {i < LINKCARD_DRAFT.length - 1 && (
-                      <div className="text-gray-800">
-                        <ChevronRight size={13} />
-                      </div>
-                    )}
-                  </React.Fragment>
-                ))}
-              </div>
-            </div>
-          </div>
-          <h3 className="text-[32px] font-[800] text-gray-800">
-            Références{" "}
-            <span className="font-[200]">créées par {selectedUsername}</span>
-          </h3>
-          <div className="flex items-center gap-7 mt-[20px]">
-            {DRAFT_CATEGORY.map((link, i) => (
-              <div
-                key={i}
-                className="cursor-pointer flex items-center gap-2"
-                onClick={() => setOnglet(link.page)}
-              >
-                <button
-                  className={`text-sm font-[600] ${
-                    onglet === link.page ? "text-blue-600" : "text-gray-800"
+          <div className="w-full flex items-center justify-between mb-4">
+            {steps.map((step, index) => (
+              <React.Fragment key={index}>
+                <div
+                  onClick={() => handleStepClick(step)}
+                  className={`relative w-[50px] h-[50px] rounded-full flex items-center justify-center cursor-pointer text-white transition-colors duration-300 ease-in-out ${
+                    currentStep >= step ? "bg-[#3B71CA]" : "bg-gray-300"
                   }`}
                 >
-                  {link.name}
-                </button>
-                <span className="text-[14px]">(2222)</span>
-              </div>
+                  {currentStep === step && (
+                    <span className="absolute inset-0 flex items-center justify-center">
+                      <span className="animate-ping absolute h-full w-full rounded-full bg-[#3B71CA] opacity-65"></span>
+                    </span>
+                  )}
+                  <span className="text-lg font-bold z-10">{step}</span>
+                </div>
+
+                {index < steps.length - 1 && (
+                  <div className="flex-1 h-[4px] bg-gray-300">
+                    <div
+                      className={`h-full transition-all duration-300 ease-in-out ${
+                        currentStep > index + 1
+                          ? "w-full bg-[#3B71CA]"
+                          : "w-0 bg-[#3B71CA]"
+                      }`}
+                    ></div>
+                  </div>
+                )}
+              </React.Fragment>
             ))}
+          </div>
+
+          <div className="mt-7">
+            {currentStep === 1 && (
+              <h3 className="text-[32px] font-[800] text-gray-800">
+                B<span className="font-[200]">rouillons</span>
+              </h3>
+            )}
+            {currentStep === 2 && (
+              <h3 className="text-[32px] font-[800] text-gray-800">
+                En<span className="font-[200]"> cours de validation</span>
+              </h3>
+            )}
+            {currentStep === 3 && (
+              <h3 className="text-[32px] font-[800] text-gray-800">
+                V<span className="font-[200]">alidées</span>
+              </h3>
+            )}
+            <div className="flex items-center gap-7 mt-[20px]">
+              {DRAFT_CATEGORY.map((link, i) => (
+                <div
+                  key={i}
+                  className="cursor-pointer flex items-center gap-2"
+                  onClick={() => setOnglet(link.page)}
+                >
+                  <button
+                    className={`text-sm font-[600] ${
+                      onglet === link.page ? "text-blue-600" : "text-gray-800"
+                    }`}
+                  >
+                    {link.name}
+                  </button>
+                  <span className="text-[14px]">(2222)</span>
+                </div>
+              ))}
+            </div>
           </div>
           <div className="relative flex items-center gap-3 mt-4">
             <label className="text-gray-700 font-semibold">Utilisateur :</label>
@@ -412,7 +443,7 @@ export default function DraftPage() {
               </th>
             </tr>
           </thead>
-          {page === "draft" && (
+          {currentStep === 1 && (
             <tbody>
               {filteredDrafts.length === 0 ? (
                 <tr>
@@ -438,9 +469,7 @@ export default function DraftPage() {
                     </td>
                     <td className="px-6 py-2">{product.long_label}</td>
                     <td className="px-6 py-2">{product.brandName}</td>
-                    <td className="px-6 py-2">
-                      {product.supplierName}
-                    </td>
+                    <td className="px-6 py-2">{product.supplierName}</td>
                     <td className="px-6 py-2">{product.familyName}</td>
                     <td className="px-6 py-2">{product.subFamilyName}</td>
                     <td className="px-6 py-2 text-blue-600">
@@ -451,7 +480,7 @@ export default function DraftPage() {
               )}
             </tbody>
           )}
-          {page === "in progress" && (
+          {currentStep === 2 && (
             <tbody>
               {filteredInProgress.length === 0 ? (
                 <tr>
@@ -476,7 +505,10 @@ export default function DraftPage() {
                       {product.reference}
                     </td>
                     <td className="px-6 py-2">{product.long_label}</td>
-                    <td className="px-6 py-2">{product.brand_ids}</td>
+                    <td className="px-6 py-2">{product.brandName}</td>
+                    <td className="px-6 py-2">{product.supplierName}</td>
+                    <td className="px-6 py-2">{product.familyName}</td>
+                    <td className="px-6 py-2">{product.subFamilyName}</td>
                     <td className="px-6 py-2 text-blue-600">
                       {formatDate(product.createdAt)}
                     </td>
@@ -485,23 +517,37 @@ export default function DraftPage() {
               )}
             </tbody>
           )}
-          {page === "done" && (
+          {currentStep === 3 && (
             <tbody>
-              {PRODUCTS.filter((product) => product.status === 2).map(
-                (product, i) => (
+              {filteredDone.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={7}
+                    className="px-6 py-4 text-center text-gray-500"
+                  >
+                    <span className="capitalize font-[800]">
+                      {selectedUsername}
+                    </span>{" "}
+                    n'a pas de références validées
+                  </td>
+                </tr>
+              ) : (
+                filteredInProgress.map((product, i) => (
                   <tr
                     key={i}
-                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap border"
+                    className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 even:bg-slate-50 whitespace-nowrap border"
+                    onClick={() => navigate(`/draft/${product._id}`)}
                   >
-                    <td className="px-6 py-4">{product.code}</td>
-                    <td className="px-6 py-4">{product.name}</td>
-                    <td className="px-6 py-4">
-                      <span className="bg-green-500 p-2 text-white rounded-md">
-                        Validé
-                      </span>
+                    <td className="px-6 py-2 text-blue-500">
+                      {product.reference}
+                    </td>
+                    <td className="px-6 py-2">{product.long_label}</td>
+                    <td className="px-6 py-2">{product.brand_ids}</td>
+                    <td className="px-6 py-2 text-blue-600">
+                      {formatDate(product.createdAt)}
                     </td>
                   </tr>
-                )
+                ))
               )}
             </tbody>
           )}

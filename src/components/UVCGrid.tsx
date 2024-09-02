@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Maximize, Maximize2, Palette, Plus, Ruler } from "lucide-react";
+import { Maximize2, Palette, Plus, Ruler, Check, X } from "lucide-react";
 import Modal from "./Shared/Modal";
 
 interface UVCGridProps {
@@ -13,7 +13,8 @@ interface UVCGridProps {
   sizes: string[];
   colors: string[];
   uvcGrid: boolean[][];
-  isFullScreen?: any
+  isFullScreen?: any;
+  isModify?: boolean;
 }
 
 interface Grid {
@@ -34,7 +35,8 @@ const UVCGrid: React.FC<UVCGridProps> = ({
   sizes,
   colors,
   uvcGrid,
-  isFullScreen
+  isFullScreen,
+  isModify, // Destructure the new prop
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [grids, setGrids] = useState<Grid[]>([]);
@@ -223,7 +225,9 @@ const UVCGrid: React.FC<UVCGridProps> = ({
                         <td className="px-6 py-4">
                           <div className="flex items-center flex-wrap gap-2">
                             {grid.dimensions.map((dimension) => (
-                              <span className="bg-orange-200 w-[30px] h-[30px] rounded-full flex items-center justify-center text-gray-800">{removePrefix([dimension], "Taille")}</span>
+                              <span className="bg-orange-200 w-[30px] h-[30px] rounded-full flex items-center justify-center text-gray-800">
+                                {removePrefix([dimension], "Taille")}
+                              </span>
                             ))}
                           </div>
                         </td>
@@ -264,7 +268,9 @@ const UVCGrid: React.FC<UVCGridProps> = ({
                         <td className="px-6 py-4">
                           <div className="flex items-center flex-wrap gap-2">
                             {grid.dimensions.map((dimension) => (
-                              <span className="bg-orange-200 w-[30px] h-[30px] rounded-full flex items-center justify-center text-gray-800">{removePrefix([dimension], "Couleur")}</span>
+                              <span className="bg-orange-200 w-[30px] h-[30px] rounded-full flex items-center justify-center text-gray-800">
+                                {removePrefix([dimension], "Couleur")}
+                              </span>
                             ))}
                           </div>
                         </td>
@@ -277,35 +283,50 @@ const UVCGrid: React.FC<UVCGridProps> = ({
         )}
       </Modal>
       <div className="flex items-center justify-between">
-      <div className="flex gap-4 mb-3 mt-3">
-        <button
-          onClick={displaySizeGridOptions}
-          type="button"
-          className="flex items-center gap-2 text-[12px] text-blue-500"
+        {isModify && (
+          <div className="flex gap-4 mb-3 mt-3">
+            <button
+              onClick={displaySizeGridOptions}
+              type="button"
+              className="flex items-center gap-2 text-[12px] text-blue-500"
+            >
+              <Ruler size={17} />
+              Associer une grille de tailles
+            </button>
+            <button
+              onClick={displayColorGridOptions}
+              type="button"
+              className="flex items-center gap-2 text-[12px] text-blue-500"
+            >
+              <Palette size={17} />
+              Associer une grille de couleurs
+            </button>
+            <div className="h-[30px] w-[2px] bg-gray-300"></div>
+            <button
+              onClick={addNewSize}
+              type="button"
+              className="flex items-center gap-2 text-[12px] text-green-500"
+            >
+              <Plus size={17} />
+              Ajouter une taille
+            </button>
+            <button
+              onClick={addNewColor}
+              type="button"
+              className="flex items-center gap-2 text-[12px] text-green-500"
+            >
+              <Plus size={17} />
+              Ajouter une couleur
+            </button>
+          </div>
+        )}
+        <div
+          onClick={isFullScreen}
+          className={`cursor-pointer hover:text-gray-400 ${
+            !isModify && "flex justify-end w-full py-2"
+          }`}
         >
-          <Ruler size={17} />
-          Associer une grille de tailles
-        </button>
-        <button
-          onClick={displayColorGridOptions}
-          type="button"
-          className="flex items-center gap-2 text-[12px] text-blue-500"
-        >
-          <Palette size={17} />
-          Associer une grille de couleurs
-        </button>
-        <div className="h-[30px] w-[2px] bg-gray-300"></div>
-        <button onClick={addNewSize} type="button" className="flex items-center gap-2 text-[12px] text-green-500">
-          <Plus size={17} />
-          Ajouter une taille
-        </button>
-        <button onClick={addNewColor} type="button" className="flex items-center gap-2 text-[12px] text-green-500">
-          <Plus size={17} />
-          Ajouter une couleur
-        </button>
-      </div>
-        <div onClick={isFullScreen}  className="cursor-pointer hover:text-gray-400">
-          <Maximize2 size={17}/>
+          <Maximize2 size={17} />
         </div>
       </div>
       <div className="overflow-x-auto">
@@ -324,12 +345,16 @@ const UVCGrid: React.FC<UVCGridProps> = ({
                   scope="col"
                   className="px-1 py-2 text-center border border-solid border-gray-300 border-b"
                 >
-                  <input
-                    type="text"
-                    value={size}
-                    onChange={(e) => handleSizeChange(index, e.target.value)}
-                    className="w-full text-center bg-gray-100 focus:outline-none"
-                  />
+                  {isModify ? (
+                    <input
+                      type="text"
+                      value={size}
+                      onChange={(e) => handleSizeChange(index, e.target.value)}
+                      className="w-full text-center bg-gray-100 focus:outline-none"
+                    />
+                  ) : (
+                    size
+                  )}
                 </th>
               ))}
             </tr>
@@ -341,25 +366,39 @@ const UVCGrid: React.FC<UVCGridProps> = ({
                 className="border text-gray-700 cursor-pointer"
               >
                 <td className="max-w-[200px] py-2 px-2 border">
-                  <input
-                    type="text"
-                    value={color}
-                    onChange={(e) =>
-                      handleColorChange(colorIndex, e.target.value)
-                    }
-                    className="w-full text-center bg-white focus:outline-none"
-                  />
+                  {isModify ? (
+                    <input
+                      type="text"
+                      value={color}
+                      onChange={(e) =>
+                        handleColorChange(colorIndex, e.target.value)
+                      }
+                      className="w-full text-center bg-white focus:outline-none"
+                    />
+                  ) : (
+                    color
+                  )}
                 </td>
                 {sizes.map((size, sizeIndex) => (
                   <td
                     key={sizeIndex}
                     className="max-w-[200px] py-2 px-2 border"
                   >
-                    <input
-                      type="checkbox"
-                      checked={uvcGrid[colorIndex][sizeIndex]}
-                      onChange={() => toggleCheckbox(colorIndex, sizeIndex)}
-                    />
+                    {isModify ? (
+                      <input
+                        type="checkbox"
+                        checked={uvcGrid[colorIndex][sizeIndex]}
+                        onChange={() => toggleCheckbox(colorIndex, sizeIndex)}
+                      />
+                    ) : uvcGrid[colorIndex][sizeIndex] ? (
+                      <div className="flex items-center justify-center">
+                        <Check className="text-green-500" size={18} />
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center">
+                        <X className="text-red-500" size={18} />
+                      </div>
+                    )}
                   </td>
                 ))}
               </tr>

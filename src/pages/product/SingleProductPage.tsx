@@ -285,19 +285,19 @@ export default function SingleProductPage() {
                   <FormSection title="Identification" size={`${!isModify ? "h-[400px]" : "h-[450px]"}`}>
                     <div className="relative mt-3">
                       <div className="grid grid-cols-4 gap-2 py-2">
-                        <span className="col-span-1 font-bold text-gray-700">
+                        <span className="col-span-1 text-gray-700 font-bold">
                           Référence :
                         </span>
-                        <span className="col-span-3 text-gray-600 text-[14px]">
+                        <span className="col-span-3 text-slate-500">
                           {product.reference}
                         </span>
                       </div>
                       <div className="grid grid-cols-4 gap-2 py-2">
-                        <span className="col-span-1 font-bold text-gray-700">
+                        <span className="col-span-1 text-gray-700 font-bold">
                           Nom d'appel :
                         </span>
                         {!isModify ? (
-                          <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                          <span className="col-span-3 text-slate-500 whitespace-nowrap">
                             {product.name ? (
                               product.name
                             ) : (
@@ -312,11 +312,11 @@ export default function SingleProductPage() {
                         )}
                       </div>
                       <div className="grid grid-cols-4 gap-2 py-2">
-                        <span className="col-span-1 font-bold text-gray-700">
+                        <span className="col-span-1 text-gray-700 font-bold">
                           Désignation longue :
                         </span>
                         {!isModify ? (
-                          <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                          <span className="col-span-3 text-slate-500 whitespace-nowrap">
                             {product.long_label ? (
                               product.long_label
                             ) : (
@@ -332,11 +332,11 @@ export default function SingleProductPage() {
                         )}
                       </div>
                       <div className="grid grid-cols-4 gap-2 py-2">
-                        <span className="col-span-1 font-bold text-gray-700">
+                        <span className="col-span-1 font-[600] text-gray-700 font-bold">
                           Désignation courte :
                         </span>
                         {!isModify ? (
-                          <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                          <span className="col-span-3 text-slate-500 whitespace-nowrap">
                             {product.short_label ? (
                               product.short_label
                             ) : (
@@ -352,11 +352,11 @@ export default function SingleProductPage() {
                         )}
                       </div>
                       <div className="grid grid-cols-4 gap-2 py-2">
-                        <span className="col-span-1 font-bold text-gray-700">
+                        <span className="col-span-1 font-[600] text-gray-700 font-bold">
                           Marque :
                         </span>
                         {!isModify ? (
-                          <span className="col-span-3 text-gray-600 text-[14px]">
+                          <span className="col-span-3 text-slate-500">
                             {product.brand_ids &&
                             product.brand_ids.length > 0 ? (
                               product.brand_ids.map((brand, index) => (
@@ -385,11 +385,11 @@ export default function SingleProductPage() {
                       </div>
 
                       <div className="grid grid-cols-4 gap-2 py-2">
-                        <span className="col-span-1 font-bold text-gray-700">
+                        <span className="col-span-1 font-[600] text-gray-700 font-bold">
                           Famille :
                         </span>
                         {!isModify ? (
-                          <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                          <span className="col-span-3 text-slate-500 whitespace-nowrap">
                             {product.tag_ids && product.tag_ids.length > 0 ? (
                               `${product.tag_ids[0].code} - ${product.tag_ids[0].name}`
                             ) : (
@@ -410,11 +410,11 @@ export default function SingleProductPage() {
                       </div>
 
                       <div className="grid grid-cols-4 gap-2 py-2">
-                        <span className="col-span-1 font-bold text-gray-700">
+                        <span className="col-span-1 font-[600] text-gray-700 font-bold">
                           Sous-famille :
                         </span>
                         {!isModify ? (
-                          <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                          <span className="col-span-3 text-slate-500 whitespace-nowrap">
                             {product.tag_ids && product.tag_ids.length > 0 ? (
                               `${product.tag_ids[1].code} - ${product.tag_ids[1].name}`
                             ) : (
@@ -435,11 +435,11 @@ export default function SingleProductPage() {
                       </div>
 
                       <div className="grid grid-cols-4 gap-2 py-2">
-                        <span className="col-span-1 font-bold text-gray-700">
+                        <span className="col-span-1 font-[600] text-gray-700 font-bold">
                           Sous-sous-famille :
                         </span>
                         {!isModify ? (
-                          <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
+                          <span className="col-span-3 text-slate-500 whitespace-nowrap">
                             {product.tag_ids && product.tag_ids.length > 3 ? (
                               `${product.tag_ids[3].code} - ${product.tag_ids[3].name}`
                             ) : (
@@ -503,11 +503,11 @@ export default function SingleProductPage() {
                         </div>
                       )}
                       <div className="grid grid-cols-12 gap-2 py-2">
-                        <span className="col-span-6 font-bold text-gray-700 text-[13px]">
+                        <span className="col-span-6 font-bold text-gray-700">
                           Code :
                         </span>
                         {!isModify ? (
-                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                          <span className="col-span-6 text-slate-500 whitespace-nowrap overflow-ellipsis overflow-hidden">
                             {product.princ_supplier_id ? (
                               product.princ_supplier_id.code
                             ) : (
@@ -527,11 +527,11 @@ export default function SingleProductPage() {
                         )}
                       </div>
                       <div className="grid grid-cols-12 gap-2 py-2">
-                        <span className="col-span-6 font-bold text-gray-700 text-[13px]">
+                        <span className="col-span-6 font-bold text-gray-700">
                           Raison sociale :
                         </span>
                         {!isModify ? (
-                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                          <span className="col-span-6 text-slate-500 whitespace-nowrap overflow-ellipsis overflow-hidden">
                             {product.princ_supplier_id ? (
                               product.princ_supplier_id.company_name
                             ) : (
@@ -552,11 +552,11 @@ export default function SingleProductPage() {
                       </div>
 
                       <div className="grid grid-cols-12 gap-2 py-2">
-                        <span className="col-span-6 font-bold text-gray-700 text-[13px]">
+                        <span className="col-span-6 font-bold text-gray-700">
                           Ref. produit :
                         </span>
                         {!isModify ? (
-                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                          <span className="col-span-6 text-slate-500 whitespace-nowrap overflow-ellipsis overflow-hidden">
                             <CircleSlash2 size={15} />
                           </span>
                         ) : (
@@ -567,11 +567,11 @@ export default function SingleProductPage() {
                         )}
                       </div>
                       <div className="grid grid-cols-12 gap-2 py-2">
-                        <span className="col-span-6 font-bold text-gray-700 text-[13px]">
+                        <span className="col-span-6 font-bold text-gray-700">
                           Multiple achat :
                         </span>
                         {!isModify ? (
-                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                          <span className="col-span-6 text-slate-500 whitespace-nowrap overflow-ellipsis overflow-hidden">
                             <CircleSlash2 size={15} />
                           </span>
                         ) : (
@@ -582,11 +582,11 @@ export default function SingleProductPage() {
                         )}
                       </div>
                       <div className="grid grid-cols-12 gap-2 py-2">
-                        <span className="col-span-6 font-bold text-gray-700 text-[13px]">
+                        <span className="col-span-6 font-bold text-gray-700">
                           Origine :
                         </span>
                         {!isModify ? (
-                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                          <span className="col-span-6 text-slate-500 whitespace-nowrap overflow-ellipsis overflow-hidden">
                             <CircleSlash2 size={15} />
                           </span>
                         ) : (
@@ -597,11 +597,11 @@ export default function SingleProductPage() {
                         )}
                       </div>
                       <div className="grid grid-cols-12 gap-2 py-2">
-                        <span className="col-span-6 font-bold text-gray-700 text-[13px]">
+                        <span className="col-span-6 font-bold text-gray-700">
                           Catégorie douanière :
                         </span>
                         {!isModify ? (
-                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                          <span className="col-span-6 text-slate-500 whitespace-nowrap overflow-ellipsis overflow-hidden">
                             <CircleSlash2 size={15} />
                           </span>
                         ) : (
@@ -622,11 +622,11 @@ export default function SingleProductPage() {
                   >
                     <div className="mt-3">
                       <div className="grid grid-cols-12 gap-2 py-2">
-                        <span className="col-span-4 font-bold text-gray-700 text-[13px]">
+                        <span className="col-span-4 font-bold text-gray-700">
                           Type :
                         </span>
                         {!isModify ? (
-                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                          <span className="col-span-6 text-slate-500 whitespace-nowrap overflow-ellipsis overflow-hidden">
                             {product.type ? product.type : "Marchandise"}
                           </span>
                         ) : (
@@ -637,10 +637,10 @@ export default function SingleProductPage() {
                         )}
                       </div>
                       <div className="grid grid-cols-12 gap-2 py-2">
-                        <span className="col-span-4 font-bold text-gray-700 text-[13px]">
+                        <span className="col-span-4 font-bold text-gray-700">
                           Dimensions :
                         </span>
-                        <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px] capitalize">
+                        <span className="col-span-6 text-slate-500 whitespace-nowrap overflow-ellipsis overflow-hidden capitalize">
                           {product.dimension_types &&
                           product.dimension_types.length > 0 ? (
                             product.dimension_types.join(" / ")
@@ -650,11 +650,11 @@ export default function SingleProductPage() {
                         </span>
                       </div>
                       <div className="grid grid-cols-12 gap-2 py-2">
-                        <span className="col-span-4 font-bold text-gray-700 text-[13px]">
+                        <span className="col-span-4 font-bold text-gray-700">
                           Collection :
                         </span>
                         {!isModify ? (
-                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                          <span className="col-span-6 text-slate-500 whitespace-nowrap overflow-ellipsis overflow-hidden">
                             {product.collection_ids &&
                             product.collection_ids.length > 0 ? (
                               product.collection_ids.map(
@@ -686,11 +686,11 @@ export default function SingleProductPage() {
                   >
                     <div className="mt-3">
                       <div className="grid grid-cols-12 gap-2 py-2">
-                        <span className="col-span-6 font-bold text-gray-700 text-[13px]">
+                        <span className="col-span-6 font-bold text-gray-700">
                           Prix Achat (PAEU) :
                         </span>
                         {!isModify ? (
-                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                          <span className="col-span-6 text-slate-500 whitespace-nowrap overflow-ellipsis overflow-hidden">
                             100,20
                           </span>
                         ) : (
@@ -701,11 +701,11 @@ export default function SingleProductPage() {
                         )}
                       </div>
                       <div className="grid grid-cols-12 gap-2 py-2">
-                        <span className="col-span-6 font-bold text-gray-700 text-[13px]">
+                        <span className="col-span-6 font-bold text-gray-700">
                           Prix Vente (TBEU/PB) :
                         </span>
                         {!isModify ? (
-                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                          <span className="col-span-6 text-slate-500 whitespace-nowrap overflow-ellipsis overflow-hidden">
                             100,20
                           </span>
                         ) : (
@@ -716,11 +716,11 @@ export default function SingleProductPage() {
                         )}
                       </div>
                       <div className="grid grid-cols-12 gap-2 py-2">
-                        <span className="col-span-6 font-bold text-gray-700 text-[13px]">
+                        <span className="col-span-6 font-bold text-gray-700">
                           Prix Modulé (TBEU/PMEU) :
                         </span>
                         {!isModify ? (
-                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                          <span className="col-span-6 text-slate-500 whitespace-nowrap overflow-ellipsis overflow-hidden">
                             100,20
                           </span>
                         ) : (
@@ -792,6 +792,7 @@ export default function SingleProductPage() {
                 colors={colors}
                 uvcGrid={uvcGrid}
                 isFullScreen={toggleFullScreen}
+                isModify={isModify}
               />
             </div>
           )}

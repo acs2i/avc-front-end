@@ -159,7 +159,7 @@ function ParamsMenuPage() {
         <div className="w-[300px]">
           <button
             onClick={handleOpenCreatePanel}
-            className="bg-blue-500 text-white text-[12px] font-[700] w-full py-2 rounded-md"
+            className="w-full bg-[#3B71CA] text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
             type="button"
           >
             Créer {page === "classe" && "une classification"}
