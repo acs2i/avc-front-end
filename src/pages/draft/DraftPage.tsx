@@ -325,17 +325,17 @@ export default function DraftPage() {
           <div className="mt-7">
             {currentStep === 1 && (
               <h3 className="text-[32px] font-[800] text-gray-800">
-                B<span className="font-[200]">rouillons</span>
+                B<span className="font-[200]">rouillons ({filteredDrafts.length})</span>
               </h3>
             )}
             {currentStep === 2 && (
               <h3 className="text-[32px] font-[800] text-gray-800">
-                En<span className="font-[200]"> cours de validation</span>
+                En<span className="font-[200]"> cours de validation ({filteredInProgress.length})</span>
               </h3>
             )}
             {currentStep === 3 && (
               <h3 className="text-[32px] font-[800] text-gray-800">
-                V<span className="font-[200]">alidées</span>
+                V<span className="font-[200]">alidées ({filteredDone.length})</span>
               </h3>
             )}
             <div className="flex items-center gap-7 mt-[20px]">

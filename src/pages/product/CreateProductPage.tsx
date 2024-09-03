@@ -75,6 +75,9 @@ interface FormData {
   dimension_types: string;
   brand_ids: any[];
   collection_ids: any[];
+  peau: number;
+  tbeu_pb: number;
+  tbeu_pmeu: number;
   imgPath: string;
   status: string;
   additional_fields: any;
@@ -227,6 +230,9 @@ export default function CreateProductPage() {
     dimension_types: "Couleur/Taille",
     brand_ids: [],
     collection_ids: [],
+    peau: 0,
+    tbeu_pb: 0,
+    tbeu_pmeu: 0,
     imgPath: "",
     status: "A",
     additional_fields: "",
@@ -359,9 +365,9 @@ export default function CreateProductPage() {
           currency: "",
           supplier_id: "",
           price: {
-            peau: 0,
-            tbeu_pb: 0,
-            tbeu_pmeu: 0,
+            peau: formData.peau,
+            tbeu_pb: formData.tbeu_pb,
+            tbeu_pmeu: formData.tbeu_pmeu,
           },
           store: "",
         },
@@ -733,25 +739,12 @@ export default function CreateProductPage() {
     });
   };
 
-  const handleChangePrice = (field: keyof PriceItemSchema, value: string) => {
-    const parsedValue = parseFloat(value);
-    setFormData((prevFormData) => {
-      const updatedUvc = prevFormData.uvc.map((uvc) => ({
-        ...uvc,
-        prices: uvc.prices.map((price) => ({
-          ...price,
-          price: {
-            ...price.price,
-            [field]: isNaN(parsedValue) ? 0 : parsedValue,
-          },
-        })),
-      }));
-
-      return {
-        ...prevFormData,
-        uvc: updatedUvc,
-      };
-    });
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [id]: value === "" ? 0 : parseFloat(value),
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -827,7 +820,7 @@ export default function CreateProductPage() {
   console.log(formData);
   return (
     <>
-     <Modal
+      <Modal
         show={supplierModalIsOpen}
         onCancel={() => setsupplierModalIsOpen(false)}
         onClose={() => setsupplierModalIsOpen(false)}
@@ -871,8 +864,8 @@ export default function CreateProductPage() {
               )}
             </div>
 
-            <div className="flex gap-7 mt-[80px]">
-              <div className="relative w-[70%] flex flex-col gap-3">
+            <div className="flex flex-col-reverse lg:flex-row gap-7 mt-[50px] items-stretch">
+              <div className="w-[60%]">
                 <FormSection title="Identification">
                   <div className="mt-3">
                     <Input
@@ -1013,389 +1006,8 @@ export default function CreateProductPage() {
                     </div>
                   </div>
                 </FormSection>
-                <div className="flex gap-2 mt-[30px]">
-                  <div className="w-1/3 flex flex-col">
-                    {formData.suppliers.map((supplier, index) => (
-                      <div
-                        key={index}
-                        className={`relative flex flex-col gap-2 ${
-                          index > 0 && "mt-5"
-                        }`}
-                      >
-                        <FormSection title="Fournisseurs">
-                          <div className="mt-3">
-                            <div>
-                              <label className="text-sm font-medium text-gray-600">
-                                Nom
-                              </label>
-                              <CreatableSelect<SuppliersOption>
-                                value={optionsSupplier?.find(
-                                  (option) =>
-                                    option.value === supplier.supplier_id
-                                )}
-                                onChange={(option) =>
-                                  handleSupplierSelectChange(index, option)
-                                }
-                                onInputChange={handleInputChangeSupplier}
-                                inputValue={inputValueSupplier}
-                                options={optionsSupplier}
-                                placeholder="Selectionner un fournisseur"
-                                styles={customStyles}
-                                className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                                required
-                              />
-                            </div>
-                            <div>
-                              <Input
-                                element="input"
-                                id={`supplier_ref-${index}`}
-                                label="Référence produit :"
-                                value={supplier.supplier_ref}
-                                onChange={(e) =>
-                                  handleSupplierChange(
-                                    index,
-                                    "supplier_ref",
-                                    e.target.value
-                                  )
-                                }
-                                validators={[]}
-                                placeholder="Ajouter la référence produit"
-                                create
-                                gray
-                              />
-                            </div>
-                            <div>
-                              <Input
-                                element="input"
-                                id={`pcb-${index}`}
-                                label="PCB :"
-                                value={supplier.pcb}
-                                onChange={(e) =>
-                                  handleSupplierChange(
-                                    index,
-                                    "pcb",
-                                    e.target.value
-                                  )
-                                }
-                                validators={[]}
-                                placeholder="Ajouter le PCB"
-                                create
-                                gray
-                              />
-                            </div>
-                            <div>
-                              <Input
-                                element="input"
-                                id={`custom_cat-${index}`}
-                                label="Catégorie douanière :"
-                                value={supplier.custom_cat}
-                                onChange={(e) =>
-                                  handleSupplierChange(
-                                    index,
-                                    "custom_cat",
-                                    e.target.value
-                                  )
-                                }
-                                validators={[]}
-                                placeholder="Ajouter la catégorie douanière"
-                                create
-                                gray
-                              />
-                            </div>
-                            <div>
-                              <CountrySelector
-                                index={index}
-                                value={supplier.made_in}
-                                onChange={handleSupplierChange}
-                              />
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => removeSupplier(index)}
-                              className="mt-2 text-red-600 flex items-center gap-2 text-[12px]"
-                            >
-                              <Trash2 size={13} />
-                              Supprimer ce fournisseur
-                            </button>
-                          </div>
-                        </FormSection>
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => setsupplierModalIsOpen(true)}
-                      className="flex items-center gap-2 text-[12px] text-orange-400 mt-3"
-                    >
-                      <Plus size={17} />
-                      Ajouter un fournisseur
-                    </button>
-                  </div>
-                  <div className="w-1/3 flex flex-col gap-2">
-                    <FormSection
-                      title="Caractéristiques Produit"
-                      size="h-[300px]"
-                    >
-                      <div className="mt-3">
-                        <Input
-                          element="input"
-                          id="product_type"
-                          label="Type :"
-                          value={formData.type}
-                          onChange={handleChange}
-                          validators={[]}
-                          placeholder="Selectionnez un type de dimension"
-                          create
-                          disabled
-                          gray
-                        />
-                        <Input
-                          element="input"
-                          id="dimension_type"
-                          label="Type de dimension :"
-                          value={formData.dimension_types}
-                          onChange={handleChange}
-                          validators={[]}
-                          placeholder="Selectionnez un type de dimension"
-                          create
-                          disabled
-                          gray
-                        />
-                        <div>
-                          <label className="text-sm font-medium text-gray-600">
-                            Collection
-                          </label>
-                          <CreatableSelect<CollectionOption>
-                            value={selectedOptionCollection}
-                            onChange={handleChangeCollection}
-                            onInputChange={handleInputChangeCollection}
-                            inputValue={inputValueCollection}
-                            options={optionsCollection}
-                            placeholder="Selectionner une collection"
-                            styles={customStyles}
-                            className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                            required
-                          />
-                        </div>
-                      </div>
-                    </FormSection>
-                  </div>
-                  <div className="w-1/3 flex flex-col gap-2">
-                    <FormSection title="Prix" size="h-[300px]">
-                      <div className="mt-3">
-                        <Input
-                          element="input"
-                          id="default-peau"
-                          label="Prix achat :"
-                          value={
-                            formData.uvc[0]?.prices[0]?.price.peau.toString() ||
-                            ""
-                          }
-                          onChange={(e) =>
-                            handleChangePrice("peau", e.target.value)
-                          }
-                          validators={[]}
-                          placeholder=""
-                          create
-                          gray
-                        />
-                        <Input
-                          element="input"
-                          id="default-tbeu_pb"
-                          label="Prix Vente :"
-                          value={
-                            formData.uvc[0]?.prices[0]?.price.tbeu_pb.toString() ||
-                            ""
-                          }
-                          onChange={(e) =>
-                            handleChangePrice("tbeu_pb", e.target.value)
-                          }
-                          validators={[]}
-                          placeholder=""
-                          create
-                          gray
-                        />
-                        <Input
-                          element="input"
-                          id="default-tbeu_pmeu"
-                          label="Prix Modulé :"
-                          value={
-                            formData.uvc[0]?.prices[0]?.price.tbeu_pmeu.toString() ||
-                            ""
-                          }
-                          onChange={(e) =>
-                            handleChangePrice("tbeu_pmeu", e.target.value)
-                          }
-                          validators={[]}
-                          placeholder=""
-                          create
-                          gray
-                        />
-                      </div>
-                    </FormSection>
-                  </div>
-                </div>
-                <div className="mt-3">
-                  <Divider />
-                </div>
-                {/* Partie onglets */}
-                <div className="mt-[30px] flex mb-[50px]">
-                  <div className="w-[30%] border-t-[1px] border-gray-300">
-                    {LINKS_Product.map((link) => (
-                      <div
-                        key={link.page}
-                        className={`relative border-r-[1px] border-b-[1px] border-gray-300 py-4 flex items-center gap-3 cursor-pointer ${
-                          page === link.page ? "text-blue-500" : "text-gray-500"
-                        } hover:text-blue-500`}
-                        onClick={() => setPage(link.page)}
-                      >
-                        {React.createElement(link.icon, {
-                          size: new RegExp(`^${link.link}(/.*)?$`).test(
-                            location.pathname
-                          )
-                            ? 20
-                            : 15,
-                        })}
-                        <span className="text-xs font-[600]">{link.name}</span>
-                        {page === link.page && (
-                          <>
-                            <div
-                              className="absolute right-0 top-1/2 transform -translate-y-1/2 rotate-180 w-5 h-5 bg-gray-300"
-                              style={{
-                                clipPath: "polygon(0 0, 100% 50%, 0 100%)",
-                              }}
-                            ></div>
-                            <div
-                              className="absolute right-[-1px] top-1/2 transform -translate-y-1/2 rotate-180 w-4 h-4 bg-gray-100"
-                              style={{
-                                clipPath: "polygon(0 0, 100% 50%, 0 100%)",
-                              }}
-                            ></div>
-                          </>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                  {page === "dimension" && (
-                    <div
-                      className={`border-t-[1px] border-gray-300 px-5 py-2 overflow-y-auto ${
-                        isFullScreen
-                          ? "fixed right-0 top-0 h-full w-full z-[9999] bg-gray-100"
-                          : "w-[70%]"
-                      }`}
-                    >
-                      <UVCGrid2
-                        onDimensionsChange={handleDimensionsChange}
-                        initialSizes={formData.initialSizes}
-                        initialColors={formData.initialColors}
-                        initialGrid={formData.initialGrid}
-                        setSizes={setSizes}
-                        setColors={setColors}
-                        setUvcGrid={setUvcGrid}
-                        sizes={sizes}
-                        colors={colors}
-                        uvcGrid={uvcGrid}
-                        isFullScreen={toggleFullScreen}
-                      />
-                    </div>
-                  )}
-                  {page === "uvc" && (
-                    <div
-                      className={`border-t-[1px] border-gray-300 px-5 py-2 ${
-                        isFullScreen
-                          ? "fixed right-0 top-0 h-full w-full z-[9999] bg-gray-100"
-                          : "w-[70%]"
-                      } overflow-y-auto`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <ul className="flex items-center py-3 gap-3">
-                          {LINKS_UVC.map((link) => (
-                            <li
-                              key={link.page}
-                              className={`text-[13px] font-[700] cursor-pointer ${
-                                onglet === link.page
-                                  ? "text-blue-500"
-                                  : "text-gray-500"
-                              } hover:text-blue-500`}
-                              onClick={() => setOnglet(link.page)}
-                            >
-                              {link.name}
-                            </li>
-                          ))}
-                        </ul>
-                        <div
-                          className="cursor-pointer hover:text-gray-400"
-                          onClick={toggleFullScreen}
-                        >
-                          {isFullScreen ? (
-                            <Minimize2 size={17} />
-                          ) : (
-                            <Maximize2 size={17} />
-                          )}
-                        </div>
-                      </div>
-                      {formData.uvc.map((uvc, index) => (
-                        <div key={index}>
-                          {onglet === "infos" && (
-                            <UVCInfosTable
-                              uvcDimension={uvc.dimensions || []}
-                              productReference={formData.reference || ""}
-                              brandLabel={brandLabel}
-                            />
-                          )}
-                          {/* {onglet === "price" && (
-                          <UVCPriceTable
-                            uvcPrices={uvc.prices}
-                            productReference={formData.reference || ""}
-                            handleChangePrice={(priceIndex, field, value) =>
-                              handleChangePriceUVC(index, priceIndex, field, value)
-                            }
-                          />
-                        )} */}
-                          {/* {onglet === "supplier" && (
-                          <UVCSupplierTable
-                            uvcDimensions={uvc.dimensions || []}
-                            productReference={formData.reference || ""}
-                            productSupplier={
-                              formData.suppliers[0]?.supplier_id || ""
-                            }
-                          />
-                        )} */}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                {/* Partie boutton */}
-                {!isLoading ? (
-                  <div className="mt-[50px] flex gap-2">
-                    <button
-                      className="w-full bg-[#9FA6B2] text-white py-2 rounded-md font-[600] hover:bg-[#bac3d4] hover:text-white shadow-md"
-                      type="button"
-                    >
-                      Annuler
-                    </button>
-                    <button
-                      className="w-full bg-[#3B71CA] text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
-                      type="submit"
-                    >
-                      Créer la référence
-                    </button>
-                  </div>
-                ) : (
-                  <div className="relative flex justify-center mt-7 px-7 gap-2">
-                    <CircularProgress size={100} />
-                    <div className="absolute h-[60px] w-[80px] top-[50%] translate-y-[-50%]">
-                      <img
-                        src="/img/logo.png"
-                        alt="logo"
-                        className="w-full h-full animate-pulse"
-                      />
-                    </div>
-                  </div>
-                )}
               </div>
-
-              <div className="w-[30%] flex flex-col gap-5">
+              <div className="w-[480px] flex flex-col gap-5">
                 <Card title=" Ajouter une image">
                   <div className="w-full h-[250px] border border-dashed border-2 border-gray-300 mt-3 flex justify-center items-center">
                     <div className="flex flex-col items-center text-center">
@@ -1413,6 +1025,363 @@ export default function CreateProductPage() {
                 </Card>
               </div>
             </div>
+            <div className="flex gap-2 mt-[50px]">
+              <div className="w-1/3 flex flex-col">
+                {formData.suppliers.map((supplier, index) => (
+                  <div
+                    key={index}
+                    className={`relative flex flex-col gap-2 ${
+                      index > 0 && "mt-5"
+                    }`}
+                  >
+                    <FormSection title="Fournisseurs">
+                      <div className="mt-3">
+                        <div>
+                          <label className="text-sm font-medium text-gray-600">
+                            Nom
+                          </label>
+                          <CreatableSelect<SuppliersOption>
+                            value={optionsSupplier?.find(
+                              (option) => option.value === supplier.supplier_id
+                            )}
+                            onChange={(option) =>
+                              handleSupplierSelectChange(index, option)
+                            }
+                            onInputChange={handleInputChangeSupplier}
+                            inputValue={inputValueSupplier}
+                            options={optionsSupplier}
+                            placeholder="Selectionner un fournisseur"
+                            styles={customStyles}
+                            className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Input
+                            element="input"
+                            id={`supplier_ref-${index}`}
+                            label="Référence produit :"
+                            value={supplier.supplier_ref}
+                            onChange={(e) =>
+                              handleSupplierChange(
+                                index,
+                                "supplier_ref",
+                                e.target.value
+                              )
+                            }
+                            validators={[]}
+                            placeholder="Ajouter la référence produit"
+                            create
+                            gray
+                          />
+                        </div>
+                        <div>
+                          <Input
+                            element="input"
+                            id={`pcb-${index}`}
+                            label="PCB :"
+                            value={supplier.pcb}
+                            onChange={(e) =>
+                              handleSupplierChange(index, "pcb", e.target.value)
+                            }
+                            validators={[]}
+                            placeholder="Ajouter le PCB"
+                            create
+                            gray
+                          />
+                        </div>
+                        <div>
+                          <Input
+                            element="input"
+                            id={`custom_cat-${index}`}
+                            label="Catégorie douanière :"
+                            value={supplier.custom_cat}
+                            onChange={(e) =>
+                              handleSupplierChange(
+                                index,
+                                "custom_cat",
+                                e.target.value
+                              )
+                            }
+                            validators={[]}
+                            placeholder="Ajouter la catégorie douanière"
+                            create
+                            gray
+                          />
+                        </div>
+                        <div>
+                          <CountrySelector
+                            index={index}
+                            value={supplier.made_in}
+                            onChange={handleSupplierChange}
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeSupplier(index)}
+                          className="mt-2 text-red-600 flex items-center gap-2 text-[12px]"
+                        >
+                          <Trash2 size={13} />
+                          Supprimer ce fournisseur
+                        </button>
+                      </div>
+                    </FormSection>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setsupplierModalIsOpen(true)}
+                  className="flex items-center gap-2 text-[12px] text-orange-400 mt-3"
+                >
+                  <Plus size={17} />
+                  Ajouter un fournisseur
+                </button>
+              </div>
+              <div className="w-1/3 flex flex-col gap-2">
+                <FormSection title="Caractéristiques Produit" size="h-[300px]">
+                  <div className="mt-3">
+                    <Input
+                      element="input"
+                      id="product_type"
+                      label="Type :"
+                      value={formData.type}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder="Selectionnez un type de dimension"
+                      create
+                      disabled
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      id="dimension_type"
+                      label="Type de dimension :"
+                      value={formData.dimension_types}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder="Selectionnez un type de dimension"
+                      create
+                      disabled
+                      gray
+                    />
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">
+                        Collection
+                      </label>
+                      <CreatableSelect<CollectionOption>
+                        value={selectedOptionCollection}
+                        onChange={handleChangeCollection}
+                        onInputChange={handleInputChangeCollection}
+                        inputValue={inputValueCollection}
+                        options={optionsCollection}
+                        placeholder="Selectionner une collection"
+                        styles={customStyles}
+                        className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+                        required
+                      />
+                    </div>
+                  </div>
+                </FormSection>
+              </div>
+              <div className="w-1/3 flex flex-col gap-2">
+                <FormSection title="Prix" size="h-[300px]">
+                  <div className="mt-3">
+                    <Input
+                      element="input"
+                      id="peau"
+                      label="Prix achat :"
+                      value={formData.peau}
+                      onChange={handlePriceChange}
+                      validators={[]}
+                      placeholder=""
+                      create
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      id="tbeu_pb"
+                      label="Prix Vente :"
+                      value={formData.tbeu_pb}
+                      onChange={handlePriceChange}
+                      validators={[]}
+                      placeholder=""
+                      create
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      id="tbeu_pmeu"
+                      label="Prix Modulé :"
+                      value={formData.tbeu_pmeu}
+                      onChange={handlePriceChange}
+                      validators={[]}
+                      placeholder=""
+                      create
+                      gray
+                    />
+                  </div>
+                </FormSection>
+              </div>
+            </div>
+            <div className="mt-3">
+              <Divider />
+            </div>
+            {/* Partie onglets */}
+            <div className="mt-[30px] flex mb-[50px]">
+              <div className="w-[30%] border-t-[1px] border-gray-300">
+                {LINKS_Product.map((link) => (
+                  <div
+                    key={link.page}
+                    className={`relative border-r-[1px] border-b-[1px] border-gray-300 py-4 flex items-center gap-3 cursor-pointer ${
+                      page === link.page ? "text-blue-500" : "text-gray-500"
+                    } hover:text-blue-500`}
+                    onClick={() => setPage(link.page)}
+                  >
+                    {React.createElement(link.icon, {
+                      size: new RegExp(`^${link.link}(/.*)?$`).test(
+                        location.pathname
+                      )
+                        ? 20
+                        : 15,
+                    })}
+                    <span className="text-xs font-[600]">{link.name}</span>
+                    {page === link.page && (
+                      <>
+                        <div
+                          className="absolute right-0 top-1/2 transform -translate-y-1/2 rotate-180 w-5 h-5 bg-gray-300"
+                          style={{
+                            clipPath: "polygon(0 0, 100% 50%, 0 100%)",
+                          }}
+                        ></div>
+                        <div
+                          className="absolute right-[-1px] top-1/2 transform -translate-y-1/2 rotate-180 w-4 h-4 bg-gray-100"
+                          style={{
+                            clipPath: "polygon(0 0, 100% 50%, 0 100%)",
+                          }}
+                        ></div>
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {page === "dimension" && (
+                <div
+                  className={`border-t-[1px] border-gray-300 px-5 py-2 overflow-y-auto ${
+                    isFullScreen
+                      ? "fixed right-0 top-0 h-full w-full z-[9999] bg-gray-100"
+                      : "w-[70%]"
+                  }`}
+                >
+                  <UVCGrid2
+                    onDimensionsChange={handleDimensionsChange}
+                    initialSizes={formData.initialSizes}
+                    initialColors={formData.initialColors}
+                    initialGrid={formData.initialGrid}
+                    setSizes={setSizes}
+                    setColors={setColors}
+                    setUvcGrid={setUvcGrid}
+                    sizes={sizes}
+                    colors={colors}
+                    uvcGrid={uvcGrid}
+                    isFullScreen={toggleFullScreen}
+                  />
+                </div>
+              )}
+              {page === "uvc" && (
+                <div
+                  className={`border-t-[1px] border-gray-300 px-5 py-2 ${
+                    isFullScreen
+                      ? "fixed right-0 top-0 h-full w-full z-[9999] bg-gray-100"
+                      : "w-[70%]"
+                  } overflow-y-auto`}
+                >
+                  <div className="flex items-center justify-between">
+                    <ul className="flex items-center py-3 gap-3">
+                      {LINKS_UVC.map((link) => (
+                        <li
+                          key={link.page}
+                          className={`text-[13px] font-[700] cursor-pointer ${
+                            onglet === link.page
+                              ? "text-blue-500"
+                              : "text-gray-500"
+                          } hover:text-blue-500`}
+                          onClick={() => setOnglet(link.page)}
+                        >
+                          {link.name}
+                        </li>
+                      ))}
+                    </ul>
+                    <div
+                      className="cursor-pointer hover:text-gray-400"
+                      onClick={toggleFullScreen}
+                    >
+                      {isFullScreen ? (
+                        <Minimize2 size={17} />
+                      ) : (
+                        <Maximize2 size={17} />
+                      )}
+                    </div>
+                  </div>
+                  {formData.uvc.map((uvc, index) => (
+                    <div key={index}>
+                      {onglet === "infos" && (
+                        <UVCInfosTable
+                          uvcDimension={uvc.dimensions || []}
+                          productReference={formData.reference || ""}
+                          brandLabel={brandLabel}
+                        />
+                      )}
+                      {/* {onglet === "price" && (
+                          <UVCPriceTable
+                            uvcPrices={uvc.prices}
+                            productReference={formData.reference || ""}
+                            handleChangePrice={(priceIndex, field, value) =>
+                              handleChangePriceUVC(index, priceIndex, field, value)
+                            }
+                          />
+                        )} */}
+                      {/* {onglet === "supplier" && (
+                          <UVCSupplierTable
+                            uvcDimensions={uvc.dimensions || []}
+                            productReference={formData.reference || ""}
+                            productSupplier={
+                              formData.suppliers[0]?.supplier_id || ""
+                            }
+                          />
+                        )} */}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            {/* Partie boutton */}
+            {!isLoading ? (
+              <div className="mt-[50px] flex gap-2">
+                <button
+                  className="w-full bg-[#9FA6B2] text-white py-2 rounded-md font-[600] hover:bg-[#bac3d4] hover:text-white shadow-md"
+                  type="button"
+                >
+                  Annuler
+                </button>
+                <button
+                  className="w-full bg-[#3B71CA] text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
+                  type="submit"
+                >
+                  Créer la référence
+                </button>
+              </div>
+            ) : (
+              <div className="relative flex justify-center mt-7 px-7 gap-2">
+                <CircularProgress size={100} />
+                <div className="absolute h-[60px] w-[80px] top-[50%] translate-y-[-50%]">
+                  <img
+                    src="/img/logo.png"
+                    alt="logo"
+                    className="w-full h-full animate-pulse"
+                  />
+                </div>
+              </div>
+            )}
           </form>
         </div>
       </section>

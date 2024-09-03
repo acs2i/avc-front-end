@@ -60,6 +60,9 @@ interface Draft {
   tag_ids: string[];
   brand_ids: string[];
   collection_ids: string[];
+  peau: number;
+  tbeu_pb: number;
+  tbeu_pmeu: number;
   imgPath: string;
   status: string;
   additional_fields: any;
@@ -114,6 +117,9 @@ interface FormData {
   dimension_types: string;
   brand_ids: any[];
   collection_ids: any[];
+  peau: number;
+  tbeu_pb: number;
+  tbeu_pmeu: number;
   imgPath: string;
   status: string;
   additional_fields: any;
@@ -155,7 +161,7 @@ export default function DraftUpdatePage() {
   const { notifySuccess, notifyError } = useNotify();
   const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
-  const [isSend, setisSned] = useState(true);
+  const [refreshDetails, setRefreshDetails] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 10;
   const [error, setError] = useState("");
@@ -183,6 +189,9 @@ export default function DraftUpdatePage() {
     dimension_types: draft?.dimension_types?.[0] || "Couleur/Taille",
     brand_ids: [],
     collection_ids: [],
+    peau: draft?.peau || 0,
+    tbeu_pb: draft?.tbeu_pb || 0,
+    tbeu_pmeu: draft?.tbeu_pmeu || 0,
     imgPath: "",
     status: "A",
     additional_fields: "",
@@ -191,8 +200,6 @@ export default function DraftUpdatePage() {
     initialColors: ["000"],
     initialGrid: [[true]],
   });
-
-  // State for CreatableSelect options
   const [selectedOptionBrand, setSelectedOptionBrand] =
     useState<SingleValue<BrandOption> | null>(null);
   const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
@@ -258,35 +265,41 @@ export default function DraftUpdatePage() {
     }
   };
 
-  const handleUpdateDraft = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
+  const fetchDetails = async () => {
+    if (!draft) return;
+
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/draft/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(formData),
-        }
+      const tagDetails = await Promise.all(
+        draft.tag_ids.map((tagId) => fetchTagDetails(tagId))
+      );
+      const brandDetails = await Promise.all(
+        draft.brand_ids.map((brandId) => fetchBrandDetails(brandId))
+      );
+      const collectionDetails = await Promise.all(
+        draft.collection_ids.map((collectionId) =>
+          fetchCollectionDetails(collectionId)
+        )
+      );
+      const supplierDetails = await Promise.all(
+        draft.suppliers.map((supplier) =>
+          fetchSupplierDetails(supplier.supplier_id)
+        )
       );
 
-      if (response.ok) {
-        setTimeout(() => {
-          notifySuccess("Brouillon modifié avec succés !");
-          setIsLoading(false);
-          navigate("/draft");
-        }, 100);
-      } else {
-        notifyError("Erreur lors de la modification !");
-        setIsLoading(false);
-      }
+      setDraft((prevDraft) => ({
+        ...prevDraft!,
+        tag_details: tagDetails.filter(Boolean) as TagDetail[],
+        brand_details: brandDetails.filter(Boolean) as BrandDetail[],
+        collection_details: collectionDetails.filter(
+          Boolean
+        ) as CollectionDetail[],
+        suppliers: draft.suppliers.map((supplier, index) => ({
+          ...supplier,
+          ...supplierDetails[index],
+        })),
+      }));
     } catch (error) {
-      console.error("Erreur lors de la requête", error);
-      setError("Erreur lors de la mise à jour du brouillon");
+      console.error("Erreur lors de la récupération des détails", error);
     }
   };
 
@@ -447,49 +460,11 @@ export default function DraftUpdatePage() {
   };
 
   useEffect(() => {
-    const fetchDetails = async () => {
-      if (!draft) return;
-
-      try {
-        const tagDetails = await Promise.all(
-          draft.tag_ids.map((tagId) => fetchTagDetails(tagId))
-        );
-        const brandDetails = await Promise.all(
-          draft.brand_ids.map((brandId) => fetchBrandDetails(brandId))
-        );
-        const collectionDetails = await Promise.all(
-          draft.collection_ids.map((collectionId) =>
-            fetchCollectionDetails(collectionId)
-          )
-        );
-        const supplierDetails = await Promise.all(
-          draft.suppliers.map((supplier) =>
-            fetchSupplierDetails(supplier.supplier_id)
-          )
-        );
-
-        setDraft((prevDraft) => ({
-          ...prevDraft!,
-          tag_details: tagDetails.filter(Boolean) as TagDetail[],
-          brand_details: brandDetails.filter(Boolean) as BrandDetail[],
-          collection_details: collectionDetails.filter(
-            Boolean
-          ) as CollectionDetail[],
-          suppliers: draft.suppliers.map((supplier, index) => ({
-            ...supplier,
-            ...supplierDetails[index],
-          })),
-        }));
-      } catch (error) {
-        console.error("Erreur lors de la récupération des détails", error);
-      }
-    };
-
     if (draft && !isDetailsFetched) {
       fetchDetails();
       setIsDetailsFetched(true);
     }
-  }, [draft, isDetailsFetched]);
+  }, [draft, isDetailsFetched, refreshDetails]);
 
   useEffect(() => {
     if (draft) {
@@ -505,6 +480,9 @@ export default function DraftUpdatePage() {
         dimension_types: draft.dimension_types[0] || "Couleur/Taille",
         brand_ids: draft.brand_ids || [],
         collection_ids: draft.collection_ids || [],
+        peau: draft.peau || 0,
+        tbeu_pb: draft.tbeu_pb || 0,
+        tbeu_pmeu: draft.tbeu_pmeu || 0,
         imgPath: draft.imgPath || "",
         status: draft.status || "A",
         additional_fields: draft.additional_fields || {},
@@ -831,36 +809,133 @@ export default function DraftUpdatePage() {
     setSelectedOptionCollection(selectedOption);
     setFormData((prevFormData) => ({
       ...prevFormData,
-      ref_collection: collectionId,
+      collection_ids: [collectionId],
     }));
   };
 
   const handleInputChangeCollection = async (inputValueCollection: string) => {
     setInputValueCollection(inputValueCollection);
 
+    if (inputValueCollection === "") {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/collection`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+
+        const optionsCollection = data.data?.map(
+          (collection: CollectionOption) => ({
+            value: collection._id,
+            label: collection.label,
+          })
+        );
+
+        setOptionsCollection(optionsCollection);
+      } catch (error) {
+        console.error("Erreur lors de la requête", error);
+      }
+      return;
+    }
+
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/collection/search?label=${inputValueCollection}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/collection/search?label=${inputValueCollection}&page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
           },
         }
       );
       const data = await response.json();
 
-      const optionsCollection = data.map((collection: CollectionOption) => ({
-        value: collection._id,
-        label: collection.label,
-      }));
+      const optionsCollection = data.data?.map(
+        (collection: CollectionOption) => ({
+          value: collection._id,
+          label: collection.label,
+        })
+      );
 
       setOptionsCollection(optionsCollection);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     }
   };
+
+  // Fonction de mise a jour du brouillon
+  const handleUpdateDraft = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/draft/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (response.ok) {
+        setTimeout(() => {
+          notifySuccess("Brouillon modifié avec succès !");
+          setIsLoading(false);
+          setIsModify(false);
+          // fetchDraft();
+          window.location.reload();
+        }, 300);
+      } else {
+        notifyError("Erreur lors de la modification !");
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+      setError("Erreur lors de la mise à jour du brouillon");
+    }
+  };
+
+  const updateDraftStatus = async (newStatus: string) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/draft/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ status: newStatus }),
+        }
+      );
+  
+      if (response.ok) {
+        setTimeout(() => {
+          notifySuccess("Brouiilon validée");
+          setIsLoading(false);
+          navigate("/draft")
+          window.location.reload();
+        }, 100);
+      } else {
+        notifyError("Erreur lors de la mise à jour du statut !");
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du statut", error);
+      setError("Erreur lors de la mise à jour du statut du brouillon");
+      setIsLoading(false);
+    }
+  };
+  
 
   console.log(formData);
 
@@ -937,6 +1012,16 @@ export default function DraftUpdatePage() {
                   <Button
                     size="small"
                     type="button"
+                    green
+                    onClick={() => {
+                      updateDraftStatus("I");
+                    }}
+                  >
+                    Valider le brouillon
+                  </Button>
+                  <Button
+                    size="small"
+                    type="button"
                     cancel
                     onClick={(e) => {
                       e.preventDefault();
@@ -961,8 +1046,8 @@ export default function DraftUpdatePage() {
                   </Button>
                 </div>
               ) : !isLoading ? (
-                <div className="flex items-center justify-between gap-3 mt-[50px]">
-                  <div className="flex gap-3">
+                <div className="flex items-center gap-2">
+              
                     <Button
                       size="small"
                       cancel
@@ -974,7 +1059,7 @@ export default function DraftUpdatePage() {
                     <Button size="small" blue type="submit">
                       Valider
                     </Button>
-                  </div>
+               
                 </div>
               ) : (
                 <div className="mt-3">
@@ -1396,7 +1481,7 @@ export default function DraftUpdatePage() {
                             Collection :
                           </span>
                           {!isModify ? (
-                            <span className="col-span-3 text-gray-600 text-[14px]">
+                            <span className="col-span-6 text-gray-600 text-[14px]">
                               {draft.collection_details &&
                               draft.collection_details.length > 0 ? (
                                 draft.collection_details.map(
@@ -1436,7 +1521,7 @@ export default function DraftUpdatePage() {
                           </span>
                           {!isModify ? (
                             <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                              100,20
+                              {draft.peau} €
                             </span>
                           ) : (
                             <input
@@ -1451,7 +1536,7 @@ export default function DraftUpdatePage() {
                           </span>
                           {!isModify ? (
                             <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                              100,20
+                              {draft.tbeu_pb} €
                             </span>
                           ) : (
                             <input
@@ -1466,7 +1551,7 @@ export default function DraftUpdatePage() {
                           </span>
                           {!isModify ? (
                             <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                              100,20
+                              {draft.tbeu_pmeu} €
                             </span>
                           ) : (
                             <input
@@ -1484,7 +1569,7 @@ export default function DraftUpdatePage() {
           </div>
 
           {/* Partie onglets */}
-          <div className="mt-[30px] flex mb-[500px]">
+          <div className="mt-[30px] flex">
             <div className="w-[30%] border-t-[1px] border-gray-300">
               {LINKS_Product.map((link) => (
                 <div
@@ -1599,6 +1684,38 @@ export default function DraftUpdatePage() {
               </div>
             )}
           </div>
+          {isModify && (
+            <div>
+              {!isLoading ? (
+                <div className="mt-[50px] flex gap-2">
+                  <button
+                    className="w-full bg-[#9FA6B2] text-white py-2 rounded-md font-[600] hover:bg-[#bac3d4] hover:text-white shadow-md"
+                    type="button"
+                    onClick={() => setIsModify(false)}
+                  >
+                    Annuler la modification
+                  </button>
+                  <button
+                    className="w-full bg-[#3B71CA] text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
+                    type="submit"
+                  >
+                    Valider les modifications
+                  </button>
+                </div>
+              ) : (
+                <div className="relative flex justify-center mt-7 px-7 gap-2">
+                  <CircularProgress size={100} />
+                  <div className="absolute h-[60px] w-[80px] top-[50%] translate-y-[-50%]">
+                    <img
+                      src="/img/logo.png"
+                      alt="logo"
+                      className="w-full h-full animate-pulse"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </form>
       </section>
     </>

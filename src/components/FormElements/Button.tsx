@@ -31,7 +31,7 @@ const Button: React.FC<ButtonProps> = (props) => {
     ${props.size === "xs" ? "text-xs py-[5px] px-[5px]" : ""}
     ${props.size === "big" ? "text-lg flex items-center justify-center gap-2.5 w-full" : ""}
     ${props.orange ? "bg-gradient-to-r from-orange-600 to-orange-400 border border-orange-500 text-white hover:brightness-125" : ""}
-    ${props.green ? "bg-green-400 border border-emerald-500 text-white hover:brightness-125" : ""}
+    ${props.green ? "bg-green-700 border border-green-600 text-white hover:brightness-125 font-bold" : ""}
     ${props.blue ? "bg-[#3B71CA] border border-sky-600 text-white hover:brightness-125 font-bold" : ""}
     ${props.inverseBlue ? "bg-transparent border border-sky-600 text-gray-700 font-bold hover:bg-sky-700 hover:text-white" : ""}
     ${props.inverse ? "bg-transparent border border-emerald-500 text-gray-700 hover:brightness-125" : ""}
