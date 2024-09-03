@@ -40,6 +40,7 @@ interface CollectionDetail {
 }
 
 interface SupplierDetail {
+  index: number;
   code: string;
   company_name: string;
   supplier_id: string;
@@ -218,6 +219,10 @@ export default function DraftUpdatePage() {
   );
   const [inputValueSubSubFamily, setInputValueSubSubFamily] = useState("");
   const [inputValueFamily, setInputValueFamily] = useState("");
+  const [selectedSupplier, setSelectedSupplier] = useState<
+    SupplierDetail
+  >();
+  const [modalSupplierisOpen, setModalSupplierisOpen] = useState(false);
   const [inputSubValueFamily, setInputSubValueFamily] = useState("");
   const [selectedOptionCollection, setSelectedOptionCollection] =
     useState<SingleValue<CollectionOption> | null>(null);
@@ -243,6 +248,14 @@ export default function DraftUpdatePage() {
           ? e.target.value.substring(0, 15)
           : formData.short_label,
     });
+  };
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [id]: value === "" ? 0 : parseFloat(value),
+    }));
   };
 
   const fetchDraft = async () => {
@@ -889,9 +902,9 @@ export default function DraftUpdatePage() {
         setTimeout(() => {
           notifySuccess("Brouillon modifié avec succès !");
           setIsLoading(false);
+          window.location.reload();
           setIsModify(false);
           // fetchDraft();
-          window.location.reload();
         }, 300);
       } else {
         notifyError("Erreur lors de la modification !");
@@ -917,12 +930,12 @@ export default function DraftUpdatePage() {
           body: JSON.stringify({ status: newStatus }),
         }
       );
-  
+
       if (response.ok) {
         setTimeout(() => {
           notifySuccess("Brouiilon validée");
           setIsLoading(false);
-          navigate("/draft")
+          navigate("/draft");
           window.location.reload();
         }, 100);
       } else {
@@ -935,64 +948,64 @@ export default function DraftUpdatePage() {
       setIsLoading(false);
     }
   };
-  
 
   console.log(formData);
 
   return (
     <>
-      <section className="w-full bg-slate-50 p-8 max-w-[2000px] mx-auto">
-        <Modal
-          show={isModalOpen}
-          onCancel={() => setIsModalOpen(false)}
-          onClose={() => setIsModalOpen(false)}
-          header="Fournisseurs"
-        >
-          <SupplierComponent />
-        </Modal>
-        <Modal
-          show={isModalOpenConfirm}
-          onCancel={() => setIsModalOpenConfirm(false)}
-          onClose={() => setIsModalOpenConfirm(false)}
-          header={`Desactivation de  ${draft && draft.long_label}`}
-        >
-          <div className="border-b-[2px] py-5">
-            <div className="w-[90%] mx-auto">
-              {draft && (
-                <p>
-                  Recopiez ce texte pour valider la desactivation :
-                  <span className="font-[800] text-[13px]">
-                    {" "}
-                    {draft.long_label}
-                  </span>
-                </p>
-              )}
-              <div className="mt-3">
-                <input
-                  type="text"
-                  value={desactivationInput}
-                  onChange={handleInputChange}
-                  className="border p-2 w-full rounded-md focus:outline-none focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
-                />
-              </div>
+      <Modal
+        show={modalSupplierisOpen}
+        onCancel={() => setModalSupplierisOpen(false)}
+        onClose={() => setModalSupplierisOpen(false)}
+        header="Fournisseur"
+      >
+        <SupplierComponent supplier={selectedSupplier} index={selectedSupplier?.index ?? 0}/> 
+      </Modal>
+
+      <Modal
+        show={isModalOpenConfirm}
+        onCancel={() => setIsModalOpenConfirm(false)}
+        onClose={() => setIsModalOpenConfirm(false)}
+        header={`Desactivation de  ${draft && draft.long_label}`}
+      >
+        <div className="border-b-[2px] py-5">
+          <div className="w-[90%] mx-auto">
+            {draft && (
+              <p>
+                Recopiez ce texte pour valider la desactivation :
+                <span className="font-[800] text-[13px]">
+                  {" "}
+                  {draft.long_label}
+                </span>
+              </p>
+            )}
+            <div className="mt-3">
+              <input
+                type="text"
+                value={desactivationInput}
+                onChange={handleInputChange}
+                className="border p-2 w-full rounded-md focus:outline-none focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
+              />
             </div>
           </div>
-          <div className="mt-4 w-[90%] mx-auto">
-            {draft && (
-              <button
-                type="button"
-                disabled={desactivationInput !== draft.long_label}
-                className={`p-2 w-full rounded-md ${
-                  desactivationInput !== draft.long_label
-                    ? "bg-gray-300"
-                    : "bg-red-500 text-white"
-                }`}
-              >
-                Valider la desactivation
-              </button>
-            )}
-          </div>
-        </Modal>
+        </div>
+        <div className="mt-4 w-[90%] mx-auto">
+          {draft && (
+            <button
+              type="button"
+              disabled={desactivationInput !== draft.long_label}
+              className={`p-2 w-full rounded-md ${
+                desactivationInput !== draft.long_label
+                  ? "bg-gray-300"
+                  : "bg-red-500 text-white"
+              }`}
+            >
+              Valider la desactivation
+            </button>
+          )}
+        </div>
+      </Modal>
+      <section className="w-full bg-slate-50 p-8 max-w-[2000px] mx-auto">
         <form onSubmit={handleUpdateDraft}>
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-2">
@@ -1009,16 +1022,22 @@ export default function DraftUpdatePage() {
               )}
               {!isModify ? (
                 <div className="flex items-center gap-2">
-                  <Button
-                    size="small"
-                    type="button"
-                    green
-                    onClick={() => {
-                      updateDraftStatus("I");
-                    }}
-                  >
-                    Valider le brouillon
-                  </Button>
+                  {draft?.status === "A" ? (
+                    <Button
+                      size="small"
+                      type="button"
+                      green
+                      onClick={() => {
+                        updateDraftStatus("I");
+                      }}
+                    >
+                      Valider le brouillon
+                    </Button>
+                  ) : (
+                    <Button size="small" type="button" green>
+                      Enregistrer la référence
+                    </Button>
+                  )}
                   <Button
                     size="small"
                     type="button"
@@ -1047,19 +1066,17 @@ export default function DraftUpdatePage() {
                 </div>
               ) : !isLoading ? (
                 <div className="flex items-center gap-2">
-              
-                    <Button
-                      size="small"
-                      cancel
-                      type="button"
-                      onClick={() => setIsModify(false)}
-                    >
-                      Annuler
-                    </Button>
-                    <Button size="small" blue type="submit">
-                      Valider
-                    </Button>
-               
+                  <Button
+                    size="small"
+                    cancel
+                    type="button"
+                    onClick={() => setIsModify(false)}
+                  >
+                    Annuler
+                  </Button>
+                  <Button size="small" blue type="submit">
+                    Valider
+                  </Button>
                 </div>
               ) : (
                 <div className="mt-3">
@@ -1320,7 +1337,7 @@ export default function DraftUpdatePage() {
                     >
                       <div className="relative flex flex-col gap-3">
                         <div className="mt-3">
-                          {!isModify && (
+                          {isModify && (
                             <div
                               className="absolute right-[10px] cursor-pointer text-gray-600"
                               onClick={() => setIsModalOpen(true)}
@@ -1328,114 +1345,23 @@ export default function DraftUpdatePage() {
                               <Pen size={17} />
                             </div>
                           )}
-                          <div className="grid grid-cols-12 gap-2 py-2">
-                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                              Code :
-                            </span>
-                            {!isModify ? (
-                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {draft?.suppliers &&
-                                draft.suppliers.length > 0 ? (
-                                  draft.suppliers[0].code
-                                ) : (
-                                  <CircleSlash2 size={15} />
-                                )}
-                              </span>
-                            ) : (
-                              <input
-                                type="text"
-                                className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                                value=""
-                              />
-                            )}
-                          </div>
-
-                          <div className="grid grid-cols-12 gap-2 py-2">
-                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                              Raison sociale :
-                            </span>
-                            {!isModify ? (
-                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {draft?.suppliers &&
-                                draft.suppliers.length > 0 ? (
-                                  draft.suppliers[0].company_name
-                                ) : (
-                                  <CircleSlash2 size={15} />
-                                )}
-                              </span>
-                            ) : (
-                              <input
-                                type="text"
-                                className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                                value=""
-                              />
-                            )}
-                          </div>
-
-                          <div className="grid grid-cols-12 gap-2 py-2">
-                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                              Ref. produit :
-                            </span>
-                            {!isModify ? (
-                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {draft?.suppliers &&
-                                draft.suppliers.length > 0 ? (
-                                  draft.suppliers[0].supplier_ref
-                                ) : (
-                                  <CircleSlash2 size={15} />
-                                )}
-                              </span>
-                            ) : (
-                              <input
-                                type="text"
-                                className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                              />
-                            )}
-                          </div>
-                          <div className="grid grid-cols-12 gap-2 py-2">
-                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                              Multiple achat :
-                            </span>
-                            {!isModify ? (
-                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                <CircleSlash2 size={15} />
-                              </span>
-                            ) : (
-                              <input
-                                type="text"
-                                className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                              />
-                            )}
-                          </div>
-                          <div className="grid grid-cols-12 gap-2 py-2">
-                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                              Origine :
-                            </span>
-                            {!isModify ? (
-                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                <CircleSlash2 size={15} />
-                              </span>
-                            ) : (
-                              <input
-                                type="text"
-                                className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                              />
-                            )}
-                          </div>
-                          <div className="grid grid-cols-12 gap-2 py-2">
-                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                              Catégorie douanière :
-                            </span>
-                            {!isModify ? (
-                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                <CircleSlash2 size={15} />
-                              </span>
-                            ) : (
-                              <input
-                                type="text"
-                                className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                              />
-                            )}
+                          <div className="flex flex-col gap-2">
+                            {draft.suppliers.map((supplier, index) => (
+                              <div
+                                key={index}
+                                className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md ${
+                                  index === 0 ? "bg-[#3B71CA]" : "bg-slate-400"
+                                }`}
+                                onClick={() => {
+                                  setSelectedSupplier({ ...supplier, index });
+                                  setModalSupplierisOpen(true);  // Ouvre la modal
+                                }}
+                              >
+                                <span className="text-[20px] text-white font-bold">
+                                  {supplier.code} - {supplier.company_name}
+                                </span>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       </div>
@@ -1526,6 +1452,9 @@ export default function DraftUpdatePage() {
                           ) : (
                             <input
                               type="text"
+                              id="peau"
+                              onChange={handlePriceChange}
+                              value={formData.peau}
                               className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
                             />
                           )}
@@ -1541,6 +1470,9 @@ export default function DraftUpdatePage() {
                           ) : (
                             <input
                               type="text"
+                              id="tbeu_pb"
+                              onChange={handlePriceChange}
+                              value={formData.tbeu_pb}
                               className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
                             />
                           )}
@@ -1556,6 +1488,9 @@ export default function DraftUpdatePage() {
                           ) : (
                             <input
                               type="text"
+                              id="tbeu_pmeu"
+                              onChange={handlePriceChange}
+                              value={formData.tbeu_pmeu}
                               className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
                             />
                           )}

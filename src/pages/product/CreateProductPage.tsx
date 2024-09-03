@@ -1034,7 +1034,7 @@ export default function CreateProductPage() {
                       index > 0 && "mt-5"
                     }`}
                   >
-                    <FormSection title="Fournisseurs">
+                    <FormSection title={index === 0 ? "Fournisseur principal" : `Fournisseur ${index + 1}`}>
                       <div className="mt-3">
                         <div>
                           <label className="text-sm font-medium text-gray-600">
@@ -1130,7 +1130,7 @@ export default function CreateProductPage() {
                 ))}
                 <button
                   type="button"
-                  onClick={() => setsupplierModalIsOpen(true)}
+                  onClick={() => addSupplier()}
                   className="flex items-center gap-2 text-[12px] text-orange-400 mt-3"
                 >
                   <Plus size={17} />

@@ -1,32 +1,53 @@
 import React from "react";
-import Button from "./FormElements/Button";
 
-export default function SupplierComponent() {
+interface SupplierProps {
+  supplier: any;
+  index: number;
+}
+
+export default function SupplierComponent({ supplier, index }: SupplierProps) {
   return (
-    <div className="grid grid-cols-2 gap-2 px-2 mt-5">
-      <div className="relative">
-        <div className="absolute top-[-25px]">
-          <h5>Liste des fournisseurs</h5>
-        </div>
-        <div className="w-full h-[300px] border border-gray-200"></div>
+    <div className="px-4">
+      <div className="flex items-center gap-3 mb-4">
+        <h2 className="text-[30px] font-bold">{supplier.company_name}</h2>
+        {index === 0 && <span className="italic">(Fournisseur principal)</span>}
       </div>
-      <div className="flex flex-col gap-7">
-        <div className="relative border-[1px] border-gray-200 p-2">
-          <div className="absolute top-[-15px]">
-            <h5>Classer les fournisseurs</h5>
-          </div>
-          <div className="flex items-center justify-center gap-2 mt-3">
-            <button className="px-6 py-1 bg-gray-300 rounded-sm">Monter</button>
-            <button className="px-6 py-1 bg-gray-300 rounded-sm">
-              Descendre
-            </button>
-          </div>
+      <div className="flex flex-col gap-2">
+        <div>
+          <span className="text-[15px] font-[700] text-slate-600">Code : </span>
+          <span className="text-[15px] font-[500] text-gray-700">
+            {supplier.code}{" "}
+          </span>
         </div>
-        <div className="relative border-[1px] border-gray-200 p-2">
-          <div className="absolute top-[-15px]">
-            <h5>Prix d'achat</h5>
-          </div>
-          <div></div>
+        <div>
+          <span className="text-[15px] font-[700] text-slate-600">
+            Reférence du produit :{" "}
+          </span>
+          <span className="text-[15px] font-[500] text-gray-700">
+            {supplier.supplier_ref}{" "}
+          </span>
+        </div>
+        <div>
+          <span className="text-[15px] font-[700] text-slate-600">Pcb : </span>
+          <span className="text-[15px] font-[500] text-gray-700">
+            {supplier.pcb}{" "}
+          </span>
+        </div>
+        <div>
+          <span className="text-[15px] font-[700] text-slate-600">
+            Categorie douanière :{" "}
+          </span>
+          <span className="text-[15px] font-[500] text-gray-700">
+            {supplier.custom_cat}{" "}
+          </span>
+        </div>
+        <div>
+          <span className="text-[15px] font-[700] text-slate-600">
+            Origine :{" "}
+          </span>
+          <span className="text-[15px] font-[500] text-gray-700">
+            {supplier.made_in}{" "}
+          </span>
         </div>
       </div>
     </div>

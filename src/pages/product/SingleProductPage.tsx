@@ -165,14 +165,6 @@ export default function SingleProductPage() {
   return (
     <section className="w-full bg-slate-50 p-8 max-w-[2000px] mx-auto">
       <Modal
-        show={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
-        onClose={() => setIsModalOpen(false)}
-        header="Fournisseurs"
-      >
-        <SupplierComponent />
-      </Modal>
-      <Modal
         show={isModalOpenConfirm}
         onCancel={() => setIsModalOpenConfirm(false)}
         onClose={() => setIsModalOpenConfirm(false)}
