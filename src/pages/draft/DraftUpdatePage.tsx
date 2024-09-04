@@ -22,6 +22,7 @@ import { SingleValue } from "react-select";
 import Input from "../../components/FormElements/Input";
 import useNotify from "../../utils/hooks/useToast";
 import { CircularProgress } from "@mui/material";
+import { useFetchDetails } from "../../utils/hooks/usefetchdetails";
 
 interface TagDetail {
   _id: string;
@@ -219,9 +220,7 @@ export default function DraftUpdatePage() {
   );
   const [inputValueSubSubFamily, setInputValueSubSubFamily] = useState("");
   const [inputValueFamily, setInputValueFamily] = useState("");
-  const [selectedSupplier, setSelectedSupplier] = useState<
-    SupplierDetail
-  >();
+  const [selectedSupplier, setSelectedSupplier] = useState<SupplierDetail>();
   const [modalSupplierisOpen, setModalSupplierisOpen] = useState(false);
   const [inputSubValueFamily, setInputSubValueFamily] = useState("");
   const [selectedOptionCollection, setSelectedOptionCollection] =
@@ -238,6 +237,14 @@ export default function DraftUpdatePage() {
   useEffect(() => {
     fetchDraft();
   }, []);
+
+  const {
+    tagDetails,
+    brandDetails,
+    collectionDetails,
+    supplierDetails,
+    loading,
+  } = useFetchDetails({ token, draft });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -275,44 +282,6 @@ export default function DraftUpdatePage() {
       setDraft(data);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
-    }
-  };
-
-  const fetchDetails = async () => {
-    if (!draft) return;
-
-    try {
-      const tagDetails = await Promise.all(
-        draft.tag_ids.map((tagId) => fetchTagDetails(tagId))
-      );
-      const brandDetails = await Promise.all(
-        draft.brand_ids.map((brandId) => fetchBrandDetails(brandId))
-      );
-      const collectionDetails = await Promise.all(
-        draft.collection_ids.map((collectionId) =>
-          fetchCollectionDetails(collectionId)
-        )
-      );
-      const supplierDetails = await Promise.all(
-        draft.suppliers.map((supplier) =>
-          fetchSupplierDetails(supplier.supplier_id)
-        )
-      );
-
-      setDraft((prevDraft) => ({
-        ...prevDraft!,
-        tag_details: tagDetails.filter(Boolean) as TagDetail[],
-        brand_details: brandDetails.filter(Boolean) as BrandDetail[],
-        collection_details: collectionDetails.filter(
-          Boolean
-        ) as CollectionDetail[],
-        suppliers: draft.suppliers.map((supplier, index) => ({
-          ...supplier,
-          ...supplierDetails[index],
-        })),
-      }));
-    } catch (error) {
-      console.error("Erreur lors de la récupération des détails", error);
     }
   };
 
@@ -360,124 +329,6 @@ export default function DraftUpdatePage() {
       uvc: updatedUVCs,
     }));
   };
-  const fetchTagDetails = async (tagId: any) => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/${tagId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error(
-        "Erreur lors de la requête pour récupérer les détails du tag",
-        error
-      );
-      return null;
-    }
-  };
-
-  const fetchBrandDetails = async (brandId: any) => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/brand/${brandId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error(
-        "Erreur lors de la requête pour récupérer les détails de la marque",
-        error
-      );
-      return null;
-    }
-  };
-
-  const fetchCollectionDetails = async (collectionId: any) => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/collection/${collectionId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error(
-        "Erreur lors de la requête pour récupérer les détails de la collection",
-        error
-      );
-      return null;
-    }
-  };
-
-  const fetchSupplierDetails = async (supplierId: string) => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/supplier/${supplierId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Erreur HTTP: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error(
-        "Erreur lors de la requête pour récupérer les détails du fournisseur",
-        error
-      );
-      return null;
-    }
-  };
-
-  useEffect(() => {
-    if (draft && !isDetailsFetched) {
-      fetchDetails();
-      setIsDetailsFetched(true);
-    }
-  }, [draft, isDetailsFetched, refreshDetails]);
 
   useEffect(() => {
     if (draft) {
@@ -899,10 +750,10 @@ export default function DraftUpdatePage() {
       );
 
       if (response.ok) {
+        notifySuccess("Brouillon modifié avec succès !");
+        window.location.reload();
         setTimeout(() => {
-          notifySuccess("Brouillon modifié avec succès !");
           setIsLoading(false);
-          window.location.reload();
           setIsModify(false);
           // fetchDraft();
         }, 300);
@@ -959,7 +810,10 @@ export default function DraftUpdatePage() {
         onClose={() => setModalSupplierisOpen(false)}
         header="Fournisseur"
       >
-        <SupplierComponent supplier={selectedSupplier} index={selectedSupplier?.index ?? 0}/> 
+        <SupplierComponent
+          supplier={selectedSupplier}
+          index={selectedSupplier?.index ?? 0}
+        />
       </Modal>
 
       <Modal
@@ -1197,9 +1051,8 @@ export default function DraftUpdatePage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-3 text-gray-600 text-[14px]">
-                                {draft.brand_details &&
-                                draft.brand_details.length > 0 ? (
-                                  draft.brand_details.map((brand, index) => (
+                                {brandDetails && brandDetails.length > 0 ? (
+                                  brandDetails.map((brand, index) => (
                                     <p key={index}>{brand.label}</p>
                                   ))
                                 ) : (
@@ -1225,9 +1078,8 @@ export default function DraftUpdatePage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
-                                {draft.tag_details &&
-                                draft.tag_details.length > 0 ? (
-                                  `${draft.tag_details[0].code} - ${draft.tag_details[0].name}`
+                                {tagDetails && tagDetails.length > 0 ? (
+                                  `${tagDetails[0].code} - ${tagDetails[0].name}`
                                 ) : (
                                   <CircleSlash2 size={15} />
                                 )}
@@ -1251,9 +1103,8 @@ export default function DraftUpdatePage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
-                                {draft.tag_details &&
-                                draft.tag_details.length > 0 ? (
-                                  `${draft.tag_details[1].code} - ${draft.tag_details[1].name}`
+                                {tagDetails && tagDetails.length > 0 ? (
+                                  `${tagDetails[1].code} - ${tagDetails[1].name}`
                                 ) : (
                                   <CircleSlash2 size={15} />
                                 )}
@@ -1277,9 +1128,8 @@ export default function DraftUpdatePage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
-                                {draft.tag_details &&
-                                draft.tag_details.length > 0 ? (
-                                  `${draft.tag_details[2].code} - ${draft.tag_details[2].name}`
+                                {tagDetails && tagDetails.length > 0 ? (
+                                  `${tagDetails[2].code} - ${tagDetails[2].name}`
                                 ) : (
                                   <CircleSlash2 size={15} />
                                 )}
@@ -1346,22 +1196,41 @@ export default function DraftUpdatePage() {
                             </div>
                           )}
                           <div className="flex flex-col gap-2">
-                            {draft.suppliers.map((supplier, index) => (
-                              <div
-                                key={index}
-                                className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md ${
-                                  index === 0 ? "bg-[#3B71CA]" : "bg-slate-400"
-                                }`}
-                                onClick={() => {
-                                  setSelectedSupplier({ ...supplier, index });
-                                  setModalSupplierisOpen(true);  // Ouvre la modal
-                                }}
-                              >
-                                <span className="text-[20px] text-white font-bold">
-                                  {supplier.code} - {supplier.company_name}
-                                </span>
-                              </div>
-                            ))}
+                            {supplierDetails.map((supplierDetail, index) => {
+                              
+                              const draftSupplier = draft?.suppliers.find(
+                                (draftSup) =>
+                                  draftSup.supplier_id === supplierDetail._id
+                              );
+
+                              const combinedSupplier = {
+                                ...supplierDetail,
+                                ...draftSupplier,
+                              };
+
+                              return (
+                                <div
+                                  key={index}
+                                  className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md ${
+                                    index === 0
+                                      ? "bg-[#3B71CA]"
+                                      : "bg-slate-400"
+                                  }`}
+                                  onClick={() => {
+                                    setSelectedSupplier({
+                                      ...combinedSupplier,
+                                      index,
+                                    });
+                                    setModalSupplierisOpen(true);
+                                  }}
+                                >
+                                  <span className="text-[20px] text-white font-bold">
+                                    {combinedSupplier.code} -{" "}
+                                    {combinedSupplier.company_name}
+                                  </span>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       </div>
@@ -1408,13 +1277,11 @@ export default function DraftUpdatePage() {
                           </span>
                           {!isModify ? (
                             <span className="col-span-6 text-gray-600 text-[14px]">
-                              {draft.collection_details &&
-                              draft.collection_details.length > 0 ? (
-                                draft.collection_details.map(
-                                  (collection, index) => (
-                                    <p key={index}>{collection.label}</p>
-                                  )
-                                )
+                              {collectionDetails &&
+                              collectionDetails.length > 0 ? (
+                                collectionDetails.map((collection, index) => (
+                                  <p key={index}>{collection.label}</p>
+                                ))
                               ) : (
                                 <CircleSlash2 size={15} />
                               )}

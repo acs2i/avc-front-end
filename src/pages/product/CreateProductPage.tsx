@@ -31,6 +31,7 @@ import UVCSupplierTable from "../../components/UVCSupplierTable";
 import UVCGrid2 from "../../components/UVCGrid_2";
 import FormSection from "../../components/Formulaires/FormSection";
 import Modal from "../../components/Shared/Modal";
+import SupplierFormComponent from "../../components/SupplierFormComponent";
 
 interface PriceItemSchema {
   peau: number;
@@ -155,9 +156,6 @@ const customStyles = {
 export default function CreateProductPage() {
   const creatorId = useSelector((state: any) => state.auth.user);
   const token = useSelector((state: any) => state.auth.token);
-  const [additionalFields, setAdditionalFields] = useState([
-    { name: "", value: "" },
-  ]);
   const { notifySuccess, notifyError } = useNotify();
   const location = useLocation();
   const [supplierModalIsOpen, setsupplierModalIsOpen] = useState(false);
@@ -171,7 +169,9 @@ export default function CreateProductPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [inputValueFamily, setInputValueFamily] = useState("");
   const [inputValueClassification, setInputValueClassification] = useState("");
-  const [addFieldIsVisible, setaddFieldIsVisible] = useState(false);
+  const [selectedSuppliers, setSelectedSuppliers] = useState<SuppliersOption[]>(
+    []
+  );
   const [inputSubValueFamily, setInputSubValueFamily] = useState("");
   const [inputValueSubSubFamily, setInputValueSubSubFamily] = useState("");
   const [inputValueBrand, setInputValueBrand] = useState("");
@@ -194,11 +194,18 @@ export default function CreateProductPage() {
   const [optionsSubSubFamily, setOptionsSubSubFamily] = useState<TagOption[]>(
     []
   );
+  const [selectedSupplierIndex, setSelectedSupplierIndex] = useState<
+    number | null
+  >(null);
   const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
   const [optionsCollection, setOptionsCollection] = useState<
     CollectionOption[]
   >([]);
   const [optionsSupplier, setOptionsSupplier] = useState<SuppliersOption[]>([]);
+  const [isEditing, setIsEditing] = useState<number | null>(null);
+  const [currentSupplier, setCurrentSupplier] = useState<
+    Supplier | undefined
+  >();
 
   const classificationOptions = [
     {
@@ -726,16 +733,32 @@ export default function CreateProductPage() {
     index: number,
     option: SingleValue<SuppliersOption>
   ) => {
+    // Mettre à jour formData (comme dans votre ancienne version)
     setFormData((prevFormData) => {
       const newSuppliers = [...(prevFormData.suppliers || [])];
       newSuppliers[index] = {
         ...newSuppliers[index],
-        supplier_id: option ? option.value : "",
+        supplier_id: option ? option.value : "", // Mettez à jour l'ID du fournisseur
       };
       return {
         ...prevFormData,
         suppliers: newSuppliers,
       };
+    });
+
+    // Mettre à jour selectedSuppliers pour stocker le nom (nouvelle logique)
+    setSelectedSuppliers((prevSuppliers) => {
+      const newSuppliers = [...prevSuppliers];
+
+      // Si l'option est sélectionnée, ajoutez ou mettez à jour le fournisseur
+      newSuppliers[index] = {
+        _id: option?.value || "", // ID du fournisseur
+        value: option?.value || "", // Utilisez la même valeur pour éviter l'erreur
+        label: option?.label || "", // Nom du fournisseur
+        company_name: option?.label || "", // Afficher le nom du fournisseur
+      };
+
+      return newSuppliers;
     });
   };
 
@@ -778,30 +801,28 @@ export default function CreateProductPage() {
     }
   };
 
-  const addField = () => {
-    setAdditionalFields([...additionalFields, { name: "", value: "" }]);
-  };
-
-  const removeField = (index: any) => {
-    const updatedFields = additionalFields.filter((_, i) => i !== index);
-    setAdditionalFields(updatedFields);
-  };
-
-  const addSupplier = () => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      suppliers: [
-        ...prevFormData.suppliers,
-        {
-          supplier_id: "",
-          supplier_ref: "",
-          pcb: "",
-          custom_cat: "",
-          made_in: "",
-        },
-      ],
-    }));
-  };
+  const addSupplier = (newSupplier: Supplier) => {
+    setFormData((prevFormData) => {
+      const suppliers = [...prevFormData.suppliers];
+  
+      const isNewSupplierFilled =
+        newSupplier.supplier_id !== "" &&
+        newSupplier.supplier_ref !== "" &&
+        newSupplier.pcb !== "" &&
+        newSupplier.custom_cat !== "" &&
+        newSupplier.made_in !== "";
+  
+      if (isNewSupplierFilled) {
+        suppliers.push(newSupplier);
+      } else {
+        console.error("Veuillez remplir tous les champs du fournisseur avant de l'ajouter.");
+        return prevFormData; 
+      }
+  
+      return { ...prevFormData, suppliers };
+    });
+    setsupplierModalIsOpen(false);
+  }; 
 
   const removeSupplier = (index: number) => {
     setFormData((prevFormData) => {
@@ -824,12 +845,25 @@ export default function CreateProductPage() {
         show={supplierModalIsOpen}
         onCancel={() => setsupplierModalIsOpen(false)}
         onClose={() => setsupplierModalIsOpen(false)}
-        onSubmit={handleSubmit}
-        header="Modifier mon adresse mail"
+        header="Ajouter un fournisseur"
       >
-        <div className="w-[70%] flex flex-col gap-3 mt-2 mx-auto">
-          Hello from modal
-        </div>
+        {formData.suppliers.length > 0 &&
+          formData.suppliers
+            .slice(-1)
+            .map((supplier) => (
+              <SupplierFormComponent
+                supplier={supplier}
+                index={formData.suppliers.length - 1}
+                optionsSupplier={optionsSupplier}
+                inputValueSupplier={inputValueSupplier}
+                handleSupplierSelectChange={handleSupplierSelectChange}
+                handleInputChangeSupplier={handleInputChangeSupplier}
+                handleSupplierChange={handleSupplierChange}
+                removeSupplier={removeSupplier}
+                onCloseModal={() => setsupplierModalIsOpen(false)}
+                addSupplier={addSupplier}
+              />
+            ))}
       </Modal>
       <section className="w-full bg-slate-50 p-7">
         <div className="max-w-[2024px] mx-auto">
@@ -1007,135 +1041,51 @@ export default function CreateProductPage() {
                   </div>
                 </FormSection>
               </div>
-              <div className="w-[480px] flex flex-col gap-5">
-                <Card title=" Ajouter une image">
-                  <div className="w-full h-[250px] border border-dashed border-2 border-gray-300 mt-3 flex justify-center items-center">
-                    <div className="flex flex-col items-center text-center">
-                      <p className="font-bold text-gray-600">
-                        Glissez déposez votre image ici ou{" "}
-                        <span className="text-blue-400">
-                          téléchargez depuis votre ordinateur
-                        </span>
-                      </p>
-                      <div className="text-gray-300">
-                        <ImageUp size={50} />
-                      </div>
+              <div className="w-[480px] h-[400px] flex flex-col gap-5 border border-dashed border-2 border-slate-200 hover:bg-white hover:bg-opacity-75 transition-all duration-300 cursor-pointer">
+                <div className="w-full h-full flex justify-center items-center rounded-md">
+                  <div className="flex flex-col items-center text-center">
+                    <p className="font-bold text-gray-600">
+                      Glissez déposez votre image ici ou{" "}
+                      <span className="text-blue-400">
+                        téléchargez depuis votre ordinateur
+                      </span>
+                    </p>
+                    <div className="text-gray-300">
+                      <ImageUp size={50} />
                     </div>
                   </div>
-                </Card>
+                </div>
               </div>
             </div>
             <div className="flex gap-2 mt-[50px]">
               <div className="w-1/3 flex flex-col">
-                {formData.suppliers.map((supplier, index) => (
-                  <div
-                    key={index}
-                    className={`relative flex flex-col gap-2 ${
-                      index > 0 && "mt-5"
-                    }`}
-                  >
-                    <FormSection title={index === 0 ? "Fournisseur principal" : `Fournisseur ${index + 1}`}>
-                      <div className="mt-3">
-                        <div>
-                          <label className="text-sm font-medium text-gray-600">
-                            Nom
-                          </label>
-                          <CreatableSelect<SuppliersOption>
-                            value={optionsSupplier?.find(
-                              (option) => option.value === supplier.supplier_id
-                            )}
-                            onChange={(option) =>
-                              handleSupplierSelectChange(index, option)
-                            }
-                            onInputChange={handleInputChangeSupplier}
-                            inputValue={inputValueSupplier}
-                            options={optionsSupplier}
-                            placeholder="Selectionner un fournisseur"
-                            styles={customStyles}
-                            className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                            required
-                          />
-                        </div>
-                        <div>
-                          <Input
-                            element="input"
-                            id={`supplier_ref-${index}`}
-                            label="Référence produit :"
-                            value={supplier.supplier_ref}
-                            onChange={(e) =>
-                              handleSupplierChange(
-                                index,
-                                "supplier_ref",
-                                e.target.value
-                              )
-                            }
-                            validators={[]}
-                            placeholder="Ajouter la référence produit"
-                            create
-                            gray
-                          />
-                        </div>
-                        <div>
-                          <Input
-                            element="input"
-                            id={`pcb-${index}`}
-                            label="PCB :"
-                            value={supplier.pcb}
-                            onChange={(e) =>
-                              handleSupplierChange(index, "pcb", e.target.value)
-                            }
-                            validators={[]}
-                            placeholder="Ajouter le PCB"
-                            create
-                            gray
-                          />
-                        </div>
-                        <div>
-                          <Input
-                            element="input"
-                            id={`custom_cat-${index}`}
-                            label="Catégorie douanière :"
-                            value={supplier.custom_cat}
-                            onChange={(e) =>
-                              handleSupplierChange(
-                                index,
-                                "custom_cat",
-                                e.target.value
-                              )
-                            }
-                            validators={[]}
-                            placeholder="Ajouter la catégorie douanière"
-                            create
-                            gray
-                          />
-                        </div>
-                        <div>
-                          <CountrySelector
-                            index={index}
-                            value={supplier.made_in}
-                            onChange={handleSupplierChange}
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => removeSupplier(index)}
-                          className="mt-2 text-red-600 flex items-center gap-2 text-[12px]"
+                <FormSection title="Fournisseurs">
+                  <div className="flex flex-col gap-2">
+                    {selectedSuppliers.map((supplier, index) =>
+                      supplier?.company_name ? (
+                        <div
+                          key={index}
+                          className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md ${
+                            index === 0 ? "bg-[#3B71CA]" : "bg-slate-400"
+                          }`}
                         >
-                          <Trash2 size={13} />
-                          Supprimer ce fournisseur
-                        </button>
-                      </div>
-                    </FormSection>
+                          <span className="text-[20px] text-white font-bold">
+                            {supplier.company_name}
+                          </span>
+                        </div>
+                      ) : null
+                    )}
                   </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={() => addSupplier()}
-                  className="flex items-center gap-2 text-[12px] text-orange-400 mt-3"
-                >
-                  <Plus size={17} />
-                  Ajouter un fournisseur
-                </button>
+                  <div
+                    className="flex flex-col items-center justify-center p-[20px] text-orange-400 hover:text-orange-300 cursor-pointer"
+                    onClick={() => setsupplierModalIsOpen(true)}
+                  >
+                    <div className="flex items-center gap-2 text-[12px] mt-3">
+                      <Plus size={30} />
+                    </div>
+                    <p className="font-[700]">Ajouter un fournisseur</p>
+                  </div>
+                </FormSection>
               </div>
               <div className="w-1/3 flex flex-col gap-2">
                 <FormSection title="Caractéristiques Produit" size="h-[300px]">
