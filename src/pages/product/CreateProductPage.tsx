@@ -733,35 +733,36 @@ export default function CreateProductPage() {
     index: number,
     option: SingleValue<SuppliersOption>
   ) => {
-    // Mettre à jour formData (comme dans votre ancienne version)
     setFormData((prevFormData) => {
       const newSuppliers = [...(prevFormData.suppliers || [])];
+      
+      // Mettre à jour seulement l'élément à l'index fourni
       newSuppliers[index] = {
         ...newSuppliers[index],
         supplier_id: option ? option.value : "", // Mettez à jour l'ID du fournisseur
       };
+      
       return {
         ...prevFormData,
         suppliers: newSuppliers,
       };
     });
-
-    // Mettre à jour selectedSuppliers pour stocker le nom (nouvelle logique)
+  
+    // Mettre à jour selectedSuppliers pour stocker le nom du fournisseur
     setSelectedSuppliers((prevSuppliers) => {
       const newSuppliers = [...prevSuppliers];
-
-      // Si l'option est sélectionnée, ajoutez ou mettez à jour le fournisseur
+      
       newSuppliers[index] = {
-        _id: option?.value || "", // ID du fournisseur
-        value: option?.value || "", // Utilisez la même valeur pour éviter l'erreur
-        label: option?.label || "", // Nom du fournisseur
-        company_name: option?.label || "", // Afficher le nom du fournisseur
+        _id: option?.value || "", 
+        value: option?.value || "",
+        label: option?.label || "",
+        company_name: option?.label || "",
       };
-
+      
       return newSuppliers;
     });
   };
-
+  
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData((prevFormData) => ({
@@ -804,25 +805,27 @@ export default function CreateProductPage() {
   const addSupplier = (newSupplier: Supplier) => {
     setFormData((prevFormData) => {
       const suppliers = [...prevFormData.suppliers];
-  
+    
       const isNewSupplierFilled =
         newSupplier.supplier_id !== "" &&
         newSupplier.supplier_ref !== "" &&
         newSupplier.pcb !== "" &&
         newSupplier.custom_cat !== "" &&
         newSupplier.made_in !== "";
-  
+    
       if (isNewSupplierFilled) {
-        suppliers.push(newSupplier);
+        suppliers.push(newSupplier); // Ajouter le nouveau fournisseur à la fin de la liste
       } else {
         console.error("Veuillez remplir tous les champs du fournisseur avant de l'ajouter.");
-        return prevFormData; 
+        return prevFormData;
       }
-  
+    
       return { ...prevFormData, suppliers };
     });
-    setsupplierModalIsOpen(false);
-  }; 
+  
+    setsupplierModalIsOpen(false); // Fermer la modal après l'ajout
+  };
+  
 
   const removeSupplier = (index: number) => {
     setFormData((prevFormData) => {
