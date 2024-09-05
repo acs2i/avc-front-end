@@ -29,13 +29,15 @@ interface Product {
   long_label: string;
   type: string;
   tag_ids: any[];
-  princ_supplier_id: any;
-  supplier_ids: any[];
+  suppliers: any[];
   dimension_types: string[];
   uvc_ids: any[];
   brand_ids: any[];
   collection_ids: any[];
   imgPath: string;
+  peau: number;
+  tbeu_pb: number;
+  tbeu_pmeu: number;
   status: string;
   additional_fields: any;
 }
@@ -138,18 +140,37 @@ export default function SingleProductPage() {
 
   useEffect(() => {
     if (product) {
-      const initialSizes = [
-        ...new Set(product.uvc_ids.map((uvc) => uvc.dimensions[1])),
-      ];
-      const initialColors = [
-        ...new Set(product.uvc_ids.map((uvc) => uvc.dimensions[0])),
-      ];
-      const initialGrid = initialColors.map((color) =>
-        initialSizes.map(() => true)
+      // Extraire les tailles et les couleurs
+      const extractedColors = product?.uvc_ids
+        ? [
+            ...new Set(
+              product.uvc_ids.map((uvc) => uvc.dimensions?.[0]?.split("/")[0])
+            ),
+          ]
+        : [];
+
+      const extractedSizes = product?.uvc_ids
+        ? [
+            ...new Set(
+              product.uvc_ids.map((uvc) => uvc.dimensions?.[0]?.split("/")[1])
+            ),
+          ]
+        : [];
+
+      // Construire la grille initiale
+      const initialGrid = extractedColors.map((color) =>
+        extractedSizes.map(
+          (size) =>
+            product?.uvc_ids?.some((uvc) => {
+              const [uvcColor, uvcSize] = uvc.dimensions[0].split("/");
+              return uvcColor === color && uvcSize === size;
+            }) || false // Si la valeur est undefined, elle sera remplacée par false
+        )
       );
 
-      setSizes(initialSizes);
-      setColors(initialColors);
+      // Mettre à jour les états
+      setSizes(extractedSizes);
+      setColors(extractedColors);
       setUvcGrid(initialGrid);
     }
   }, [product]);
@@ -274,7 +295,10 @@ export default function SingleProductPage() {
               {/* Indentification */}
               <div className="flex flex-col-reverse lg:flex-row gap-7 mt-[50px] items-stretch">
                 <div className="w-[60%]">
-                  <FormSection title="Identification" size={`${!isModify ? "h-[400px]" : "h-[450px]"}`}>
+                  <FormSection
+                    title="Identification"
+                    size={`${!isModify ? "h-[400px]" : "h-[450px]"}`}
+                  >
                     <div className="relative mt-3">
                       <div className="grid grid-cols-4 gap-2 py-2">
                         <span className="col-span-1 text-gray-700 font-bold">
@@ -456,7 +480,9 @@ export default function SingleProductPage() {
                 </div>
 
                 <div className="w-[480px] bg-white">
-                  <FormSection size={`${!isModify ? "h-[400px]" : "h-[450px]"}`}>
+                  <FormSection
+                    size={`${!isModify ? "h-[400px]" : "h-[450px]"}`}
+                  >
                     {product.imgPath ? (
                       <div className="relative w-full h-0 pb-[75%]">
                         <img
@@ -484,123 +510,28 @@ export default function SingleProductPage() {
               <div className="flex gap-7 mt-[50px] items-stretch">
                 {/* Fournisseur */}
                 <div className="w-1/3 ">
-                  <FormSection title="Fournisseur" size={`${!isModify ? "h-[300px]" : "h-[400px]"}`}>
-                    <div className="mt-3">
-                      {!isModify && (
-                        <div
-                          className="absolute right-[10px] cursor-pointer text-gray-600"
-                          onClick={() => setIsModalOpen(true)}
-                        >
-                          <Pen size={17} />
-                        </div>
-                      )}
-                      <div className="grid grid-cols-12 gap-2 py-2">
-                        <span className="col-span-6 font-bold text-gray-700">
-                          Code :
-                        </span>
-                        {!isModify ? (
-                          <span className="col-span-6 text-slate-500 whitespace-nowrap overflow-ellipsis overflow-hidden">
-                            {product.princ_supplier_id ? (
-                              product.princ_supplier_id.code
-                            ) : (
-                              <CircleSlash2 size={15} />
-                            )}
-                          </span>
+                  <FormSection
+                    title="Fournisseur"
+                    size={`${!isModify ? "h-[300px]" : "h-[400px]"}`}
+                  >
+                    <div className="relative flex flex-col gap-3">
+                      <div className="mt-3">
+                        {product.suppliers && product.suppliers.length > 0 ? (
+                          product.suppliers.map((supplier, index) => (
+                            <div
+                              key={index}
+                              className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md ${
+                                index === 0 ? "bg-[#3B71CA]" : "bg-slate-400"
+                              }`}
+                            >
+                              <span className="text-[20px] text-white font-bold capitalize">
+                                {supplier.supplier_id.code} -{" "}
+                                {supplier.supplier_id.company_name}
+                              </span>
+                            </div>
+                          ))
                         ) : (
-                          <input
-                            type="text"
-                            className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                            value={
-                              product.princ_supplier_id
-                                ? product.princ_supplier_id.code
-                                : "N/A"
-                            }
-                          />
-                        )}
-                      </div>
-                      <div className="grid grid-cols-12 gap-2 py-2">
-                        <span className="col-span-6 font-bold text-gray-700">
-                          Raison sociale :
-                        </span>
-                        {!isModify ? (
-                          <span className="col-span-6 text-slate-500 whitespace-nowrap overflow-ellipsis overflow-hidden">
-                            {product.princ_supplier_id ? (
-                              product.princ_supplier_id.company_name
-                            ) : (
-                              <CircleSlash2 size={15} />
-                            )}
-                          </span>
-                        ) : (
-                          <input
-                            type="text"
-                            className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                            value={
-                              product.princ_supplier_id
-                                ? product.princ_supplier_id.company_name
-                                : "N/A"
-                            }
-                          />
-                        )}
-                      </div>
-
-                      <div className="grid grid-cols-12 gap-2 py-2">
-                        <span className="col-span-6 font-bold text-gray-700">
-                          Ref. produit :
-                        </span>
-                        {!isModify ? (
-                          <span className="col-span-6 text-slate-500 whitespace-nowrap overflow-ellipsis overflow-hidden">
-                            <CircleSlash2 size={15} />
-                          </span>
-                        ) : (
-                          <input
-                            type="text"
-                            className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                          />
-                        )}
-                      </div>
-                      <div className="grid grid-cols-12 gap-2 py-2">
-                        <span className="col-span-6 font-bold text-gray-700">
-                          Multiple achat :
-                        </span>
-                        {!isModify ? (
-                          <span className="col-span-6 text-slate-500 whitespace-nowrap overflow-ellipsis overflow-hidden">
-                            <CircleSlash2 size={15} />
-                          </span>
-                        ) : (
-                          <input
-                            type="text"
-                            className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                          />
-                        )}
-                      </div>
-                      <div className="grid grid-cols-12 gap-2 py-2">
-                        <span className="col-span-6 font-bold text-gray-700">
-                          Origine :
-                        </span>
-                        {!isModify ? (
-                          <span className="col-span-6 text-slate-500 whitespace-nowrap overflow-ellipsis overflow-hidden">
-                            <CircleSlash2 size={15} />
-                          </span>
-                        ) : (
-                          <input
-                            type="text"
-                            className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                          />
-                        )}
-                      </div>
-                      <div className="grid grid-cols-12 gap-2 py-2">
-                        <span className="col-span-6 font-bold text-gray-700">
-                          Catégorie douanière :
-                        </span>
-                        {!isModify ? (
-                          <span className="col-span-6 text-slate-500 whitespace-nowrap overflow-ellipsis overflow-hidden">
-                            <CircleSlash2 size={15} />
-                          </span>
-                        ) : (
-                          <input
-                            type="text"
-                            className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                          />
+                          <p>Aucun fournisseur pour cette référence</p>
                         )}
                       </div>
                     </div>
@@ -683,7 +614,7 @@ export default function SingleProductPage() {
                         </span>
                         {!isModify ? (
                           <span className="col-span-6 text-slate-500 whitespace-nowrap overflow-ellipsis overflow-hidden">
-                            100,20
+                            {product.peau} €
                           </span>
                         ) : (
                           <input
@@ -698,7 +629,7 @@ export default function SingleProductPage() {
                         </span>
                         {!isModify ? (
                           <span className="col-span-6 text-slate-500 whitespace-nowrap overflow-ellipsis overflow-hidden">
-                            100,20
+                            {product.tbeu_pb} €
                           </span>
                         ) : (
                           <input
@@ -713,7 +644,7 @@ export default function SingleProductPage() {
                         </span>
                         {!isModify ? (
                           <span className="col-span-6 text-slate-500 whitespace-nowrap overflow-ellipsis overflow-hidden">
-                            100,20
+                            {product.tbeu_pmeu} €
                           </span>
                         ) : (
                           <input
@@ -834,13 +765,13 @@ export default function SingleProductPage() {
                   productReference={product.reference || ""}
                 />
               )}
-              {onglet === "supplier" && product && (
+              {/* {onglet === "supplier" && product && (
                 <UVCSupplierTable
                   uvcDimensions={formData.dimension}
                   productReference={product.reference || ""}
                   productSupplier={product.princ_supplier_id || ""}
                 />
-              )}
+              )} */}
             </div>
           )}
         </div>

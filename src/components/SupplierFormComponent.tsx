@@ -1,7 +1,6 @@
 import React from "react";
 import CreatableSelect from "react-select/creatable";
 import Input from "../components/FormElements/Input";
-import CountrySelector from "../components/Shared/CountrySelect";
 import { Trash2 } from "lucide-react";
 
 interface SupplierEditorProps {
@@ -32,13 +31,16 @@ const SupplierFormComponent: React.FC<SupplierEditorProps> = ({
   const handleAddSupplier = () => {
     // Créer un nouveau fournisseur avec les données actuelles
     const newSupplier = {
-      supplier_id: supplier.supplier_id,
-      supplier_ref: supplier.supplier_ref,
-      pcb: supplier.pcb,
-      custom_cat: supplier.custom_cat,
-      made_in: supplier.made_in,
+      supplier_id: supplier.supplier_id || "",
+      supplier_ref: supplier.supplier_ref || "",
+      pcb: supplier.pcb || "",
+      custom_cat: supplier.custom_cat || "",
+      made_in: supplier.made_in || "",
     };
 
+    console.log("Vérification des champs du nouveau fournisseur : ", newSupplier);
+
+    
     // Appeler la fonction pour ajouter le fournisseur dans formData.suppliers
     addSupplier(newSupplier);
 
@@ -68,6 +70,7 @@ const SupplierFormComponent: React.FC<SupplierEditorProps> = ({
           element="input"
           id={`supplier_ref-${index}`}
           label="Référence produit :"
+          value={supplier.supplier_ref || ""}
           onChange={(e) =>
             handleSupplierChange(index, "supplier_ref", e.target.value)
           }
@@ -82,6 +85,7 @@ const SupplierFormComponent: React.FC<SupplierEditorProps> = ({
           element="input"
           id={`pcb-${index}`}
           label="PCB :"
+          value={supplier.pcb || ""}
           onChange={(e) => handleSupplierChange(index, "pcb", e.target.value)}
           placeholder="Ajouter le PCB"
           validators={[]}
@@ -94,6 +98,7 @@ const SupplierFormComponent: React.FC<SupplierEditorProps> = ({
           element="input"
           id={`custom_cat-${index}`}
           label="Catégorie douanière :"
+          value={supplier.custom_cat || ""}
           onChange={(e) =>
             handleSupplierChange(index, "custom_cat", e.target.value)
           }
@@ -108,6 +113,7 @@ const SupplierFormComponent: React.FC<SupplierEditorProps> = ({
           element="input"
           id={`made_in-${index}`}
           label="Origine :"
+          value={supplier.made_in || ""}
           onChange={(e) =>
             handleSupplierChange(index, "made_in", e.target.value)
           }
