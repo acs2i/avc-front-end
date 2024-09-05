@@ -748,10 +748,6 @@ export default function CreateProductPage() {
     }
   };
   
-  
-  
-  
-  console.log(selectedSuppliers)
 
   const addSupplier = (newSupplier: any) => {
     setFormData((prevFormData) => ({
@@ -885,7 +881,7 @@ export default function CreateProductPage() {
                       Annuler
                     </Button>
                     <Button size="small" blue type="submit">
-                      Créer une référence
+                      Créer la référence
                     </Button>
                   </div>
                 </div>
