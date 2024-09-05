@@ -55,13 +55,13 @@ interface Uvc {
   status: string;
   additional_fields: any;
 }
-
 interface Supplier {
   supplier_id: string;
   supplier_ref: string;
   pcb: string;
   custom_cat: string;
   made_in: string;
+  company_name: string; 
 }
 
 interface FormData {
@@ -118,7 +118,12 @@ type SuppliersOption = {
   value: string;
   label: string;
   company_name: string;
+  supplier_ref?: string;  // Champs optionnels
+  pcb?: string;
+  custom_cat?: string;
+  made_in?: string;
 };
+
 
 type CollectionOption = {
   _id: string;
@@ -194,6 +199,14 @@ export default function CreateProductPage() {
   const [optionsSubSubFamily, setOptionsSubSubFamily] = useState<TagOption[]>(
     []
   );
+  const [newSupplier, setNewSupplier] = useState<Supplier>({
+    supplier_id: "",
+    supplier_ref: "",
+    pcb: "",
+    custom_cat: "",
+    made_in: "",
+    company_name: ""
+  });
   const [selectedSupplierIndex, setSelectedSupplierIndex] = useState<
     number | null
   >(null);
@@ -202,11 +215,6 @@ export default function CreateProductPage() {
     CollectionOption[]
   >([]);
   const [optionsSupplier, setOptionsSupplier] = useState<SuppliersOption[]>([]);
-  const [isEditing, setIsEditing] = useState<number | null>(null);
-  const [currentSupplier, setCurrentSupplier] = useState<
-    Supplier | undefined
-  >();
-
   const classificationOptions = [
     {
       value: "Au vieux campeur",
@@ -225,15 +233,7 @@ export default function CreateProductPage() {
     long_label: "",
     type: "Marchandise",
     tag_ids: [],
-    suppliers: [
-      {
-        supplier_id: "",
-        supplier_ref: "",
-        pcb: "",
-        custom_cat: "",
-        made_in: "",
-      },
-    ],
+    suppliers: [],
     dimension_types: "Couleur/Taille",
     brand_ids: [],
     collection_ids: [],
@@ -714,52 +714,60 @@ export default function CreateProductPage() {
     }
   };
 
-  const handleSupplierChange = (
-    index: number,
-    field: string,
-    value: string
-  ) => {
-    setFormData((prevFormData) => {
-      const newSuppliers = [...prevFormData.suppliers];
-      newSuppliers[index] = { ...newSuppliers[index], [field]: value };
-      return {
-        ...prevFormData,
-        suppliers: newSuppliers,
-      };
-    });
+  const handleSupplierSelectChange = (index: number, option: SuppliersOption) => {
+    const selectedSupplier = optionsSupplier.find(
+      (supplier) => supplier.value === option?.value
+    );
+  
+    if (selectedSupplier) {
+      setSelectedSuppliers((prevSuppliers) => {
+        const newSupplier = {
+          _id: selectedSupplier.value,
+          value: selectedSupplier.value,
+          label: selectedSupplier.label,
+          company_name: selectedSupplier.label,
+          supplier_ref: "",
+          pcb: "",
+          custom_cat: "",
+          made_in: "0",
+        };
+  
+        // Ajoute le nouveau fournisseur à la fin du tableau
+        return [...prevSuppliers, newSupplier];
+      });
+  
+      // Mettez à jour `newSupplier` pour le fournisseur actuellement sélectionné
+      setNewSupplier({
+        supplier_id: selectedSupplier.value,
+        company_name: selectedSupplier.label,
+        supplier_ref: "",
+        pcb: "",
+        custom_cat: "",
+        made_in: "",
+      });
+    }
   };
+  
+  
+  
+  
+  console.log(selectedSuppliers)
 
-  const handleSupplierSelectChange = (
-    index: number,
-    option: SingleValue<SuppliersOption>
-  ) => {
-    // Mettre à jour formData (comme dans votre ancienne version)
-    setFormData((prevFormData) => {
-      const newSuppliers = [...(prevFormData.suppliers || [])];
-      newSuppliers[index] = {
-        ...newSuppliers[index],
-        supplier_id: option ? option.value : "", // Mettez à jour l'ID du fournisseur
-      };
-      return {
-        ...prevFormData,
-        suppliers: newSuppliers,
-      };
+  const addSupplier = (newSupplier: any) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      suppliers: [...prevFormData.suppliers, newSupplier],
+    }));
+
+    setNewSupplier({
+      supplier_id: "",
+      company_name: "",
+      supplier_ref: "",
+      pcb: "",
+      custom_cat: "",
+      made_in: "",
     });
-
-    // Mettre à jour selectedSuppliers pour stocker le nom (nouvelle logique)
-    setSelectedSuppliers((prevSuppliers) => {
-      const newSuppliers = [...prevSuppliers];
-
-      // Si l'option est sélectionnée, ajoutez ou mettez à jour le fournisseur
-      newSuppliers[index] = {
-        _id: option?.value || "", // ID du fournisseur
-        value: option?.value || "", // Utilisez la même valeur pour éviter l'erreur
-        label: option?.label || "", // Nom du fournisseur
-        company_name: option?.label || "", // Afficher le nom du fournisseur
-      };
-
-      return newSuppliers;
-    });
+    
   };
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -801,29 +809,6 @@ export default function CreateProductPage() {
     }
   };
 
-  const addSupplier = (newSupplier: Supplier) => {
-    setFormData((prevFormData) => {
-      const suppliers = [...prevFormData.suppliers];
-  
-      const isNewSupplierFilled =
-        newSupplier.supplier_id !== "" &&
-        newSupplier.supplier_ref !== "" &&
-        newSupplier.pcb !== "" &&
-        newSupplier.custom_cat !== "" &&
-        newSupplier.made_in !== "";
-  
-      if (isNewSupplierFilled) {
-        suppliers.push(newSupplier);
-      } else {
-        console.error("Veuillez remplir tous les champs du fournisseur avant de l'ajouter.");
-        return prevFormData; 
-      }
-  
-      return { ...prevFormData, suppliers };
-    });
-    setsupplierModalIsOpen(false);
-  }; 
-
   const removeSupplier = (index: number) => {
     setFormData((prevFormData) => {
       const newSuppliers = prevFormData.suppliers.filter((_, i) => i !== index);
@@ -838,6 +823,22 @@ export default function CreateProductPage() {
     setIsFullScreen((prevState) => !prevState);
   };
 
+ 
+
+  useEffect(() => {
+    if (supplierModalIsOpen) {
+      setNewSupplier({
+        supplier_id: "",
+        supplier_ref: "",
+        pcb: "",
+        custom_cat: "",
+        made_in: "",
+        company_name: ""
+      });
+      setInputValueSupplier("");
+    }
+  }, [supplierModalIsOpen]);
+
   console.log(formData);
   return (
     <>
@@ -847,23 +848,20 @@ export default function CreateProductPage() {
         onClose={() => setsupplierModalIsOpen(false)}
         header="Ajouter un fournisseur"
       >
-        {formData.suppliers.length > 0 &&
-          formData.suppliers
-            .slice(-1)
-            .map((supplier) => (
-              <SupplierFormComponent
-                supplier={supplier}
-                index={formData.suppliers.length - 1}
-                optionsSupplier={optionsSupplier}
-                inputValueSupplier={inputValueSupplier}
-                handleSupplierSelectChange={handleSupplierSelectChange}
-                handleInputChangeSupplier={handleInputChangeSupplier}
-                handleSupplierChange={handleSupplierChange}
-                removeSupplier={removeSupplier}
-                onCloseModal={() => setsupplierModalIsOpen(false)}
-                addSupplier={addSupplier}
-              />
-            ))}
+        <SupplierFormComponent
+          supplier={newSupplier}
+          index={0} // Pas besoin de multiples index ici car c'est un formulaire d'ajout
+          optionsSupplier={optionsSupplier}
+          inputValueSupplier={inputValueSupplier}
+          handleSupplierSelectChange={handleSupplierSelectChange}
+          handleInputChangeSupplier={handleInputChangeSupplier}
+          handleSupplierChange={(index, field, value) => {
+            setNewSupplier({ ...newSupplier, [field]: value });
+          }}
+          removeSupplier={() => {}}
+          onCloseModal={() => setsupplierModalIsOpen(false)}
+          addSupplier={addSupplier}
+        />
       </Modal>
       <section className="w-full bg-slate-50 p-7">
         <div className="max-w-[2024px] mx-auto">
