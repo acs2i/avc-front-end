@@ -89,6 +89,40 @@ export type MarkerInfo = {
 }
 
 
+export type SupplierDetail = {
+  index: number;
+  code: string;
+  company_name: string;
+  supplier_id: string;
+  supplier_ref: string;
+  pcb: string;
+  custom_cat: string;
+  made_in: string;
+}
+
+export type TagDetail = {
+  _id: string;
+  name: string;
+  code: string;
+}
+
+export type BrandDetail = {
+  _id: string;
+  label: string;
+}
+
+export type CollectionDetail = {
+  _id: string;
+  label: string;
+}
+
+export type Tag = {
+  _id: string;
+  level: string;
+  code: string;
+  name: string;
+};
+
 export type Product = {
   _id: string;
   creator_id: any;
@@ -109,6 +143,31 @@ export type Product = {
   tbeu_pmeu: number;
   status: string;
   additional_fields: any;
+}
+
+export type Draft = {
+  _id: string;
+  creator_id: any;
+  reference: string;
+  name: string;
+  short_label: string;
+  long_label: string;
+  type: string;
+  tag_ids: string[];
+  brand_ids: string[];
+  collection_ids: string[];
+  peau: number;
+  tbeu_pb: number;
+  tbeu_pmeu: number;
+  imgPath: string;
+  status: string;
+  additional_fields: any;
+  suppliers: SupplierDetail[];
+  dimension_types: string[];
+  uvc?: any[];
+  tag_details?: TagDetail[];
+  brand_details?: BrandDetail[];
+  collection_details?: CollectionDetail[];
 }
 
 export type PriceItemSchema = {
@@ -140,5 +199,37 @@ export type Supplier = {
   pcb: string;
   custom_cat: string;
   made_in: string;
+  company_name: string; 
 }
+
+export type TagOption = {
+  _id: string;
+  name: string;
+  value: string;
+  label: string;
+};
+
+export type BrandOption = {
+  _id: string;
+  value: string;
+  label: string;
+};
+
+export type CollectionOption = {
+  _id: string;
+  value: string;
+  label: string;
+};
+
+export type SuppliersOption = {
+  _id: string;
+  value: string;
+  label: string;
+  company_name: string;
+  supplier_ref?: string;  // Champs optionnels
+  pcb?: string;
+  custom_cat?: string;
+  made_in?: string;
+};
+
 

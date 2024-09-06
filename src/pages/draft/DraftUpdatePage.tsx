@@ -21,90 +21,9 @@ import CreatableSelect from "react-select/creatable";
 import { SingleValue } from "react-select";
 import useNotify from "../../utils/hooks/useToast";
 import { CircularProgress } from "@mui/material";
+import { Uvc, Supplier, Draft, SupplierDetail, TagOption, BrandOption, CollectionOption, Tag } from "@/type";
 import { useFetchDetails } from "../../utils/hooks/usefetchdetails";
 
-interface TagDetail {
-  _id: string;
-  name: string;
-  code: string;
-}
-
-interface BrandDetail {
-  _id: string;
-  label: string;
-}
-
-interface CollectionDetail {
-  _id: string;
-  label: string;
-}
-
-interface SupplierDetail {
-  index: number;
-  code: string;
-  company_name: string;
-  supplier_id: string;
-  supplier_ref: string;
-  pcb: string;
-  custom_cat: string;
-  made_in: string;
-}
-
-interface Draft {
-  _id: string;
-  creator_id: any;
-  reference: string;
-  name: string;
-  short_label: string;
-  long_label: string;
-  type: string;
-  tag_ids: string[];
-  brand_ids: string[];
-  collection_ids: string[];
-  peau: number;
-  tbeu_pb: number;
-  tbeu_pmeu: number;
-  imgPath: string;
-  status: string;
-  additional_fields: any;
-  suppliers: SupplierDetail[];
-  dimension_types: string[];
-  uvc?: any[];
-  tag_details?: TagDetail[];
-  brand_details?: BrandDetail[];
-  collection_details?: CollectionDetail[];
-}
-
-interface PriceItemSchema {
-  peau: number;
-  tbeu_pb: number;
-  tbeu_pmeu: number;
-}
-
-interface Price {
-  tarif_id: any;
-  currency: string;
-  supplier_id: any;
-  price: PriceItemSchema;
-  store: string;
-}
-
-interface Uvc {
-  code: string;
-  dimensions: string[];
-  prices: Price[];
-  eans: string[];
-  status: string;
-  additional_fields: any;
-}
-
-interface Supplier {
-  supplier_id: string;
-  supplier_ref: string;
-  pcb: string;
-  custom_cat: string;
-  made_in: string;
-}
 
 interface FormData {
   creator_id: any;
@@ -130,31 +49,6 @@ interface FormData {
   initialGrid: any[];
 }
 
-type Tag = {
-  _id: string;
-  level: string;
-  code: string;
-  name: string;
-};
-
-type TagOption = {
-  _id: string;
-  name: string;
-  value: string;
-  label: string;
-};
-
-type BrandOption = {
-  _id: string;
-  value: string;
-  label: string;
-};
-
-type CollectionOption = {
-  _id: string;
-  value: string;
-  label: string;
-};
 
 export default function DraftUpdatePage() {
   const { id } = useParams();
@@ -601,13 +495,13 @@ export default function DraftUpdatePage() {
     setFormData((prevFormData) => {
       let newTagIds = [...prevFormData.tag_ids];
       if (newValue) {
-        newTagIds[2] = newValue.value; // Place le SubSubFamily ID à l'index 2
+        newTagIds[2] = newValue.value;
       } else {
-        newTagIds[2] = ""; // Retire la sous-sous-famille si aucun n'est sélectionné
+        newTagIds[2] = "";
       }
       return {
         ...prevFormData,
-        tag_ids: newTagIds.filter(Boolean), // Supprime les valeurs vides
+        tag_ids: newTagIds.filter(Boolean),
       };
     });
   };
