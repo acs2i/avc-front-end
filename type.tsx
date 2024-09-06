@@ -90,15 +90,55 @@ export type MarkerInfo = {
 
 
 export type Product = {
-  code: string;
+  _id: string;
+  creator_id: any;
+  reference: string;
   name: string;
-  brand: string;
-  supplier: string;
-  family: string;
-  subFamily: string;
-  productImg: string;
-  creatorName: string;
-  creatorImg: string;
-  comment: string;
-  status: number;
-};
+  short_label: string;
+  long_label: string;
+  type: string;
+  tag_ids: any[];
+  suppliers: any[];
+  dimension_types: string[];
+  uvc_ids: any[];
+  brand_ids: any[];
+  collection_ids: any[];
+  imgPath: string;
+  peau: number;
+  tbeu_pb: number;
+  tbeu_pmeu: number;
+  status: string;
+  additional_fields: any;
+}
+
+export type PriceItemSchema = {
+  peau: number;
+  tbeu_pb: number;
+  tbeu_pmeu: number;
+}
+
+export type Price = {
+  tarif_id: any;
+  currency: string;
+  supplier_id: any;
+  price: PriceItemSchema;
+  store: string;
+}
+
+export type Uvc = {
+  code: string;
+  dimensions: string[];
+  prices: Price[];
+  eans: string[];
+  status: string;
+  additional_fields: any;
+}
+
+export type Supplier = {
+  supplier_id: string;
+  supplier_ref: string;
+  pcb: string;
+  custom_cat: string;
+  made_in: string;
+}
+

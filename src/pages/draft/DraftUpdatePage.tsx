@@ -19,7 +19,6 @@ import UVCGrid from "../../components/UVCGrid";
 import FormSection from "../../components/Formulaires/FormSection";
 import CreatableSelect from "react-select/creatable";
 import { SingleValue } from "react-select";
-import Input from "../../components/FormElements/Input";
 import useNotify from "../../utils/hooks/useToast";
 import { CircularProgress } from "@mui/material";
 import { useFetchDetails } from "../../utils/hooks/usefetchdetails";
@@ -158,6 +157,7 @@ type CollectionOption = {
 };
 
 export default function DraftUpdatePage() {
+  const { id } = useParams();
   const token = useSelector((state: any) => state.auth.token);
   const creatorId = useSelector((state: any) => state.auth.user);
   const { notifySuccess, notifyError } = useNotify();
@@ -172,7 +172,6 @@ export default function DraftUpdatePage() {
   const [draft, setDraft] = useState<Draft>();
   const [isDetailsFetched, setIsDetailsFetched] = useState(false);
   const [isModify, setIsModify] = useState(false);
-  const { id } = useParams();
   const [product, setProduct] = useState<Draft>();
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [desactivationInput, setDesactivationInput] = useState("");

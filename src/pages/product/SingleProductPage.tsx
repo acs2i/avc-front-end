@@ -19,9 +19,10 @@ import SupplierComponent from "../../components/SupplierComponent";
 import UVCInfosTable from "../../components/UVCInfosTable";
 import UVCSupplierTable from "../../components/UVCSupplierTable";
 import FormSection from "../../components/Formulaires/FormSection";
+import { Uvc, Supplier, Product } from "@/type";
+import { useSelector } from "react-redux";
 
-interface Product {
-  _id: string;
+interface FormData {
   creator_id: any;
   reference: string;
   name: string;
@@ -29,36 +30,17 @@ interface Product {
   long_label: string;
   type: string;
   tag_ids: any[];
-  suppliers: any[];
-  dimension_types: string[];
-  uvc_ids: any[];
+  suppliers: Supplier[];
+  dimension_types: string;
   brand_ids: any[];
   collection_ids: any[];
-  imgPath: string;
   peau: number;
   tbeu_pb: number;
   tbeu_pmeu: number;
+  imgPath: string;
   status: string;
   additional_fields: any;
-}
-
-interface FormData {
-  creator_id: any;
-  description_ref: string;
-  reference: string;
-  designation_longue: string;
-  designation_courte: string;
-  call_name: string;
-  supplier_name: string;
-  supplier_ref: string;
-  family: string[];
-  subFamily: string[];
-  dimension_type: string;
-  dimension: string[];
-  brand: string;
-  ref_collection: string;
-  composition: string;
-  description_brouillon: string;
+  uvc_ids: Uvc[];
   initialSizes: any[];
   initialColors: any[];
   initialGrid: any[];
@@ -66,6 +48,8 @@ interface FormData {
 
 export default function SingleProductPage() {
   const { id } = useParams();
+  const token = useSelector((state: any) => state.auth.token);
+  const creatorId = useSelector((state: any) => state.auth.user);
   const navigate = useNavigate();
   const [product, setProduct] = useState<Product>();
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -77,25 +61,27 @@ export default function SingleProductPage() {
   const [page, setPage] = useState("dimension");
   const [onglet, setOnglet] = useState("infos");
   const [formData, setFormData] = useState<FormData>({
-    creator_id: "",
-    description_ref: "",
-    reference: "",
-    designation_longue: "",
-    designation_courte: "",
-    call_name: "",
-    supplier_name: "",
-    supplier_ref: "",
-    family: [],
-    subFamily: [],
-    dimension_type: "",
-    brand: "",
-    ref_collection: "",
-    description_brouillon: "",
-    dimension: [],
-    composition: "",
-    initialSizes: [],
-    initialColors: [],
-    initialGrid: [],
+    creator_id: creatorId._id,
+    reference: product?.reference || "",
+    name: product?.name || "",
+    short_label: product?.short_label || "",
+    long_label: product?.long_label || "",
+    type: "Marchandise",
+    tag_ids: [],
+    suppliers: product?.suppliers || [],
+    dimension_types: product?.dimension_types?.[0] || "Couleur/Taille",
+    brand_ids: [],
+    collection_ids: [],
+    peau: product?.peau || 0,
+    tbeu_pb: product?.tbeu_pb || 0,
+    tbeu_pmeu: product?.tbeu_pmeu || 0,
+    imgPath: "",
+    status: "A",
+    additional_fields: "",
+    uvc_ids: product?.uvc_ids || [],
+    initialSizes: ["000"],
+    initialColors: ["000"],
+    initialGrid: [[true]],
   });
 
   const [sizes, setSizes] = useState<string[]>(formData.initialSizes);
@@ -752,7 +738,7 @@ export default function SingleProductPage() {
                   )}
                 </div>
               </div>
-              {onglet === "infos" && product && (
+              {/* {onglet === "infos" && product && (
                 <UVCInfosTable
                   uvcDimension={formData.dimension}
                   productReference={product.reference || ""}
@@ -764,7 +750,7 @@ export default function SingleProductPage() {
                   uvcPrices={formData.dimension}
                   productReference={product.reference || ""}
                 />
-              )}
+              )} */}
               {/* {onglet === "supplier" && product && (
                 <UVCSupplierTable
                   uvcDimensions={formData.dimension}
