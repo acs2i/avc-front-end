@@ -15,6 +15,7 @@ interface UVCGridProps {
   uvcGrid: boolean[][];
   isFullScreen?: any;
   isModify?: boolean;
+  isEditable?: boolean;
 }
 
 interface Grid {
@@ -36,7 +37,8 @@ const UVCGrid: React.FC<UVCGridProps> = ({
   colors,
   uvcGrid,
   isFullScreen,
-  isModify, // Destructure the new prop
+  isModify,
+  isEditable,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [grids, setGrids] = useState<Grid[]>([]);
@@ -345,7 +347,7 @@ const UVCGrid: React.FC<UVCGridProps> = ({
                   scope="col"
                   className="px-1 py-2 text-center border border-solid border-gray-300 border-b"
                 >
-                  {isModify ? (
+                  {isModify && isEditable ? (
                     <input
                       type="text"
                       value={size}
@@ -366,7 +368,7 @@ const UVCGrid: React.FC<UVCGridProps> = ({
                 className="border text-gray-700 cursor-pointer"
               >
                 <td className="max-w-[200px] py-2 px-2 border">
-                  {isModify ? (
+                  {isModify && isEditable ? (
                     <input
                       type="text"
                       value={color}

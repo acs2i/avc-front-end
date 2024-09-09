@@ -53,7 +53,6 @@ interface Uvc {
   prices: Price[];
   eans: string[];
   status: string;
-  additional_fields: any;
 }
 interface Supplier {
   supplier_id: string;
@@ -262,7 +261,6 @@ export default function CreateProductPage() {
         ],
         eans: [],
         status: "",
-        additional_fields: {},
       },
     ],
     initialSizes: ["000"],

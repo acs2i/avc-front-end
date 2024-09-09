@@ -190,7 +190,15 @@ export type Uvc = {
   prices: Price[];
   eans: string[];
   status: string;
-  additional_fields: any;
+}
+
+export type DatalakeUvc = {
+  product_id: any;
+  code: string;
+  dimensions: string[];
+  prices: Price[];
+  eans: string[];
+  status: string;
 }
 
 export type Supplier = {

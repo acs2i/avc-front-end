@@ -31,13 +31,16 @@ import {
   CollectionOption,
   SupplierDetail,
   SuppliersOption,
+  Price,
+  DatalakeUvc,
 } from "@/type";
 import { useSelector } from "react-redux";
 import SupplierFormComponent from "../../components/SupplierFormComponent";
-
+import useNotify from "../../utils/hooks/useToast";
+import { CircularProgress } from "@mui/material";
 
 interface formDataUVC {
-    uvc: Uvc[]
+  uvc: DatalakeUvc[];
 }
 
 interface FormData {
@@ -57,7 +60,6 @@ interface FormData {
   tbeu_pmeu: number;
   imgPath: string;
   status: string;
-  additional_fields: any;
   uvc_ids: Uvc[];
   initialSizes: any[];
   initialColors: any[];
@@ -68,6 +70,8 @@ export default function SingleProductPage() {
   const { id } = useParams();
   const token = useSelector((state: any) => state.auth.token);
   const creatorId = useSelector((state: any) => state.auth.user);
+  const { notifySuccess, notifyError } = useNotify();
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [modalSupplierisOpen, setModalSupplierisOpen] = useState(false);
   const [product, setProduct] = useState<Product>();
@@ -123,37 +127,40 @@ export default function SingleProductPage() {
     dimension_types: "Couleur/Taille",
     brand_ids: [],
     collection_ids: [],
-    peau: 0,
-    tbeu_pb: 0,
-    tbeu_pmeu: 0,
+    peau: product?.peau || 0,
+    tbeu_pb: product?.tbeu_pb || 0,
+    tbeu_pmeu: product?.tbeu_pmeu || 0,
     imgPath: "",
     status: "A",
-    additional_fields: "",
     uvc_ids: [],
     initialSizes: ["000"],
     initialColors: ["000"],
     initialGrid: [[true]],
   });
-  // const [formDataUvc, setFormDataUvc] = useState<formDataUVC>({
-  //   code: "",
-  //   dimensions: [],
-  //   prices: [
-  //     {
-  //       tarif_id: "",
-  //       currency: "",
-  //       supplier_id: "",
-  //       price: {
-  //         peau: 0,
-  //         tbeu_pb: 0,
-  //         tbeu_pmeu: 0,
-  //       },
-  //       store: "",
-  //     },
-  //   ],
-  //   eans: [],
-  //   status: "",
-  //   additional_fields: {},
-  // });
+  const [formDataUvc, setFormDataUvc] = useState<formDataUVC>({
+    uvc: [
+      {
+        product_id: "",
+        code: "",
+        dimensions: [],
+        prices: [
+          {
+            tarif_id: "",
+            currency: "",
+            supplier_id: "",
+            price: {
+              peau: 0,
+              tbeu_pb: 0,
+              tbeu_pmeu: 0,
+            },
+            store: "",
+          },
+        ],
+        eans: [],
+        status: "",
+      },
+    ],
+  });
   const [newSupplier, setNewSupplier] = useState<Supplier>({
     supplier_id: "",
     supplier_ref: "",
@@ -181,7 +188,6 @@ export default function SingleProductPage() {
         tbeu_pmeu: product.tbeu_pmeu || 0,
         imgPath: product.imgPath || "",
         status: product.status || "A",
-        additional_fields: product.additional_fields || "",
         uvc_ids: product.uvc_ids || [],
         initialSizes: ["000"],
         initialColors: ["000"],
@@ -665,12 +671,42 @@ export default function SingleProductPage() {
     });
   };
 
-  const handleGridChange = (grid: string[][]) => {
-    const flattenedGrid = grid.flat();
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      dimension: flattenedGrid,
+  const handleDimensionsChange = (dimensions: string[][]) => {
+    const newDimensions = dimensions.flatMap((dim) => {
+      return dim.map((combination) => {
+        const [color, size] = combination.split(",");
+        return { color, size };
+      });
+    });
+
+    const newUVCs = newDimensions.map((dim, index) => ({
+      product_id: id,
+      code: `${dim.color}${dim.size}${formData.reference}`,
+      dimensions: [`${dim.color}/${dim.size}`],
+      prices: [
+        {
+          tarif_id: "",
+          currency: "EUR",
+          supplier_id:
+            selectedSuppliers.length > 0 ? selectedSuppliers[0]._id : "",
+          price: {
+            peau: formData.peau,
+            tbeu_pb: formData.tbeu_pb,
+            tbeu_pmeu: formData.tbeu_pmeu,
+          },
+          store: "",
+        },
+      ],
+      eans: [],
+      status: "A",
     }));
+
+    setFormDataUvc((prevFormData) => ({
+      ...prevFormData,
+      uvc: newUVCs,
+    }));
+
+    console.log(newUVCs);
   };
 
   const fetchProduct = async () => {
@@ -746,7 +782,67 @@ export default function SingleProductPage() {
     setDesactivationInput(event.target.value);
   };
 
-  console.log(formData);
+  // Fonction de mise a jour de la référence
+  const handleUpdateReference = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const uvcPromises = formDataUvc.uvc.map(async (uvc) => {
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/uvc`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(uvc),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Erreur lors de la création des UVC !");
+        }
+
+        const createdUvc = await response.json();
+        return createdUvc._id;
+      });
+
+      const uvcIds = await Promise.all(uvcPromises);
+
+      const updatedFormData = {
+        ...formData,
+        uvc_ids: uvcIds,
+      };
+
+      const productResponse = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(updatedFormData),
+        }
+      );
+
+      if (productResponse.ok) {
+        notifySuccess("Référence mise à jour avec succès !");
+        window.location.reload();
+      } else {
+        notifyError("Erreur lors de la mise à jour de la référence !");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+      notifyError("Erreur lors de la mise à jour de la référence");
+    } finally {
+      setIsLoading(false);
+      setIsModify(false);
+    }
+  };
+
 
   return (
     <>
@@ -815,7 +911,7 @@ export default function SingleProductPage() {
         </div>
       </Modal>
       <section className="w-full bg-slate-50 p-8 max-w-[2000px] mx-auto">
-        <form>
+        <form onSubmit={handleUpdateReference}>
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-2">
               <div onClick={() => navigate(-1)} className="cursor-pointer">
@@ -829,7 +925,12 @@ export default function SingleProductPage() {
               {product && (
                 <h2 className="text-[25px] font-[200]">{product.long_label}</h2>
               )}
-              {!isModify ? (
+              {isLoading ? (
+                // Afficher un indicateur de chargement si isLoading est vrai
+                <div className="flex items-center gap-2">
+                  <CircularProgress />
+                </div>
+              ) : !isModify ? (
                 <div className="flex items-center gap-2">
                   <Button
                     size="small"
@@ -906,7 +1007,7 @@ export default function SingleProductPage() {
                               onChange={handleChange}
                               placeholder={product?.reference}
                               value={formData.reference}
-                              className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                              className="col-span-3 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
                             />
                           )}
                         </div>
@@ -929,7 +1030,7 @@ export default function SingleProductPage() {
                               onChange={handleChange}
                               placeholder={product?.name}
                               value={formData.name}
-                              className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                              className="col-span-3 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
                             />
                           )}
                         </div>
@@ -952,7 +1053,7 @@ export default function SingleProductPage() {
                               onChange={handleChange}
                               placeholder={product?.long_label}
                               value={formData.long_label}
-                              className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                              className="col-span-3 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
                             />
                           )}
                         </div>
@@ -975,7 +1076,7 @@ export default function SingleProductPage() {
                               onChange={handleChange}
                               placeholder={product?.short_label}
                               value={formData.short_label}
-                              className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                              className="col-span-3 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
                             />
                           )}
                         </div>
@@ -1292,7 +1393,7 @@ export default function SingleProductPage() {
           </div>
 
           {/* Partie onglets */}
-          <div className="mt-[30px] flex mb-[500px]">
+          <div className="mt-[30px] flex">
             <div className="w-[30%] border-t-[1px] border-gray-300">
               {LINKS_Product.map((link) => (
                 <div
@@ -1334,10 +1435,10 @@ export default function SingleProductPage() {
                 }`}
               >
                 <UVCGrid
-                  onDimensionsChange={handleGridChange}
-                  initialSizes={sizes} // Passer les tailles extraites
-                  initialColors={colors} // Passer les couleurs extraites
-                  initialGrid={uvcGrid} // La grille initiale basée sur les UVC
+                  onDimensionsChange={handleDimensionsChange}
+                  initialSizes={sizes}
+                  initialColors={colors}
+                  initialGrid={uvcGrid}
                   setSizes={setSizes}
                   setColors={setColors}
                   setUvcGrid={setUvcGrid}
@@ -1346,6 +1447,7 @@ export default function SingleProductPage() {
                   uvcGrid={uvcGrid}
                   isFullScreen={toggleFullScreen}
                   isModify={isModify}
+                  isEditable={false}
                 />
               </div>
             )}
@@ -1407,6 +1509,38 @@ export default function SingleProductPage() {
               </div>
             )}
           </div>
+          {isModify && (
+            <div>
+              {!isLoading ? (
+                <div className="mt-[50px] flex gap-2">
+                  <button
+                    className="w-full bg-[#9FA6B2] text-white py-2 rounded-md font-[600] hover:bg-[#bac3d4] hover:text-white shadow-md"
+                    type="button"
+                    onClick={() => setIsModify(false)}
+                  >
+                    Annuler la modification
+                  </button>
+                  <button
+                    className="w-full bg-[#3B71CA] text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
+                    type="submit"
+                  >
+                    Valider les modifications
+                  </button>
+                </div>
+              ) : (
+                <div className="relative flex justify-center mt-7 px-7 gap-2">
+                  <CircularProgress size={100} />
+                  <div className="absolute h-[60px] w-[80px] top-[50%] translate-y-[-50%]">
+                    <img
+                      src="/img/logo.png"
+                      alt="logo"
+                      className="w-full h-full animate-pulse"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </form>
       </section>
     </>

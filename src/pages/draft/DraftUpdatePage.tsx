@@ -211,7 +211,6 @@ export default function DraftUpdatePage() {
             ],
             eans: [],
             status: "",
-            additional_fields: {},
           });
         }
       });
@@ -1318,6 +1317,7 @@ export default function DraftUpdatePage() {
                   uvcGrid={uvcGrid}
                   isFullScreen={toggleFullScreen}
                   isModify={isModify}
+                  isEditable
                 />
               </div>
             )}
