@@ -84,7 +84,7 @@ const SupplierFormComponent: React.FC<SupplierEditorProps> = ({
         <Input
           element="input"
           id={`pcb-${index}`}
-          label="PCB :"
+          label="PCB (multiple) :"
           value={supplier.pcb || ""}
           onChange={(e) => handleSupplierChange(index, "pcb", e.target.value)}
           placeholder="Ajouter le PCB"

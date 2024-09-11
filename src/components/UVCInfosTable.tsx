@@ -1,30 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 
 interface UVCInfosTableProps {
-  uvcDimension: string[];
-  productReference: string;
+  uvcDimension: { code: string; dimensions: string[] }[];  // Mise à jour du type
   brandLabel: string;
 }
 
 const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
   uvcDimension,
-  productReference,
   brandLabel
 }) => {
-  const [brands, setBrands] = useState<{ [key: string]: string }>(
-    uvcDimension.reduce((acc, dimension) => {
-      acc[dimension] = "";
-      return acc;
-    }, {} as { [key: string]: string })
-  );
-
-  const handlebrandChange = (dimension: string, value: string) => {
-    setBrands((prevCollections) => ({
-      ...prevCollections,
-      [dimension]: value,
-    }));
-  };
-
   return (
     <table className="w-full border">
       <thead>
@@ -36,12 +20,13 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
         </tr>
       </thead>
       <tbody>
-        {uvcDimension.map((dimension, index) => {
-          const [couleur, taille] = dimension.split(",");
-          const codeUVC = `${productReference}${couleur}${taille}`;
+        {uvcDimension.map((uvc, index) => {
+          // Extraire la couleur et la taille à partir de dimensions
+          const [couleur, taille] = uvc.dimensions[0].split("/");
+
           return (
             <tr key={index} className="text-[11px]">
-              <td className="border px-4 py-1 text-center">{codeUVC}</td>
+              <td className="border px-4 py-1 text-center">{uvc.code}</td>
               <td className="border px-4 py-1 text-center">{couleur}</td>
               <td className="border px-4 py-1 text-center">{taille}</td>
               <td className="border px-4 py-1 text-center">{brandLabel}</td>

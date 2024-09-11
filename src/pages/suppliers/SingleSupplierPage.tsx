@@ -16,16 +16,17 @@ import Button from "../../components/FormElements/Button";
 import useNotify from "../../utils/hooks/useToast";
 import { CircularProgress, Collapse } from "@mui/material";
 import FormSection from "../../components/Formulaires/FormSection";
+import BrandSection from "../../components/Formulaires/BrandSection";
 
 interface BrandId {
+  _id: string;
   label: string;
 }
 
-interface Product {
+interface Supplier {
   creator_id: any;
   code: string;
   company_name: string;
-  juridique: string;
   phone: string;
   email: string;
   web_url: string;
@@ -38,7 +39,6 @@ interface Product {
   postal: string;
   country: string;
   currency: string;
-  discount: string;
   brand_id: BrandId[];
   contacts: Contact[];
   conditions: Condition[];
@@ -70,7 +70,6 @@ interface FormData {
   creator_id: any;
   code: string;
   company_name: string;
-  juridique: string;
   phone: string;
   email: string;
   web_url: string;
@@ -83,8 +82,7 @@ interface FormData {
   postal: string;
   country: string;
   currency: string;
-  discount: string;
-  brand_id: string[];
+  brand_id: any[];
   contacts: Contact[];
   conditions: Condition[];
 }
@@ -95,7 +93,6 @@ type BrandOption = {
   code: string;
   label: string;
 };
-
 const customStyles = {
   control: (provided: any) => ({
     ...provided,
@@ -125,7 +122,7 @@ const customStyles = {
 export default function SingleSupplierPage() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [supplier, setSupplier] = useState<Product>();
+  const [supplier, setSupplier] = useState<Supplier>();
   const creatorId = useSelector((state: any) => state.auth.user);
   const token = useSelector((state: any) => state.auth.token);
   const limit = 10;
@@ -133,28 +130,29 @@ export default function SingleSupplierPage() {
   const [inputValueBrand, setInputValueBrand] = useState("");
   const [isModify, setIsModify] = useState(false);
   const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
-  const [brands, setBrands] = useState<SingleValue<BrandOption>[]>([null]);
+  const [selectedOptionBrand, setSelectedOptionBrand] =
+    useState<SingleValue<BrandOption> | null>(null);
+  const [brandLabel, setBrandLabel] = useState("");
+  const [brands, setBrands] = useState<SingleValue<BrandOption>[]>([]);
   const { notifySuccess, notifyError } = useNotify();
   const [isLoading, setIsLoading] = useState(false);
   const [addFieldIsVisible, setaddFieldIsVisible] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     creator_id: creatorId._id,
-    code: "",
-    company_name: "",
-    juridique: "",
-    phone: "",
-    email: "",
-    web_url: "",
-    siret: "",
-    tva: "",
-    address_1: "",
-    address_2: "",
-    address_3: "",
-    city: "",
-    postal: "",
-    country: "",
-    currency: "",
-    discount: "",
+    code: supplier?.code || "",
+    company_name: supplier?.company_name || "",
+    phone: supplier?.phone || "",
+    email: supplier?.email || "",
+    web_url: supplier?.web_url || "",
+    siret: supplier?.siret || "",
+    tva: supplier?.tva || "",
+    address_1: supplier?.address_1 || "",
+    address_2: supplier?.address_2 || "",
+    address_3: supplier?.address_3 || "",
+    city: supplier?.city || "",
+    postal: supplier?.postal || "",
+    country: supplier?.country || "",
+    currency: supplier?.currency || "",
     brand_id: [],
     contacts: [
       {
@@ -209,6 +207,60 @@ export default function SingleSupplierPage() {
     fetchSupplier();
   }, [id]);
 
+  useEffect(() => {
+    if (supplier) {
+      setFormData({
+        creator_id: creatorId._id,
+        code: supplier.code || "",
+        company_name: supplier.company_name || "",
+        phone: supplier.phone || "",
+        email: supplier.email || "",
+        web_url: supplier.web_url || "",
+        siret: supplier.siret || "",
+        tva: supplier.tva || "",
+        address_1: supplier.address_1 || "",
+        address_2: supplier.address_2 || "",
+        address_3: supplier.address_3 || "",
+        city: supplier.city || "",
+        postal: supplier.postal || "",
+        country: supplier.country || "",
+        currency: supplier.currency || "",
+        brand_id: supplier.brand_id.map(brand => brand._id),
+        contacts: supplier.contacts || [
+          {
+            firstname: "",
+            lastname: "",
+            function: "",
+            phone: "",
+            mobile: "",
+            email: "",
+          },
+        ],
+        conditions: supplier.conditions || [
+          {
+            tarif: "",
+            currency: "",
+            rfa: "",
+            net_price: "",
+            labeling: "",
+            paiement_condition: "",
+            franco: "",
+            validate_tarif: "",
+            budget: "",
+          },
+        ],
+      });
+      
+    }
+  }, [supplier, creatorId]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -224,16 +276,111 @@ export default function SingleSupplierPage() {
         }
       );
       if (response.ok) {
-        setTimeout(() => {
-          notifySuccess("Brand modifiée avec succès !");
-          setIsLoading(false);
-        }, 100);
+        notifySuccess("Fournisseur modifié avec succès !");
+        window.location.reload();
+        setIsLoading(false);
       } else {
-        notifyError("Erreur lors de la modif !");
+        notifyError("Erreur lors de la modification !");
       }
     } catch (error) {
       console.error(error);
     } finally {
+    }
+  };
+
+  const handleChangeBrand = (selectedOption: SingleValue<BrandOption>, index: number) => {
+    if (!selectedOption || !selectedOption._id) {
+      console.error("Invalid brand selection");
+      return;
+    }
+  
+    setBrands((prevBrands) => {
+      const updatedBrands = [...prevBrands];
+      updatedBrands[index] = selectedOption;
+      return updatedBrands;
+    });
+  
+    setFormData((prevFormData) => {
+      const updatedBrandIds = [...prevFormData.brand_id];
+      updatedBrandIds[index] = selectedOption._id;
+      return {
+        ...prevFormData,
+        brand_id: updatedBrandIds,
+      };
+    });
+  };
+  
+  const addBrandField = () => {
+    setBrands((prevBrands) => [...prevBrands, null]);
+  
+    setFormData((prevFormData) => {
+      const newBrandIdArray = [...prevFormData.brand_id];
+           
+      return {
+        ...prevFormData,
+        brand_id: newBrandIdArray,
+      };
+    });
+  };
+  
+const removeBrandField = (index: number) => {
+  setBrands((prevBrands) => prevBrands.filter((_, i) => i !== index));
+  setFormData((prevFormData) => ({
+    ...prevFormData,
+    brand_id: brands.filter((_, i) => i !== index).map((brand) => brand?._id || ""),
+  }));
+};
+
+  const handleInputChangeBrand = async (inputValueBrand: string) => {
+    setInputValueBrand(inputValueBrand);
+
+    if (inputValueBrand === "") {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/brand`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+
+        const optionsBrand = data.data?.map((brand: BrandOption) => ({
+          value: brand.label,
+          label: brand.label,
+          _id: brand._id,
+        }));
+
+        setOptionsBrand(optionsBrand);
+      } catch (error) {
+        console.error("Erreur lors de la requête", error);
+      }
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/brand/search?label=${inputValueBrand}&page=${currentPage}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+
+      const optionsBrand = data.data?.map((brand: BrandOption) => ({
+        value: brand.label,
+        label: brand.label,
+        _id: brand._id,
+      }));
+
+      setOptionsBrand(optionsBrand);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
     }
   };
 
@@ -273,10 +420,11 @@ export default function SingleSupplierPage() {
     }));
   };
 
+  console.log(formData);
   return (
     <section className="w-full bg-slate-50 p-7">
       <div className="max-w-[2024px] mx-auto">
-        <form className="mb-[400px]">
+        <form className="mb-[400px]" onSubmit={handleSubmit}>
           <div className="flex justify-between">
             <div>
               {!isModify ? (
@@ -327,9 +475,7 @@ export default function SingleSupplierPage() {
                       }}
                       disabled={supplier?.status === "D"}
                     >
-                      {isModify
-                        ? "Annuler modification"
-                        : "Modifier le fournisseur"}
+                      {isModify ? "Annuler la modification" : "Modifier"}
                     </Button>
                   </div>
                 ) : (
@@ -358,7 +504,10 @@ export default function SingleSupplierPage() {
           <div className="flex gap-4 mt-[80px]">
             {/* Partie Infos */}
             <div className="relative w-[70%] flex flex-col gap-3">
-              <FormSection title="Identification" size={`${!isModify ? "h-[400px]" : "h-[500px]"}`}>
+              <FormSection
+                title="Identification"
+                size={`${!isModify ? "h-[400px]" : "h-[500px]"}`}
+              >
                 <div className="mt-3">
                   {isModify ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -366,9 +515,10 @@ export default function SingleSupplierPage() {
                         element="input"
                         id="code"
                         label="Code fournisseur :"
-                        value=""
+                        value={formData.code}
+                        onChange={handleChange}
                         validators={[]}
-                        placeholder="Ajouter le code fournisseur"
+                        placeholder={supplier?.code}
                         create
                         gray
                       />
@@ -376,9 +526,10 @@ export default function SingleSupplierPage() {
                         element="input"
                         id="company_name"
                         label="Raison sociale :"
-                        value=""
+                        value={formData.company_name}
+                        onChange={handleChange}
                         validators={[]}
-                        placeholder="Ajouter la raison sociale"
+                        placeholder={supplier?.company_name}
                         create
                         gray
                       />
@@ -386,9 +537,10 @@ export default function SingleSupplierPage() {
                         element="input"
                         id="siret"
                         label="Siret :"
-                        value=""
+                        value={formData.siret}
+                        onChange={handleChange}
                         validators={[]}
-                        placeholder="Entrer le numéro SIRET (14 chiffres)"
+                        placeholder={supplier?.siret}
                         create
                         gray
                       />
@@ -396,9 +548,10 @@ export default function SingleSupplierPage() {
                         element="input"
                         id="tva"
                         label="N°TVA intracom :"
-                        value=""
+                        value={formData.tva}
+                        onChange={handleChange}
                         validators={[]}
-                        placeholder="Ajouter le numero tva intracom"
+                        placeholder={supplier?.tva}
                         create
                         gray
                       />
@@ -422,9 +575,7 @@ export default function SingleSupplierPage() {
                         </p>
                       </div>
                       <div>
-                        <span className="font-bold text-gray-700">
-                          Siret :
-                        </span>
+                        <span className="font-bold text-gray-700">Siret :</span>
                         <p className="font-[600] text-slate-500">
                           {supplier?.siret}
                         </p>
@@ -446,9 +597,7 @@ export default function SingleSupplierPage() {
                         </p>
                       </div>
                       <div className="mt-3">
-                        <span className="font-bold text-gray-700">
-                          Email :
-                        </span>
+                        <span className="font-bold text-gray-700">Email :</span>
                         <p className="font-[600] text-slate-500">
                           {supplier?.email}
                         </p>
@@ -469,9 +618,10 @@ export default function SingleSupplierPage() {
                         element="input"
                         id="web_url"
                         label="Site web :"
-                        value=""
+                        value={formData.web_url}
+                        onChange={handleChange}
                         validators={[]}
-                        placeholder="www.monsite.com"
+                        placeholder={supplier?.web_url}
                         create
                         gray
                       />
@@ -480,9 +630,10 @@ export default function SingleSupplierPage() {
                         type="email"
                         id="email"
                         label="Email :"
-                        value=""
+                        value={formData.email}
+                        onChange={handleChange}
                         validators={[]}
-                        placeholder="ex: email@email.fr"
+                        placeholder={supplier?.email}
                         create
                         gray
                       />
@@ -490,9 +641,10 @@ export default function SingleSupplierPage() {
                         element="phone"
                         id="phone"
                         label="Téléphone :"
-                        value=""
+                        value={formData.phone}
+                        onChange={handleChange}
                         validators={[]}
-                        placeholder="0142391456"
+                        placeholder={supplier?.phone}
                         create
                         gray
                       />
@@ -503,7 +655,10 @@ export default function SingleSupplierPage() {
             </div>
             {/* Partie adresse */}
             <div className="relative w-[30%] flex flex-col gap-3">
-              <FormSection title="Adresse" size={`${!isModify ? "h-[400px]" : "h-[500px]"}`}>
+              <FormSection
+                title="Adresse"
+                size={`${!isModify ? "h-[400px]" : "h-[500px]"}`}
+              >
                 <div className="mt-3">
                   {isModify ? (
                     <>
@@ -511,19 +666,20 @@ export default function SingleSupplierPage() {
                         element="input"
                         id="address_1"
                         label="Adresse 1 :"
-                        value=""
+                        value={formData.address_1}
+                        onChange={handleChange}
                         validators={[]}
-                        placeholder="14 rue mon adresse"
-                        create
+                        placeholder={supplier?.address_1}
                         gray
                       />
                       <Input
                         element="input"
                         id="address_2"
                         label="Adresse 2 :"
-                        value=""
+                        value={formData.address_2}
+                        onChange={handleChange}
                         validators={[]}
-                        placeholder="Complément d'adresse"
+                        placeholder={supplier?.address_2}
                         create
                         gray
                       />
@@ -531,9 +687,10 @@ export default function SingleSupplierPage() {
                         element="input"
                         id="address_3"
                         label="Adresse 3 :"
-                        value=""
+                        value={formData.address_3}
+                        onChange={handleChange}
                         validators={[]}
-                        placeholder="Complément d'adresse"
+                        placeholder={supplier?.address_3}
                         create
                         gray
                       />
@@ -541,9 +698,10 @@ export default function SingleSupplierPage() {
                         element="input"
                         id="city"
                         label="Ville :"
-                        value=""
+                        value={formData.city}
+                        onChange={handleChange}
                         validators={[]}
-                        placeholder="Ajouter la ville"
+                        placeholder={supplier?.city}
                         create
                         gray
                       />
@@ -552,8 +710,9 @@ export default function SingleSupplierPage() {
                         id="postal"
                         label="Code postal :"
                         value=""
+                        onChange={handleChange}
                         validators={[]}
-                        placeholder="75019"
+                        placeholder={supplier?.postal}
                         create
                         gray
                       />
@@ -562,8 +721,9 @@ export default function SingleSupplierPage() {
                         id="country"
                         label="Pays :"
                         value=""
+                        onChange={handleChange}
                         validators={[]}
-                        placeholder="France"
+                        placeholder={supplier?.country}
                         create
                         gray
                       />
@@ -601,9 +761,7 @@ export default function SingleSupplierPage() {
                         )}
                       </div>
                       <div className="mt-3">
-                        <span className="font-bold text-gray-700">
-                          Ville :
-                        </span>
+                        <span className="font-bold text-gray-700">Ville :</span>
                         <p className="font-[600] text-slate-500">
                           {supplier?.city}
                         </p>
@@ -617,9 +775,7 @@ export default function SingleSupplierPage() {
                         </p>
                       </div>
                       <div className="mt-3">
-                        <span className="font-bold text-gray-700">
-                          Pays :
-                        </span>
+                        <span className="font-bold text-gray-700">Pays :</span>
                         {supplier?.country ? (
                           <p className="font-[600] text-slate-500">
                             {supplier?.country}
@@ -653,23 +809,33 @@ export default function SingleSupplierPage() {
                           <div className="grid grid-cols-2 gap-2">
                             <Input
                               element="input"
-                              id="lastname"
-                              label="Nom :"
-                              value={contact.lastname}
-                              onChange={handleContactChange(index)}
-                              validators={[]}
-                              placeholder="Nom"
-                              create
-                              gray
-                            />
-                            <Input
-                              element="input"
                               id="firstname"
                               label="Prénom :"
                               value={contact.firstname}
                               onChange={handleContactChange(index)}
                               validators={[]}
-                              placeholder="Prénom"
+                              placeholder={
+                                supplier?.contacts &&
+                                supplier.contacts[index]?.firstname
+                                  ? supplier.contacts[index].firstname
+                                  : ""
+                              }
+                              create
+                              gray
+                            />
+                            <Input
+                              element="input"
+                              id="lastname"
+                              label="Nom :"
+                              value={contact.lastname}
+                              onChange={handleContactChange(index)}
+                              validators={[]}
+                              placeholder={
+                                supplier?.contacts &&
+                                supplier.contacts[index]?.lastname
+                                  ? supplier.contacts[index].lastname
+                                  : ""
+                              }
                               create
                               gray
                             />
@@ -681,7 +847,12 @@ export default function SingleSupplierPage() {
                             value={contact.function}
                             onChange={handleContactChange(index)}
                             validators={[]}
-                            placeholder="Fonction"
+                            placeholder={
+                              supplier?.contacts &&
+                              supplier.contacts[index]?.function
+                                ? supplier.contacts[index].function
+                                : ""
+                            }
                             create
                             gray
                           />
@@ -693,7 +864,12 @@ export default function SingleSupplierPage() {
                               value={contact.phone}
                               onChange={handleContactChange(index)}
                               validators={[]}
-                              placeholder="0142391456"
+                              placeholder={
+                                supplier?.contacts &&
+                                supplier.contacts[index]?.phone
+                                  ? supplier.contacts[index].phone
+                                  : ""
+                              }
                               create
                               gray
                             />
@@ -704,7 +880,12 @@ export default function SingleSupplierPage() {
                               value={contact.mobile}
                               onChange={handleContactChange(index)}
                               validators={[]}
-                              placeholder="Mobile"
+                              placeholder={
+                                supplier?.contacts &&
+                                supplier.contacts[index]?.mobile
+                                  ? supplier.contacts[index].mobile
+                                  : ""
+                              }
                               create
                               gray
                             />
@@ -717,7 +898,12 @@ export default function SingleSupplierPage() {
                             value={contact.email}
                             onChange={handleContactChange(index)}
                             validators={[]}
-                            placeholder="ex: email@email.fr"
+                            placeholder={
+                              supplier?.contacts &&
+                              supplier.contacts[index]?.email
+                                ? supplier.contacts[index].email
+                                : ""
+                            }
                             create
                             gray
                           />
@@ -731,6 +917,14 @@ export default function SingleSupplierPage() {
                           </button>
                         </div>
                       ))}
+                      <button
+                        type="button"
+                        onClick={() => addContactField()}
+                        className="flex items-center gap-2 text-[12px] text-orange-500 mt-3"
+                      >
+                        <Plus size={17} />
+                        Ajouter un contact
+                      </button>
                     </div>
                   ) : (
                     <div>
@@ -812,6 +1006,7 @@ export default function SingleSupplierPage() {
                           id="tarif"
                           label="Tarif :"
                           value=""
+                          onChange={handleChange}
                           validators={[]}
                           placeholder="Tapez un tarif"
                           create
@@ -822,6 +1017,7 @@ export default function SingleSupplierPage() {
                           id="currency"
                           label="Devise :"
                           value=""
+                          onChange={handleChange}
                           validators={[]}
                           placeholder="Choississez une devise"
                           create
@@ -933,9 +1129,7 @@ export default function SingleSupplierPage() {
                     ) : (
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-5">
                         <div className="mt-3">
-                          <span className="font-bold text-gray-700">
-                            RFA :
-                          </span>
+                          <span className="font-bold text-gray-700">RFA :</span>
                           <p className="font-[600] text-slate-500 capitalize">
                             {supplier?.conditions[0].rfa}
                           </p>
@@ -1037,6 +1231,7 @@ export default function SingleSupplierPage() {
                           id="franco"
                           label="Franco :"
                           validators={[]}
+                          onChange={handleChange}
                           placeholder="Ex: 500 EUR, 1000 USD..."
                           create
                           gray
@@ -1046,6 +1241,7 @@ export default function SingleSupplierPage() {
                           id="validate_tarif"
                           label="Validité des tarifs :"
                           validators={[]}
+                          onChange={handleChange}
                           placeholder="Ex: 6 mois, 1 mois..."
                           create
                           gray
@@ -1055,6 +1251,7 @@ export default function SingleSupplierPage() {
                           id="budget"
                           label="Budget marketing :"
                           validators={[]}
+                          onChange={handleChange}
                           placeholder="Ex: 5000 EUR par an"
                           create
                           gray
@@ -1091,80 +1288,69 @@ export default function SingleSupplierPage() {
                   </div>
                 </FormSection>
               </div>
-              {/* Partie buttons */}
-              {!isLoading ? (
-                <div className="mt-[50px] flex gap-2">
-                  <button
-                    className="w-full bg-[#9FA6B2] text-white py-2 rounded-md font-[600] hover:bg-[#bac3d4] hover:text-white shadow-md"
-                    type="button"
-                  >
-                    Annuler
-                  </button>
-                  <button
-                    className="w-full bg-[#3B71CA] text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
-                    type="submit"
-                  >
-                    Modifier le fournisseur
-                  </button>
-                </div>
-              ) : (
-                <div className="relative flex justify-center mt-7 px-7 gap-2">
-                  <CircularProgress size={100} />
-                  <div className="absolute h-[60px] w-[80px] top-[50%] translate-y-[-50%]">
-                    <img
-                      src="/img/logo.png"
-                      alt="logo"
-                      className="w-full h-full animate-pulse"
-                    />
-                  </div>
-                </div>
-              )}
             </div>
             {/* Partie marques */}
             <div className="relative w-[30%] flex flex-col gap-3">
               <FormSection title="Marques">
-                {isModify ? (
-                  <div className="mt-3">
-                    {brands.map((brand, index) => (
-                      <div key={index} className="flex items-center gap-2 mt-2">
-                        <CreatableSelect<BrandOption>
-                          value={brand}
-                          inputValue={inputValueBrand}
-                          options={optionsBrand}
-                          placeholder="Selectionner une marque"
-                          styles={customStyles}
-                          className="block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                        />
-                        <button
-                          type="button"
-                          className="text-red-500 hover:text-red-300"
-                        >
-                          <Trash size={20} />
-                        </button>
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      className="flex items-center gap-2 text-[12px] text-orange-400 mt-3"
-                    >
-                      <Plus size={17} />
-                      Ajouter une marque
-                    </button>
-                  </div>
-                ) : (
-                  <div className="mt-3">
-                    <div className="flex flex-col mt-2">
-                      {supplier?.brand_id.map((brand, index) => (
-                        <span className="font-[600] text-slate-500 capitalize">
-                          {brand.label}
-                        </span>
-                      ))}
+                <div className="mt-3">
+                  {isModify && (
+                    <BrandSection
+                      brands={brands}
+                      optionsBrand={optionsBrand}
+                      handleChangeBrand={handleChangeBrand}
+                      removeBrandField={removeBrandField}
+                      addBrandField={addBrandField}
+                      handleInputChangeBrand={handleInputChangeBrand}
+                      inputValueBrand={inputValueBrand}
+                      customStyles={customStyles}
+                    />
+                  )}
+
+                  {/* Afficher les marques ajoutées */}
+                  {supplier?.brand_id.map((brand, index) => (
+                    <div key={index} className="flex items-center gap-2 mt-2">
+                      <span className="font-[600] text-slate-500 capitalize">
+                        {brand?.label}
+                      </span>
+                      <button
+                        type="button"
+                        className="text-red-500 hover:text-red-300"
+                      >
+                        <Trash size={15} />
+                      </button>
                     </div>
-                  </div>
-                )}
+                  ))}
+                </div>
               </FormSection>
             </div>
           </div>
+          {!isLoading ? (
+            <div className="mt-[50px] flex gap-2">
+              <button
+                className="w-full bg-[#9FA6B2] text-white py-2 rounded-md font-[600] hover:bg-[#bac3d4] hover:text-white shadow-md"
+                type="button"
+              >
+                Annuler
+              </button>
+              <button
+                className="w-full bg-[#3B71CA] text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
+                type="submit"
+              >
+                Modifier le fournisseur
+              </button>
+            </div>
+          ) : (
+            <div className="relative flex justify-center mt-7 px-7 gap-2">
+              <CircularProgress size={100} />
+              <div className="absolute h-[60px] w-[80px] top-[50%] translate-y-[-50%]">
+                <img
+                  src="/img/logo.png"
+                  alt="logo"
+                  className="w-full h-full animate-pulse"
+                />
+              </div>
+            </div>
+          )}
         </form>
       </div>
     </section>

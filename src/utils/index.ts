@@ -34,7 +34,7 @@ export const LINKS: Link[] = [
   {
     linkCategory: [
       {
-        name: "Apps",
+        name: "",
         linksGroup: [
           {
             name: "Tableau de bord",
@@ -46,64 +46,42 @@ export const LINKS: Link[] = [
             name: "Articles",
             linksGroup: [
               {
-                name: "Liste des références",
+                name: "Liste des articles",
                 link: "/product",
+              },
+              {
+                name: "Création d'un article",
+                link: "/product/edit",
+              },
+              {
+                name: "Importer un article",
+                link: "/product/edit",
+              },
+              {
+                name: "Articles à traiter",
+                link: "/draft",
               },
             ],
             icon: Shirt,
           },
           {
-            name: "Brouillons",
-            linksGroup: [
-              {
-                name: "Création d'une référence",
-                link: "/product/edit",
-              },
-              {
-                name: "Références créées",
-                link: "/draft",
-              },
-            ],
-            icon: SquarePen,
-          },
-         
-          {
             name: "Fournisseurs",
-            linksGroup: [
-              {
-                name: "Liste des fournisseurs",
-                link: "/suppliers/suppliers-list",
-              },
-              {
-                name: "Créer un fournisseur",
-                link: "/suppliers/create",
-              },
-            ],
+            link: "/suppliers/suppliers-list",
+            linksGroup: [],
             icon: Factory,
-          },
+          },       
           {
             name: "Paramètres",
             link: "/parameters",
             linksGroup: [],
             icon: Settings2,
           },
-          // {
-          //   name: "Calendrier",
-          //   link: "/calendar",
-          //   linksGroup: [],
-          //   icon: CalendarDays,
-          // },
           {
             name: "Chat",
             link: "/chat",
             linksGroup: [],
             icon: MessageSquare,
           },
-        ],
-      },
-      {
-        name: "Admin",
-        linksGroup: [
           {
             name: "Utilisateurs",
             linksGroup: [
@@ -449,104 +427,6 @@ export const MARKERS: MarkerInfo[] = [
   {
     geocode: [47.3220, 5.0415], // Dijon
     name: "Dijon",
-  },
-];
-
-export const PRODUCTS: Product[] = [
-  {
-    code: "678900",
-    name: "SAC A DOS ALPINISME MIXT 25 + 5",
-    brand: "Ma marque",
-    family: "Matériel de montagne",
-    subFamily: "Montagne",
-    supplier: "Millet",
-    productImg:
-      "https://www.auvieuxcampeur.fr/media/catalog/product/cache/f83a0334dfee85ff9d02a56cf16dc6c2/8/0/804646122_263.jpg",
-    creatorName: "Walid Bouaka",
-    creatorImg:
-      "https://media.istockphoto.com/id/1386479313/fr/photo/heureuse-femme-daffaires-afro-am%C3%A9ricaine-mill%C3%A9naire-posant-isol%C3%A9e-sur-du-blanc.jpg?s=612x612&w=0&k=20&c=CS0xj40eNCorQyzN1ImeMKlvPDocPHSaMsXethQ-Q_g=",
-    comment:
-      "This Fitbit is fantastic! I was trying to be in better shape and needed some motivation, so I decided to treat myself to a new Fitbit.",
-    status: 1,
-  },
-  {
-    code: "678900",
-    name: "ROULEAU DE PEAUX RACE PRO 2.0",
-    brand: "Ma marque",
-    family: "Matériel de montagne",
-    subFamily: "Montagne",
-    supplier: "Millet",
-    productImg:
-      "https://www.auvieuxcampeur.fr/media/catalog/product/cache/f83a0334dfee85ff9d02a56cf16dc6c2/8/2/821580047_603.jpg",
-    creatorName: "Walid Bouaka",
-    creatorImg:
-      "https://media.istockphoto.com/id/1386479313/fr/photo/heureuse-femme-daffaires-afro-am%C3%A9ricaine-mill%C3%A9naire-posant-isol%C3%A9e-sur-du-blanc.jpg?s=612x612&w=0&k=20&c=CS0xj40eNCorQyzN1ImeMKlvPDocPHSaMsXethQ-Q_g=",
-    comment:
-      "La peau Pomoca Race 2.0 offre une glisse incroyable grâce à un nouveau procédé de glisse utilisant un produit de très haute qualité. Un conseil pour améliorer la glisse : vous crayonnez le poil avec un fart tendre, puis un passage avec le fer à farter pour gorger le poil et le tour est joué. Vendue au mètre.",
-    status: 0,
-  },
-  {
-    code: "678900",
-    name: "SHORT SPOTLESS EVOLUTION W",
-    brand: "Ma marque",
-    family: "Matériel de montagne",
-    subFamily: "Montagne",
-    supplier: "Millet",
-    productImg:
-      "https://www.auvieuxcampeur.fr/media/catalog/product/cache/f83a0334dfee85ff9d02a56cf16dc6c2/8/0/804560306_152.jpg",
-    creatorName: "Michel Jambon",
-    creatorImg:
-      "https://upload.wikimedia.org/wikipedia/commons/b/b7/Michel_Cremades.jpg",
-    comment:
-      "Mesdames, ce short Spotless Evolution Royal Robbins est juste parfait pour toutes vos aventures en plein air ! Ultra confortable, anti-tâches (oui, vous avez bien lu !), et extensible dans tous les sens pour suivre tous vos mouvements. Que vous partiez en rando ou juste pour une journée à flâner dehors, ce short est l’indispensable absolu !",
-    status: 1,
-  },
-  {
-    code: "678900",
-    name: "PIOLET AIR TECH EVO",
-    brand: "Ma marque",
-    family: "Matériel de montagne",
-    subFamily: "Montagne",
-    supplier: "Millet",
-    productImg:
-      "https://www.auvieuxcampeur.fr/media/catalog/product/cache/f83a0334dfee85ff9d02a56cf16dc6c2/8/0/802890193_303.jpg",
-    creatorName: "Jean Pourpre",
-    creatorImg: "https://ekladata.com/ixROJV5Yo31eHvhwZqcq5aAvKZU.jpg",
-    comment:
-      "Mesdames, ce short Spotless Evolution Royal Robbins est juste parfait pour toutes vos aventures en plein air !",
-    status: 1,
-  },
-  {
-    code: "678900",
-    name: "COUTEAU CO-PILOT",
-    brand: "Ma marque",
-    family: "Matériel de montagne",
-    subFamily: "Montagne",
-    supplier: "Millet",
-    productImg:
-      "https://www.auvieuxcampeur.fr/media/catalog/product/cache/f83a0334dfee85ff9d02a56cf16dc6c2/8/0/804270088_303_A.jpg",
-    creatorName: "Walid Bouaka",
-    creatorImg:
-      "https://media.istockphoto.com/id/1386479313/fr/photo/heureuse-femme-daffaires-afro-am%C3%A9ricaine-mill%C3%A9naire-posant-isol%C3%A9e-sur-du-blanc.jpg?s=612x612&w=0&k=20&c=CS0xj40eNCorQyzN1ImeMKlvPDocPHSaMsXethQ-Q_g=",
-    comment:
-      "Mesdames, ce short Spotless Evolution Royal Robbins est juste parfait pour toutes vos aventures en plein air !",
-    status: 1,
-  },
-  {
-    code: "678900",
-    name: "COUTEAU CO-PILOT",
-    brand: "Ma marque",
-    family: "Matériel de montagne",
-    subFamily: "Montagne",
-    supplier: "Millet",
-    productImg:
-      "https://www.auvieuxcampeur.fr/media/catalog/product/cache/f83a0334dfee85ff9d02a56cf16dc6c2/8/0/804270088_303_A.jpg",
-    creatorName: "Walid Bouaka",
-    creatorImg:
-      "https://media.istockphoto.com/id/1386479313/fr/photo/heureuse-femme-daffaires-afro-am%C3%A9ricaine-mill%C3%A9naire-posant-isol%C3%A9e-sur-du-blanc.jpg?s=612x612&w=0&k=20&c=CS0xj40eNCorQyzN1ImeMKlvPDocPHSaMsXethQ-Q_g=",
-    comment:
-      "Mesdames, ce short Spotless Evolution Royal Robbins est juste parfait pour toutes vos aventures en plein air !",
-    status: 2,
   },
 ];
 

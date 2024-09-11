@@ -9,6 +9,7 @@ import {
   Maximize2,
   Minimize2,
   Pen,
+  Plus,
 } from "lucide-react";
 import { LINKS_Product, LINKS_UVC } from "../../utils/index";
 import UVCInfosTable from "../../components/UVCInfosTable";
@@ -21,9 +22,37 @@ import CreatableSelect from "react-select/creatable";
 import { SingleValue } from "react-select";
 import useNotify from "../../utils/hooks/useToast";
 import { CircularProgress } from "@mui/material";
-import { Uvc, Supplier, Draft, SupplierDetail, TagOption, BrandOption, CollectionOption, Tag } from "@/type";
+import {
+  Uvc,
+  Supplier,
+  Draft,
+  SupplierDetail,
+  TagOption,
+  BrandOption,
+  CollectionOption,
+  SuppliersOption,
+  Tag,
+} from "@/type";
 import { useFetchDetails } from "../../utils/hooks/usefetchdetails";
+import DynamicField from "../../components/FormElements/DynamicField";
+import SupplierFormComponent from "../../components/SupplierFormComponent";
 
+interface CustomField {
+  field_name: string;
+  field_type: string;
+  options?: string[];
+  value?: string;
+}
+
+interface UserField {
+  _id: string;
+  code: string;
+  label: string;
+  apply_to: string;
+  status: string;
+  creator_id: any;
+  additional_fields: CustomField[];
+}
 
 interface FormData {
   creator_id: any;
@@ -42,13 +71,12 @@ interface FormData {
   tbeu_pmeu: number;
   imgPath: string;
   status: string;
-  additional_fields: any;
+  additional_fields: any[];
   uvc: Uvc[];
   initialSizes: any[];
   initialColors: any[];
   initialGrid: any[];
 }
-
 
 export default function DraftUpdatePage() {
   const { id } = useParams();
@@ -89,7 +117,7 @@ export default function DraftUpdatePage() {
     tbeu_pmeu: draft?.tbeu_pmeu || 0,
     imgPath: "",
     status: "A",
-    additional_fields: "",
+    additional_fields: [],
     uvc: draft?.uvc || [],
     initialSizes: ["000"],
     initialColors: ["000"],
@@ -98,6 +126,8 @@ export default function DraftUpdatePage() {
   const [selectedOptionBrand, setSelectedOptionBrand] =
     useState<SingleValue<BrandOption> | null>(null);
   const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
+  const [fieldValues, setFieldValues] = useState<{ [key: string]: any }>({});
+  const [userFields, setUserFields] = useState<UserField[]>([]);
   const [inputValueBrand, setInputValueBrand] = useState("");
   const [brandLabel, setBrandLabel] = useState("");
   const [selectedOptionFamily, setSelectedOptionFamily] =
@@ -111,6 +141,12 @@ export default function DraftUpdatePage() {
   const [optionsSubSubFamily, setOptionsSubSubFamily] = useState<TagOption[]>(
     []
   );
+  const [supplierModalIsOpen, setsupplierModalIsOpen] = useState(false)
+  const [optionsSupplier, setOptionsSupplier] = useState<SuppliersOption[]>([]);
+  const [selectedSuppliers, setSelectedSuppliers] = useState<SuppliersOption[]>(
+    []
+  );
+  const [inputValueSupplier, setInputValueSupplier] = useState("");
   const [inputValueSubSubFamily, setInputValueSubSubFamily] = useState("");
   const [inputValueFamily, setInputValueFamily] = useState("");
   const [selectedSupplier, setSelectedSupplier] = useState<SupplierDetail>();
@@ -121,6 +157,14 @@ export default function DraftUpdatePage() {
   const [optionsCollection, setOptionsCollection] = useState<
     CollectionOption[]
   >([]);
+  const [newSupplier, setNewSupplier] = useState<Supplier>({
+    supplier_id: "",
+    supplier_ref: "",
+    pcb: "",
+    custom_cat: "",
+    made_in: "",
+    company_name: "",
+  });
   const [inputValueCollection, setInputValueCollection] = useState("");
 
   const [sizes, setSizes] = useState<string[]>(formData.initialSizes);
@@ -147,6 +191,43 @@ export default function DraftUpdatePage() {
         e.target.id === "long_label"
           ? e.target.value.substring(0, 15)
           : formData.short_label,
+    });
+  };
+
+  const handleFieldChange = (
+    label: string,
+    field_type: string, // Ajout du type de champ
+    id: string,
+    newValue: string
+  ) => {
+    // Mettre à jour fieldValues pour le contrôle local
+    setFieldValues((prevValues) => ({
+      ...prevValues,
+      [id]: newValue, // Met à jour l'état local du champ
+    }));
+
+    // Mettre à jour formData.additional_fields pour avoir un tableau d'objets
+    setFormData((prevFormData) => {
+      const updatedAdditionalFields = [...prevFormData.additional_fields];
+
+      // Vérifier si un champ avec ce label existe déjà
+      const fieldIndex = updatedAdditionalFields.findIndex(
+        (field) => field.label === label
+      );
+
+      if (fieldIndex !== -1) {
+        // Mettre à jour la valeur et le type si le champ existe
+        updatedAdditionalFields[fieldIndex].value = newValue;
+        updatedAdditionalFields[fieldIndex].field_type = field_type;
+      } else {
+        // Ajouter un nouveau champ s'il n'existe pas encore
+        updatedAdditionalFields.push({ label, value: newValue, field_type });
+      }
+
+      return {
+        ...prevFormData,
+        additional_fields: updatedAdditionalFields,
+      };
     });
   };
 
@@ -222,6 +303,27 @@ export default function DraftUpdatePage() {
     }));
   };
 
+  const fetchField = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/user-field`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+      setUserFields(data.data);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (draft) {
       setFormData({
@@ -249,6 +351,10 @@ export default function DraftUpdatePage() {
       });
     }
   }, [draft]);
+
+  useEffect(() => {
+    fetchField();
+  }, []);
 
   useEffect(() => {
     if (draft && draft.uvc) {
@@ -692,10 +798,142 @@ export default function DraftUpdatePage() {
     }
   };
 
-  console.log(formData);
+  const handleTypeChange = (selectedType: string) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      type: selectedType,
+    }));
+  };
+
+  const handleSupplierSelectChange = (
+    index: number,
+    option: SuppliersOption
+  ) => {
+    const selectedSupplier = optionsSupplier.find(
+      (supplier) => supplier.value === option?.value
+    );
+
+    if (selectedSupplier) {
+      setSelectedSuppliers((prevSuppliers) => {
+        const newSupplier = {
+          _id: selectedSupplier.value,
+          value: selectedSupplier.value,
+          label: selectedSupplier.label,
+          company_name: selectedSupplier.label,
+          supplier_ref: "",
+          pcb: "",
+          custom_cat: "",
+          made_in: "0",
+        };
+
+        // Ajoute le nouveau fournisseur à la fin du tableau
+        return [...prevSuppliers, newSupplier];
+      });
+
+      // Mettez à jour `newSupplier` pour le fournisseur actuellement sélectionné
+      setNewSupplier({
+        supplier_id: selectedSupplier.value,
+        company_name: selectedSupplier.label,
+        supplier_ref: "",
+        pcb: "",
+        custom_cat: "",
+        made_in: "",
+      });
+    }
+  };
+
+  const handleInputChangeSupplier = async (inputValueSupplier: string) => {
+    setInputValueSupplier(inputValueSupplier);
+
+    if (inputValueSupplier === "") {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/supplier`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+
+        const optionsSupplier = data.data?.map((supplier: SuppliersOption) => ({
+          value: supplier._id,
+          label: supplier.company_name,
+        }));
+
+        setOptionsSupplier(optionsSupplier);
+      } catch (error) {
+        console.error("Erreur lors de la requête", error);
+      }
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/supplier/search?company_name=${inputValueSupplier}&page=${currentPage}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+
+      const optionsSupplier = data.data?.map((supplier: SuppliersOption) => ({
+        value: supplier._id,
+        label: supplier.company_name,
+      }));
+
+      setOptionsSupplier(optionsSupplier);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
+  };
+
+  const addSupplier = (newSupplier: any) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      suppliers: [...prevFormData.suppliers, newSupplier],
+    }));
+
+    setNewSupplier({
+      supplier_id: "",
+      company_name: "",
+      supplier_ref: "",
+      pcb: "",
+      custom_cat: "",
+      made_in: "",
+    });
+  };
+
+
 
   return (
     <>
+      <Modal
+        show={supplierModalIsOpen}
+        onCancel={() => setsupplierModalIsOpen(false)}
+        onClose={() => setsupplierModalIsOpen(false)}
+        header="Fournisseur"
+      >
+        <SupplierFormComponent
+          supplier={newSupplier}
+          index={0}
+          optionsSupplier={optionsSupplier}
+          inputValueSupplier={inputValueSupplier}
+          handleSupplierSelectChange={handleSupplierSelectChange}
+          handleInputChangeSupplier={handleInputChangeSupplier}
+          handleSupplierChange={(index, field, value) => {
+            setNewSupplier({ ...newSupplier, [field]: value });
+          }}
+          removeSupplier={() => {}}
+          onCloseModal={() => setsupplierModalIsOpen(false)}
+          addSupplier={addSupplier}
+        />
+      </Modal>
       <Modal
         show={modalSupplierisOpen}
         onCancel={() => setModalSupplierisOpen(false)}
@@ -707,7 +945,6 @@ export default function DraftUpdatePage() {
           index={selectedSupplier?.index ?? 0}
         />
       </Modal>
-
       <Modal
         show={isModalOpenConfirm}
         onCancel={() => setIsModalOpenConfirm(false)}
@@ -864,7 +1101,7 @@ export default function DraftUpdatePage() {
                                 onChange={handleChange}
                                 placeholder={draft?.reference}
                                 value={formData.reference}
-                                className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                                className="col-span-3 border rounded-md p-1 bg-white py-2 focus:outline-none focus:border-blue-500"
                               />
                             )}
                           </div>
@@ -887,7 +1124,7 @@ export default function DraftUpdatePage() {
                                 onChange={handleChange}
                                 placeholder={draft?.name}
                                 value={formData.name}
-                                className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                                className="col-span-3 border rounded-md p-1 bg-white py-2 focus:outline-none focus:border-blue-500"
                               />
                             )}
                           </div>
@@ -910,7 +1147,7 @@ export default function DraftUpdatePage() {
                                 onChange={handleChange}
                                 placeholder={draft?.long_label}
                                 value={formData.long_label}
-                                className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                                className="col-span-3 border rounded-md p-1 bg-white py-2 focus:outline-none focus:border-blue-500"
                               />
                             )}
                           </div>
@@ -933,7 +1170,7 @@ export default function DraftUpdatePage() {
                                 onChange={handleChange}
                                 placeholder={draft?.short_label}
                                 value={formData.short_label}
-                                className="w-[300px] border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                                className="col-span-3 border rounded-md p-1 bg-white py-2 focus:outline-none focus:border-blue-500"
                               />
                             )}
                           </div>
@@ -1070,26 +1307,14 @@ export default function DraftUpdatePage() {
                   </div>
                 </div>
 
-                <div className="flex gap-7 mt-[50px] items-stretch">
+                <div className="flex gap-7 mt-[30px] items-stretch">
                   {/* Fournisseur */}
                   <div className="w-1/3 ">
-                    <FormSection
-                      title="Fournisseur"
-                      size={`${!isModify ? "h-[250px]" : "h-[400px]"}`}
-                    >
+                    <FormSection title="Fournisseur">
                       <div className="relative flex flex-col gap-3">
                         <div className="mt-3">
-                          {isModify && (
-                            <div
-                              className="absolute right-[10px] cursor-pointer text-gray-600"
-                              onClick={() => setIsModalOpen(true)}
-                            >
-                              <Pen size={17} />
-                            </div>
-                          )}
                           <div className="flex flex-col gap-2">
-                            {supplierDetails.map((supplierDetail, index) => {
-                              
+                            {[...supplierDetails, ...selectedSuppliers].map((supplierDetail, index) => {
                               const draftSupplier = draft?.suppliers.find(
                                 (draftSup) =>
                                   draftSup.supplier_id === supplierDetail._id
@@ -1117,23 +1342,32 @@ export default function DraftUpdatePage() {
                                   }}
                                 >
                                   <span className="text-[20px] text-white font-bold">
-                                    {combinedSupplier.code} -{" "}
                                     {combinedSupplier.company_name}
                                   </span>
                                 </div>
                               );
                             })}
                           </div>
+                          {isModify && (
+                            <div
+                              className="flex flex-col items-center justify-center p-[20px] text-orange-400 hover:text-orange-300 cursor-pointer"
+                              onClick={() => setsupplierModalIsOpen(true)}
+                            >
+                              <div className="flex items-center gap-2 text-[12px] mt-3">
+                                <Plus size={30} />
+                              </div>
+                              <p className="font-[700]">
+                                Ajouter un fournisseur
+                              </p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </FormSection>
                   </div>
                   {/* Caractéristiques produit */}
                   <div className="w-1/3">
-                    <FormSection
-                      title="Caractéristiques Produit"
-                      size={`${!isModify ? "h-[250px]" : "h-[400px]"}`}
-                    >
+                    <FormSection title="Caractéristiques Produit">
                       <div className="mt-3">
                         <div className="grid grid-cols-12 gap-2 py-2">
                           <span className="col-span-4 font-[700] text-slate-500 text-[13px]">
@@ -1144,10 +1378,17 @@ export default function DraftUpdatePage() {
                               {draft.type ? draft.type : "Marchandise"}
                             </span>
                           ) : (
-                            <input
-                              type="text"
-                              className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                            />
+                            <select
+                              className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 py-2"
+                              value={formData.type}
+                              onChange={(e) => handleTypeChange(e.target.value)}
+                            >
+                              <option value="marchandise">Marchandise</option>
+                              <option value="service">Service</option>
+                              <option value="produit_financier">
+                                Produit financier
+                              </option>
+                            </select>
                           )}
                         </div>
                         <div className="grid grid-cols-12 gap-2 py-2">
@@ -1195,10 +1436,7 @@ export default function DraftUpdatePage() {
                   </div>
                   {/* Prix produit */}
                   <div className="w-1/3">
-                    <FormSection
-                      title="Prix"
-                      size={`${!isModify ? "h-[250px]" : "h-[400px]"}`}
-                    >
+                    <FormSection title="Prix">
                       <div className="mt-3">
                         <div className="grid grid-cols-12 gap-2 py-2">
                           <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
@@ -1214,7 +1452,7 @@ export default function DraftUpdatePage() {
                               id="peau"
                               onChange={handlePriceChange}
                               value={formData.peau}
-                              className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                              className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
                             />
                           )}
                         </div>
@@ -1232,7 +1470,7 @@ export default function DraftUpdatePage() {
                               id="tbeu_pb"
                               onChange={handlePriceChange}
                               value={formData.tbeu_pb}
-                              className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                              className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
                             />
                           )}
                         </div>
@@ -1250,13 +1488,81 @@ export default function DraftUpdatePage() {
                               id="tbeu_pmeu"
                               onChange={handlePriceChange}
                               value={formData.tbeu_pmeu}
-                              className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                              className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
                             />
                           )}
                         </div>
                       </div>
                     </FormSection>
                   </div>
+                </div>
+                <div className="mt-[30px] w-1/3">
+                  <FormSection title="Champs additionnels (optionel)">
+                    {!isModify ? (
+                      <div>
+                        {draft.additional_fields.map(
+                          (field: any, index: number) => (
+                            <div
+                              key={index}
+                              className="grid grid-cols-12 gap-2 py-2"
+                            >
+                              <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                                {field.label} :
+                              </span>
+
+                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                {field.value}
+                              </span>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    ) : (
+                      <div>
+                        {userFields && userFields.length > 0 && (
+                          <div className="mt-3">
+                            {userFields
+                              .filter((field) => field.apply_to === "Produit")
+                              .map((field) => (
+                                <div key={field._id} className="mb-6">
+                                  <h3 className="text-md font-semibold text-gray-800 mb-1">
+                                    {field.label}
+                                  </h3>
+                                  {field.additional_fields.map(
+                                    (customField, index) => (
+                                      <div
+                                        key={`${field._id}-${index}`}
+                                        className="mb-4"
+                                      >
+                                        <DynamicField
+                                          id={`${field._id}-${index}`}
+                                          name={customField.field_name}
+                                          fieldType={customField.field_type}
+                                          value={
+                                            fieldValues[
+                                              `${field._id}-${index}`
+                                            ] || ""
+                                          }
+                                          onChange={(e) =>
+                                            handleFieldChange(
+                                              field.label,
+                                              customField.field_type,
+                                              `${field._id}-${index}`,
+                                              e.target.value
+                                            )
+                                          }
+                                          options={customField.options}
+                                        />
+                                      </div>
+                                    )
+                                  )}
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </FormSection>
                 </div>
               </>
             )}

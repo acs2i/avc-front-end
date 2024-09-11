@@ -32,6 +32,7 @@ import UVCGrid2 from "../../components/UVCGrid_2";
 import FormSection from "../../components/Formulaires/FormSection";
 import Modal from "../../components/Shared/Modal";
 import SupplierFormComponent from "../../components/SupplierFormComponent";
+import DynamicField from "../../components/FormElements/DynamicField";
 
 interface PriceItemSchema {
   peau: number;
@@ -60,7 +61,7 @@ interface Supplier {
   pcb: string;
   custom_cat: string;
   made_in: string;
-  company_name: string; 
+  company_name: string;
 }
 
 interface FormData {
@@ -80,11 +81,28 @@ interface FormData {
   tbeu_pmeu: number;
   imgPath: string;
   status: string;
-  additional_fields: any;
+  additional_fields: any[];
   uvc: Uvc[];
   initialSizes: any[];
   initialColors: any[];
   initialGrid: any[];
+}
+
+interface CustomField {
+  field_name: string;
+  field_type: string;
+  options?: string[];
+  value?: string;
+}
+
+interface UserField {
+  _id: string;
+  code: string;
+  label: string;
+  apply_to: string;
+  status: string;
+  creator_id: any;
+  additional_fields: CustomField[];
 }
 
 type Tag = {
@@ -117,12 +135,11 @@ type SuppliersOption = {
   value: string;
   label: string;
   company_name: string;
-  supplier_ref?: string;  // Champs optionnels
+  supplier_ref?: string;
   pcb?: string;
   custom_cat?: string;
   made_in?: string;
 };
-
 
 type CollectionOption = {
   _id: string;
@@ -163,6 +180,8 @@ export default function CreateProductPage() {
   const { notifySuccess, notifyError } = useNotify();
   const location = useLocation();
   const [supplierModalIsOpen, setsupplierModalIsOpen] = useState(false);
+  const [userFields, setUserFields] = useState<UserField[]>([]);
+  const [fieldValues, setFieldValues] = useState<{ [key: string]: any }>({});
   const [page, setPage] = useState("dimension");
   const [onglet, setOnglet] = useState("infos");
   const [brandLabel, setBrandLabel] = useState("");
@@ -204,7 +223,7 @@ export default function CreateProductPage() {
     pcb: "",
     custom_cat: "",
     made_in: "",
-    company_name: ""
+    company_name: "",
   });
   const [selectedSupplierIndex, setSelectedSupplierIndex] = useState<
     number | null
@@ -241,7 +260,6 @@ export default function CreateProductPage() {
     tbeu_pmeu: 0,
     imgPath: "",
     status: "A",
-    additional_fields: "",
     uvc: [
       {
         code: "",
@@ -263,6 +281,7 @@ export default function CreateProductPage() {
         status: "",
       },
     ],
+    additional_fields: [],
     initialSizes: ["000"],
     initialColors: ["000"],
     initialGrid: [[true]],
@@ -280,6 +299,43 @@ export default function CreateProductPage() {
         e.target.id === "long_label"
           ? e.target.value.substring(0, 15)
           : formData.short_label,
+    });
+  };
+
+  const handleFieldChange = (
+    label: string,
+    field_type: string, // Ajout du type de champ
+    id: string,
+    newValue: string
+  ) => {
+    // Mettre à jour fieldValues pour le contrôle local
+    setFieldValues((prevValues) => ({
+      ...prevValues,
+      [id]: newValue, // Met à jour l'état local du champ
+    }));
+
+    // Mettre à jour formData.additional_fields pour avoir un tableau d'objets
+    setFormData((prevFormData) => {
+      const updatedAdditionalFields = [...prevFormData.additional_fields];
+
+      // Vérifier si un champ avec ce label existe déjà
+      const fieldIndex = updatedAdditionalFields.findIndex(
+        (field) => field.label === label
+      );
+
+      if (fieldIndex !== -1) {
+        // Mettre à jour la valeur et le type si le champ existe
+        updatedAdditionalFields[fieldIndex].value = newValue;
+        updatedAdditionalFields[fieldIndex].field_type = field_type;
+      } else {
+        // Ajouter un nouveau champ s'il n'existe pas encore
+        updatedAdditionalFields.push({ label, value: newValue, field_type });
+      }
+
+      return {
+        ...prevFormData,
+        additional_fields: updatedAdditionalFields,
+      };
     });
   };
 
@@ -358,36 +414,40 @@ export default function CreateProductPage() {
     });
   };
 
-  const handleDimensionsChange = (
-    newDimensions: { color: string; size: string }[]
-  ) => {
-    const newUVCs = newDimensions.map((dim) => ({
-      code: "",
-      dimensions: [`${dim.color}/${dim.size}`],
-      prices: [
-        {
-          tarif_id: "",
-          currency: "",
-          supplier_id: "",
-          price: {
-            peau: formData.peau,
-            tbeu_pb: formData.tbeu_pb,
-            tbeu_pmeu: formData.tbeu_pmeu,
+  const handleDimensionsChange = (newDimensions: { color: string; size: string }[]) => {
+    const newUVCs = newDimensions.map((dim, index) => {
+      // Génération d'un code unique pour chaque UVC basé sur la référence du produit, couleur et taille
+      const generatedCode = `${formData.reference}${dim.color}${dim.size}`;
+  
+      return {
+        code: generatedCode, // Utilisation du code généré
+        dimensions: [`${dim.color}/${dim.size}`],
+        prices: [
+          {
+            tarif_id: "",
+            currency: "",
+            supplier_id: "",
+            price: {
+              peau: formData.peau,
+              tbeu_pb: formData.tbeu_pb,
+              tbeu_pmeu: formData.tbeu_pmeu,
+            },
+            store: "",
           },
-          store: "",
-        },
-      ],
-      eans: [],
-      status: "",
-      additional_fields: {},
-    }));
-
+        ],
+        eans: [],
+        status: "",
+        additional_fields: {},
+      };
+    });
+  
     setFormData((prevFormData) => ({
       ...prevFormData,
       uvc: newUVCs,
     }));
-    console.log(newUVCs);
+    
   };
+  
 
   const handleInputChangeBrand = async (inputValueBrand: string) => {
     setInputValueBrand(inputValueBrand);
@@ -712,11 +772,14 @@ export default function CreateProductPage() {
     }
   };
 
-  const handleSupplierSelectChange = (index: number, option: SuppliersOption) => {
+  const handleSupplierSelectChange = (
+    index: number,
+    option: SuppliersOption
+  ) => {
     const selectedSupplier = optionsSupplier.find(
       (supplier) => supplier.value === option?.value
     );
-  
+
     if (selectedSupplier) {
       setSelectedSuppliers((prevSuppliers) => {
         const newSupplier = {
@@ -729,11 +792,11 @@ export default function CreateProductPage() {
           custom_cat: "",
           made_in: "0",
         };
-  
+
         // Ajoute le nouveau fournisseur à la fin du tableau
         return [...prevSuppliers, newSupplier];
       });
-  
+
       // Mettez à jour `newSupplier` pour le fournisseur actuellement sélectionné
       setNewSupplier({
         supplier_id: selectedSupplier.value,
@@ -745,7 +808,27 @@ export default function CreateProductPage() {
       });
     }
   };
-  
+
+  const fetchField = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/user-field`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+      setUserFields(data.data);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const addSupplier = (newSupplier: any) => {
     setFormData((prevFormData) => ({
@@ -761,7 +844,6 @@ export default function CreateProductPage() {
       custom_cat: "",
       made_in: "",
     });
-    
   };
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -817,8 +899,6 @@ export default function CreateProductPage() {
     setIsFullScreen((prevState) => !prevState);
   };
 
- 
-
   useEffect(() => {
     if (supplierModalIsOpen) {
       setNewSupplier({
@@ -827,11 +907,15 @@ export default function CreateProductPage() {
         pcb: "",
         custom_cat: "",
         made_in: "",
-        company_name: ""
+        company_name: "",
       });
       setInputValueSupplier("");
     }
   }, [supplierModalIsOpen]);
+
+  useEffect(() => {
+    fetchField();
+  }, []);
 
   console.log(formData);
   return (
@@ -1165,6 +1249,45 @@ export default function CreateProductPage() {
                 </FormSection>
               </div>
             </div>
+            <div className="mt-3 w-1/3">
+              {userFields && userFields.length > 0 && (
+                <FormSection title="Champs additionnels (optionel)">
+                  <div className="mt-3">
+                    {userFields
+                      .filter((field) => field.apply_to === "Produit")
+                      .map((field) => (
+                        <div key={field._id} className="mb-6">
+                          {/* Affichage du label au niveau supérieur */}
+                          <h3 className="text-md font-semibold text-gray-800 mb-1">
+                            {field.label}
+                          </h3>
+                          {field.additional_fields.map((customField, index) => (
+                            <div key={`${field._id}-${index}`} className="mb-4">
+                              <DynamicField
+                                id={`${field._id}-${index}`}
+                                name={customField.field_name}
+                                fieldType={customField.field_type}
+                                value={
+                                  fieldValues[`${field._id}-${index}`] || ""
+                                }
+                                onChange={(e) =>
+                                  handleFieldChange(
+                                    field.label,
+                                    customField.field_type,
+                                    `${field._id}-${index}`,
+                                    e.target.value
+                                  )
+                                }
+                                options={customField.options}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                  </div>
+                </FormSection>
+              )}
+            </div>
             <div className="mt-3">
               <Divider />
             </div>
@@ -1267,11 +1390,13 @@ export default function CreateProductPage() {
                   {formData.uvc.map((uvc, index) => (
                     <div key={index}>
                       {onglet === "infos" && (
-                        <UVCInfosTable
-                          uvcDimension={uvc.dimensions || []}
-                          productReference={formData.reference || ""}
-                          brandLabel={brandLabel}
-                        />
+                         <UVCInfosTable
+                         uvcDimension={formData.uvc.map((uvc) => ({
+                           code: uvc.code,
+                           dimensions: uvc.dimensions,
+                         }))}
+                         brandLabel={selectedOptionBrand?.label || ""}
+                       />
                       )}
                       {/* {onglet === "price" && (
                           <UVCPriceTable

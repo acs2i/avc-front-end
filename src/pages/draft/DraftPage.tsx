@@ -86,7 +86,6 @@ export default function DraftPage() {
   const [selectedUsername, setSelectedUsername] = useState("");
   const draftsEnriched = useRef(false);
   const navigate = useNavigate();
-
   const filteredDrafts = drafts.filter((draft) => draft.status === "A");
   const filteredInProgress = drafts.filter((draft) => draft.status === "I");
   const filteredDone = drafts.filter((draft) => draft.status === "D");

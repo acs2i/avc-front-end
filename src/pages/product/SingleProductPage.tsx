@@ -242,6 +242,13 @@ export default function SingleProductPage() {
     setBrandLabel(brandLabel);
   };
 
+  const handleTypeChange = (selectedType: string) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      type: selectedType,
+    }));
+  };
+
   const handleInputChangeBrand = async (inputValueBrand: string) => {
     setInputValueBrand(inputValueBrand);
 
@@ -705,8 +712,6 @@ export default function SingleProductPage() {
       ...prevFormData,
       uvc: newUVCs,
     }));
-
-    console.log(newUVCs);
   };
 
   const fetchProduct = async () => {
@@ -842,7 +847,6 @@ export default function SingleProductPage() {
       setIsModify(false);
     }
   };
-
 
   return (
     <>
@@ -985,7 +989,7 @@ export default function SingleProductPage() {
                   <div className="w-[60%]">
                     <FormSection
                       title="Identification"
-                      size={`${!isModify ? "h-[400px]" : "h-[450px]"}`}
+                      size={`${!isModify ? "h-[400px]" : "h-[470px]"}`}
                     >
                       <div className="relative mt-3">
                         <div className="grid grid-cols-4 gap-2 py-2">
@@ -1007,7 +1011,8 @@ export default function SingleProductPage() {
                               onChange={handleChange}
                               placeholder={product?.reference}
                               value={formData.reference}
-                              className="col-span-3 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                              className="col-span-3 border rounded-md p-1 bg-gray-200 border-white text-gray-500 italic py-2"
+                              disabled
                             />
                           )}
                         </div>
@@ -1030,7 +1035,7 @@ export default function SingleProductPage() {
                               onChange={handleChange}
                               placeholder={product?.name}
                               value={formData.name}
-                              className="col-span-3 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                              className="col-span-3 border rounded-md p-1 bg-white py-2 focus:outline-none focus:border-blue-500"
                             />
                           )}
                         </div>
@@ -1053,7 +1058,7 @@ export default function SingleProductPage() {
                               onChange={handleChange}
                               placeholder={product?.long_label}
                               value={formData.long_label}
-                              className="col-span-3 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                              className="col-span-3 border rounded-md p-1 bg-white py-2 focus:outline-none focus:border-blue-500"
                             />
                           )}
                         </div>
@@ -1076,7 +1081,7 @@ export default function SingleProductPage() {
                               onChange={handleChange}
                               placeholder={product?.short_label}
                               value={formData.short_label}
-                              className="col-span-3 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                              className="col-span-3 border rounded-md p-1 bg-white py-2 focus:outline-none focus:border-blue-500"
                             />
                           )}
                         </div>
@@ -1190,7 +1195,7 @@ export default function SingleProductPage() {
 
                   <div className="w-[480px] bg-white">
                     <FormSection
-                      size={`${!isModify ? "h-[400px]" : "h-[450px]"}`}
+                      size={`${!isModify ? "h-[400px]" : "h-[470px]"}`}
                     >
                       {product.imgPath ? (
                         <div className="relative w-full h-0 pb-[75%]">
@@ -1219,10 +1224,7 @@ export default function SingleProductPage() {
                 <div className="flex gap-7 mt-[50px] items-stretch">
                   {/* Fournisseur */}
                   <div className="w-1/3 ">
-                    <FormSection
-                      title="Fournisseur"
-                      size={`${!isModify ? "h-[300px]" : "h-[400px]"}`}
-                    >
+                    <FormSection title="Fournisseurs">
                       <div className="relative flex flex-col gap-3">
                         <div className="mt-3 flex flex-col gap-2">
                           {selectedSuppliers && selectedSuppliers.length > 0 ? (
@@ -1258,28 +1260,32 @@ export default function SingleProductPage() {
                   </div>
                   {/* Caractéristiques produit */}
                   <div className="w-1/3">
-                    <FormSection
-                      title="Caractéristiques Produit"
-                      size={`${!isModify ? "h-[300px]" : "h-[400px]"}`}
-                    >
+                    <FormSection title="Caractéristiques Produit">
                       <div className="mt-3">
                         <div className="grid grid-cols-12 gap-2 py-2">
-                          <span className="col-span-4 font-[700] text-slate-500 text-[13px]">
+                          <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
                             Type :
                           </span>
                           {!isModify ? (
-                            <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                            <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px] capitalize">
                               {product.type ? product.type : "Marchandise"}
                             </span>
                           ) : (
-                            <input
-                              type="text"
-                              className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
-                            />
+                            <select
+                              className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 py-2"
+                              value={formData.type}
+                              onChange={(e) => handleTypeChange(e.target.value)}
+                            >
+                              <option value="marchandise">Marchandise</option>
+                              <option value="service">Service</option>
+                              <option value="produit_financier">
+                                Produit financier
+                              </option>
+                            </select>
                           )}
                         </div>
                         <div className="grid grid-cols-12 gap-2 py-2">
-                          <span className="col-span-4 font-[700] text-slate-500 text-[13px]">
+                          <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
                             Dimensions :
                           </span>
                           <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px] capitalize">
@@ -1292,7 +1298,7 @@ export default function SingleProductPage() {
                           </span>
                         </div>
                         <div className="grid grid-cols-12 gap-2 py-2">
-                          <span className="col-span-4 font-[700] text-slate-500 text-[13px]">
+                          <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
                             Collection :
                           </span>
                           {!isModify ? (
@@ -1325,10 +1331,7 @@ export default function SingleProductPage() {
                   </div>
                   {/* Prix produit */}
                   <div className="w-1/3">
-                    <FormSection
-                      title="Prix"
-                      size={`${!isModify ? "h-[300px]" : "h-[400px]"}`}
-                    >
+                    <FormSection title="Prix">
                       <div className="mt-3">
                         <div className="grid grid-cols-12 gap-2 py-2">
                           <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
@@ -1344,7 +1347,7 @@ export default function SingleProductPage() {
                               id="peau"
                               onChange={handlePriceChange}
                               value={formData.peau}
-                              className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                              className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
                             />
                           )}
                         </div>
@@ -1362,7 +1365,7 @@ export default function SingleProductPage() {
                               id="tbeu_pb"
                               onChange={handlePriceChange}
                               value={formData.tbeu_pb}
-                              className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                              className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
                             />
                           )}
                         </div>
@@ -1380,7 +1383,7 @@ export default function SingleProductPage() {
                               id="tbeu_pmeu"
                               onChange={handlePriceChange}
                               value={formData.tbeu_pmeu}
-                              className="col-span-6 border rounded-md p-1 bg-gray-100 focus:outline-none focus:border-blue-500"
+                              className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
                             />
                           )}
                         </div>
@@ -1455,7 +1458,7 @@ export default function SingleProductPage() {
               <div
                 className={`border-t-[1px] border-gray-300 px-5 py-2 ${
                   isFullScreen
-                    ? "fixed right-0 top-0 w-full z-[9999] bg-gray-100"
+                    ? "fixed right-0 top-0 w-full h-screen z-[9999] bg-gray-100"
                     : "w-[70%]"
                 } overflow-y-auto`}
               >
@@ -1486,19 +1489,23 @@ export default function SingleProductPage() {
                     )}
                   </div>
                 </div>
-                {/* {onglet === "infos" && product && (
-                <UVCInfosTable
-                  uvcDimension={formData.dimension}
-                  productReference={product.reference || ""}
-                  brandLabel=""
+                {onglet === "infos" && product && (
+                  <UVCInfosTable
+                    uvcDimension={formData.uvc_ids}
+                    brandLabel={product.brand_ids[0]?.label || ""}
+                  />
+                )}
+                {onglet === "price" && product && (
+                  <UVCPriceTable
+                  uvcPrices={formData.uvc_ids}
+                  brandLabel={product.brand_ids[0]?.label || ""}
+                  globalPrices={{
+                    peau: formData.peau,
+                    tbeu_pb: formData.tbeu_pb,
+                    tbeu_pmeu: formData.tbeu_pmeu,
+                  }}
                 />
-              )}
-              {onglet === "price" && product && (
-                <UVCPriceTable
-                  uvcPrices={formData.dimension}
-                  productReference={product.reference || ""}
-                />
-              )} */}
+                )}
                 {/* {onglet === "supplier" && product && (
                 <UVCSupplierTable
                   uvcDimensions={formData.dimension}

@@ -4,7 +4,7 @@ import Card from "../../components/Shared/Card";
 import Button from "../../components/FormElements/Button";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Spinner from "../../components/Shared/Spinner";
 import { ChevronsUpDown, CircleSlash2, FileDown, Plus } from "lucide-react";
 import Header from "../../components/Navigation/Header";
@@ -91,18 +91,18 @@ export default function SuppliersList() {
           body: JSON.stringify(supplier),
         }
       );
-  
+
       if (response.ok) {
         const data = await response.json();
         // console.log(data.filePath);
         // window.open(data.filePath, '_blank');
         const fileName = data.filePath.substring(
-          data.filePath.lastIndexOf('/') + 1, 
-          data.filePath.indexOf('.pdf')
+          data.filePath.lastIndexOf("/") + 1,
+          data.filePath.indexOf(".pdf")
         );
-        const link = document.createElement('a');
-        link.href = 'http://'+data.filePath;
-        link.target = '_blank';
+        const link = document.createElement("a");
+        link.href = "http://" + data.filePath;
+        link.target = "_blank";
         link.download = `${fileName}.pdf`; // Vous pouvez spécifier un nom de fichier pour le téléchargement
         document.body.appendChild(link);
         link.click();
@@ -116,7 +116,6 @@ export default function SuppliersList() {
       setIsLoading(false);
     }
   };
-  
 
   return (
     <section>
@@ -154,21 +153,15 @@ export default function SuppliersList() {
               autoComplete="off"
             />
           </div>
+        </div>
 
-          <div className="flex items-center">
-            {!isLoading ? (
-              <Button type="submit" size="small" blue>
-                Lancer la Recherche
-              </Button>
-            ) : (
-              <Spinner
-                width="50px"
-                height="40px"
-                logoSize="90%"
-                progressSize={50}
-              />
-            )}
-          </div>
+        <div className="flex items-center justify-between w-full mt-3">
+          <Button type="submit" size="small" blue>
+            Lancer la Recherche
+          </Button>
+          <Link to="/suppliers/create" className="bg-[#3B71CA] text-white text-[12px] p-2 rounded-md font-bold hover:brightness-125">
+            Créer un fournisseur
+          </Link>
         </div>
       </Header>
       <div className="relative overflow-x-auto bg-white">

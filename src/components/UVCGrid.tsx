@@ -48,18 +48,27 @@ const UVCGrid: React.FC<UVCGridProps> = ({
   const [showSizeGridOptions, setShowSizeGridOptions] = useState(false);
   const [showColorGridOptions, setShowColorGridOptions] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [savedUvcGrid, setSavedUvcGrid] = useState<boolean[][]>([]);
+
 
   useEffect(() => {
     updateDimensions(uvcGrid);
   }, [sizes, colors, uvcGrid]);
 
   const toggleCheckbox = (colorIndex: number, sizeIndex: number) => {
+    if (!isEditable && uvcGrid[colorIndex][sizeIndex]) {
+      return;
+    }
+  
     const newGrid = uvcGrid.map((row, i) =>
-      row.map((col, j) => (i === colorIndex && j === sizeIndex ? !col : col))
+      row.map((col, j) =>
+        i === colorIndex && j === sizeIndex ? !col : col
+      )
     );
     setUvcGrid(newGrid);
     updateDimensions(newGrid);
   };
+  
 
   const updateDimensions = (grid: boolean[][]) => {
     const dimensions = grid.map((row, i) =>
