@@ -55,7 +55,7 @@ export const LINKS: Link[] = [
               },
               {
                 name: "Importer un article",
-                link: "/product/edit",
+                link: "/draft/import",
               },
               {
                 name: "Articles à traiter",

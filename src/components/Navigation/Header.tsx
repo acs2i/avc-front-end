@@ -37,7 +37,7 @@ export default function Header({
         <h3 className="text-[35px] font-[800] text-gray-800">{title} <span className="font-[200]">{light}</span></h3>
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
-            <div className="relative w-[400px]">
+            {/* <div className="relative w-[400px]">
               <div className="absolute inset-y-0 start-0 flex items-center ps-3 cursor-pointer">
                 <svg
                   className="w-4 h-4 text-gray-500 dark:text-gray-400"
@@ -62,7 +62,7 @@ export default function Header({
                 placeholder={placeholder}
                 required
               />
-            </div>
+            </div> */}
             {button && <Button size="small" blue to={link}>
               {btnTitle}
             </Button>}

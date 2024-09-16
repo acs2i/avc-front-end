@@ -414,11 +414,13 @@ export default function CreateProductPage() {
     });
   };
 
-  const handleDimensionsChange = (newDimensions: { color: string; size: string }[]) => {
+  const handleDimensionsChange = (
+    newDimensions: { color: string; size: string }[]
+  ) => {
     const newUVCs = newDimensions.map((dim, index) => {
       // Génération d'un code unique pour chaque UVC basé sur la référence du produit, couleur et taille
       const generatedCode = `${formData.reference}${dim.color}${dim.size}`;
-  
+
       return {
         code: generatedCode, // Utilisation du code généré
         dimensions: [`${dim.color}/${dim.size}`],
@@ -440,14 +442,12 @@ export default function CreateProductPage() {
         additional_fields: {},
       };
     });
-  
+
     setFormData((prevFormData) => ({
       ...prevFormData,
       uvc: newUVCs,
     }));
-    
   };
-  
 
   const handleInputChangeBrand = async (inputValueBrand: string) => {
     setInputValueBrand(inputValueBrand);
@@ -1117,21 +1117,26 @@ export default function CreateProductPage() {
                   </div>
                 </FormSection>
               </div>
-              <div className="w-[480px] h-[400px] flex flex-col gap-5 border border-dashed border-2 border-slate-200 hover:bg-white hover:bg-opacity-75 transition-all duration-300 cursor-pointer">
-                <div className="w-full h-full flex justify-center items-center rounded-md">
-                  <div className="flex flex-col items-center text-center">
-                    <p className="font-bold text-gray-600">
-                      Glissez déposez votre image ici ou{" "}
-                      <span className="text-blue-400">
-                        téléchargez depuis votre ordinateur
-                      </span>
-                    </p>
-                    <div className="text-gray-300">
-                      <ImageUp size={50} />
+           
+                <div className="w-[480px] h-[400px] flex flex-col gap-5 border-[5px] border-dashed border-slate-300 rounded-lg hover:bg-white hover:bg-opacity-75 transition ease-in-out delay-150 duration-300 cursor-pointer">
+                  <div className="w-full h-full flex justify-center items-center rounded-md">
+                    <div className="flex flex-col items-center text-center gap-5">
+                      <div className="w-[120px]">
+                        <img src="/img/img_upload.png" alt="icone" />
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <p className="text-gray-600 text-[25px]">
+                          Glissez déposez votre image ici
+                        </p>
+                        <span className="text-gray-600 text-[15px]">ou</span>
+                        <button className="border-[3px] border-blue-400 rounded-full hover:font-bold py-1 hover:bg-gradient-to-r from-cyan-500 to-blue-500 hover:text-white transition-all">
+                          Téléchargez la depuis votre ordinateur
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+           
             </div>
             <div className="flex gap-2 mt-[50px]">
               <div className="w-1/3 flex flex-col">
@@ -1390,13 +1395,13 @@ export default function CreateProductPage() {
                   {formData.uvc.map((uvc, index) => (
                     <div key={index}>
                       {onglet === "infos" && (
-                         <UVCInfosTable
-                         uvcDimension={formData.uvc.map((uvc) => ({
-                           code: uvc.code,
-                           dimensions: uvc.dimensions,
-                         }))}
-                         brandLabel={selectedOptionBrand?.label || ""}
-                       />
+                        <UVCInfosTable
+                          uvcDimension={formData.uvc.map((uvc) => ({
+                            code: uvc.code,
+                            dimensions: uvc.dimensions,
+                          }))}
+                          brandLabel={selectedOptionBrand?.label || ""}
+                        />
                       )}
                       {/* {onglet === "price" && (
                           <UVCPriceTable

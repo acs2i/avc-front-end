@@ -1,47 +1,48 @@
 import ScrollToTop from "../../components/ScrollToTop";
 import React, { useState, useEffect } from "react";
-import Card from "../../components/Shared/Card";
 import Button from "../../components/FormElements/Button";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { Link, useNavigate } from "react-router-dom";
 import Spinner from "../../components/Shared/Spinner";
-import { ChevronsUpDown, CircleSlash2, FileDown, Plus } from "lucide-react";
+import { ChevronsUpDown, CircleSlash2, Plus } from "lucide-react";
 import Header from "../../components/Navigation/Header";
 
 interface Supplier {
   _id: string;
   code: string;
   company_name: string;
-  siret: string;
-  tva: string;
-  web_url: string;
-  email: string;
-  phone: string;
   address_1: string;
-  address_2: string;
-  address_3: string;
   postal: string;
+  city: string;
   country: string;
-  contacts?: any[];
-  conditions?: any[];
-  brand_id: any[];
   status: string;
-  creator: any; // it's an object
-  additional_fields?: any;
 }
 
 export default function SuppliersList() {
-  const [prevSearchValue, setPrevSearchValue] = useState("");
   const [codeValue, setCodeValue] = useState("");
   const [labelValue, setLabelValue] = useState("");
+  const [addressValue, setAddressValue] = useState("");
+  const [postalValue, setPostalValue] = useState("");
+  const [cityValue, setCityValue] = useState("");
+  const [countryValue, setCountryValue] = useState("");
+  const [statusValue, setStatusValue] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItem, setTotalItem] = useState(null);
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [searchParams, setSearchParams] = useState<any>(null);
   const limit = 20;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
-  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (searchParams) {
+      searchSuppliers(searchParams);
+    } else {
+      fetchSuppliers();
+    }
+  }, [currentPage]);
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -50,11 +51,9 @@ export default function SuppliersList() {
     setCurrentPage(value);
   };
 
-  useEffect(() => {
-    fetchSuppliers();
-  }, [currentPage]);
-
   const fetchSuppliers = async () => {
+    setIsLoading(true);
+
     try {
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/supplier?page=${currentPage}&limit=${limit}`,
@@ -69,7 +68,6 @@ export default function SuppliersList() {
       const data = await response.json();
       setSuppliers(data.data);
       setTotalItem(data.total);
-      console.log(data);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     } finally {
@@ -77,45 +75,62 @@ export default function SuppliersList() {
     }
   };
 
-  const handleGeneratePdf = async (supplier: Supplier) => {
+  const searchSuppliers = async (params: any) => {
     setIsLoading(true);
-    console.log(supplier);
+
     try {
+      const queryParams = new URLSearchParams(params);
+
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/generate-pdf`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/supplier/search?page=${currentPage}&limit=${limit}&${queryParams.toString()}`,
         {
-          method: "POST",
+          method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(supplier),
         }
       );
 
-      if (response.ok) {
-        const data = await response.json();
-        // console.log(data.filePath);
-        // window.open(data.filePath, '_blank');
-        const fileName = data.filePath.substring(
-          data.filePath.lastIndexOf("/") + 1,
-          data.filePath.indexOf(".pdf")
-        );
-        const link = document.createElement("a");
-        link.href = "http://" + data.filePath;
-        link.target = "_blank";
-        link.download = `${fileName}.pdf`; // Vous pouvez spécifier un nom de fichier pour le téléchargement
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } else {
-        console.error("Erreur lors de la génération du PDF");
-      }
+      const data = await response.json();
+      setSuppliers(data.data);
+      setTotalItem(data.total);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const handleSearch = () => {
+    if (
+      !codeValue &&
+      !labelValue &&
+      !addressValue &&
+      !postalValue &&
+      !cityValue &&
+      !countryValue &&
+      statusValue === "all"
+    ) {
+      setSearchParams(null);
+      setCurrentPage(1);
+      fetchSuppliers();
+    } else {
+      const params: any = {};
+  
+      if (codeValue) params.code = codeValue;
+      if (labelValue) params.company_name = labelValue;
+      if (addressValue) params.address = addressValue;
+      if (postalValue) params.postal = postalValue;
+      if (cityValue) params.city = cityValue;
+      if (countryValue) params.country = countryValue;
+      if (statusValue !== "all") params.status = statusValue;
+  
+      setSearchParams(params);
+      setCurrentPage(1);
+      searchSuppliers(params);
+    }
+  };
+  
 
   return (
     <section>
@@ -125,16 +140,16 @@ export default function SuppliersList() {
         link="/suppliers/create"
         btnTitle="Créer un fournisseur"
         placeholder="Rechercher un fournisseur"
-        height="300px"
+        height="450px"
       >
-        <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 text-gray-600">
+        <div className="relative grid grid-cols-4 md:grid-cols-5 lg:grid-cols-4 gap-6 text-gray-600">
           <div className="flex flex-col">
             <label className="text-sm font-bold mb-1">Code :</label>
             <input
               type="text"
               id="code"
-              className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
-              placeholder="Rechercher par code fournisseur"
+              className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:ring-blue-500 transition-all focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
+              placeholder="Rechercher par code"
               value={codeValue}
               onChange={(e) => setCodeValue(e.target.value)}
               autoComplete="off"
@@ -142,28 +157,121 @@ export default function SuppliersList() {
           </div>
 
           <div className="flex flex-col">
-            <label className="text-sm font-bold mb-1">Raison social :</label>
+            <label className="text-sm font-bold mb-1">Raison sociale :</label>
             <input
               type="text"
               id="label"
-              className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
-              placeholder="Rechercher par nom du fournisseur"
+              className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:ring-blue-500 transition-all focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
+              placeholder="Rechercher par nom"
               value={labelValue}
               onChange={(e) => setLabelValue(e.target.value)}
               autoComplete="off"
             />
           </div>
+
+          {/* Autres champs de recherche */}
+          <div className="flex flex-col">
+            <label className="text-sm font-bold mb-1">Adresse :</label>
+            <input
+              type="text"
+              className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:ring-blue-500 transition-all focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
+              placeholder="Rechercher par adresse"
+              value={addressValue}
+              onChange={(e) => setAddressValue(e.target.value)}
+              autoComplete="off"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label className="text-sm font-bold mb-1">Code postal :</label>
+            <input
+              type="text"
+              className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:ring-blue-500 transition-all focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
+              placeholder="Rechercher par code postal"
+              value={postalValue}
+              onChange={(e) => setPostalValue(e.target.value)}
+              autoComplete="off"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label className="text-sm font-bold mb-1">Ville :</label>
+            <input
+              type="text"
+              className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:ring-blue-500 transition-all focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
+              placeholder="Rechercher par ville"
+              value={cityValue}
+              onChange={(e) => setCityValue(e.target.value)}
+              autoComplete="off"
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label className="text-sm font-bold mb-1">Pays :</label>
+            <input
+              type="text"
+              className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:ring-blue-500 transition-all focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
+              placeholder="Rechercher par pays"
+              value={countryValue}
+              onChange={(e) => setCountryValue(e.target.value)}
+              autoComplete="off"
+            />
+          </div>
+        </div>
+
+        {/* Boutons radio pour le statut */}
+        <div className="mt-3 flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            <input
+              type="radio"
+              id="tous"
+              name="status"
+              value="all"
+              checked={statusValue === "all"}
+              onChange={() => setStatusValue("all")}
+            />
+            <label htmlFor="tous">Tous</label>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="radio"
+              id="actif"
+              name="status"
+              value="A"
+              checked={statusValue === "A"}
+              onChange={() => setStatusValue("A")}
+            />
+            <label htmlFor="actif">Actifs</label>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              type="radio"
+              id="inactif"
+              name="status"
+              value="I"
+              checked={statusValue === "I"}
+              onChange={() => setStatusValue("I")}
+            />
+            <label htmlFor="inactif">Inactifs</label>
+          </div>
         </div>
 
         <div className="flex items-center justify-between w-full mt-3">
-          <Button type="submit" size="small" blue>
+          <Button type="button" size="small" blue onClick={handleSearch}>
             Lancer la Recherche
           </Button>
-          <Link to="/suppliers/create" className="bg-[#3B71CA] text-white text-[12px] p-2 rounded-md font-bold hover:brightness-125">
+          <Link
+            to="/suppliers/create"
+            className="bg-[#3B71CA] text-white text-[12px] p-2 rounded-md font-bold hover:brightness-125"
+          >
             Créer un fournisseur
           </Link>
         </div>
       </Header>
+
+      {/* Table des résultats */}
       <div className="relative overflow-x-auto bg-white">
         <table className="w-full text-left">
           <thead className="border-y-[2px] border-slate-100 text-sm font-[900] text-black uppercase">
@@ -178,15 +286,10 @@ export default function SuppliersList() {
               </th>
               <th scope="col" className="px-6">
                 <div className="flex items-center">
-                  <span>Raison Social</span>
+                  <span>Raison Sociale</span>
                   <div className="cursor-pointer">
                     <ChevronsUpDown size={13} />
                   </div>
-                </div>
-              </th>
-              <th scope="col" className="px-6">
-                <div className="flex items-center">
-                  <span>Email</span>
                 </div>
               </th>
               <th scope="col" className="px-6">
@@ -199,11 +302,21 @@ export default function SuppliersList() {
                   <span>Code postal</span>
                 </div>
               </th>
-              {/* <th scope="col" className="px-1">
-                <div className="flex items-center justify-center">
-                  <span>Action</span>
+              <th scope="col" className="px-6">
+                <div className="flex items-center">
+                  <span>Ville</span>
                 </div>
-              </th> */}
+              </th>
+              <th scope="col" className="px-6">
+                <div className="flex items-center">
+                  <span>Pays</span>
+                </div>
+              </th>
+              <th scope="col" className="px-6">
+                <div className="flex items-center">
+                  <span>Status</span>
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -219,19 +332,13 @@ export default function SuppliersList() {
                   <td className="px-6 py-2">{supplier.code}</td>
                   <td className="px-6 py-2">{supplier.company_name}</td>
                   <td className="px-6 py-2">
-                    {supplier.email ? (
-                      supplier.email
-                    ) : (
-                      <CircleSlash2 size={15} />
-                    )}
-                  </td>
-                  <td className="px-6 py-2">
                     {supplier.address_1 ? (
                       supplier.address_1
                     ) : (
                       <CircleSlash2 size={15} />
                     )}
                   </td>
+
                   <td className="px-2 py-2">
                     {supplier.postal ? (
                       supplier.postal
@@ -239,14 +346,27 @@ export default function SuppliersList() {
                       <CircleSlash2 size={15} />
                     )}
                   </td>
-                  {/* <td className="flex justify-center">
-                    <div
-                      className="w-[30px] h-[30px] flex items-center justify-center text-sky-600 cursor-pointer"
-                      onClick={() => handleGeneratePdf(supplier)}
-                    >
-                      <FileDown size={17} />
-                    </div>
-                  </td> */}
+                  <td className="px-6 py-2">
+                    {supplier.city ? supplier.city : <CircleSlash2 size={15} />}
+                  </td>
+                  <td className="px-6 py-2">
+                    {supplier.country ? (
+                      supplier.country
+                    ) : (
+                      <CircleSlash2 size={15} />
+                    )}
+                  </td>
+                  <td className="px-6 py-2 uppercase">
+                    {supplier.status === "A" ? (
+                      <div className="text-center bg-green-200 text-green-600 border border-green-400 py-1 rounded-md max-w-[60px]">
+                        <span>Actif</span>
+                      </div>
+                    ) : (
+                      <div className="text-center bg-gray-200 text-gray-600 border border-gray-400 py-1 rounded-md max-w-[60px]">
+                        <span>Inactif</span>
+                      </div>
+                    )}
+                  </td>
                 </tr>
               ))
             ) : (
@@ -264,15 +384,13 @@ export default function SuppliersList() {
             )}
           </tbody>
         </table>
+
         <div className="px-4 py-2 flex flex-col gap-2">
           <div className="w-full flex justify-between items-center">
             <div className="flex items-center">
               <h4 className="text-sm whitespace-nowrap">
                 <span className="font-bold">{totalItem}</span> Fournisseurs
               </h4>
-              {prevSearchValue && (
-                <span className="text-sm italic ml-2">{`"${prevSearchValue}"`}</span>
-              )}
             </div>
             <div className="flex justify-end w-full">
               {suppliers && suppliers.length > 0 && (

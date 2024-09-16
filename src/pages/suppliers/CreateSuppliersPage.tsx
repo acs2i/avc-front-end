@@ -57,6 +57,7 @@ interface FormData {
   brand_id: string[];
   contacts: Contact[];
   conditions: Condition[];
+  status: string;
 }
 
 type BrandOption = {
@@ -168,6 +169,7 @@ export default function CreateSupplierPage() {
         budget: "",
       },
     ],
+    status: "A"
   });
 
   const currencies = [
