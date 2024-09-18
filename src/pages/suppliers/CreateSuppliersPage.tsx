@@ -9,11 +9,13 @@ import CreatableSelect from "react-select/creatable";
 import { ActionMeta, SingleValue } from "react-select";
 import Button from "../../components/FormElements/Button";
 import useNotify from "../../utils/hooks/useToast";
-import { CircularProgress, Collapse } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import BrandSection from "../../components/Formulaires/BrandSection";
 import ContactSection from "../../components/Formulaires/ContactSection";
 import ConditionSection from "../../components/Formulaires/ConditionsSection";
 import DynamicField from "../../components/FormElements/DynamicField";
+import Modal from "../../components/Shared/Modal";
+import ContactFormComponent from "../../components/ContactFormComponent";
 
 interface Contact {
   firstname: string;
@@ -24,17 +26,7 @@ interface Contact {
   email: string;
 }
 
-interface Condition {
-  tarif: string;
-  currency: string;
-  rfa: string;
-  net_price: string;
-  labeling: string;
-  paiement_condition: string;
-  franco: string;
-  validate_tarif: string;
-  budget: string;
-}
+
 
 interface FormData {
   creator_id: any;
@@ -56,7 +48,7 @@ interface FormData {
   discount: string;
   brand_id: string[];
   contacts: Contact[];
-  conditions: Condition[];
+  additional_fields: any[];
   status: string;
 }
 
@@ -119,6 +111,7 @@ export default function CreateSupplierPage() {
   const [additionalFields, setAdditionalFields] = useState([
     { name: "", value: "" },
   ]);
+  const [contactModalIsOpen, setContactModalIsOpen] = useState(false);
   const [inputValueBrand, setInputValueBrand] = useState("");
   const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
   const [brands, setBrands] = useState<SingleValue<BrandOption>[]>([null]);
@@ -146,31 +139,19 @@ export default function CreateSupplierPage() {
     currency: "",
     discount: "",
     brand_id: [],
-    contacts: [
-      {
-        firstname: "",
-        lastname: "",
-        function: "",
-        phone: "",
-        mobile: "",
-        email: "",
-      },
-    ],
-    conditions: [
-      {
-        tarif: "",
-        currency: "",
-        rfa: "",
-        net_price: "",
-        labeling: "",
-        paiement_condition: "",
-        franco: "",
-        validate_tarif: "",
-        budget: "",
-      },
-    ],
-    status: "A"
+    contacts: [],
+    additional_fields: [],
+    status: "A",
   });
+  const [newContact, setNewContact] = useState<Contact>({
+    firstname: "",
+    lastname: "",
+    function: "",
+    phone: "",
+    mobile: "",
+    email: "",
+  });
+  const [selectedContacts, setSelectedContacts] = useState<Contact[]>([]);
 
   const currencies = [
     { value: "EUR", label: "Euro (EUR)", name: "EUR" },
@@ -259,28 +240,6 @@ export default function CreateSupplierPage() {
     });
   };
 
-  const handleContactChange =
-    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { id, value } = e.target;
-      setFormData((prevData) => ({
-        ...prevData,
-        contacts: prevData.contacts.map((contact, i) =>
-          i === index ? { ...contact, [id]: value } : contact
-        ),
-      }));
-    };
-
-  const handleConditionChange =
-    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { id, value } = e.target;
-      setFormData((prevData) => ({
-        ...prevData,
-        conditions: prevData.conditions.map((condition, i) =>
-          i === index ? { ...condition, [id]: value } : condition
-        ),
-      }));
-    };
-
   const addBrandField = () => {
     setBrands([...brands, null]);
   };
@@ -292,40 +251,6 @@ export default function CreateSupplierPage() {
     setFormData((prevFormData) => ({
       ...prevFormData,
       brands: updatedBrands.map((brand) => brand?.value || ""),
-    }));
-  };
-
-  const addField = () => {
-    setAdditionalFields([...additionalFields, { name: "", value: "" }]);
-  };
-
-  const removeField = (index: any) => {
-    const updatedFields = additionalFields.filter((_, i) => i !== index);
-    setAdditionalFields(updatedFields);
-  };
-
-  const addContactField = () => {
-    setFormData((prevData) => ({
-      ...prevData,
-      contacts: [
-        ...prevData.contacts,
-        {
-          firstname: "",
-          lastname: "",
-          function: "",
-          phone: "",
-          mobile: "",
-          email: "",
-        },
-      ],
-    }));
-  };
-
-  const removeContactField = (index: number) => {
-    if (formData.contacts.length === 1) return;
-    setFormData((prevData) => ({
-      ...prevData,
-      contacts: prevData.contacts.filter((_, i) => i !== index),
     }));
   };
 
@@ -350,16 +275,81 @@ export default function CreateSupplierPage() {
     }
   };
 
-  const handleFieldChange = (id: string, newValue: string) => {
+  const handleFieldChange = (
+    label: string,
+    field_type: string, // Ajout du type de champ
+    id: string,
+    newValue: string
+  ) => {
+    // Mettre à jour fieldValues pour le contrôle local
     setFieldValues((prevValues) => ({
       ...prevValues,
-      [id]: newValue,
+      [id]: newValue, // Met à jour l'état local du champ
     }));
+
+    // Mettre à jour formData.additional_fields pour avoir un tableau d'objets
+    setFormData((prevFormData) => {
+      const updatedAdditionalFields = [...prevFormData.additional_fields];
+
+      // Vérifier si un champ avec ce label existe déjà
+      const fieldIndex = updatedAdditionalFields.findIndex(
+        (field) => field.label === label
+      );
+
+      if (fieldIndex !== -1) {
+        // Mettre à jour la valeur et le type si le champ existe
+        updatedAdditionalFields[fieldIndex].value = newValue;
+        updatedAdditionalFields[fieldIndex].field_type = field_type;
+      } else {
+        // Ajouter un nouveau champ s'il n'existe pas encore
+        updatedAdditionalFields.push({ label, value: newValue, field_type });
+      }
+
+      return {
+        ...prevFormData,
+        additional_fields: updatedAdditionalFields,
+      };
+    });
   };
 
   useEffect(() => {
     fetchField();
   }, []);
+
+  const handleContactChange = (field: keyof Contact, value: string) => {
+    setNewContact((prevContact) => {
+      const updatedContact = { ...prevContact, [field]: value };
+      console.log("Updated Contact:", updatedContact); // Pour le débogage
+      return updatedContact;
+    });
+  };
+  
+  const addContact = (newContact: Contact) => {
+    console.log("Adding contact:", newContact);
+    setFormData((prevFormData) => {
+      const updatedFormData = {
+        ...prevFormData,
+        contacts: [...prevFormData.contacts, newContact],
+      };
+      console.log("Updated FormData:", updatedFormData);
+      return updatedFormData;
+    });
+  
+    setSelectedContacts((prevContacts) => [...prevContacts, newContact]);
+  
+    setNewContact({
+      firstname: "",
+      lastname: "",
+      function: "",
+      phone: "",
+      mobile: "",
+      email: "",
+    });
+  
+    setContactModalIsOpen(false);
+  };
+  
+  
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -395,305 +385,315 @@ export default function CreateSupplierPage() {
 
   console.log(formData);
   return (
-    <section className="w-full bg-slate-50 p-7">
-      <div className="max-w-[2024px] mx-auto">
-        <form onSubmit={handleSubmit} className="mb-[400px]">
-          <div className="flex justify-between">
-            <div>
-              <h3 className="text-[32px] font-[800] text-gray-800">
-                Créer <span className="font-[200]">un fournisseur</span>
-              </h3>
-              {creatorId && (
-                <p className="text-[17px] text-gray-600 italic">
-                  Création par{" "}
-                  <span className="font-[600]">{creatorId.username}</span>
-                </p>
+    <>
+      <Modal
+        show={contactModalIsOpen}
+        onCancel={() => setContactModalIsOpen(false)}
+        onClose={() => setContactModalIsOpen(false)}
+        header="Ajouter un contact"
+      >
+        <ContactFormComponent
+          contact={newContact}
+          handleContactChange={handleContactChange}
+          addContact={addContact}
+          onCloseModal={() => setContactModalIsOpen(false)}
+        />
+      </Modal>
+      <section className="w-full bg-slate-50 p-7">
+        <div className="max-w-[2024px] mx-auto">
+          <form onSubmit={handleSubmit} className="mb-[400px]">
+            <div className="flex justify-between">
+              <div>
+                <h3 className="text-[32px] font-[800] text-gray-800">
+                  Créer <span className="font-[200]">un fournisseur</span>
+                </h3>
+                {creatorId && (
+                  <p className="text-[17px] text-gray-600 italic">
+                    Création par{" "}
+                    <span className="font-[600]">{creatorId.username}</span>
+                  </p>
+                )}
+              </div>
+              {!isLoading ? (
+                <div className="flex items-center justify-between gap-3 mt-[50px]">
+                  <div className="flex gap-3">
+                    <Button size="small" cancel type="button">
+                      Annuler
+                    </Button>
+                    <Button size="small" blue type="submit">
+                      Créer le fournisseur
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-3">
+                  <CircularProgress />
+                </div>
               )}
             </div>
-            {!isLoading ? (
-              <div className="flex items-center justify-between gap-3 mt-[50px]">
-                <div className="flex gap-3">
-                  <Button size="small" cancel type="button">
-                    Annuler
-                  </Button>
-                  <Button size="small" blue type="submit">
-                    Créer le fournisseur
-                  </Button>
+
+            <div className="flex gap-4 mt-[80px]">
+              <FormSection title="Identification" size="h-[550px]">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <Input
+                    element="input"
+                    id="code"
+                    label="Code fournisseur :"
+                    value={formData.code}
+                    onChange={handleChange}
+                    validators={[]}
+                    placeholder="Ajouter le code fournisseur"
+                    create
+                    gray
+                  />
+                  <Input
+                    element="input"
+                    id="company_name"
+                    label="Raison sociale :"
+                    value={formData.company_name}
+                    onChange={handleChange}
+                    validators={[]}
+                    placeholder="Ajouter la raison sociale"
+                    create
+                    gray
+                  />
+                  <Input
+                    element="input"
+                    id="siret"
+                    label="Siret :"
+                    value={formData.siret}
+                    onChange={handleChange}
+                    validators={[]}
+                    placeholder="Entrer le numéro SIRET (14 chiffres)"
+                    create
+                    gray
+                  />
+                  <Input
+                    element="input"
+                    id="tva"
+                    label="N°TVA intracom :"
+                    value={formData.tva}
+                    onChange={handleChange}
+                    validators={[]}
+                    placeholder="Ajouter le numero tva intracom"
+                    create
+                    gray
+                  />
                 </div>
-              </div>
-            ) : (
-              <div className="mt-3">
-                <CircularProgress />
-              </div>
-            )}
-          </div>
-
-          <div className="flex gap-4 mt-[80px]">
-            <FormSection title="Identification" size="h-[550px]">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <Input
                   element="input"
-                  id="code"
-                  label="Code fournisseur :"
-                  value={formData.code}
+                  id="web_url"
+                  label="Site web :"
+                  value={formData.web_url}
                   onChange={handleChange}
                   validators={[]}
-                  placeholder="Ajouter le code fournisseur"
+                  placeholder="www.monsite.com"
                   create
                   gray
                 />
                 <Input
                   element="input"
-                  id="company_name"
-                  label="Raison sociale :"
-                  value={formData.company_name}
+                  type="email"
+                  id="email"
+                  label="Email :"
+                  value={formData.email}
                   onChange={handleChange}
                   validators={[]}
-                  placeholder="Ajouter la raison sociale"
+                  placeholder="ex: email@email.fr"
+                  create
+                  gray
+                />
+                <Input
+                  element="phone"
+                  id="phone"
+                  label="Téléphone :"
+                  value={formData.phone}
+                  onChange={(e) => handlePhoneChange(e.target.value)}
+                  validators={[]}
+                  placeholder="0142391456"
+                  create
+                  gray
+                />
+              </FormSection>
+
+              <FormSection title="Adresse" size="h-[550px]">
+                <Input
+                  element="input"
+                  id="address_1"
+                  label="Adresse 1 :"
+                  value={formData.address_1}
+                  onChange={handleChange}
+                  validators={[]}
+                  placeholder="14 rue mon adresse"
                   create
                   gray
                 />
                 <Input
                   element="input"
-                  id="siret"
-                  label="Siret :"
-                  value={formData.siret}
+                  id="address_2"
+                  label="Adresse 2 :"
+                  value={formData.address_2}
                   onChange={handleChange}
                   validators={[]}
-                  placeholder="Entrer le numéro SIRET (14 chiffres)"
+                  placeholder="Complément d'adresse"
                   create
                   gray
                 />
                 <Input
                   element="input"
-                  id="tva"
-                  label="N°TVA intracom :"
-                  value={formData.tva}
+                  id="address_3"
+                  label="Adresse 3 :"
+                  value={formData.address_3}
                   onChange={handleChange}
                   validators={[]}
-                  placeholder="Ajouter le numero tva intracom"
+                  placeholder="Complément d'adresse"
                   create
                   gray
                 />
-              </div>
-              <Input
-                element="input"
-                id="web_url"
-                label="Site web :"
-                value={formData.web_url}
-                onChange={handleChange}
-                validators={[]}
-                placeholder="www.monsite.com"
-                create
-                gray
-              />
-              <Input
-                element="input"
-                type="email"
-                id="email"
-                label="Email :"
-                value={formData.email}
-                onChange={handleChange}
-                validators={[]}
-                placeholder="ex: email@email.fr"
-                create
-                gray
-              />
-              <Input
-                element="phone"
-                id="phone"
-                label="Téléphone :"
-                value={formData.phone}
-                onChange={(e) => handlePhoneChange(e.target.value)}
-                validators={[]}
-                placeholder="0142391456"
-                create
-                gray
-              />
-            </FormSection>
-
-            <FormSection title="Adresse" size="h-[550px]">
-              <Input
-                element="input"
-                id="address_1"
-                label="Adresse 1 :"
-                value={formData.address_1}
-                onChange={handleChange}
-                validators={[]}
-                placeholder="14 rue mon adresse"
-                create
-                gray
-              />
-              <Input
-                element="input"
-                id="address_2"
-                label="Adresse 2 :"
-                value={formData.address_2}
-                onChange={handleChange}
-                validators={[]}
-                placeholder="Complément d'adresse"
-                create
-                gray
-              />
-              <Input
-                element="input"
-                id="address_3"
-                label="Adresse 3 :"
-                value={formData.address_3}
-                onChange={handleChange}
-                validators={[]}
-                placeholder="Complément d'adresse"
-                create
-                gray
-              />
-              <Input
-                element="input"
-                id="city"
-                label="Ville :"
-                value={formData.city}
-                onChange={handleChange}
-                validators={[]}
-                placeholder="Ajouter la ville"
-                create
-                gray
-              />
-              <Input
-                element="input"
-                id="postal"
-                label="Code postal :"
-                value={formData.postal}
-                onChange={handleChange}
-                validators={[]}
-                placeholder="75019"
-                create
-                gray
-              />
-              <Input
-                element="input"
-                id="country"
-                label="Pays :"
-                value={formData.country}
-                onChange={handleChange}
-                validators={[]}
-                placeholder="France"
-                create
-                gray
-              />
-            </FormSection>
-          </div>
-
-          <div className="flex gap-4 mt-[30px]">
-            <FormSection title="Contacts">
-              {formData.contacts.map((contact, index) => (
-                <ContactSection
-                  key={index}
-                  contact={contact}
-                  index={index}
-                  handleContactChange={handleContactChange}
-                  removeContactField={removeContactField}
+                <Input
+                  element="input"
+                  id="city"
+                  label="Ville :"
+                  value={formData.city}
+                  onChange={handleChange}
+                  validators={[]}
+                  placeholder="Ajouter la ville"
+                  create
+                  gray
                 />
-              ))}
-              <button
-                type="button"
-                onClick={addContactField}
-                className="flex items-center gap-2 text-[12px] text-orange-400 mt-5"
-              >
-                <Plus size={17} />
-                Ajouter un contact
-              </button>
-            </FormSection>
-
-            <FormSection title="Marques">
-              <BrandSection
-                brands={brands}
-                optionsBrand={optionsBrand}
-                handleChangeBrand={handleChangeBrand}
-                removeBrandField={removeBrandField}
-                addBrandField={addBrandField}
-                handleInputChangeBrand={handleInputChangeBrand}
-                inputValueBrand={inputValueBrand}
-                customStyles={customStyles}
-              />
-            </FormSection>
-          </div>
-
-          <div className="flex gap-4 mt-[30px]">
-            <FormSection title="Tarifs & conditions">
-              {formData.conditions.map((condition, index) => (
-                <ConditionSection
-                  key={index}
-                  condition={condition}
-                  index={index}
-                  handleConditionChange={handleConditionChange}
-                  currencies={currencies}
+                <Input
+                  element="input"
+                  id="postal"
+                  label="Code postal :"
+                  value={formData.postal}
+                  onChange={handleChange}
+                  validators={[]}
+                  placeholder="75019"
+                  create
+                  gray
                 />
-              ))}
-            </FormSection>
-            {userFields && userFields.length > 0 && (
-              <FormSection title="Champs additionnels">
-                <div className="mt-3">
-                  {userFields
-                    .filter((field) => field.apply_to === "Fournisseur")
-                    .map((field) => (
-                      <div key={field._id} className="mb-6">
-                        {/* Affichage du label au niveau supérieur */}
-                        <h3 className="text-md font-semibold text-gray-800 mb-1">
-                          {field.label}
-                        </h3>
-                        {field.additional_fields.map((customField, index) => (
-                          <div key={`${field._id}-${index}`} className="mb-4">
-                            <DynamicField
-                              id={`${field._id}-${index}`}
-                              name={customField.field_name}
-                              fieldType={customField.field_type}
-                              value={fieldValues[`${field._id}-${index}`] || ""}
-                              onChange={(e) =>
-                                handleFieldChange(
-                                  `${field._id}-${index}`,
-                                  e.target.value
-                                )
-                              }
-                              options={customField.options}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    ))}
+                <Input
+                  element="input"
+                  id="country"
+                  label="Pays :"
+                  value={formData.country}
+                  onChange={handleChange}
+                  validators={[]}
+                  placeholder="France"
+                  create
+                  gray
+                />
+              </FormSection>
+            </div>
+
+            <div className="flex gap-4 mt-[30px]">
+              <FormSection title="Contacts">
+                <div className="flex flex-col gap-2">
+                  {selectedContacts.map((contact, index) => (
+                    <div
+                      key={index}
+                      className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md bg-slate-400`}
+                    >
+                      <span className="text-[20px] text-white font-bold">
+                        {contact.firstname} {contact.lastname}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div
+                  className="flex flex-col items-center justify-center p-[20px] text-orange-400 hover:text-orange-300 cursor-pointer"
+                  onClick={() => setContactModalIsOpen(true)}
+                >
+                  <div className="flex items-center gap-2 text-[12px] mt-3">
+                    <Plus size={30} />
+                  </div>
+                  <p className="font-[700]">Ajouter un contact</p>
                 </div>
               </FormSection>
-            )}
-          </div>
 
-          {/* Boutons de soumission */}
-          {!isLoading ? (
-            <div className="mt-[50px] flex gap-2">
-              <button
-                className="w-full bg-[#9FA6B2] text-white py-2 rounded-md font-[600] hover:bg-[#bac3d4] hover:text-white shadow-md"
-                type="button"
-              >
-                Annuler
-              </button>
-              <button
-                className="w-full bg-[#3B71CA] text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
-                type="submit"
-              >
-                Créer le fournisseur
-              </button>
-            </div>
-          ) : (
-            <div className="relative flex justify-center mt-7 px-7 gap-2">
-              <CircularProgress size={100} />
-              <div className="absolute h-[60px] w-[80px] top-[50%] translate-y-[-50%]">
-                <img
-                  src="/img/logo.png"
-                  alt="logo"
-                  className="w-full h-full animate-pulse"
+              <FormSection title="Marques">
+                <BrandSection
+                  brands={brands}
+                  optionsBrand={optionsBrand}
+                  handleChangeBrand={handleChangeBrand}
+                  removeBrandField={removeBrandField}
+                  addBrandField={addBrandField}
+                  handleInputChangeBrand={handleInputChangeBrand}
+                  inputValueBrand={inputValueBrand}
+                  customStyles={customStyles}
                 />
-              </div>
+              </FormSection>
             </div>
-          )}
-        </form>
-      </div>
-    </section>
+
+            <div className="flex gap-4 mt-[30px]">
+            <FormSection title="Champs additionnels (optionel)">
+                  <div className="mt-3">
+                    {userFields
+                      .filter((field) => field.apply_to === "Fournisseur")
+                      .map((field) => (
+                        <div key={field._id} className="mb-6">
+                          {/* Affichage du label au niveau supérieur */}
+                          <h3 className="text-md font-semibold text-gray-800 mb-1">
+                            {field.label}
+                          </h3>
+                          {field.additional_fields.map((customField, index) => (
+                            <div key={`${field._id}-${index}`} className="mb-4">
+                              <DynamicField
+                                id={`${field._id}-${index}`}
+                                name={customField.field_name}
+                                fieldType={customField.field_type}
+                                value={
+                                  fieldValues[`${field._id}-${index}`] || ""
+                                }
+                                onChange={(e) =>
+                                  handleFieldChange(
+                                    field.label,
+                                    customField.field_type,
+                                    `${field._id}-${index}`,
+                                    e.target.value
+                                  )
+                                }
+                                options={customField.options}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                  </div>
+                </FormSection>
+            </div>
+
+            {/* Boutons de soumission */}
+            {!isLoading ? (
+              <div className="mt-[50px] flex gap-2">
+                <button
+                  className="w-full bg-[#9FA6B2] text-white py-2 rounded-md font-[600] hover:bg-[#bac3d4] hover:text-white shadow-md"
+                  type="button"
+                >
+                  Annuler
+                </button>
+                <button
+                  className="w-full bg-[#3B71CA] text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
+                  type="submit"
+                >
+                  Créer le fournisseur
+                </button>
+              </div>
+            ) : (
+              <div className="relative flex justify-center mt-7 px-7 gap-2">
+                <CircularProgress size={100} />
+                <div className="absolute h-[60px] w-[80px] top-[50%] translate-y-[-50%]">
+                  <img
+                    src="/img/logo.png"
+                    alt="logo"
+                    className="w-full h-full animate-pulse"
+                  />
+                </div>
+              </div>
+            )}
+          </form>
+        </div>
+      </section>
+    </>
   );
 }

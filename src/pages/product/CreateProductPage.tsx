@@ -809,6 +809,23 @@ export default function CreateProductPage() {
     }
   };
 
+  const addSupplier = (newSupplier: any) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      suppliers: [...prevFormData.suppliers, newSupplier],
+    }));
+
+    setNewSupplier({
+      supplier_id: "",
+      company_name: "",
+      supplier_ref: "",
+      pcb: "",
+      custom_cat: "",
+      made_in: "",
+    });
+  };
+
+
   const fetchField = async () => {
     try {
       const response = await fetch(
@@ -830,21 +847,6 @@ export default function CreateProductPage() {
     }
   };
 
-  const addSupplier = (newSupplier: any) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      suppliers: [...prevFormData.suppliers, newSupplier],
-    }));
-
-    setNewSupplier({
-      supplier_id: "",
-      company_name: "",
-      supplier_ref: "",
-      pcb: "",
-      custom_cat: "",
-      made_in: "",
-    });
-  };
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -928,7 +930,7 @@ export default function CreateProductPage() {
       >
         <SupplierFormComponent
           supplier={newSupplier}
-          index={0} // Pas besoin de multiples index ici car c'est un formulaire d'ajout
+          index={0}
           optionsSupplier={optionsSupplier}
           inputValueSupplier={inputValueSupplier}
           handleSupplierSelectChange={handleSupplierSelectChange}
