@@ -7,6 +7,12 @@ import Spinner from "../../components/Shared/Spinner";
 import truncateText from "../../utils/func/Formattext";
 import Header from "../../components/Navigation/Header";
 import { ChevronsUpDown, CircleSlash2 } from "lucide-react";
+import { useBrands } from "../../utils/hooks/useBrands";
+import { useFamily } from "../../utils/hooks/useFamily";
+import { useSubFamily } from "../../utils/hooks/useSubFamily";
+import BrandSection from "../../components/Formulaires/BrandSection";
+import FamilySection from "../../components/Formulaires/FamilySection";
+import SubFamilySection from "../../components/Formulaires/SubFamilySection";
 
 interface Product {
   _id: string;
@@ -18,6 +24,36 @@ interface Product {
   imgPath: string;
   status: string;
 }
+
+const customStyles = {
+  control: (provided: any) => ({
+    ...provided,
+    border: "none", // Supprimer la bordure
+    boxShadow: "none",
+    borderRadius: "10px", // Ajouter une bordure arrondie
+    "&:hover": {
+      border: "none", // Assurez-vous que la bordure n'apparaît pas au survol
+    },
+  }),
+  option: (provided: any, state: any) => ({
+    ...provided,
+    borderBottom: "1px solid #e5e5e5",
+    backgroundColor: state.isSelected ? "#e5e5e5" : "white",
+    color: state.isSelected ? "black" : "gray",
+    "&:hover": {
+      backgroundColor: "#e5e5e5",
+      color: "black",
+    },
+  }),
+  singleValue: (provided: any) => ({
+    ...provided,
+    color: "gray",
+  }),
+  container: (provided: any) => ({
+    ...provided,
+    marginTop: 0,
+  }),
+};
 
 export default function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -34,6 +70,29 @@ export default function ProductList() {
   const limit = 20;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const navigate = useNavigate();
+  const {
+    inputValueBrand,
+    optionsBrand,
+    brands,
+    handleInputChangeBrand,
+    handleChangeBrand,
+    addBrandField,
+    removeBrandField,
+  } = useBrands("", 10);
+  const {
+    inputValueFamily,
+    optionsFamily,
+    selectedFamily,
+    handleInputChangeFamily,
+    handleChangeFamily,
+  } = useFamily("", 10);
+  const {
+    inputValueSubFamily,
+    optionsSubFamily,
+    selectedSubFamily,
+    handleInputChangeSubFamily,
+    handleChangeSubFamily,
+  } = useSubFamily("", 10);
 
   useEffect(() => {
     fetchProducts();
@@ -95,22 +154,36 @@ export default function ProductList() {
 
   const handleSearch = () => {
     const params: any = {};
-
+  
     if (codeValue) params.reference = codeValue;
     if (labelValue) params.long_label = labelValue;
-    if (brandValue) params.brand = brandValue;
+  
+    const selectedBrandLabel = brands.find((brand) => brand !== null)?.label;
+    if (selectedBrandLabel) {
+      params.brand = selectedBrandLabel;
+    }
+  
+    if (selectedFamily && selectedFamily.name) {
+      params.tag = selectedFamily.name;
+    }
+  
+    if (selectedSubFamily && selectedSubFamily.name) {
+      params.sub_family = selectedSubFamily.name;
+    }
+  
     if (supplierValue) params.supplier = supplierValue;
-    if (familyValue) params.tag = familyValue;
-    if (subFamilyValue) params.tag = subFamilyValue;
     if (selectedActiveValue !== "all") params.status = selectedActiveValue;
+  
+    console.log("Selected SubFamily:", selectedSubFamily);
 
+  
     if (
       !codeValue &&
       !labelValue &&
-      !brandValue &&
+      !selectedBrandLabel &&
       !supplierValue &&
-      !familyValue &&
-      !subFamilyValue &&
+      !selectedFamily &&
+      !selectedSubFamily &&
       selectedActiveValue === "all"
     ) {
       fetchProducts();
@@ -119,6 +192,8 @@ export default function ProductList() {
       searchProducts(params);
     }
   };
+  
+  
 
   return (
     <section className="w-full">
@@ -156,15 +231,17 @@ export default function ProductList() {
               autoComplete="off"
             />
           </div>
-          <div className="flex flex-col">
-            <label className="text-sm font-bold mb-1">Marque :</label>
-            <input
-              type="text"
-              className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:ring-blue-500 transition-all focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
-              placeholder="Rechercher par marque"
-              value={brandValue}
-              onChange={(e) => setBrandValue(e.target.value)}
-              autoComplete="off"
+          <div className="flex flex-col relative">
+            <label className="text-sm font-bold">Marque :</label>
+            <BrandSection
+              brands={brands}
+              optionsBrand={optionsBrand}
+              handleChangeBrand={handleChangeBrand}
+              removeBrandField={removeBrandField}
+              addBrandField={addBrandField}
+              handleInputChangeBrand={handleInputChangeBrand}
+              inputValueBrand={inputValueBrand}
+              customStyles={customStyles}
             />
           </div>
           <div className="flex flex-col">
@@ -179,25 +256,27 @@ export default function ProductList() {
             />
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-bold mb-1">Famille :</label>
-            <input
-              type="text"
-              className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:ring-blue-500 transition-all focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
-              placeholder="Rechercher par famille"
-              value={familyValue}
-              onChange={(e) => setFamilyValue(e.target.value)}
-              autoComplete="off"
+            <label className="text-sm font-bold">Famille :</label>
+            <FamilySection
+              family={selectedFamily}
+              optionsFamily={optionsFamily}
+              handleChangeFamily={handleChangeFamily}
+              handleInputChangeFamily={handleInputChangeFamily}
+              inputValueFamily={inputValueFamily}
+              customStyles={customStyles}
+              isList
             />
           </div>
           <div className="flex flex-col">
-            <label className="text-sm font-bold mb-1">Sous-famille :</label>
-            <input
-              type="text"
-              className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:ring-blue-500 transition-all focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
-              placeholder="Rechercher par sous-famille"
-              value={subFamilyValue}
-              onChange={(e) => setSubFamilyValue(e.target.value)}
-              autoComplete="off"
+            <label className="text-sm font-bold">Sous-famille :</label>
+            <SubFamilySection
+              subFamily={selectedSubFamily}
+              optionsSubFamily={optionsSubFamily}
+              handleChangeSubFamily={handleChangeSubFamily}
+              handleInputChangeSubFamily={handleInputChangeSubFamily}
+              inputValueSubFamily={inputValueSubFamily}
+              customStyles={customStyles}
+              isList
             />
           </div>
         </div>
@@ -247,7 +326,7 @@ export default function ProductList() {
       </Header>
 
       {/* Table des résultats */}
-      <div className="relative overflow-x-auto bg-white">
+      <div className="overflow-x-auto bg-white">
         <table className="w-full text-left">
           <thead className="border-y-[2px] border-slate-100 text-sm font-[900] text-black uppercase">
             <tr>

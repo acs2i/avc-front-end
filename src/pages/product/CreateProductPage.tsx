@@ -5,17 +5,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import Card from "../../components/Shared/Card";
 import {
-  ArrowBigRight,
-  ArrowRight,
-  ChevronDown,
-  ChevronUp,
-  ImageUp,
   Maximize2,
   Minimize2,
-  MinusCircle,
   Plus,
-  Trash,
-  Trash2,
 } from "lucide-react";
 import Button from "../../components/FormElements/Button";
 import useNotify from "../../utils/hooks/useToast";
@@ -33,6 +25,16 @@ import FormSection from "../../components/Formulaires/FormSection";
 import Modal from "../../components/Shared/Modal";
 import SupplierFormComponent from "../../components/SupplierFormComponent";
 import DynamicField from "../../components/FormElements/DynamicField";
+import BrandSection from "../../components/Formulaires/BrandSection";
+import CollectionSection from "../../components/Formulaires/CollectionSection";
+import FamilySection from "../../components/Formulaires/FamilySection";
+import SubFamilySection from "../../components/Formulaires/SubFamilySection";
+import SubSubFamilySection from "../../components/Formulaires/SubSubFamilySection";
+import { useBrands } from "../../utils/hooks/useBrands";
+import { useCollections } from "../../utils/hooks/useCollection";
+import { useFamily } from "../../utils/hooks/useFamily";
+import { useSubFamily } from "../../utils/hooks/useSubFamily";
+import { useSubSubFamily } from "../../utils/hooks/useSubSubFamily";
 
 interface PriceItemSchema {
   peau: number;
@@ -105,29 +107,9 @@ interface UserField {
   additional_fields: CustomField[];
 }
 
-type Tag = {
-  _id: string;
-  level: string;
-  code: string;
-  name: string;
-};
-
 type TagOption = {
   value: string;
   label: string;
-};
-
-type ClasificationOption = {
-  value: string;
-  label: string;
-  name: string;
-};
-
-type BrandOption = {
-  _id: string;
-  value: string;
-  label: string;
-  code: string;
 };
 
 type SuppliersOption = {
@@ -139,13 +121,6 @@ type SuppliersOption = {
   pcb?: string;
   custom_cat?: string;
   made_in?: string;
-};
-
-type CollectionOption = {
-  _id: string;
-  value: string;
-  label: string;
-  code: string;
 };
 
 const customStyles = {
@@ -190,33 +165,11 @@ export default function CreateProductPage() {
   const [classificationValue, setClassificationValue] =
     useState("Au vieux campeur");
   const [currentPage, setCurrentPage] = useState(1);
-  const [inputValueFamily, setInputValueFamily] = useState("");
   const [inputValueClassification, setInputValueClassification] = useState("");
   const [selectedSuppliers, setSelectedSuppliers] = useState<SuppliersOption[]>(
     []
   );
-  const [inputSubValueFamily, setInputSubValueFamily] = useState("");
-  const [inputValueSubSubFamily, setInputValueSubSubFamily] = useState("");
-  const [inputValueBrand, setInputValueBrand] = useState("");
-  const [inputValueCollection, setInputValueCollection] = useState("");
   const [inputValueSupplier, setInputValueSupplier] = useState("");
-  const [selectedOptionFamily, setSelectedOptionFamily] =
-    useState<SingleValue<TagOption> | null>(null);
-  const [selectedOptionSubFamily, setSelectedOptionSubFamily] =
-    useState<SingleValue<TagOption> | null>(null);
-  const [selectedOptionSubSubFamily, setSelectedOptionSubSubFamily] =
-    useState<SingleValue<TagOption> | null>(null);
-  const [selectedOptionBrand, setSelectedOptionBrand] =
-    useState<SingleValue<BrandOption> | null>(null);
-  const [selectedOptionCollection, setSelectedOptionCollection] =
-    useState<SingleValue<CollectionOption> | null>(null);
-  const [selectedOptionSupplier, setSelectedOptionSupplier] =
-    useState<SingleValue<SuppliersOption> | null>(null);
-  const [optionsFamily, setOptionsFamily] = useState<TagOption[]>([]);
-  const [optionsSubFamily, setOptionsSubFamily] = useState<TagOption[]>([]);
-  const [optionsSubSubFamily, setOptionsSubSubFamily] = useState<TagOption[]>(
-    []
-  );
   const [newSupplier, setNewSupplier] = useState<Supplier>({
     supplier_id: "",
     supplier_ref: "",
@@ -225,13 +178,6 @@ export default function CreateProductPage() {
     made_in: "",
     company_name: "",
   });
-  const [selectedSupplierIndex, setSelectedSupplierIndex] = useState<
-    number | null
-  >(null);
-  const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
-  const [optionsCollection, setOptionsCollection] = useState<
-    CollectionOption[]
-  >([]);
   const [optionsSupplier, setOptionsSupplier] = useState<SuppliersOption[]>([]);
   const classificationOptions = [
     {
@@ -242,7 +188,6 @@ export default function CreateProductPage() {
   ];
   const limit = 10;
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState<FormData>({
     creator_id: creatorId._id,
     reference: "",
@@ -286,21 +231,51 @@ export default function CreateProductPage() {
     initialColors: ["000"],
     initialGrid: [[true]],
   });
-
   const [sizes, setSizes] = useState<string[]>([]);
   const [colors, setColors] = useState<string[]>([]);
   const [uvcGrid, setUvcGrid] = useState<boolean[][]>([]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.id]: e.target.value,
-      short_label:
-        e.target.id === "long_label"
-          ? e.target.value.substring(0, 15)
-          : formData.short_label,
-    });
-  };
+  // Fonction qui fetch les marques pour l'input creatable select (brand)
+  const {
+    inputValueBrand,
+    optionsBrand,
+    brands,
+    handleInputChangeBrand,
+    handleChangeBrand,
+    addBrandField,
+    removeBrandField,
+  } = useBrands("", 10);
+  // Fonction qui fetch les collections pour l'input creatable select (collection)
+  const {
+    inputValueCollection,
+    optionsCollection,
+    selectedCollection,
+    handleInputChangeCollection,
+    handleChangeCollection,
+  } = useCollections("", 10);
+  // Fonction qui fetch les familles pour l'input creatable select (tag)
+  const {
+    inputValueFamily,
+    optionsFamily,
+    selectedFamily,
+    handleInputChangeFamily,
+    handleChangeFamily,
+  } = useFamily("", 10);
+  // Fonction qui fetch les sous-familles pour l'input creatable select (tag)
+  const {
+    inputValueSubFamily,
+    optionsSubFamily,
+    selectedSubFamily,
+    handleInputChangeSubFamily,
+    handleChangeSubFamily,
+  } = useSubFamily("", 10);
+   // Fonction qui fetch les sous-sous-familles pour l'input creatable select (tag)
+  const {
+    inputValueSubSubFamily,
+    optionsSubSubFamily,
+    selectedSubSubFamily,
+    handleInputChangeSubSubFamily,
+    handleChangeSubSubFamily,
+  } = useSubSubFamily("", 10);
 
   const handleFieldChange = (
     label: string,
@@ -339,81 +314,6 @@ export default function CreateProductPage() {
     });
   };
 
-  const handleChangeBrand = (selectedOption: SingleValue<BrandOption>) => {
-    const brandId = selectedOption ? selectedOption.value : "";
-    setSelectedOptionBrand(selectedOption);
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      brand_ids: [brandId],
-    }));
-    const brandLabel = selectedOption ? selectedOption.label : "";
-    setBrandLabel(brandLabel);
-  };
-
-  const handleChangeCollection = (
-    selectedOption: SingleValue<CollectionOption>
-  ) => {
-    const collectionId = selectedOption ? selectedOption.value : "";
-    setSelectedOptionCollection(selectedOption);
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      collection_ids: [collectionId],
-    }));
-  };
-
-  const handleChangeFamily = (newValue: SingleValue<TagOption> | null) => {
-    setSelectedOptionFamily(newValue);
-
-    setFormData((prevFormData) => {
-      let newTagIds = [...prevFormData.tag_ids];
-      if (newValue) {
-        newTagIds[0] = newValue.value; // Place le Family ID à l'index 0
-      } else {
-        newTagIds[0] = ""; // Retire la famille si aucun n'est sélectionné
-      }
-      return {
-        ...prevFormData,
-        tag_ids: newTagIds.filter(Boolean), // Supprime les valeurs vides
-      };
-    });
-  };
-
-  const handleChangeSubFamily = (newValue: SingleValue<TagOption> | null) => {
-    setSelectedOptionSubFamily(newValue);
-
-    setFormData((prevFormData) => {
-      let newTagIds = [...prevFormData.tag_ids];
-      if (newValue) {
-        newTagIds[1] = newValue.value; // Place le SubFamily ID à l'index 1
-      } else {
-        newTagIds[1] = ""; // Retire la sous-famille si aucun n'est sélectionné
-      }
-      return {
-        ...prevFormData,
-        tag_ids: newTagIds.filter(Boolean), // Supprime les valeurs vides
-      };
-    });
-  };
-
-  const handleChangeSubSubFamily = (
-    newValue: SingleValue<TagOption> | null
-  ) => {
-    setSelectedOptionSubSubFamily(newValue);
-
-    setFormData((prevFormData) => {
-      let newTagIds = [...prevFormData.tag_ids];
-      if (newValue) {
-        newTagIds[2] = newValue.value; // Place le SubSubFamily ID à l'index 2
-      } else {
-        newTagIds[2] = ""; // Retire la sous-sous-famille si aucun n'est sélectionné
-      }
-      return {
-        ...prevFormData,
-        tag_ids: newTagIds.filter(Boolean), // Supprime les valeurs vides
-      };
-    });
-  };
-
   const handleDimensionsChange = (
     newDimensions: { color: string; size: string }[]
   ) => {
@@ -447,112 +347,6 @@ export default function CreateProductPage() {
       ...prevFormData,
       uvc: newUVCs,
     }));
-  };
-
-  const handleInputChangeBrand = async (inputValueBrand: string) => {
-    setInputValueBrand(inputValueBrand);
-
-    if (inputValueBrand === "") {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_URL_DEV}/api/v1/brand`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const data = await response.json();
-
-        const optionsBrand = data.data?.map((brand: BrandOption) => ({
-          value: brand._id, // Assurez-vous que cette valeur est l'ID de la marque
-          label: brand.label,
-        }));
-
-        setOptionsBrand(optionsBrand);
-      } catch (error) {
-        console.error("Erreur lors de la requête", error);
-      }
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/brand/search?label=${inputValueBrand}&page=${currentPage}&limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = await response.json();
-
-      const optionsBrand = data.data?.map((brand: BrandOption) => ({
-        value: brand._id, // Assurez-vous que cette valeur est l'ID de la marque
-        label: brand.label,
-      }));
-
-      setOptionsBrand(optionsBrand);
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-    }
-  };
-
-  const handleInputChangeCollection = async (inputValueCollection: string) => {
-    setInputValueCollection(inputValueCollection);
-
-    if (inputValueCollection === "") {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_URL_DEV}/api/v1/collection`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const data = await response.json();
-
-        const optionsCollection = data.data?.map(
-          (collection: CollectionOption) => ({
-            value: collection._id,
-            label: collection.label,
-          })
-        );
-
-        setOptionsCollection(optionsCollection);
-      } catch (error) {
-        console.error("Erreur lors de la requête", error);
-      }
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/collection/search?label=${inputValueCollection}&page=${currentPage}&limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = await response.json();
-
-      const optionsCollection = data.data?.map(
-        (collection: CollectionOption) => ({
-          value: collection._id,
-          label: collection.label,
-        })
-      );
-
-      setOptionsCollection(optionsCollection);
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-    }
   };
 
   const handleInputChangeSupplier = async (inputValueSupplier: string) => {
@@ -617,161 +411,6 @@ export default function CreateProductPage() {
     setInputValueClassification(inputValue);
   };
 
-  const handleInputChangeFamily = async (inputValueFamily: string) => {
-    setInputValueFamily(inputValueFamily);
-
-    if (inputValueFamily === "") {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_URL_DEV}/api/v1/tag`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const data = await response.json();
-
-        const optionsFamily = data.data?.map((tag: Tag) => ({
-          value: tag._id,
-          label: tag.name,
-        }));
-
-        setOptionsFamily(optionsFamily);
-      } catch (error) {
-        console.error("Erreur lors de la requête", error);
-      }
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?name=${inputValueFamily}&page=${currentPage}&limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = await response.json();
-
-      const optionsFamily = data.data?.map((tag: Tag) => ({
-        value: tag._id,
-        label: tag.name,
-      }));
-
-      setOptionsFamily(optionsFamily);
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-    }
-  };
-
-  const handleInputChangeSubFamily = async (inputValueSubFamily: string) => {
-    setInputSubValueFamily(inputValueSubFamily);
-
-    if (inputValueSubFamily === "") {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?level=sous-famille`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const data = await response.json();
-
-        const optionsSubFamily = data.data?.map((tag: Tag) => ({
-          value: tag._id,
-          label: tag.name,
-        }));
-
-        setOptionsSubFamily(optionsSubFamily);
-      } catch (error) {
-        console.error("Erreur lors de la requête", error);
-      }
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?name=${inputValueSubFamily}&level=sous-famille&page=${currentPage}&limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = await response.json();
-
-      const optionsSubFamily = data.data?.map((tag: Tag) => ({
-        value: tag._id,
-        label: tag.name,
-      }));
-
-      setOptionsSubFamily(optionsSubFamily);
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-    }
-  };
-
-  const handleInputChangeSubSubFamily = async (
-    inputValueSubSubFamily: string
-  ) => {
-    setInputValueSubSubFamily(inputValueSubSubFamily);
-
-    if (inputValueSubSubFamily === "") {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?level=sous-sous-famille`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const data = await response.json();
-
-        const optionsSubSubFamily = data.data?.map((tag: Tag) => ({
-          value: tag._id,
-          label: tag.name,
-        }));
-
-        setOptionsSubSubFamily(optionsSubSubFamily);
-      } catch (error) {
-        console.error("Erreur lors de la requête", error);
-      }
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?name=${inputValueSubSubFamily}&level=sous-sous-famille&page=${currentPage}&limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = await response.json();
-
-      const optionsSubSubFamily = data.data?.map((tag: Tag) => ({
-        value: tag._id,
-        label: tag.name,
-      }));
-
-      setOptionsSubSubFamily(optionsSubSubFamily);
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-    }
-  };
-
   const handleSupplierSelectChange = (
     index: number,
     option: SuppliersOption
@@ -825,7 +464,6 @@ export default function CreateProductPage() {
     });
   };
 
-
   const fetchField = async () => {
     try {
       const response = await fetch(
@@ -846,7 +484,6 @@ export default function CreateProductPage() {
       setIsLoading(false);
     }
   };
-
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
@@ -901,6 +538,53 @@ export default function CreateProductPage() {
     setIsFullScreen((prevState) => !prevState);
   };
 
+  // Fonction qui récupère les données de tout les autres champs
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+      short_label:
+        e.target.id === "long_label"
+          ? e.target.value.substring(0, 15)
+          : formData.short_label,
+    });
+  };
+
+  // Use Effect pour ajouter l'id des creatable select au formdata
+  useEffect(() => {
+    setFormData((prevFormData) => {
+      const updatedTagIds = [...prevFormData.tag_ids];
+  
+      // Mise à jour de la famille à l'index 0
+      if (selectedFamily) {
+        updatedTagIds[0] = selectedFamily.value;
+      }
+  
+      // Mise à jour de la sous-famille à l'index 1
+      if (selectedSubFamily) {
+        updatedTagIds[1] = selectedSubFamily.value;
+      }
+  
+      // Mise à jour de la sous-sous-famille à l'index 2
+      if (selectedSubSubFamily) {
+        updatedTagIds[2] = selectedSubSubFamily.value;
+      }
+  
+      // Filtrer les valeurs vides éventuelles dans tag_ids
+      const filteredTagIds = updatedTagIds.filter(Boolean);
+  
+      return {
+        ...prevFormData,
+        brand_ids: brands.map((brand) => brand?._id || ""),
+        collection_ids: selectedCollection
+          ? [selectedCollection._id]
+          : prevFormData.collection_ids,
+        tag_ids: filteredTagIds,
+      };
+    });
+  }, [brands, selectedCollection, selectedFamily, selectedSubFamily, selectedSubSubFamily]);
+  
+  // Use Effect qui réinitialise les champs dans la modal fournisseur
   useEffect(() => {
     if (supplierModalIsOpen) {
       setNewSupplier({
@@ -915,6 +599,7 @@ export default function CreateProductPage() {
     }
   }, [supplierModalIsOpen]);
 
+  // Use Effect pour fetcher les "UserFields" au montage du composant
   useEffect(() => {
     fetchField();
   }, []);
@@ -1028,16 +713,17 @@ export default function CreateProductPage() {
                       <label className="text-sm font-medium text-gray-600">
                         Marque
                       </label>
-                      <CreatableSelect<BrandOption>
-                        value={selectedOptionBrand}
-                        onChange={handleChangeBrand}
-                        onInputChange={handleInputChangeBrand}
-                        inputValue={inputValueBrand}
-                        options={optionsBrand}
-                        placeholder="Selectionner une marque"
-                        styles={customStyles}
-                        className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                        required
+                      <BrandSection
+                        brands={brands}
+                        optionsBrand={optionsBrand}
+                        handleChangeBrand={handleChangeBrand}
+                        removeBrandField={removeBrandField}
+                        addBrandField={addBrandField}
+                        handleInputChangeBrand={handleInputChangeBrand}
+                        inputValueBrand={inputValueBrand}
+                        customStyles={customStyles}
+                        addBrand
+                        displayTrash
                       />
                     </div>
                     <div className="mt-[30px] grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1065,16 +751,13 @@ export default function CreateProductPage() {
                           <label className="text-sm font-medium text-gray-600">
                             Famille
                           </label>
-                          <CreatableSelect
-                            value={selectedOptionFamily}
-                            onChange={handleChangeFamily}
-                            onInputChange={handleInputChangeFamily}
-                            inputValue={inputValueFamily}
-                            options={optionsFamily}
-                            placeholder="Selectionner une famille"
-                            styles={customStyles}
-                            className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                            required
+                          <FamilySection
+                            family={selectedFamily}
+                            optionsFamily={optionsFamily}
+                            handleChangeFamily={handleChangeFamily}
+                            handleInputChangeFamily={handleInputChangeFamily}
+                            inputValueFamily={inputValueFamily}
+                            customStyles={customStyles}
                           />
                         </div>
                       )}
@@ -1084,16 +767,15 @@ export default function CreateProductPage() {
                           <label className="text-sm font-medium text-gray-600">
                             Sous-famille
                           </label>
-                          <CreatableSelect
-                            value={selectedOptionSubFamily}
-                            onChange={handleChangeSubFamily}
-                            onInputChange={handleInputChangeSubFamily}
-                            inputValue={inputSubValueFamily}
-                            options={optionsSubFamily}
-                            placeholder="Selectionner une sous-famille"
-                            styles={customStyles}
-                            className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                            required
+                          <SubFamilySection
+                            subFamily={selectedSubFamily}
+                            optionsSubFamily={optionsSubFamily}
+                            handleChangeSubFamily={handleChangeSubFamily}
+                            handleInputChangeSubFamily={
+                              handleInputChangeSubFamily
+                            }
+                            inputValueSubFamily={inputValueSubFamily}
+                            customStyles={customStyles}
                           />
                         </div>
                       )}
@@ -1102,16 +784,15 @@ export default function CreateProductPage() {
                           <label className="text-sm font-medium text-gray-600">
                             Sous-sous-famille
                           </label>
-                          <CreatableSelect
-                            value={selectedOptionSubSubFamily}
-                            onChange={handleChangeSubSubFamily}
-                            onInputChange={handleInputChangeSubSubFamily}
-                            inputValue={inputValueSubSubFamily}
-                            options={optionsSubSubFamily}
-                            placeholder="Selectionner une sous-sous-famille"
-                            styles={customStyles}
-                            className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                            required
+                          <SubSubFamilySection
+                            subSubFamily={selectedSubSubFamily}
+                            optionsSubSubFamily={optionsSubSubFamily}
+                            handleChangeSubSubFamily={handleChangeSubSubFamily}
+                            handleInputChangeSubSubFamily={
+                              handleInputChangeSubSubFamily
+                            }
+                            inputValueSubSubFamily={inputValueSubSubFamily}
+                            customStyles={customStyles}
                           />
                         </div>
                       )}
@@ -1119,26 +800,25 @@ export default function CreateProductPage() {
                   </div>
                 </FormSection>
               </div>
-           
-                <div className="w-[480px] h-[400px] flex flex-col gap-5 border-[5px] border-dashed border-slate-300 rounded-lg hover:bg-white hover:bg-opacity-75 transition ease-in-out delay-150 duration-300 cursor-pointer">
-                  <div className="w-full h-full flex justify-center items-center rounded-md">
-                    <div className="flex flex-col items-center text-center gap-5">
-                      <div className="w-[120px]">
-                        <img src="/img/img_upload.png" alt="icone" />
-                      </div>
-                      <div className="flex flex-col gap-2">
-                        <p className="text-gray-600 text-[25px]">
-                          Glissez déposez votre image ici
-                        </p>
-                        <span className="text-gray-600 text-[15px]">ou</span>
-                        <button className="border-[3px] border-blue-400 rounded-full hover:font-bold py-1 hover:bg-gradient-to-r from-cyan-500 to-blue-500 hover:text-white transition-all">
-                          Téléchargez la depuis votre ordinateur
-                        </button>
-                      </div>
+
+              <div className="w-[480px] h-[400px] flex flex-col gap-5 border-[5px] border-dashed border-slate-300 rounded-lg hover:bg-white hover:bg-opacity-75 transition ease-in-out delay-150 duration-300 cursor-pointer">
+                <div className="w-full h-full flex justify-center items-center rounded-md">
+                  <div className="flex flex-col items-center text-center gap-5">
+                    <div className="w-[120px]">
+                      <img src="/img/img_upload.png" alt="icone" />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <p className="text-gray-600 text-[25px]">
+                        Glissez déposez votre image ici
+                      </p>
+                      <span className="text-gray-600 text-[15px]">ou</span>
+                      <button className="border-[3px] border-blue-400 rounded-full hover:font-bold py-1 hover:bg-gradient-to-r from-cyan-500 to-blue-500 hover:text-white transition-all">
+                        Téléchargez la depuis votre ordinateur
+                      </button>
                     </div>
                   </div>
                 </div>
-           
+              </div>
             </div>
             <div className="flex gap-2 mt-[50px]">
               <div className="w-1/3 flex flex-col">
@@ -1201,16 +881,15 @@ export default function CreateProductPage() {
                       <label className="text-sm font-medium text-gray-600">
                         Collection
                       </label>
-                      <CreatableSelect<CollectionOption>
-                        value={selectedOptionCollection}
-                        onChange={handleChangeCollection}
-                        onInputChange={handleInputChangeCollection}
-                        inputValue={inputValueCollection}
-                        options={optionsCollection}
-                        placeholder="Selectionner une collection"
-                        styles={customStyles}
-                        className="mt-2 block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
-                        required
+                      <CollectionSection
+                        collection={selectedCollection} // Passer la collection sélectionnée
+                        optionsCollection={optionsCollection}
+                        handleChangeCollection={handleChangeCollection}
+                        handleInputChangeCollection={
+                          handleInputChangeCollection
+                        }
+                        inputValueCollection={inputValueCollection}
+                        customStyles={customStyles}
                       />
                     </div>
                   </div>
@@ -1396,7 +1075,7 @@ export default function CreateProductPage() {
                   </div>
                   {formData.uvc.map((uvc, index) => (
                     <div key={index}>
-                      {onglet === "infos" && (
+                      {/* {onglet === "infos" && (
                         <UVCInfosTable
                           uvcDimension={formData.uvc.map((uvc) => ({
                             code: uvc.code,
@@ -1404,7 +1083,7 @@ export default function CreateProductPage() {
                           }))}
                           brandLabel={selectedOptionBrand?.label || ""}
                         />
-                      )}
+                      )} */}
                       {/* {onglet === "price" && (
                           <UVCPriceTable
                             uvcPrices={uvc.prices}

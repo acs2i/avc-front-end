@@ -16,6 +16,7 @@ import ConditionSection from "../../components/Formulaires/ConditionsSection";
 import DynamicField from "../../components/FormElements/DynamicField";
 import Modal from "../../components/Shared/Modal";
 import ContactFormComponent from "../../components/ContactFormComponent";
+import { useBrands } from "../../utils/hooks/useBrands";
 
 interface Contact {
   firstname: string;
@@ -25,8 +26,6 @@ interface Contact {
   mobile: string;
   email: string;
 }
-
-
 
 interface FormData {
   creator_id: any;
@@ -51,13 +50,6 @@ interface FormData {
   additional_fields: any[];
   status: string;
 }
-
-type BrandOption = {
-  _id: string;
-  value: string;
-  code: string;
-  label: string;
-};
 
 interface CustomField {
   field_name: string;
@@ -112,9 +104,6 @@ export default function CreateSupplierPage() {
     { name: "", value: "" },
   ]);
   const [contactModalIsOpen, setContactModalIsOpen] = useState(false);
-  const [inputValueBrand, setInputValueBrand] = useState("");
-  const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
-  const [brands, setBrands] = useState<SingleValue<BrandOption>[]>([null]);
   const [userFields, setUserFields] = useState<UserField[]>([]);
   const { notifySuccess, notifyError } = useNotify();
   const [isLoading, setIsLoading] = useState(false);
@@ -152,108 +141,18 @@ export default function CreateSupplierPage() {
     email: "",
   });
   const [selectedContacts, setSelectedContacts] = useState<Contact[]>([]);
+  // Hook qui fetch les marques pour l'utiliser dans le creatable select
+  const {
+    inputValueBrand,
+    optionsBrand,
+    brands,
+    handleInputChangeBrand,
+    handleChangeBrand,
+    addBrandField,
+    removeBrandField,
+  } = useBrands("", 10);
 
-  const currencies = [
-    { value: "EUR", label: "Euro (EUR)", name: "EUR" },
-    { value: "USD", label: "United States Dollar (USD)", name: "USD" },
-    { value: "GBP", label: "British Pound (GBP)", name: "GBP" },
-    { value: "JPY", label: "Japanese Yen (JPY)", name: "JPY" },
-  ];
-
-  const handleChangeBrand = (
-    selectedOption: SingleValue<BrandOption>,
-    index: number
-  ) => {
-    const updatedBrands = [...brands];
-    updatedBrands[index] = selectedOption;
-    setBrands(updatedBrands);
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      brand_id: updatedBrands.map((brand) => brand?._id || ""),
-    }));
-  };
-
-  const handleInputChangeBrand = async (inputValueBrand: string) => {
-    setInputValueBrand(inputValueBrand);
-
-    if (inputValueBrand === "") {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_URL_DEV}/api/v1/brand`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const data = await response.json();
-
-        const optionsBrand = data.data?.map((brand: BrandOption) => ({
-          value: brand.label,
-          label: brand.label,
-          _id: brand._id,
-        }));
-
-        setOptionsBrand(optionsBrand);
-      } catch (error) {
-        console.error("Erreur lors de la requête", error);
-      }
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/brand/search?label=${inputValueBrand}&page=${currentPage}&limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = await response.json();
-
-      const optionsBrand = data.data?.map((brand: BrandOption) => ({
-        value: brand.label,
-        label: brand.label,
-        _id: brand._id,
-      }));
-
-      setOptionsBrand(optionsBrand);
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.id]: e.target.value,
-    });
-  };
-
-  const handlePhoneChange = (value: string | undefined) => {
-    setFormData({
-      ...formData,
-      phone: value || "",
-    });
-  };
-
-  const addBrandField = () => {
-    setBrands([...brands, null]);
-  };
-
-  const removeBrandField = (index: number) => {
-    if (brands.length === 1) return; // Ne pas permettre de supprimer si un seul champ
-    const updatedBrands = brands.filter((_, i) => i !== index);
-    setBrands(updatedBrands);
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      brands: updatedBrands.map((brand) => brand?.value || ""),
-    }));
-  };
-
+  // Fonction qui fetch tout les champs utilisateurs
   const fetchField = async () => {
     try {
       const response = await fetch(
@@ -275,33 +174,28 @@ export default function CreateSupplierPage() {
     }
   };
 
+  // Fonction qui met a jour les champs utilisateurs à jour
   const handleFieldChange = (
     label: string,
-    field_type: string, // Ajout du type de champ
+    field_type: string,
     id: string,
     newValue: string
   ) => {
-    // Mettre à jour fieldValues pour le contrôle local
     setFieldValues((prevValues) => ({
       ...prevValues,
-      [id]: newValue, // Met à jour l'état local du champ
+      [id]: newValue,
     }));
-
-    // Mettre à jour formData.additional_fields pour avoir un tableau d'objets
     setFormData((prevFormData) => {
       const updatedAdditionalFields = [...prevFormData.additional_fields];
 
-      // Vérifier si un champ avec ce label existe déjà
       const fieldIndex = updatedAdditionalFields.findIndex(
         (field) => field.label === label
       );
 
       if (fieldIndex !== -1) {
-        // Mettre à jour la valeur et le type si le champ existe
         updatedAdditionalFields[fieldIndex].value = newValue;
         updatedAdditionalFields[fieldIndex].field_type = field_type;
       } else {
-        // Ajouter un nouveau champ s'il n'existe pas encore
         updatedAdditionalFields.push({ label, value: newValue, field_type });
       }
 
@@ -312,10 +206,7 @@ export default function CreateSupplierPage() {
     });
   };
 
-  useEffect(() => {
-    fetchField();
-  }, []);
-
+  // Fonction qui récupère les données du contact
   const handleContactChange = (field: keyof Contact, value: string) => {
     setNewContact((prevContact) => {
       const updatedContact = { ...prevContact, [field]: value };
@@ -323,7 +214,24 @@ export default function CreateSupplierPage() {
       return updatedContact;
     });
   };
-  
+
+  // Fonction qui récupère les données du du numero de téléphone
+  const handlePhoneChange = (value: string | undefined) => {
+    setFormData({
+      ...formData,
+      phone: value || "",
+    });
+  };
+
+  // Fonction qui récupère les données de tout les autres champs
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value,
+    });
+  };
+
+  // Fonction qui ajoute un contact
   const addContact = (newContact: Contact) => {
     console.log("Adding contact:", newContact);
     setFormData((prevFormData) => {
@@ -334,9 +242,9 @@ export default function CreateSupplierPage() {
       console.log("Updated FormData:", updatedFormData);
       return updatedFormData;
     });
-  
+
     setSelectedContacts((prevContacts) => [...prevContacts, newContact]);
-  
+
     setNewContact({
       firstname: "",
       lastname: "",
@@ -345,12 +253,11 @@ export default function CreateSupplierPage() {
       mobile: "",
       email: "",
     });
-  
+
     setContactModalIsOpen(false);
   };
-  
-  
 
+  // Fonction de soumission du formulaire
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -382,6 +289,20 @@ export default function CreateSupplierPage() {
       setIsLoading(false);
     }
   };
+
+  // Use Effect pour ajouter l'id des marques choisies dans le formData
+  useEffect(() => {
+    const selectedBrandIds = brands.map((brand) => brand?._id || "");
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      brand_id: selectedBrandIds,
+    }));
+  }, [brands]);
+
+  // Use Effect pour fetcher les "UserFields" au montage du composant
+  useEffect(() => {
+    fetchField();
+  }, []);
 
   console.log(formData);
   return (
@@ -621,46 +542,46 @@ export default function CreateSupplierPage() {
                   handleInputChangeBrand={handleInputChangeBrand}
                   inputValueBrand={inputValueBrand}
                   customStyles={customStyles}
+                  addBrand
+                  displayTrash
                 />
               </FormSection>
             </div>
 
             <div className="flex gap-4 mt-[30px]">
-            <FormSection title="Champs additionnels (optionel)">
-                  <div className="mt-3">
-                    {userFields
-                      .filter((field) => field.apply_to === "Fournisseur")
-                      .map((field) => (
-                        <div key={field._id} className="mb-6">
-                          {/* Affichage du label au niveau supérieur */}
-                          <h3 className="text-md font-semibold text-gray-800 mb-1">
-                            {field.label}
-                          </h3>
-                          {field.additional_fields.map((customField, index) => (
-                            <div key={`${field._id}-${index}`} className="mb-4">
-                              <DynamicField
-                                id={`${field._id}-${index}`}
-                                name={customField.field_name}
-                                fieldType={customField.field_type}
-                                value={
-                                  fieldValues[`${field._id}-${index}`] || ""
-                                }
-                                onChange={(e) =>
-                                  handleFieldChange(
-                                    field.label,
-                                    customField.field_type,
-                                    `${field._id}-${index}`,
-                                    e.target.value
-                                  )
-                                }
-                                options={customField.options}
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      ))}
-                  </div>
-                </FormSection>
+              <FormSection title="Champs additionnels (optionel)">
+                <div className="mt-3">
+                  {userFields
+                    .filter((field) => field.apply_to === "Fournisseur")
+                    .map((field) => (
+                      <div key={field._id} className="mb-6">
+                        {/* Affichage du label au niveau supérieur */}
+                        <h3 className="text-md font-semibold text-gray-800 mb-1">
+                          {field.label}
+                        </h3>
+                        {field.additional_fields.map((customField, index) => (
+                          <div key={`${field._id}-${index}`} className="mb-4">
+                            <DynamicField
+                              id={`${field._id}-${index}`}
+                              name={customField.field_name}
+                              fieldType={customField.field_type}
+                              value={fieldValues[`${field._id}-${index}`] || ""}
+                              onChange={(e) =>
+                                handleFieldChange(
+                                  field.label,
+                                  customField.field_type,
+                                  `${field._id}-${index}`,
+                                  e.target.value
+                                )
+                              }
+                              options={customField.options}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                </div>
+              </FormSection>
             </div>
 
             {/* Boutons de soumission */}

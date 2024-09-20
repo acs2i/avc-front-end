@@ -11,6 +11,8 @@ interface BrandSelectorProps {
   handleInputChangeBrand: (inputValueBrand: string) => void;
   inputValueBrand: string;
   customStyles: any;
+  addBrand?: boolean;
+  displayTrash?: Boolean
 }
 
 const BrandSection: React.FC<BrandSelectorProps> = ({
@@ -22,12 +24,14 @@ const BrandSection: React.FC<BrandSelectorProps> = ({
   handleInputChangeBrand,
   inputValueBrand,
   customStyles,
+  addBrand,
+  displayTrash
 }) => {
   return (
     <div className="relative w-full flex flex-col gap-3">
       <div >
         {brands.map((brand, index) => (
-          <div key={index} className="flex items-center gap-2 mt-2">
+          <div key={index} className="flex items-center gap-2">
             <CreatableSelect
               value={brand}
               onChange={(option) => handleChangeBrand(option, index)}
@@ -38,23 +42,23 @@ const BrandSection: React.FC<BrandSelectorProps> = ({
               styles={customStyles}
               className="block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
             />
-            <button
+            {displayTrash && <button
               type="button"
               onClick={() => removeBrandField(index)}
               className="text-red-500 hover:text-red-300"
             >
               <Trash size={20} />
-            </button>
+            </button>}
           </div>
         ))}
-        <button
+       {addBrand && <button
           type="button"
           onClick={addBrandField}
           className="flex items-center gap-2 text-[12px] text-orange-400 mt-3"
         >
           <Plus size={17} />
           Ajouter une marque
-        </button>
+        </button>}
       </div>
     </div>
   );
