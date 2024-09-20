@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
-import { DRAFT_CATEGORY, LINKCARD_DRAFT, PRODUCTS } from "../../utils/index";
+import { DRAFT_CATEGORY, LINKCARD_DRAFT} from "../../utils/index";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import Input from "../../components/FormElements/Input";
 import { ChevronRight, ChevronsUpDown } from "lucide-react";
+import truncateText from "../../utils/func/Formattext";
 
 interface PriceItem {
   peau: number;
@@ -323,8 +324,8 @@ export default function DraftPage() {
 
           <div className="mt-7">
             {currentStep === 1 && (
-              <h3 className="text-[32px] font-[800] text-gray-800">
-                B<span className="font-[200]">rouillons ({filteredDrafts.length})</span>
+              <h3 className="text-[32px] font-[800] text-gray-800 capitalize">
+                à<span className="font-[200]"> traiter ({filteredDrafts.length})</span>
               </h3>
             )}
             {currentStep === 2 && (
@@ -466,7 +467,7 @@ export default function DraftPage() {
                     <td className="px-6 py-2 text-blue-500">
                       {product.reference}
                     </td>
-                    <td className="px-6 py-2">{product.long_label}</td>
+                    <td className="px-6 py-2">{truncateText(product.long_label, 20)}</td>
                     <td className="px-6 py-2">{product.brandName}</td>
                     <td className="px-6 py-2">{product.supplierName}</td>
                     <td className="px-6 py-2">{product.familyName}</td>

@@ -3,11 +3,7 @@ import Input from "../../components/FormElements/Input";
 import { useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  CircleSlash2,
-  Plus,
-  Trash,
-} from "lucide-react";
+import { CircleSlash2, Plus, Trash, X } from "lucide-react";
 import CreatableSelect from "react-select/creatable";
 import { SingleValue } from "react-select";
 import Button from "../../components/FormElements/Button";
@@ -15,10 +11,28 @@ import useNotify from "../../utils/hooks/useToast";
 import { CircularProgress, Collapse } from "@mui/material";
 import FormSection from "../../components/Formulaires/FormSection";
 import BrandSection from "../../components/Formulaires/BrandSection";
+import DynamicField from "../../components/FormElements/DynamicField";
 
 interface BrandId {
   _id: string;
   label: string;
+}
+
+interface CustomField {
+  field_name: string;
+  field_type: string;
+  options?: string[];
+  value?: string;
+}
+
+interface UserField {
+  _id: string;
+  code: string;
+  label: string;
+  apply_to: string;
+  status: string;
+  creator_id: any;
+  additional_fields: CustomField[];
 }
 
 interface Supplier {
@@ -40,6 +54,7 @@ interface Supplier {
   brand_id: BrandId[];
   contacts: Contact[];
   conditions: Condition[];
+  additional_fields: any[];
   status: string;
 }
 
@@ -81,6 +96,7 @@ interface FormData {
   country: string;
   currency: string;
   brand_id: any[];
+  additional_fields: any[];
   contacts: Contact[];
   conditions: Condition[];
 }
@@ -128,6 +144,8 @@ export default function SingleSupplierPage() {
   const [inputValueBrand, setInputValueBrand] = useState("");
   const [isModify, setIsModify] = useState(false);
   const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
+  const [userFields, setUserFields] = useState<UserField[]>([]);
+  const [fieldValues, setFieldValues] = useState<{ [key: string]: any }>({});
   const [selectedOptionBrand, setSelectedOptionBrand] =
     useState<SingleValue<BrandOption> | null>(null);
   const [brandLabel, setBrandLabel] = useState("");
@@ -151,6 +169,7 @@ export default function SingleSupplierPage() {
     postal: supplier?.postal || "",
     country: supplier?.country || "",
     currency: supplier?.currency || "",
+    additional_fields: [],
     brand_id: [],
     contacts: [
       {
@@ -223,7 +242,8 @@ export default function SingleSupplierPage() {
         postal: supplier.postal || "",
         country: supplier.country || "",
         currency: supplier.currency || "",
-        brand_id: supplier.brand_id.map(brand => brand._id),
+        brand_id: supplier.brand_id.map((brand) => brand._id),
+        additional_fields: [],
         contacts: supplier.contacts || [
           {
             firstname: "",
@@ -248,7 +268,6 @@ export default function SingleSupplierPage() {
           },
         ],
       });
-      
     }
   }, [supplier, creatorId]);
 
@@ -286,18 +305,21 @@ export default function SingleSupplierPage() {
     }
   };
 
-  const handleChangeBrand = (selectedOption: SingleValue<BrandOption>, index: number) => {
+  const handleChangeBrand = (
+    selectedOption: SingleValue<BrandOption>,
+    index: number
+  ) => {
     if (!selectedOption || !selectedOption._id) {
       console.error("Invalid brand selection");
       return;
     }
-  
+
     setBrands((prevBrands) => {
       const updatedBrands = [...prevBrands];
       updatedBrands[index] = selectedOption;
       return updatedBrands;
     });
-  
+
     setFormData((prevFormData) => {
       const updatedBrandIds = [...prevFormData.brand_id];
       updatedBrandIds[index] = selectedOption._id;
@@ -307,27 +329,29 @@ export default function SingleSupplierPage() {
       };
     });
   };
-  
+
   const addBrandField = () => {
     setBrands((prevBrands) => [...prevBrands, null]);
-  
+
     setFormData((prevFormData) => {
       const newBrandIdArray = [...prevFormData.brand_id];
-           
+
       return {
         ...prevFormData,
         brand_id: newBrandIdArray,
       };
     });
   };
-  
-const removeBrandField = (index: number) => {
-  setBrands((prevBrands) => prevBrands.filter((_, i) => i !== index));
-  setFormData((prevFormData) => ({
-    ...prevFormData,
-    brand_id: brands.filter((_, i) => i !== index).map((brand) => brand?._id || ""),
-  }));
-};
+
+  const removeBrandField = (index: number) => {
+    setBrands((prevBrands) => prevBrands.filter((_, i) => i !== index));
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      brand_id: brands
+        .filter((_, i) => i !== index)
+        .map((brand) => brand?._id || ""),
+    }));
+  };
 
   const handleInputChangeBrand = async (inputValueBrand: string) => {
     setInputValueBrand(inputValueBrand);
@@ -418,6 +442,68 @@ const removeBrandField = (index: number) => {
     }));
   };
 
+  const fetchField = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/user-field`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+      setUserFields(data.data);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFieldChange = (
+    label: string,
+    field_type: string, // Ajout du type de champ
+    id: string,
+    newValue: string
+  ) => {
+    // Mettre à jour fieldValues pour le contrôle local
+    setFieldValues((prevValues) => ({
+      ...prevValues,
+      [id]: newValue, // Met à jour l'état local du champ
+    }));
+
+    // Mettre à jour formData.additional_fields pour avoir un tableau d'objets
+    setFormData((prevFormData) => {
+      const updatedAdditionalFields = [...prevFormData.additional_fields];
+
+      // Vérifier si un champ avec ce label existe déjà
+      const fieldIndex = updatedAdditionalFields.findIndex(
+        (field) => field.label === label
+      );
+
+      if (fieldIndex !== -1) {
+        // Mettre à jour la valeur et le type si le champ existe
+        updatedAdditionalFields[fieldIndex].value = newValue;
+        updatedAdditionalFields[fieldIndex].field_type = field_type;
+      } else {
+        // Ajouter un nouveau champ s'il n'existe pas encore
+        updatedAdditionalFields.push({ label, value: newValue, field_type });
+      }
+
+      return {
+        ...prevFormData,
+        additional_fields: updatedAdditionalFields,
+      };
+    });
+  };
+
+  useEffect(() => {
+    fetchField();
+  }, []);
+
   console.log(formData);
   return (
     <section className="w-full bg-slate-50 p-7">
@@ -501,535 +587,593 @@ const removeBrandField = (index: number) => {
 
           <div className="flex gap-4 mt-[80px]">
             {/* Partie Infos */}
-            <div className="relative w-[70%] flex flex-col gap-3">
-              <FormSection
-                title="Identification"
-                size={`${!isModify ? "h-[400px]" : "h-[500px]"}`}
-              >
-                <div className="mt-3">
-                  {isModify ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      <Input
-                        element="input"
-                        id="code"
-                        label="Code fournisseur :"
-                        value={formData.code}
-                        onChange={handleChange}
-                        validators={[]}
-                        placeholder={supplier?.code}
-                        create
-                        gray
-                      />
-                      <Input
-                        element="input"
-                        id="company_name"
-                        label="Raison sociale :"
-                        value={formData.company_name}
-                        onChange={handleChange}
-                        validators={[]}
-                        placeholder={supplier?.company_name}
-                        create
-                        gray
-                      />
-                      <Input
-                        element="input"
-                        id="siret"
-                        label="Siret :"
-                        value={formData.siret}
-                        onChange={handleChange}
-                        validators={[]}
-                        placeholder={supplier?.siret}
-                        create
-                        gray
-                      />
-                      <Input
-                        element="input"
-                        id="tva"
-                        label="N°TVA intracom :"
-                        value={formData.tva}
-                        onChange={handleChange}
-                        validators={[]}
-                        placeholder={supplier?.tva}
-                        create
-                        gray
-                      />
+
+            <FormSection
+              title="Identification"
+              size={`${!isModify ? "h-[400px]" : "h-[500px]"}`}
+            >
+              <div className="mt-3">
+                {isModify ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <Input
+                      element="input"
+                      id="code"
+                      label="Code fournisseur :"
+                      value={formData.code}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder={supplier?.code}
+                      create
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      id="company_name"
+                      label="Raison sociale :"
+                      value={formData.company_name}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder={supplier?.company_name}
+                      create
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      id="siret"
+                      label="Siret :"
+                      value={formData.siret}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder={supplier?.siret}
+                      create
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      id="tva"
+                      label="N°TVA intracom :"
+                      value={formData.tva}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder={supplier?.tva}
+                      create
+                      gray
+                    />
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                    <div>
+                      <span className="font-bold text-gray-700">
+                        Code fournisseur :
+                      </span>
+                      <p className="font-[600] text-slate-500">
+                        {supplier?.code}
+                      </p>
                     </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-                      <div>
-                        <span className="font-bold text-gray-700">
-                          Code fournisseur :
-                        </span>
-                        <p className="font-[600] text-slate-500">
-                          {supplier?.code}
-                        </p>
-                      </div>
-                      <div>
-                        <span className="font-bold text-gray-700">
-                          Raison sociale :
-                        </span>
-                        <p className="font-[600] text-slate-500">
-                          {supplier?.company_name}
-                        </p>
-                      </div>
-                      <div>
-                        <span className="font-bold text-gray-700">Siret :</span>
-                        <p className="font-[600] text-slate-500">
-                          {supplier?.siret}
-                        </p>
-                      </div>
-                      <div>
-                        <span className="font-bold text-gray-700">
-                          N°TVA intracom :
-                        </span>
-                        <p className="font-[600] text-slate-500">
-                          {supplier?.tva}
-                        </p>
-                      </div>
-                      <div className="mt-3">
-                        <span className="font-bold text-gray-700">
-                          Site web :
-                        </span>
-                        <p className="font-[600] text-slate-500">
-                          {supplier?.web_url}
-                        </p>
-                      </div>
-                      <div className="mt-3">
-                        <span className="font-bold text-gray-700">Email :</span>
-                        <p className="font-[600] text-slate-500">
-                          {supplier?.email}
-                        </p>
-                      </div>
-                      <div className="mt-3">
-                        <span className="font-bold text-gray-700">
-                          Telephone :
-                        </span>
-                        <p className="font-[600] text-slate-500">
-                          {supplier?.phone}
-                        </p>
-                      </div>
+                    <div>
+                      <span className="font-bold text-gray-700">
+                        Raison sociale :
+                      </span>
+                      <p className="font-[600] text-slate-500">
+                        {supplier?.company_name}
+                      </p>
                     </div>
-                  )}
-                  {isModify && (
-                    <>
+                    <div>
+                      <span className="font-bold text-gray-700">Siret :</span>
+                      <p className="font-[600] text-slate-500">
+                        {supplier?.siret}
+                      </p>
+                    </div>
+                    <div>
+                      <span className="font-bold text-gray-700">
+                        N°TVA intracom :
+                      </span>
+                      <p className="font-[600] text-slate-500">
+                        {supplier?.tva}
+                      </p>
+                    </div>
+                    <div className="mt-3">
+                      <span className="font-bold text-gray-700">
+                        Site web :
+                      </span>
+                      <p className="font-[600] text-slate-500">
+                        {supplier?.web_url}
+                      </p>
+                    </div>
+                    <div className="mt-3">
+                      <span className="font-bold text-gray-700">Email :</span>
+                      <p className="font-[600] text-slate-500">
+                        {supplier?.email}
+                      </p>
+                    </div>
+                    <div className="mt-3">
+                      <span className="font-bold text-gray-700">
+                        Telephone :
+                      </span>
+                      <p className="font-[600] text-slate-500">
+                        {supplier?.phone}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {isModify && (
+                  <>
+                    <Input
+                      element="input"
+                      id="web_url"
+                      label="Site web :"
+                      value={formData.web_url}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder={supplier?.web_url}
+                      create
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      type="email"
+                      id="email"
+                      label="Email :"
+                      value={formData.email}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder={supplier?.email}
+                      create
+                      gray
+                    />
+                    <Input
+                      element="phone"
+                      id="phone"
+                      label="Téléphone :"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder={supplier?.phone}
+                      create
+                      gray
+                    />
+                  </>
+                )}
+              </div>
+            </FormSection>
+            <FormSection
+              title="Adresse"
+              size={`${!isModify ? "h-[400px]" : "h-[500px]"}`}
+            >
+              <div className="mt-3">
+                {isModify ? (
+                  <>
+                    <Input
+                      element="input"
+                      id="address_1"
+                      label="Adresse 1 :"
+                      value={formData.address_1}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder={supplier?.address_1}
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      id="address_2"
+                      label="Adresse 2 :"
+                      value={formData.address_2}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder={supplier?.address_2}
+                      create
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      id="address_3"
+                      label="Adresse 3 :"
+                      value={formData.address_3}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder={supplier?.address_3}
+                      create
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      id="city"
+                      label="Ville :"
+                      value={formData.city}
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder={supplier?.city}
+                      create
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      id="postal"
+                      label="Code postal :"
+                      value=""
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder={supplier?.postal}
+                      create
+                      gray
+                    />
+                    <Input
+                      element="input"
+                      id="country"
+                      label="Pays :"
+                      value=""
+                      onChange={handleChange}
+                      validators={[]}
+                      placeholder={supplier?.country}
+                      create
+                      gray
+                    />
+                  </>
+                ) : (
+                  <>
+                    <div className="mt-3">
+                      <span className="font-bold text-gray-700">
+                        Adresse 1 :
+                      </span>
+                      <p className="font-[600] text-slate-500">
+                        {supplier?.address_1}
+                      </p>
+                    </div>
+                    <div className="mt-3">
+                      <span className="font-bold text-gray-700">
+                        Adresse 2 :
+                      </span>
+                      <p className="font-[600] text-slate-500">
+                        {supplier?.address_2}
+                      </p>
+                    </div>
+                    <div className="mt-3">
+                      <span className="font-bold text-gray-700">
+                        Adresse 3 :
+                      </span>
+                      {supplier?.address_3 ? (
+                        <p className="font-[600] text-slate-500">
+                          {supplier?.address_3}
+                        </p>
+                      ) : (
+                        <div className="font-[600] text-slate-500">
+                          <CircleSlash2 size={15} />
+                        </div>
+                      )}
+                    </div>
+                    <div className="mt-3">
+                      <span className="font-bold text-gray-700">Ville :</span>
+                      <p className="font-[600] text-slate-500">
+                        {supplier?.city}
+                      </p>
+                    </div>
+                    <div className="mt-3">
+                      <span className="font-bold text-gray-700">
+                        Code postal :
+                      </span>
+                      <p className="font-[600] text-slate-500">
+                        {supplier?.postal}
+                      </p>
+                    </div>
+                    <div className="mt-3">
+                      <span className="font-bold text-gray-700">Pays :</span>
+                      {supplier?.country ? (
+                        <p className="font-[600] text-slate-500">
+                          {supplier?.country}
+                        </p>
+                      ) : (
+                        <div className="text-slate-400">
+                          <CircleSlash2 size={20} />
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            </FormSection>
+          </div>
+          <div className="flex gap-4 mt-[30px]">
+            {/* Partie tarifs */}
+
+            <FormSection title="Contatcts">
+              {isModify ? (
+                <div>
+                  {formData.contacts.map((contact, index) => (
+                    <div className="mt-3" key={index}>
+                      <div className="mt-5 flex items-center gap-2">
+                        <span className="italic text-gray-600 text-[12px] font-[700]">
+                          Contact {index + 1}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Input
+                          element="input"
+                          id="firstname"
+                          label="Prénom :"
+                          value={contact.firstname}
+                          onChange={handleContactChange(index)}
+                          validators={[]}
+                          placeholder={
+                            supplier?.contacts &&
+                            supplier.contacts[index]?.firstname
+                              ? supplier.contacts[index].firstname
+                              : ""
+                          }
+                          create
+                          gray
+                        />
+                        <Input
+                          element="input"
+                          id="lastname"
+                          label="Nom :"
+                          value={contact.lastname}
+                          onChange={handleContactChange(index)}
+                          validators={[]}
+                          placeholder={
+                            supplier?.contacts &&
+                            supplier.contacts[index]?.lastname
+                              ? supplier.contacts[index].lastname
+                              : ""
+                          }
+                          create
+                          gray
+                        />
+                      </div>
                       <Input
                         element="input"
-                        id="web_url"
-                        label="Site web :"
-                        value={formData.web_url}
-                        onChange={handleChange}
+                        id="function"
+                        label="Fonction :"
+                        value={contact.function}
+                        onChange={handleContactChange(index)}
                         validators={[]}
-                        placeholder={supplier?.web_url}
+                        placeholder={
+                          supplier?.contacts &&
+                          supplier.contacts[index]?.function
+                            ? supplier.contacts[index].function
+                            : ""
+                        }
                         create
                         gray
                       />
+                      <div className="grid grid-cols-2 gap-2">
+                        <Input
+                          element="input"
+                          id="phone"
+                          label="Téléphone :"
+                          value={contact.phone}
+                          onChange={handleContactChange(index)}
+                          validators={[]}
+                          placeholder={
+                            supplier?.contacts &&
+                            supplier.contacts[index]?.phone
+                              ? supplier.contacts[index].phone
+                              : ""
+                          }
+                          create
+                          gray
+                        />
+                        <Input
+                          element="input"
+                          id="mobile"
+                          label="Mobile :"
+                          value={contact.mobile}
+                          onChange={handleContactChange(index)}
+                          validators={[]}
+                          placeholder={
+                            supplier?.contacts &&
+                            supplier.contacts[index]?.mobile
+                              ? supplier.contacts[index].mobile
+                              : ""
+                          }
+                          create
+                          gray
+                        />
+                      </div>
                       <Input
                         element="input"
                         type="email"
                         id="email"
                         label="Email :"
-                        value={formData.email}
-                        onChange={handleChange}
+                        value={contact.email}
+                        onChange={handleContactChange(index)}
                         validators={[]}
-                        placeholder={supplier?.email}
+                        placeholder={
+                          supplier?.contacts && supplier.contacts[index]?.email
+                            ? supplier.contacts[index].email
+                            : ""
+                        }
                         create
                         gray
                       />
-                      <Input
-                        element="phone"
-                        id="phone"
-                        label="Téléphone :"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        validators={[]}
-                        placeholder={supplier?.phone}
-                        create
-                        gray
-                      />
-                    </>
-                  )}
-                </div>
-              </FormSection>
-            </div>
-            {/* Partie adresse */}
-            <div className="relative w-[30%] flex flex-col gap-3">
-              <FormSection
-                title="Adresse"
-                size={`${!isModify ? "h-[400px]" : "h-[500px]"}`}
-              >
-                <div className="mt-3">
-                  {isModify ? (
-                    <>
-                      <Input
-                        element="input"
-                        id="address_1"
-                        label="Adresse 1 :"
-                        value={formData.address_1}
-                        onChange={handleChange}
-                        validators={[]}
-                        placeholder={supplier?.address_1}
-                        gray
-                      />
-                      <Input
-                        element="input"
-                        id="address_2"
-                        label="Adresse 2 :"
-                        value={formData.address_2}
-                        onChange={handleChange}
-                        validators={[]}
-                        placeholder={supplier?.address_2}
-                        create
-                        gray
-                      />
-                      <Input
-                        element="input"
-                        id="address_3"
-                        label="Adresse 3 :"
-                        value={formData.address_3}
-                        onChange={handleChange}
-                        validators={[]}
-                        placeholder={supplier?.address_3}
-                        create
-                        gray
-                      />
-                      <Input
-                        element="input"
-                        id="city"
-                        label="Ville :"
-                        value={formData.city}
-                        onChange={handleChange}
-                        validators={[]}
-                        placeholder={supplier?.city}
-                        create
-                        gray
-                      />
-                      <Input
-                        element="input"
-                        id="postal"
-                        label="Code postal :"
-                        value=""
-                        onChange={handleChange}
-                        validators={[]}
-                        placeholder={supplier?.postal}
-                        create
-                        gray
-                      />
-                      <Input
-                        element="input"
-                        id="country"
-                        label="Pays :"
-                        value=""
-                        onChange={handleChange}
-                        validators={[]}
-                        placeholder={supplier?.country}
-                        create
-                        gray
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <div className="mt-3">
-                        <span className="font-bold text-gray-700">
-                          Adresse 1 :
-                        </span>
-                        <p className="font-[600] text-slate-500">
-                          {supplier?.address_1}
-                        </p>
-                      </div>
-                      <div className="mt-3">
-                        <span className="font-bold text-gray-700">
-                          Adresse 2 :
-                        </span>
-                        <p className="font-[600] text-slate-500">
-                          {supplier?.address_2}
-                        </p>
-                      </div>
-                      <div className="mt-3">
-                        <span className="font-bold text-gray-700">
-                          Adresse 3 :
-                        </span>
-                        {supplier?.address_3 ? (
-                          <p className="font-[600] text-slate-500">
-                            {supplier?.address_3}
-                          </p>
-                        ) : (
-                          <div className="font-[600] text-slate-500">
-                            <CircleSlash2 size={15} />
-                          </div>
-                        )}
-                      </div>
-                      <div className="mt-3">
-                        <span className="font-bold text-gray-700">Ville :</span>
-                        <p className="font-[600] text-slate-500">
-                          {supplier?.city}
-                        </p>
-                      </div>
-                      <div className="mt-3">
-                        <span className="font-bold text-gray-700">
-                          Code postal :
-                        </span>
-                        <p className="font-[600] text-slate-500">
-                          {supplier?.postal}
-                        </p>
-                      </div>
-                      <div className="mt-3">
-                        <span className="font-bold text-gray-700">Pays :</span>
-                        {supplier?.country ? (
-                          <p className="font-[600] text-slate-500">
-                            {supplier?.country}
-                          </p>
-                        ) : (
-                          <div className="text-slate-400">
-                            <CircleSlash2 size={20} />
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  )}
-                </div>
-              </FormSection>
-            </div>
-          </div>
-          <div className="flex gap-4 mt-[30px]">
-            {/* Partie tarifs */}
-            <div className="relative w-[70%] flex flex-col gap-3">
-              <div className="relative w-full flex flex-col gap-3 mb-5">
-                <FormSection title="Contatcts">
-                  {isModify ? (
-                    <div>
-                      {formData.contacts.map((contact, index) => (
-                        <div className="mt-3" key={index}>
-                          <div className="mt-5 flex items-center gap-2">
-                            <span className="italic text-gray-600 text-[12px] font-[700]">
-                              Contact {index + 1}
-                            </span>
-                          </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <Input
-                              element="input"
-                              id="firstname"
-                              label="Prénom :"
-                              value={contact.firstname}
-                              onChange={handleContactChange(index)}
-                              validators={[]}
-                              placeholder={
-                                supplier?.contacts &&
-                                supplier.contacts[index]?.firstname
-                                  ? supplier.contacts[index].firstname
-                                  : ""
-                              }
-                              create
-                              gray
-                            />
-                            <Input
-                              element="input"
-                              id="lastname"
-                              label="Nom :"
-                              value={contact.lastname}
-                              onChange={handleContactChange(index)}
-                              validators={[]}
-                              placeholder={
-                                supplier?.contacts &&
-                                supplier.contacts[index]?.lastname
-                                  ? supplier.contacts[index].lastname
-                                  : ""
-                              }
-                              create
-                              gray
-                            />
-                          </div>
-                          <Input
-                            element="input"
-                            id="function"
-                            label="Fonction :"
-                            value={contact.function}
-                            onChange={handleContactChange(index)}
-                            validators={[]}
-                            placeholder={
-                              supplier?.contacts &&
-                              supplier.contacts[index]?.function
-                                ? supplier.contacts[index].function
-                                : ""
-                            }
-                            create
-                            gray
-                          />
-                          <div className="grid grid-cols-2 gap-2">
-                            <Input
-                              element="input"
-                              id="phone"
-                              label="Téléphone :"
-                              value={contact.phone}
-                              onChange={handleContactChange(index)}
-                              validators={[]}
-                              placeholder={
-                                supplier?.contacts &&
-                                supplier.contacts[index]?.phone
-                                  ? supplier.contacts[index].phone
-                                  : ""
-                              }
-                              create
-                              gray
-                            />
-                            <Input
-                              element="input"
-                              id="mobile"
-                              label="Mobile :"
-                              value={contact.mobile}
-                              onChange={handleContactChange(index)}
-                              validators={[]}
-                              placeholder={
-                                supplier?.contacts &&
-                                supplier.contacts[index]?.mobile
-                                  ? supplier.contacts[index].mobile
-                                  : ""
-                              }
-                              create
-                              gray
-                            />
-                          </div>
-                          <Input
-                            element="input"
-                            type="email"
-                            id="email"
-                            label="Email :"
-                            value={contact.email}
-                            onChange={handleContactChange(index)}
-                            validators={[]}
-                            placeholder={
-                              supplier?.contacts &&
-                              supplier.contacts[index]?.email
-                                ? supplier.contacts[index].email
-                                : ""
-                            }
-                            create
-                            gray
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeContactField(index)}
-                            className="flex items-center gap-2 text-[12px] text-red-500 mt-3"
-                          >
-                            <Trash size={17} />
-                            Supprimer ce contact
-                          </button>
-                        </div>
-                      ))}
                       <button
                         type="button"
-                        onClick={() => addContactField()}
-                        className="flex items-center gap-2 text-[12px] text-orange-500 mt-3"
+                        onClick={() => removeContactField(index)}
+                        className="flex items-center gap-2 text-[12px] text-red-500 mt-3"
                       >
-                        <Plus size={17} />
-                        Ajouter un contact
-                      </button>
-                    </div>
-                  ) : (
-                    <div>
-                      {supplier?.contacts.map((contact, index) => (
-                        <div className="mt-3" key={index}>
-                          <div className="mb-3">
-                            <div className="mt-5 flex items-center gap-2">
-                              <span className="italic text-gray-600 text-[12px] font-[700]">
-                                Contact {index + 1}
-                              </span>
-                            </div>
-                            <div className="grid grid-cols-2 gap-2">
-                              <div className="mt-3">
-                                <span className="font-bold text-gray-700">
-                                  Prénom :
-                                </span>
-                                <p className="font-[600] text-slate-500">
-                                  {contact?.firstname}
-                                </p>
-                              </div>
-                              <div className="mt-3">
-                                <span className="font-bold text-gray-700">
-                                  Nom de famille :
-                                </span>
-                                <p className="font-[600] text-slate-500">
-                                  {contact?.lastname}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="mt-3">
-                              <span className="font-bold text-gray-700">
-                                Fonction :
-                              </span>
-                              <p className="font-[600] text-slate-500">
-                                {contact?.function}
-                              </p>
-                            </div>
-                            <div className="grid grid-cols-2 gap-2">
-                              <div className="mt-3">
-                                <span className="font-bold text-gray-700">
-                                  Téléphone :
-                                </span>
-                                <p className="font-[600] text-slate-500">
-                                  {contact?.phone}
-                                </p>
-                              </div>
-                              <div className="mt-3">
-                                <span className="font-bold text-gray-700">
-                                  Mobile :
-                                </span>
-                                <p className="font-[600] text-slate-500">
-                                  {contact?.mobile}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="mt-3">
-                              <span className="font-bold text-gray-700">
-                                Email :
-                              </span>
-                              <p className="font-[600] text-slate-500">
-                                {contact?.email}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </FormSection>
-              </div>
-              {/* Partie tarifs */}
-           
-            </div>
-            {/* Partie marques */}
-            <div className="relative w-[30%] flex flex-col gap-3">
-              <FormSection title="Marques">
-                <div className="mt-3">
-                  {isModify && (
-                    <BrandSection
-                      brands={brands}
-                      optionsBrand={optionsBrand}
-                      handleChangeBrand={handleChangeBrand}
-                      removeBrandField={removeBrandField}
-                      addBrandField={addBrandField}
-                      handleInputChangeBrand={handleInputChangeBrand}
-                      inputValueBrand={inputValueBrand}
-                      customStyles={customStyles}
-                    />
-                  )}
-
-                  {/* Afficher les marques ajoutées */}
-                  {supplier?.brand_id.map((brand, index) => (
-                    <div key={index} className="flex items-center gap-2 mt-2">
-                      <span className="font-[600] text-slate-500 capitalize">
-                        {brand?.label}
-                      </span>
-                      <button
-                        type="button"
-                        className="text-red-500 hover:text-red-300"
-                      >
-                        <Trash size={15} />
+                        <Trash size={17} />
+                        Supprimer ce contact
                       </button>
                     </div>
                   ))}
+                  <button
+                    type="button"
+                    onClick={() => addContactField()}
+                    className="flex items-center gap-2 text-[12px] text-orange-500 mt-3"
+                  >
+                    <Plus size={17} />
+                    Ajouter un contact
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  {supplier?.contacts.map((contact, index) => (
+                    <div className="mt-3" key={index}>
+                      <div className="mb-3">
+                        <div className="mt-5 flex items-center gap-2">
+                          <span className="italic text-gray-600 text-[12px] font-[700]">
+                            Contact {index + 1}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="mt-3">
+                            <span className="font-bold text-gray-700">
+                              Prénom :
+                            </span>
+                            <p className="font-[600] text-slate-500">
+                              {contact?.firstname}
+                            </p>
+                          </div>
+                          <div className="mt-3">
+                            <span className="font-bold text-gray-700">
+                              Nom de famille :
+                            </span>
+                            <p className="font-[600] text-slate-500">
+                              {contact?.lastname}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="mt-3">
+                          <span className="font-bold text-gray-700">
+                            Fonction :
+                          </span>
+                          <p className="font-[600] text-slate-500">
+                            {contact?.function}
+                          </p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="mt-3">
+                            <span className="font-bold text-gray-700">
+                              Téléphone :
+                            </span>
+                            <p className="font-[600] text-slate-500">
+                              {contact?.phone}
+                            </p>
+                          </div>
+                          <div className="mt-3">
+                            <span className="font-bold text-gray-700">
+                              Mobile :
+                            </span>
+                            <p className="font-[600] text-slate-500">
+                              {contact?.mobile}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="mt-3">
+                          <span className="font-bold text-gray-700">
+                            Email :
+                          </span>
+                          <p className="font-[600] text-slate-500">
+                            {contact?.email}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </FormSection>
+            <FormSection title="Marques">
+              <div className="mt-3">
+                {isModify && (
+                  <BrandSection
+                    brands={brands}
+                    optionsBrand={optionsBrand}
+                    handleChangeBrand={handleChangeBrand}
+                    removeBrandField={removeBrandField}
+                    addBrandField={addBrandField}
+                    handleInputChangeBrand={handleInputChangeBrand}
+                    inputValueBrand={inputValueBrand}
+                    customStyles={customStyles}
+                  />
+                )}
+
+                {/* Afficher les marques ajoutées */}
+                {supplier?.brand_id.map((brand, index) => (
+                  <div key={index} className="flex items-center gap-2 mt-2 bg-gray-600 justify-center py-3 relative rounded-md">
+                    <span className="font-[600] text-white capitalize">
+                      {brand?.label}
+                    </span>
+                    <button
+                      type="button"
+                      className="text-white hover:text-gray-300 absolute right-[13px]"
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </FormSection>
+          </div>
+          <div className="mt-[30px] w-[50%]">
+            {!isModify &&
+              supplier &&
+              supplier?.additional_fields.length > 0 && (
+                <FormSection title="Champs additionnels (optionel)">
+                  <div>
+                    {supplier?.additional_fields.map(
+                      (field: any, index: number) => (
+                        <div
+                          key={index}
+                          className="grid grid-cols-12 gap-2 py-2"
+                        >
+                          <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                            {field.label} :
+                          </span>
+
+                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                            {field.value}
+                          </span>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </FormSection>
+              )}
+            {isModify && (
+              <FormSection title="Champs additionnels (optionel)">
+                <div>
+                  {userFields && userFields.length > 0 && (
+                    <div className="mt-3">
+                      {userFields
+                        .filter((field) => field.apply_to === "Fournisseur")
+                        .map((field) => (
+                          <div key={field._id} className="mb-6">
+                            <h3 className="text-md font-semibold text-gray-800 mb-1">
+                              {field.label}
+                            </h3>
+                            {field.additional_fields.map(
+                              (customField, index) => (
+                                <div
+                                  key={`${field._id}-${index}`}
+                                  className="mb-4"
+                                >
+                                  <DynamicField
+                                    id={`${field._id}-${index}`}
+                                    name={customField.field_name}
+                                    fieldType={customField.field_type}
+                                    value={
+                                      fieldValues[`${field._id}-${index}`] || ""
+                                    }
+                                    onChange={(e) =>
+                                      handleFieldChange(
+                                        field.label,
+                                        customField.field_type,
+                                        `${field._id}-${index}`,
+                                        e.target.value
+                                      )
+                                    }
+                                    options={customField.options}
+                                  />
+                                </div>
+                              )
+                            )}
+                          </div>
+                        ))}
+                    </div>
+                  )}
                 </div>
               </FormSection>
-            </div>
+            )}
           </div>
           {!isLoading ? (
             <div className="mt-[50px] flex gap-2">

@@ -141,7 +141,7 @@ export default function DraftUpdatePage() {
   const [optionsSubSubFamily, setOptionsSubSubFamily] = useState<TagOption[]>(
     []
   );
-  const [supplierModalIsOpen, setsupplierModalIsOpen] = useState(false)
+  const [supplierModalIsOpen, setsupplierModalIsOpen] = useState(false);
   const [optionsSupplier, setOptionsSupplier] = useState<SuppliersOption[]>([]);
   const [selectedSuppliers, setSelectedSuppliers] = useState<SuppliersOption[]>(
     []
@@ -909,8 +909,6 @@ export default function DraftUpdatePage() {
     });
   };
 
-
-
   return (
     <>
       <Modal
@@ -988,7 +986,7 @@ export default function DraftUpdatePage() {
           )}
         </div>
       </Modal>
-      <section className="w-full bg-slate-50 p-8 max-w-[2000px] mx-auto">
+      <section className="w-full bg-slate-50 p-8 max-w-[2000px] mx-auto min-h-screen">
         <form onSubmit={handleUpdateDraft}>
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-2">
@@ -1314,39 +1312,41 @@ export default function DraftUpdatePage() {
                       <div className="relative flex flex-col gap-3">
                         <div className="mt-3">
                           <div className="flex flex-col gap-2">
-                            {[...supplierDetails, ...selectedSuppliers].map((supplierDetail, index) => {
-                              const draftSupplier = draft?.suppliers.find(
-                                (draftSup) =>
-                                  draftSup.supplier_id === supplierDetail._id
-                              );
+                            {[...supplierDetails, ...selectedSuppliers].map(
+                              (supplierDetail, index) => {
+                                const draftSupplier = draft?.suppliers.find(
+                                  (draftSup) =>
+                                    draftSup.supplier_id === supplierDetail._id
+                                );
 
-                              const combinedSupplier = {
-                                ...supplierDetail,
-                                ...draftSupplier,
-                              };
+                                const combinedSupplier = {
+                                  ...supplierDetail,
+                                  ...draftSupplier,
+                                };
 
-                              return (
-                                <div
-                                  key={index}
-                                  className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md ${
-                                    index === 0
-                                      ? "bg-[#3B71CA]"
-                                      : "bg-slate-400"
-                                  }`}
-                                  onClick={() => {
-                                    setSelectedSupplier({
-                                      ...combinedSupplier,
-                                      index,
-                                    });
-                                    setModalSupplierisOpen(true);
-                                  }}
-                                >
-                                  <span className="text-[20px] text-white font-bold">
-                                    {combinedSupplier.company_name}
-                                  </span>
-                                </div>
-                              );
-                            })}
+                                return (
+                                  <div
+                                    key={index}
+                                    className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md ${
+                                      index === 0
+                                        ? "bg-[#3B71CA]"
+                                        : "bg-slate-400"
+                                    }`}
+                                    onClick={() => {
+                                      setSelectedSupplier({
+                                        ...combinedSupplier,
+                                        index,
+                                      });
+                                      setModalSupplierisOpen(true);
+                                    }}
+                                  >
+                                    <span className="text-[20px] text-white font-bold">
+                                      {combinedSupplier.company_name}
+                                    </span>
+                                  </div>
+                                );
+                              }
+                            )}
                           </div>
                           {isModify && (
                             <div
@@ -1497,8 +1497,8 @@ export default function DraftUpdatePage() {
                   </div>
                 </div>
                 <div className="mt-[30px] w-1/3">
-                  <FormSection title="Champs additionnels (optionel)">
-                    {!isModify ? (
+                  {!isModify && draft.additional_fields.length > 0 && (
+                    <FormSection title="Champs additionnels (optionel)">
                       <div>
                         {draft.additional_fields.map(
                           (field: any, index: number) => (
@@ -1517,7 +1517,10 @@ export default function DraftUpdatePage() {
                           )
                         )}
                       </div>
-                    ) : (
+                    </FormSection>
+                  )}
+                  {isModify && (
+                    <FormSection title="Champs additionnels (optionel)">
                       <div>
                         {userFields && userFields.length > 0 && (
                           <div className="mt-3">
@@ -1561,8 +1564,8 @@ export default function DraftUpdatePage() {
                           </div>
                         )}
                       </div>
-                    )}
-                  </FormSection>
+                    </FormSection>
+                  )}
                 </div>
               </>
             )}

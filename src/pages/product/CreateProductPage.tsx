@@ -949,7 +949,7 @@ export default function CreateProductPage() {
             <div className="flex justify-between">
               <div>
                 <h3 className="text-[32px] font-[800] text-gray-800">
-                  Création <span className="font-[200]">d'une référence</span>
+                  Création <span className="font-[200]">d'un article</span>
                 </h3>
                 {creatorId && (
                   <p className="text-[17px] text-gray-600 italic">
