@@ -28,7 +28,7 @@ const BrandSection: React.FC<BrandSelectorProps> = ({
   displayTrash
 }) => {
   return (
-    <div className="relative w-full flex flex-col gap-3">
+    <div className="relative w-full flex flex-col gap-3 z-30">
       <div >
         {brands.map((brand, index) => (
           <div key={index} className="flex items-center gap-2">
@@ -40,7 +40,9 @@ const BrandSection: React.FC<BrandSelectorProps> = ({
               options={optionsBrand}
               placeholder="Selectionner une marque"
               styles={customStyles}
+              menuPortalTarget={document.body}
               className="block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+              isClearable
             />
             {displayTrash && <button
               type="button"

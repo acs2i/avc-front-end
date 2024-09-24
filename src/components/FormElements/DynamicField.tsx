@@ -54,7 +54,6 @@ const DynamicField: React.FC<DynamicFieldProps> = ({ fieldType, value, onChange,
         />
       );
     case "multiple_choice":
-    case "boolean":
       return (
         <div className="flex gap-5">
           {options &&
@@ -71,6 +70,33 @@ const DynamicField: React.FC<DynamicFieldProps> = ({ fieldType, value, onChange,
                 <span className="ml-1 text-gray-700 capitalize text-sm">{option}</span>
               </label>
             ))}
+        </div>
+      );
+    case "boolean":
+      return (
+        <div className="flex gap-5">
+          <label className="inline-flex items-center">
+            <input
+              type="radio"
+              name={name}
+              value="Oui"
+              checked={value === "Oui"}
+              onChange={onChange}
+              className="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+            />
+            <span className="ml-1 text-gray-700 text-sm">Oui</span>
+          </label>
+          <label className="inline-flex items-center">
+            <input
+              type="radio"
+              name={name}
+              value="Non"
+              checked={value === "Non"}
+              onChange={onChange}
+              className="form-radio h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+            />
+            <span className="ml-1 text-gray-700 text-sm">Non</span>
+          </label>
         </div>
       );
     case "date":

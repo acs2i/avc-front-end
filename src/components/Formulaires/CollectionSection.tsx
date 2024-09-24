@@ -29,6 +29,8 @@ const CollectionSection: React.FC<CollectionSelectorProps> = ({
           options={optionsCollection}
           placeholder="Sélectionner une collection"
           styles={customStyles}
+          menuPortalTarget={document.body}
+          isClearable
           className="block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
         />
       </div>

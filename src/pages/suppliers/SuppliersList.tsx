@@ -26,7 +26,7 @@ export default function SuppliersList() {
   const [postalValue, setPostalValue] = useState("");
   const [cityValue, setCityValue] = useState("");
   const [countryValue, setCountryValue] = useState("");
-  const [statusValue, setStatusValue] = useState("all");
+  const [statusValue, setStatusValue] = useState("A");
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItem, setTotalItem] = useState(null);
@@ -40,9 +40,9 @@ export default function SuppliersList() {
     if (searchParams) {
       searchSuppliers(searchParams);
     } else {
-      fetchSuppliers();
+      fetchSuppliers(statusValue);
     }
-  }, [currentPage]);
+  }, [currentPage, searchParams]);
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -51,19 +51,22 @@ export default function SuppliersList() {
     setCurrentPage(value);
   };
 
-  const fetchSuppliers = async () => {
+  const fetchSuppliers = async (status: string = "") => {
     setIsLoading(true);
-
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/supplier?page=${currentPage}&limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      let url = `${process.env.REACT_APP_URL_DEV}/api/v1/supplier/search?page=${currentPage}&limit=${limit}`;
+
+      // Ne pas ajouter le paramètre status si on veut "tous"
+      if (status && status !== "all") {
+        url += `&status=${status}`;
+      }
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       const data = await response.json();
       setSuppliers(data.data);
@@ -82,7 +85,9 @@ export default function SuppliersList() {
       const queryParams = new URLSearchParams(params);
 
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/supplier/search?page=${currentPage}&limit=${limit}&${queryParams.toString()}`,
+        `${
+          process.env.REACT_APP_URL_DEV
+        }/api/v1/supplier/search?page=${currentPage}&limit=${limit}&${queryParams.toString()}`,
         {
           method: "GET",
           headers: {
@@ -102,6 +107,19 @@ export default function SuppliersList() {
   };
 
   const handleSearch = () => {
+    const params: any = {};
+  
+    if (codeValue) params.code = codeValue;
+    if (labelValue) params.company_name = labelValue;
+    if (addressValue) params.address = addressValue;
+    if (postalValue) params.postal = postalValue;
+    if (cityValue) params.city = cityValue;
+    if (countryValue) params.country = countryValue;
+  
+    if (statusValue !== "all") {
+      params.status = statusValue;
+    }
+  
     if (
       !codeValue &&
       !labelValue &&
@@ -115,22 +133,16 @@ export default function SuppliersList() {
       setCurrentPage(1);
       fetchSuppliers();
     } else {
-      const params: any = {};
-  
-      if (codeValue) params.code = codeValue;
-      if (labelValue) params.company_name = labelValue;
-      if (addressValue) params.address = addressValue;
-      if (postalValue) params.postal = postalValue;
-      if (cityValue) params.city = cityValue;
-      if (countryValue) params.country = countryValue;
-      if (statusValue !== "all") params.status = statusValue;
-  
       setSearchParams(params);
       setCurrentPage(1);
       searchSuppliers(params);
     }
   };
   
+  
+  
+
+  console.log(statusValue);
 
   return (
     <section>
@@ -226,11 +238,16 @@ export default function SuppliersList() {
               type="radio"
               id="tous"
               name="status"
-              value="all"
+              value=""
               checked={statusValue === "all"}
               onChange={() => setStatusValue("all")}
             />
-            <label htmlFor="tous">Tous</label>
+            <label
+              htmlFor="tous"
+              className="text-[14px] font-bold text-gray-600"
+            >
+              Tous
+            </label>
           </div>
 
           <div className="flex items-center gap-2">
@@ -242,7 +259,12 @@ export default function SuppliersList() {
               checked={statusValue === "A"}
               onChange={() => setStatusValue("A")}
             />
-            <label htmlFor="actif">Actifs</label>
+            <label
+              htmlFor="actif"
+              className="text-[14px] font-bold text-gray-600"
+            >
+              Actifs
+            </label>
           </div>
 
           <div className="flex items-center gap-2">
@@ -254,7 +276,12 @@ export default function SuppliersList() {
               checked={statusValue === "I"}
               onChange={() => setStatusValue("I")}
             />
-            <label htmlFor="inactif">Inactifs</label>
+            <label
+              htmlFor="inactif"
+              className="text-[14px] font-bold text-gray-600"
+            >
+              Inactifs
+            </label>
           </div>
         </div>
 

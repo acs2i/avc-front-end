@@ -549,7 +549,7 @@ export default function CreateSupplierPage() {
             </div>
 
             <div className="flex gap-4 mt-[30px]">
-              <FormSection title="Champs additionnels (optionel)">
+              <FormSection title="Champs additionnels">
                 <div className="mt-3">
                   {userFields
                     .filter((field) => field.apply_to === "Fournisseur")

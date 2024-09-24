@@ -95,18 +95,19 @@ export default function UserFieldCreatePage({
   const handleFieldTypeSelection = (index: number, type: string) => {
     const updatedFields = [...formData.additional_fields];
     updatedFields[index].field_type = type;
-
-    if (type === "boolean") {
-      updatedFields[index].options = ["", ""];
-    } else if (type === "multiple_choice") {
+    
+    // Pas besoin de définir des options pour boolean pendant la création
+    if (type === "multiple_choice") {
       updatedFields[index].options = [""];
     } else {
       updatedFields[index].options = [];
     }
-
+    
     updatedFields[index].value = updatedFields[index].value || "";
     setFormData({ ...formData, additional_fields: updatedFields });
   };
+  
+  
 
   const handleOptionChange = (
     fieldIndex: number,

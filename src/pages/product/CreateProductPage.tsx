@@ -937,7 +937,7 @@ export default function CreateProductPage() {
             </div>
             <div className="mt-3 w-1/3">
               {userFields && userFields.length > 0 && (
-                <FormSection title="Champs additionnels (optionel)">
+                <FormSection title="Champs additionnels">
                   <div className="mt-3">
                     {userFields
                       .filter((field) => field.apply_to === "Produit")

@@ -26,13 +26,17 @@ interface Product {
 }
 
 const customStyles = {
+  menuPortal: (base: any) => ({
+    ...base,
+    zIndex: 9999, // S'assurer que le menu est bien au-dessus
+  }),
   control: (provided: any) => ({
     ...provided,
-    border: "none", // Supprimer la bordure
+    border: "none",
     boxShadow: "none",
-    borderRadius: "10px", // Ajouter une bordure arrondie
+    borderRadius: "10px",
     "&:hover": {
-      border: "none", // Assurez-vous que la bordure n'apparaît pas au survol
+      border: "none",
     },
   }),
   option: (provided: any, state: any) => ({
@@ -45,19 +49,15 @@ const customStyles = {
       color: "black",
     },
   }),
-  singleValue: (provided: any) => ({
+  menu: (provided: any) => ({
     ...provided,
-    color: "gray",
-  }),
-  container: (provided: any) => ({
-    ...provided,
-    marginTop: 0,
+    zIndex: 9999,
   }),
 };
 
 export default function ProductList() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [selectedActiveValue, setSelectedActiveValue] = useState("all");
+  const [selectedActiveValue, setSelectedActiveValue] = useState("A");
   const [codeValue, setCodeValue] = useState("");
   const [labelValue, setLabelValue] = useState("");
   const [brandValue, setBrandValue] = useState("");
@@ -65,6 +65,7 @@ export default function ProductList() {
   const [familyValue, setFamilyValue] = useState("");
   const [subFamilyValue, setSubFamilyValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [searchParams, setSearchParams] = useState<any>(null);
   const [totalItem, setTotalItem] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 20;
@@ -95,8 +96,12 @@ export default function ProductList() {
   } = useSubFamily("", 10);
 
   useEffect(() => {
-    fetchProducts();
-  }, [currentPage]);
+    if (searchParams) {
+      searchProducts(searchParams);
+    } else {
+      fetchProducts(selectedActiveValue);
+    }
+  }, [currentPage, searchParams]);
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -105,18 +110,21 @@ export default function ProductList() {
     setCurrentPage(value);
   };
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (status: string = "") => {
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/product?page=${currentPage}&limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      let url = `${process.env.REACT_APP_URL_DEV}/api/v1/product/search?page=${currentPage}&limit=${limit}`;
+
+      if (status && status !== "all") {
+        url += `&status=${status}`;
+      }
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       const result = await response.json();
       setProducts(result.data);
       setTotalItem(result.total);
@@ -172,10 +180,11 @@ export default function ProductList() {
     }
   
     if (supplierValue) params.supplier = supplierValue;
-    if (selectedActiveValue !== "all") params.status = selectedActiveValue;
   
-    console.log("Selected SubFamily:", selectedSubFamily);
-
+    // N'ajoute pas le paramètre status si "Tous" est sélectionné
+    if (selectedActiveValue !== "all") {
+      params.status = selectedActiveValue;
+    }
   
     if (
       !codeValue &&
@@ -186,14 +195,15 @@ export default function ProductList() {
       !selectedSubFamily &&
       selectedActiveValue === "all"
     ) {
+      setSearchParams(null);
+      setCurrentPage(1);
       fetchProducts();
     } else {
+      setSearchParams(params);
       setCurrentPage(1);
       searchProducts(params);
     }
   };
-  
-  
 
   return (
     <section className="w-full">
@@ -292,7 +302,12 @@ export default function ProductList() {
               checked={selectedActiveValue === "all"}
               onChange={() => setSelectedActiveValue("all")}
             />
-            <label htmlFor="tous">Tous</label>
+            <label
+              htmlFor="tous"
+              className="text-[14px] font-bold text-gray-600"
+            >
+              Tous
+            </label>
           </div>
           <div className="flex items-center gap-2">
             <input
@@ -303,7 +318,12 @@ export default function ProductList() {
               checked={selectedActiveValue === "A"}
               onChange={() => setSelectedActiveValue("A")}
             />
-            <label htmlFor="actif">Actifs</label>
+            <label
+              htmlFor="actif"
+              className="text-[14px] font-bold text-gray-600"
+            >
+              Actifs
+            </label>
           </div>
           <div className="flex items-center gap-2">
             <input
@@ -314,7 +334,12 @@ export default function ProductList() {
               checked={selectedActiveValue === "I"}
               onChange={() => setSelectedActiveValue("I")}
             />
-            <label htmlFor="inactif">Inactifs</label>
+            <label
+              htmlFor="inactif"
+              className="text-[14px] font-bold text-gray-600"
+            >
+              Inactifs
+            </label>
           </div>
         </div>
 

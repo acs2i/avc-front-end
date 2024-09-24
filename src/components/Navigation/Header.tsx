@@ -67,7 +67,7 @@ export default function Header({
               {btnTitle}
             </Button>}
           </div>
-          <div className="relative">{children}</div>
+          <div className="">{children}</div>
         </div>
       </div>
     </div>

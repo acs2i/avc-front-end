@@ -914,7 +914,7 @@ export default function SingleProductPage() {
           )}
         </div>
       </Modal>
-      <section className="w-full bg-slate-50 p-8 max-w-[2000px] mx-auto">
+      <section className="w-full bg-slate-50 p-8 max-w-[2000px] mx-auto min-h-screen">
         <form onSubmit={handleUpdateReference}>
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-2">
