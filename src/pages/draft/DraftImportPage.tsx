@@ -72,9 +72,6 @@ interface FormData {
   status: string;
   additional_fields: any[];
   uvc: Uvc[];
-  initialSizes: any[];
-  initialColors: any[];
-  initialGrid: any[];
 }
 
 export default function DraftImportPage() {
@@ -93,56 +90,14 @@ export default function DraftImportPage() {
     "Réf fournisseur",
     "Collection",
   ];
-  const [formData, setFormData] = useState<FormData>({
-    creator_id: creatorId._id,
-    reference: "",
-    name: "",
-    short_label: "",
-    long_label: "",
-    type: "Marchandise",
-    tag_ids: [],
-    suppliers: [],
-    dimension_types: "Couleur/Taille",
-    brand_ids: [],
-    collection_ids: [],
-    peau: 0,
-    tbeu_pb: 0,
-    tbeu_pmeu: 0,
-    imgPath: "",
-    status: "A",
-    uvc: [
-      {
-        code: "",
-        dimensions: [],
-        prices: [
-          {
-            tarif_id: "",
-            currency: "",
-            supplier_id: "",
-            price: {
-              peau: 0,
-              tbeu_pb: 0,
-              tbeu_pmeu: 0,
-            },
-            store: "",
-          },
-        ],
-        eans: [],
-        status: "",
-      },
-    ],
-    additional_fields: [],
-    initialSizes: ["000"],
-    initialColors: ["000"],
-    initialGrid: [[true]],
-  });
+  const [formData, setFormData] = useState<FormData[]>([]);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setFileName(file.name);
       const fileExtension = file.name.split(".").pop()?.toLowerCase();
-
+  
       if (fileExtension === "xlsx" || fileExtension === "xls") {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -150,30 +105,28 @@ export default function DraftImportPage() {
           const workbook = XLSX.read(data, { type: "array" });
           const sheetName = workbook.SheetNames[0]; // Sélectionne la première feuille
           const worksheet = workbook.Sheets[sheetName];
-
+  
           // Transformation des données en JSON
           const jsonData = XLSX.utils.sheet_to_json(worksheet, {
             header: 1,
             defval: "",
           });
-
+  
           // Trouver l'index de la ligne contenant les en-têtes
           const headerIndex = jsonData.findIndex(
             (row: any) =>
               row.includes("Famille") || row.includes("Sous Famille")
           );
-
+  
           if (headerIndex === -1) {
-            console.error(
-              "Les colonnes nécessaires ne sont pas présentes dans le fichier."
-            );
+            console.error("Les colonnes nécessaires ne sont pas présentes dans le fichier.");
             return;
           }
-
+  
           // Extraire les en-têtes et les lignes de données
           const headers = jsonData[headerIndex] as string[];
           const rows = jsonData.slice(headerIndex + 1);
-
+  
           // Colonnes à garder et mappage dynamique
           const columnsToKeep = [
             "Famille",
@@ -190,7 +143,7 @@ export default function DraftImportPage() {
             "PA Net",
             "PV Conseillé",
           ];
-
+  
           const columnMap: { [key: string]: number } = {};
           columnsToKeep.forEach((col) => {
             const index = headers.findIndex(
@@ -200,8 +153,8 @@ export default function DraftImportPage() {
               columnMap[col] = index;
             }
           });
-
-          // Créer un tableau pour stocker les données formatées et mettre à jour formData
+  
+        
           const formattedData: ImportData[] = rows.map((row: any) => {
             const formattedRow: ImportData = {
               Famille: row[columnMap["Famille"]] || "",
@@ -213,52 +166,74 @@ export default function DraftImportPage() {
               Fournisseur: row[columnMap["Code Fournisseur"]] || "",
               Marque: row[columnMap["Code Marque"]] || "",
               "Réf fournisseur": row[columnMap["Réf fournisseur"]] || "",
-              "Collection actuelle":
-                row[columnMap["Collection actuelle"]] || "",
+              "Collection actuelle": row[columnMap["Collection actuelle"]] || "",
               Collection: row[columnMap["Nouvelle Collection"]] || "",
               "PA Net": row[columnMap["PA Net"]] || 0,
               "PV Conseillé": row[columnMap["PV Conseillé"]] || 0,
             };
-
+  
             return formattedRow;
           });
-
-          if (formattedData.length > 0) {
-            const firstRow = formattedData[0];
-
-            setFormData((prevFormData) => ({
-              ...prevFormData,
-              reference: firstRow.Référence,
-              name: "",
-              long_label: "",
-              suppliers: [
-                {
-                  supplier_id: firstRow.Fournisseur,
-                  supplier_ref: firstRow["Réf fournisseur"],
-                  pcb: "",
-                  custom_cat: "",
-                  made_in: "",
-                  company_name: firstRow.Fournisseur,
-                },
-              ],
-              tag_ids: [
-                firstRow.Famille,
-                firstRow["Sous Famille"],
-                firstRow["Sous Sous Famille"],
-              ],
-              brand_ids: [firstRow.Marque],
-              collection_ids: [firstRow.Collection],
-              peau: 0,
-              tbeu_pb: 0,
-            }));
-          }
-
+  
+         
+          const updatedFormData = formattedData.map((data) => ({
+            creator_id: creatorId._id,
+            reference: data.Référence,
+            name: "",
+            short_label: "",
+            long_label: "",
+            type: "Marchandise",
+            tag_ids: [data.Famille, data["Sous Famille"], data["Sous Sous Famille"]],
+            suppliers: [
+              {
+                supplier_id: data.Fournisseur,
+                supplier_ref: data["Réf fournisseur"],
+                pcb: "",
+                custom_cat: "",
+                made_in: "",
+                company_name: data.Fournisseur,
+              },
+            ],
+            dimension_types: "Couleur/Taille",
+            brand_ids: [data.Marque],
+            collection_ids: [data.Collection],
+            peau: 0,
+            tbeu_pb: 0,
+            tbeu_pmeu: 0,
+            imgPath: "",
+            status: "A",
+            additional_fields: [],
+            uvc: [
+              {
+                code: "",
+                dimensions: [],
+                prices: [
+                  {
+                    tarif_id: "",
+                    currency: "",
+                    supplier_id: "",
+                    price: {
+                      peau: 0,
+                      tbeu_pb: 0,
+                      tbeu_pmeu: 0,
+                    },
+                    store: "",
+                  },
+                ],
+                eans: [],
+                status: "",
+              },
+            ],
+          }));
+  
+          setFormData(updatedFormData);
           setFileData(formattedData);
         };
         reader.readAsArrayBuffer(file);
       }
     }
   };
+  
 
   console.log(formData);
 

@@ -1498,29 +1498,36 @@ export default function DraftUpdatePage() {
                 </div>
                 <div className="mt-[30px] w-1/3">
                   {!isModify && draft.additional_fields.length > 0 && (
-                    <FormSection title="Champs additionnels (optionel)">
+                    <FormSection title="Champs additionnels">
                       <div>
-                        {draft.additional_fields.map(
-                          (field: any, index: number) => (
-                            <div
-                              key={index}
-                              className="grid grid-cols-12 gap-2 py-2"
-                            >
-                              <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                                {field.label} :
-                              </span>
+                        {userFields
+                          .filter((field) => field.apply_to === "Produit")
+                          .map((field: any, index: number) => {
+                            const draftField = draft.additional_fields.find(
+                              (draftField: any) =>
+                                draftField.label === field.label
+                            );
 
-                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {field.value}
-                              </span>
-                            </div>
-                          )
-                        )}
+                            return (
+                              <div
+                                key={index}
+                                className="grid grid-cols-12 gap-2 py-2"
+                              >
+                                <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                                  {field.label} :
+                                </span>
+
+                                <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                  {draftField?.value || "Non renseigné"}
+                                </span>
+                              </div>
+                            );
+                          })}
                       </div>
                     </FormSection>
                   )}
                   {isModify && (
-                    <FormSection title="Champs additionnels (optionel)">
+                    <FormSection title="Champs additionnels">
                       <div>
                         {userFields && userFields.length > 0 && (
                           <div className="mt-3">

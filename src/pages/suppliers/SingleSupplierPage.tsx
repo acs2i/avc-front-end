@@ -1089,7 +1089,10 @@ export default function SingleSupplierPage() {
 
                 {/* Afficher les marques ajoutées */}
                 {supplier?.brand_id.map((brand, index) => (
-                  <div key={index} className="flex items-center gap-2 mt-2 bg-gray-600 justify-center py-3 relative rounded-md">
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 mt-2 bg-gray-600 justify-center py-3 relative rounded-md"
+                  >
                     <span className="font-[600] text-white capitalize">
                       {brand?.label}
                     </span>
@@ -1108,29 +1111,35 @@ export default function SingleSupplierPage() {
             {!isModify &&
               supplier &&
               supplier?.additional_fields.length > 0 && (
-                <FormSection title="Champs additionnels (optionel)">
+                <FormSection title="Champs additionnels">
                   <div>
-                    {supplier?.additional_fields.map(
-                      (field: any, index: number) => (
-                        <div
-                          key={index}
-                          className="grid grid-cols-12 gap-2 py-2"
-                        >
-                          <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                            {field.label} :
-                          </span>
+                    {userFields
+                      .filter((field) => field.apply_to === "Fournisseur")
+                      .map((field: any, index: number) => {
+                        const supplierField = supplier.additional_fields.find(
+                          (supField: any) => supField.label === field.label
+                        );
 
-                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                            {field.value}
-                          </span>
-                        </div>
-                      )
-                    )}
+                        return (
+                          <div
+                            key={index}
+                            className="grid grid-cols-12 gap-2 py-2"
+                          >
+                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                              {field.label} :
+                            </span>
+
+                            <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                              {supplierField?.value || "Non renseigné"}
+                            </span>
+                          </div>
+                        );
+                      })}
                   </div>
                 </FormSection>
               )}
             {isModify && (
-              <FormSection title="Champs additionnels (optionel)">
+              <FormSection title="Champs additionnels">
                 <div>
                   {userFields && userFields.length > 0 && (
                     <div className="mt-3">
@@ -1177,18 +1186,22 @@ export default function SingleSupplierPage() {
           </div>
           {!isLoading ? (
             <div className="mt-[50px] flex gap-2">
-              <button
-                className="w-full bg-[#9FA6B2] text-white py-2 rounded-md font-[600] hover:bg-[#bac3d4] hover:text-white shadow-md"
-                type="button"
-              >
-                Annuler
-              </button>
-              <button
-                className="w-full bg-[#3B71CA] text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
-                type="submit"
-              >
-                Modifier le fournisseur
-              </button>
+              {isModify && (
+                <>
+                  <button
+                    className="w-full bg-[#9FA6B2] text-white py-2 rounded-md font-[600] hover:bg-[#bac3d4] hover:text-white shadow-md"
+                    type="button"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    className="w-full bg-[#3B71CA] text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
+                    type="submit"
+                  >
+                    Modifier le fournisseur
+                  </button>
+                </>
+              )}
             </div>
           ) : (
             <div className="relative flex justify-center mt-7 px-7 gap-2">
