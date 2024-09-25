@@ -443,11 +443,7 @@ export default function ProductList() {
                     )}
                   </td>
                   <td className="px-6 py-2 text-blue-500">
-                    {product?.long_label ? (
-                      <span>{truncateText(product.long_label, 25)}</span>
-                    ) : (
-                      <span>Loading...</span>
-                    )}
+                    <span>{truncateText(product?.long_label || "", 25)}</span>
                   </td>
                   <td className="px-6 py-2">
                     {product.brand_ids && product.brand_ids.length > 0 ? (
@@ -483,7 +479,7 @@ export default function ProductList() {
                       <div>
                         <span>{product.tag_ids[0]?.code ?? "NA"}</span>
                         <span className="mx-1">-</span>
-                        
+
                         <span>
                           {truncateText(product.tag_ids[0]?.name, 10) ?? "NA"}
                         </span>
