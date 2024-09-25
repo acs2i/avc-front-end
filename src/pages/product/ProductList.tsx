@@ -28,7 +28,7 @@ interface Product {
 const customStyles = {
   menuPortal: (base: any) => ({
     ...base,
-    zIndex: 9999, // S'assurer que le menu est bien au-dessus
+    zIndex: 9999,
   }),
   control: (provided: any) => ({
     ...provided,
@@ -162,30 +162,30 @@ export default function ProductList() {
 
   const handleSearch = () => {
     const params: any = {};
-  
+
     if (codeValue) params.reference = codeValue;
     if (labelValue) params.long_label = labelValue;
-  
+
     const selectedBrandLabel = brands.find((brand) => brand !== null)?.label;
     if (selectedBrandLabel) {
       params.brand = selectedBrandLabel;
     }
-  
+
     if (selectedFamily && selectedFamily.name) {
       params.tag = selectedFamily.name;
     }
-  
+
     if (selectedSubFamily && selectedSubFamily.name) {
       params.sub_family = selectedSubFamily.name;
     }
-  
+
     if (supplierValue) params.supplier = supplierValue;
-  
+
     // N'ajoute pas le paramètre status si "Tous" est sélectionné
     if (selectedActiveValue !== "all") {
       params.status = selectedActiveValue;
     }
-  
+
     if (
       !codeValue &&
       !labelValue &&
@@ -443,7 +443,11 @@ export default function ProductList() {
                     )}
                   </td>
                   <td className="px-6 py-2 text-blue-500">
-                    {truncateText(product.long_label, 25)}
+                    {product?.long_label ? (
+                      <span>{truncateText(product.long_label, 25)}</span>
+                    ) : (
+                      <span>Loading...</span>
+                    )}
                   </td>
                   <td className="px-6 py-2">
                     {product.brand_ids && product.brand_ids.length > 0 ? (
@@ -479,6 +483,7 @@ export default function ProductList() {
                       <div>
                         <span>{product.tag_ids[0]?.code ?? "NA"}</span>
                         <span className="mx-1">-</span>
+                        
                         <span>
                           {truncateText(product.tag_ids[0]?.name, 10) ?? "NA"}
                         </span>
