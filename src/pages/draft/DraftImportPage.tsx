@@ -92,6 +92,7 @@ export default function DraftImportPage() {
   ];
   const [formData, setFormData] = useState<FormData[]>([]);
 
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -233,6 +234,10 @@ export default function DraftImportPage() {
       }
     }
   };
+
+
+
+  //Fontion de création
   
 
   console.log(formData);

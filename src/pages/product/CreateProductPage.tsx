@@ -4,11 +4,7 @@ import { useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import Card from "../../components/Shared/Card";
-import {
-  Maximize2,
-  Minimize2,
-  Plus,
-} from "lucide-react";
+import { Maximize2, Minimize2, Plus } from "lucide-react";
 import Button from "../../components/FormElements/Button";
 import useNotify from "../../utils/hooks/useToast";
 import { CircularProgress, Divider } from "@mui/material";
@@ -81,6 +77,15 @@ interface FormData {
   peau: number;
   tbeu_pb: number;
   tbeu_pmeu: number;
+  height: string;
+  width: string;
+  long: string;
+  comment: string;
+  size_unit: string;
+  weigth_unit: string;
+  weight: string;
+  weight_brut: string;
+  weight_net: string;
   imgPath: string;
   status: string;
   additional_fields: any[];
@@ -105,6 +110,12 @@ interface UserField {
   status: string;
   creator_id: any;
   additional_fields: CustomField[];
+}
+
+interface Unit {
+  value: string;
+  name: string;
+  unit: string;
 }
 
 type TagOption = {
@@ -157,6 +168,7 @@ export default function CreateProductPage() {
   const [supplierModalIsOpen, setsupplierModalIsOpen] = useState(false);
   const [userFields, setUserFields] = useState<UserField[]>([]);
   const [fieldValues, setFieldValues] = useState<{ [key: string]: any }>({});
+  const [units, setUnits] = useState<[]>([]);
   const [page, setPage] = useState("dimension");
   const [onglet, setOnglet] = useState("infos");
   const [brandLabel, setBrandLabel] = useState("");
@@ -203,6 +215,15 @@ export default function CreateProductPage() {
     peau: 0,
     tbeu_pb: 0,
     tbeu_pmeu: 0,
+    height: "",
+    width: "",
+    long: "",
+    comment: "",
+    size_unit: "",
+    weigth_unit: "",
+    weight: "",
+    weight_brut: "",
+    weight_net: "",
     imgPath: "",
     status: "A",
     uvc: [
@@ -268,7 +289,7 @@ export default function CreateProductPage() {
     handleInputChangeSubFamily,
     handleChangeSubFamily,
   } = useSubFamily("", 10);
-   // Fonction qui fetch les sous-sous-familles pour l'input creatable select (tag)
+  // Fonction qui fetch les sous-sous-familles pour l'input creatable select (tag)
   const {
     inputValueSubSubFamily,
     optionsSubSubFamily,
@@ -534,6 +555,32 @@ export default function CreateProductPage() {
     });
   };
 
+  const fetchUnits = async () => {
+    setIsLoading(true);
+    try {
+      let url = `${process.env.REACT_APP_URL_DEV}/api/v1/unit`;
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const result = await response.json();
+      // Assurez-vous que les données sont bien formatées
+      const formattedUnits = result.data.map((unit: Unit) => ({
+        value: unit.unit,
+        label: unit.name,
+        name: unit.unit,
+      }));
+      setUnits(formattedUnits);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const toggleFullScreen = () => {
     setIsFullScreen((prevState) => !prevState);
   };
@@ -554,25 +601,25 @@ export default function CreateProductPage() {
   useEffect(() => {
     setFormData((prevFormData) => {
       const updatedTagIds = [...prevFormData.tag_ids];
-  
+
       // Mise à jour de la famille à l'index 0
       if (selectedFamily) {
         updatedTagIds[0] = selectedFamily.value;
       }
-  
+
       // Mise à jour de la sous-famille à l'index 1
       if (selectedSubFamily) {
         updatedTagIds[1] = selectedSubFamily.value;
       }
-  
+
       // Mise à jour de la sous-sous-famille à l'index 2
       if (selectedSubSubFamily) {
         updatedTagIds[2] = selectedSubSubFamily.value;
       }
-  
+
       // Filtrer les valeurs vides éventuelles dans tag_ids
       const filteredTagIds = updatedTagIds.filter(Boolean);
-  
+
       return {
         ...prevFormData,
         brand_ids: brands.map((brand) => brand?._id || ""),
@@ -582,8 +629,14 @@ export default function CreateProductPage() {
         tag_ids: filteredTagIds,
       };
     });
-  }, [brands, selectedCollection, selectedFamily, selectedSubFamily, selectedSubSubFamily]);
-  
+  }, [
+    brands,
+    selectedCollection,
+    selectedFamily,
+    selectedSubFamily,
+    selectedSubSubFamily,
+  ]);
+
   // Use Effect qui réinitialise les champs dans la modal fournisseur
   useEffect(() => {
     if (supplierModalIsOpen) {
@@ -602,7 +655,10 @@ export default function CreateProductPage() {
   // Use Effect pour fetcher les "UserFields" au montage du composant
   useEffect(() => {
     fetchField();
+    fetchUnits();
   }, []);
+
+  console.log(units);
 
   console.log(formData);
   return (
@@ -821,7 +877,7 @@ export default function CreateProductPage() {
               </div>
             </div>
             <div className="flex gap-2 mt-[50px]">
-              <div className="w-1/3 flex flex-col">
+              <div className="w-1/4 flex flex-col">
                 <FormSection title="Fournisseurs">
                   <div className="flex flex-col gap-2">
                     {selectedSuppliers.map((supplier, index) =>
@@ -850,8 +906,8 @@ export default function CreateProductPage() {
                   </div>
                 </FormSection>
               </div>
-              <div className="w-1/3 flex flex-col gap-2">
-                <FormSection title="Caractéristiques Produit" size="h-[300px]">
+              <div className="w-1/4 flex flex-col gap-2">
+                <FormSection title="Caractéristiques Produit" size="h-[350px]">
                   <div className="mt-3">
                     <Input
                       element="input"
@@ -895,9 +951,18 @@ export default function CreateProductPage() {
                   </div>
                 </FormSection>
               </div>
-              <div className="w-1/3 flex flex-col gap-2">
-                <FormSection title="Prix" size="h-[300px]">
+              <div className="w-1/4 flex flex-col gap-2">
+                <FormSection title="Prix" size="h-[350px]">
                   <div className="mt-3">
+                    <Input
+                      element="select"
+                      id="tax"
+                      label="Taxes :"
+                      validators={[]}
+                      placeholder=""
+                      create
+                      gray
+                    />
                     <Input
                       element="input"
                       id="peau"
@@ -934,8 +999,109 @@ export default function CreateProductPage() {
                   </div>
                 </FormSection>
               </div>
+              <div className="w-1/4 flex flex-col gap-2">
+                <FormSection title="Cotes et poids" size="h-[350px]">
+                  <div className="flex gap-3">
+                    <div>
+                      <Input
+                        element="select"
+                        id="size_unit"
+                        label="Unité (taille)"
+                        validators={[]}
+                        placeholder="Sélectionnez une unité"
+                        value={formData.size_unit}
+                        onChange={handleChange}
+                        create
+                        gray
+                        options={units}
+                      />
+                      <Input
+                        element="input"
+                        id="height"
+                        label="Hauteur :"
+                        value={formData.height}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder=""
+                        create
+                        gray
+                      />
+                      <Input
+                        element="input"
+                        id="long"
+                        label="Longueur :"
+                        value={formData.long}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder=""
+                        create
+                        gray
+                      />
+                      <Input
+                        element="input"
+                        id="width"
+                        label="Largeur :"
+                        value={formData.width}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder=""
+                        create
+                        gray
+                      />
+                    </div>
+                    <div>
+                      <Input
+                        element="select"
+                        id="weigth_unit"
+                        label="Unité (poids)"
+                        onChange={handleChange}
+                        value={formData.weigth_unit}
+                        validators={[]}
+                        placeholder="Sélectionnez une unité"
+                        create
+                        gray
+                        options={units}
+                      />
+                      <Input
+                        element="input"
+                        id="weight"
+                        label="Poids :"
+                        value={formData.weight}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder=""
+                        create
+                        gray
+                      />
+                       <Input
+                        element="input"
+                        id="weight_brut"
+                        label="Brut :"
+                        value={formData.weight_brut}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder=""
+                        create
+                        gray
+                      />
+                      <Input
+                        element="input"
+                        id="weight_net"
+                        label="Net :"
+                        value={formData.weight_net}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder=""
+                        create
+                        gray
+                      />
+                     
+                    </div>
+                  </div>
+                </FormSection>
+              </div>
             </div>
-            <div className="mt-3 w-1/3">
+            <div className="mt-3 w-full">
               {userFields && userFields.length > 0 && (
                 <FormSection title="Champs additionnels">
                   <div className="mt-3">
@@ -973,6 +1139,22 @@ export default function CreateProductPage() {
                   </div>
                 </FormSection>
               )}
+            </div>
+            <div className="mt-3">
+              <FormSection title="Commentaire">
+                <Input
+                  element="textarea"
+                  id="comment"
+                  label=""
+                  onChange={handleChange}
+                  value={formData.comment}
+                  validators={[]}
+                  placeholder="Tapez votre commentaire sur le produit"
+                  maxLength={3000}
+                  create
+                  gray
+                />
+              </FormSection>
             </div>
             <div className="mt-3">
               <Divider />

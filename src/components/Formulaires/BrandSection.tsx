@@ -28,7 +28,7 @@ const BrandSection: React.FC<BrandSelectorProps> = ({
   displayTrash
 }) => {
   return (
-    <div className="relative w-full flex flex-col gap-3 z-30">
+    <div className="w-full flex flex-col gap-3">
       <div >
         {brands.map((brand, index) => (
           <div key={index} className="flex items-center gap-2">

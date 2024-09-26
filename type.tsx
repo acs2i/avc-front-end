@@ -159,6 +159,15 @@ export type Draft = {
   peau: number;
   tbeu_pb: number;
   tbeu_pmeu: number;
+  height: string;
+  width: string;
+  long: string;
+  comment: string;
+  size_unit: string;
+  weigth_unit: string;
+  weight: string;
+  weight_brut: string;
+  weight_net: string;
   imgPath: string;
   status: string;
   additional_fields: any;

@@ -22,7 +22,7 @@ const FamilySection: React.FC<FamilySelectorProps> = ({
 }) => {
   return (
     <div
-      className={`relative w-full flex flex-col gap-3 ${isList ? "" : "mt-2"}`}
+      className={`w-full flex flex-col gap-3 ${isList ? "" : "mt-2"}`}
     >
       <div>
         <CreatableSelect
@@ -35,7 +35,7 @@ const FamilySection: React.FC<FamilySelectorProps> = ({
           styles={customStyles}
           menuPortalTarget={document.body}
           isClearable
-          className="block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize z-30"
+          className="block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
         />
       </div>
     </div>

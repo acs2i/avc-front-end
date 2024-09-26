@@ -36,6 +36,7 @@ import {
 import { useFetchDetails } from "../../utils/hooks/usefetchdetails";
 import DynamicField from "../../components/FormElements/DynamicField";
 import SupplierFormComponent from "../../components/SupplierFormComponent";
+import Input from "../../components/FormElements/Input";
 
 interface CustomField {
   field_name: string;
@@ -69,6 +70,15 @@ interface FormData {
   peau: number;
   tbeu_pb: number;
   tbeu_pmeu: number;
+  height: string;
+  width: string;
+  long: string;
+  comment: string;
+  size_unit: string;
+  weigth_unit: string;
+  weight: string;
+  weight_brut: string;
+  weight_net: string;
   imgPath: string;
   status: string;
   additional_fields: any[];
@@ -115,6 +125,15 @@ export default function DraftUpdatePage() {
     peau: draft?.peau || 0,
     tbeu_pb: draft?.tbeu_pb || 0,
     tbeu_pmeu: draft?.tbeu_pmeu || 0,
+    height: draft?.height || "",
+    width: draft?.width || "",
+    long: draft?.long || "",
+    comment: draft?.comment || "",
+    size_unit: draft?.size_unit || "",
+    weigth_unit: draft?.weigth_unit || "",
+    weight: draft?.weight || "",
+    weight_brut: draft?.weight_brut || "",
+    weight_net: draft?.weight_net || "",
     imgPath: "",
     status: "A",
     additional_fields: [],
@@ -254,6 +273,7 @@ export default function DraftUpdatePage() {
 
       const data = await response.json();
       setDraft(data);
+      console.log(data);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     }
@@ -341,6 +361,15 @@ export default function DraftUpdatePage() {
         peau: draft.peau || 0,
         tbeu_pb: draft.tbeu_pb || 0,
         tbeu_pmeu: draft.tbeu_pmeu || 0,
+        height: draft?.height || "",
+        width: draft?.width || "",
+        long: draft?.long || "",
+        comment: draft?.comment || "",
+        size_unit: draft?.size_unit || "",
+        weigth_unit: draft?.weigth_unit || "",
+        weight: draft?.weight || "",
+        weight_brut: draft?.weight_brut || "",
+        weight_net: draft?.weight_net || "",
         imgPath: draft.imgPath || "",
         status: draft.status || "A",
         additional_fields: draft.additional_fields || {},
@@ -909,6 +938,8 @@ export default function DraftUpdatePage() {
     });
   };
 
+  console.log(product);
+
   return (
     <>
       <Modal
@@ -1305,9 +1336,9 @@ export default function DraftUpdatePage() {
                   </div>
                 </div>
 
-                <div className="flex gap-7 mt-[30px] items-stretch">
+                <div className="flex gap-2 mt-[30px] items-stretch">
                   {/* Fournisseur */}
-                  <div className="w-1/3 ">
+                  <div className="w-1/4">
                     <FormSection title="Fournisseur">
                       <div className="relative flex flex-col gap-3">
                         <div className="mt-3">
@@ -1366,7 +1397,7 @@ export default function DraftUpdatePage() {
                     </FormSection>
                   </div>
                   {/* Caractéristiques produit */}
-                  <div className="w-1/3">
+                  <div className="w-1/4">
                     <FormSection title="Caractéristiques Produit">
                       <div className="mt-3">
                         <div className="grid grid-cols-12 gap-2 py-2">
@@ -1435,7 +1466,7 @@ export default function DraftUpdatePage() {
                     </FormSection>
                   </div>
                   {/* Prix produit */}
-                  <div className="w-1/3">
+                  <div className="w-1/4">
                     <FormSection title="Prix">
                       <div className="mt-3">
                         <div className="grid grid-cols-12 gap-2 py-2">
@@ -1495,8 +1526,133 @@ export default function DraftUpdatePage() {
                       </div>
                     </FormSection>
                   </div>
+                  {/* Cotes et poids */}
+                  <div className="w-1/4">
+                    <FormSection title="Cotes et poids">
+                      <div className="flex gap-3">
+                        <div>
+                          <div className="grid grid-cols-12 gap-2 py-2">
+                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                              Hauteur
+                            </span>
+                            {!isModify ? (
+                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                {draft.height}
+                                {draft.size_unit}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                id="height"
+                                onChange={handleChange}
+                                value={formData.height}
+                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                              />
+                            )}
+                          </div>
+                          <div className="grid grid-cols-12 gap-2 py-2">
+                            <span className="col-span-6 font-[700] text-slate-500 text-[13px] whitespace-nowrap">
+                              Longueur
+                            </span>
+                            {!isModify ? (
+                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                {draft.long}
+                                {draft.size_unit}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                id="long"
+                                onChange={handleChange}
+                                value={formData.long}
+                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                              />
+                            )}
+                          </div>
+                          <div className="grid grid-cols-12 gap-2 py-2">
+                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                              Largeur
+                            </span>
+                            {!isModify ? (
+                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                {draft.width}
+                                {draft.size_unit}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                id="width"
+                                onChange={handleChange}
+                                value={formData.width}
+                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                              />
+                            )}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="grid grid-cols-12 gap-2 py-2">
+                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                              Poids
+                            </span>
+                            {!isModify ? (
+                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                {draft.weight}
+                                {draft.weigth_unit}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                id="weight"
+                                onChange={handleChange}
+                                value={formData.weight}
+                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                              />
+                            )}
+                          </div>
+                          <div className="grid grid-cols-12 gap-2 py-2">
+                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                              Brut
+                            </span>
+                            {!isModify ? (
+                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                {draft.weight_brut}
+                                {draft.weigth_unit}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                id="weight_brut"
+                                onChange={handleChange}
+                                value={formData.weight_brut}
+                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                              />
+                            )}
+                          </div>
+                          <div className="grid grid-cols-12 gap-2 py-2">
+                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                              Net
+                            </span>
+                            {!isModify ? (
+                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                {draft.weight_net}
+                                {draft.weigth_unit}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                id="width"
+                                onChange={handleChange}
+                                value={formData.weight_net}
+                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                              />
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </FormSection>
+                  </div>
                 </div>
-                <div className="mt-[30px] w-1/3">
+                <div className="mt-3 w-full">
                   {!isModify && draft.additional_fields.length > 0 && (
                     <FormSection title="Champs additionnels">
                       <div>
@@ -1513,11 +1669,11 @@ export default function DraftUpdatePage() {
                                 key={index}
                                 className="grid grid-cols-12 gap-2 py-2"
                               >
-                                <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                                <span className="col-span-2 font-[700] text-slate-500 text-[13px]">
                                   {field.label} :
                                 </span>
 
-                                <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                <span className="col-span-4 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
                                   {draftField?.value || "Non renseigné"}
                                 </span>
                               </div>
@@ -1573,6 +1729,28 @@ export default function DraftUpdatePage() {
                       </div>
                     </FormSection>
                   )}
+                </div>
+                <div className="mt-3">
+                  <FormSection title="Commentaire">
+                    <div>
+                      {!isModify ? (
+                        <p className="">{draft.comment}</p>
+                      ) : (
+                        <Input
+                          element="textarea"
+                          id="comment"
+                          label=""
+                          onChange={handleChange}
+                          value={formData.comment}
+                          validators={[]}
+                          placeholder="Tapez votre commentaire sur le produit"
+                          maxLength={3000}
+                          create
+                          gray
+                        />
+                      )}
+                    </div>
+                  </FormSection>
                 </div>
               </>
             )}
