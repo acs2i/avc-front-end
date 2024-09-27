@@ -137,6 +137,15 @@ export type Product = {
   uvc_ids: any[];
   brand_ids: any[];
   collection_ids: any[];
+  height: string;
+  width: string;
+  long: string;
+  comment: string;
+  size_unit: string;
+  weigth_unit: string;
+  weight: string;
+  weight_brut: string;
+  weight_net: string;
   imgPath: string;
   peau: number;
   tbeu_pb: number;

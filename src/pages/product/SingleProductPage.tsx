@@ -38,9 +38,28 @@ import { useSelector } from "react-redux";
 import SupplierFormComponent from "../../components/SupplierFormComponent";
 import useNotify from "../../utils/hooks/useToast";
 import { CircularProgress } from "@mui/material";
+import DynamicField from "../../components/FormElements/DynamicField";
+import Input from "../../components/FormElements/Input";
 
 interface formDataUVC {
   uvc: DatalakeUvc[];
+}
+
+interface CustomField {
+  field_name: string;
+  field_type: string;
+  options?: string[];
+  value?: string;
+}
+
+interface UserField {
+  _id: string;
+  code: string;
+  label: string;
+  apply_to: string;
+  status: string;
+  creator_id: any;
+  additional_fields: CustomField[];
 }
 
 interface FormData {
@@ -58,9 +77,19 @@ interface FormData {
   peau: number;
   tbeu_pb: number;
   tbeu_pmeu: number;
+  height: string;
+  width: string;
+  long: string;
+  comment: string;
+  size_unit: string;
+  weigth_unit: string;
+  weight: string;
+  weight_brut: string;
+  weight_net: string;
   imgPath: string;
   status: string;
   uvc_ids: Uvc[];
+  additional_fields: any[];
   initialSizes: any[];
   initialColors: any[];
   initialGrid: any[];
@@ -70,6 +99,7 @@ export default function SingleProductPage() {
   const { id } = useParams();
   const token = useSelector((state: any) => state.auth.token);
   const creatorId = useSelector((state: any) => state.auth.user);
+  const [fieldValues, setFieldValues] = useState<{ [key: string]: any }>({});
   const { notifySuccess, notifyError } = useNotify();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -112,6 +142,7 @@ export default function SingleProductPage() {
   const [selectedSuppliers, setSelectedSuppliers] = useState<SuppliersOption[]>(
     []
   );
+  const [userFields, setUserFields] = useState<UserField[]>([]);
   const [isModify, setIsModify] = useState(false);
   const [page, setPage] = useState("dimension");
   const [onglet, setOnglet] = useState("infos");
@@ -130,12 +161,22 @@ export default function SingleProductPage() {
     peau: product?.peau || 0,
     tbeu_pb: product?.tbeu_pb || 0,
     tbeu_pmeu: product?.tbeu_pmeu || 0,
+    height: product?.height || "",
+    width: product?.width || "",
+    long: product?.long || "",
+    comment: product?.comment || "",
+    size_unit: product?.size_unit || "",
+    weigth_unit: product?.weigth_unit || "",
+    weight: product?.weight || "",
+    weight_brut: product?.weight_brut || "",
+    weight_net: product?.weight_net || "",
     imgPath: "",
     status: "A",
     uvc_ids: [],
     initialSizes: ["000"],
     initialColors: ["000"],
     initialGrid: [[true]],
+    additional_fields: [],
   });
   const [formDataUvc, setFormDataUvc] = useState<formDataUVC>({
     uvc: [
@@ -186,9 +227,19 @@ export default function SingleProductPage() {
         peau: product.peau || 0,
         tbeu_pb: product.tbeu_pb || 0,
         tbeu_pmeu: product.tbeu_pmeu || 0,
+        height: product?.height || "",
+        width: product?.width || "",
+        long: product?.long || "",
+        comment: product?.comment || "",
+        size_unit: product?.size_unit || "",
+        weigth_unit: product?.weigth_unit || "",
+        weight: product?.weight || "",
+        weight_brut: product?.weight_brut || "",
+        weight_net: product?.weight_net || "",
         imgPath: product.imgPath || "",
         status: product.status || "A",
         uvc_ids: product.uvc_ids || [],
+        additional_fields: product.additional_fields || [],
         initialSizes: ["000"],
         initialColors: ["000"],
         initialGrid: [[true]],
@@ -743,6 +794,10 @@ export default function SingleProductPage() {
   }, [id]);
 
   useEffect(() => {
+    fetchField();
+  }, []);
+
+  useEffect(() => {
     if (product) {
       // Extraire les tailles et les couleurs
       const extractedColors = product?.uvc_ids
@@ -848,6 +903,67 @@ export default function SingleProductPage() {
     }
   };
 
+  const fetchField = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/user-field`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+      setUserFields(data.data);
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFieldChange = (
+    label: string,
+    field_type: string, 
+    id: string,
+    newValue: string
+  ) => {
+    // Mettre à jour fieldValues pour le contrôle local
+    setFieldValues((prevValues) => ({
+      ...prevValues,
+      [id]: newValue, // Met à jour l'état local du champ
+    }));
+  
+    // Vérifier si additional_fields est un tableau, sinon initialiser un tableau vide
+    setFormData((prevFormData) => {
+      const updatedAdditionalFields = Array.isArray(prevFormData.additional_fields)
+        ? [...prevFormData.additional_fields]
+        : [];
+  
+      // Vérifier si un champ avec ce label existe déjà
+      const fieldIndex = updatedAdditionalFields.findIndex(
+        (field) => field.label === label
+      );
+  
+      if (fieldIndex !== -1) {
+        // Mettre à jour la valeur et le type si le champ existe
+        updatedAdditionalFields[fieldIndex].value = newValue;
+        updatedAdditionalFields[fieldIndex].field_type = field_type;
+      } else {
+        // Ajouter un nouveau champ s'il n'existe pas encore
+        updatedAdditionalFields.push({ label, value: newValue, field_type });
+      }
+  
+      return {
+        ...prevFormData,
+        additional_fields: updatedAdditionalFields,
+      };
+    });
+  };
+  
+console.log(formData)
   return (
     <>
       <Modal
@@ -1221,9 +1337,9 @@ export default function SingleProductPage() {
                   </div>
                 </div>
 
-                <div className="flex gap-7 mt-[50px] items-stretch">
+                <div className="flex gap-2 mt-[50px] items-stretch">
                   {/* Fournisseur */}
-                  <div className="w-1/3 ">
+                  <div className="w-1/4">
                     <FormSection title="Fournisseurs">
                       <div className="relative flex flex-col gap-3">
                         <div className="mt-3 flex flex-col gap-2">
@@ -1259,7 +1375,7 @@ export default function SingleProductPage() {
                     </FormSection>
                   </div>
                   {/* Caractéristiques produit */}
-                  <div className="w-1/3">
+                  <div className="w-1/4">
                     <FormSection title="Caractéristiques Produit">
                       <div className="mt-3">
                         <div className="grid grid-cols-12 gap-2 py-2">
@@ -1330,7 +1446,7 @@ export default function SingleProductPage() {
                     </FormSection>
                   </div>
                   {/* Prix produit */}
-                  <div className="w-1/3">
+                  <div className="w-1/4">
                     <FormSection title="Prix">
                       <div className="mt-3">
                         <div className="grid grid-cols-12 gap-2 py-2">
@@ -1390,6 +1506,231 @@ export default function SingleProductPage() {
                       </div>
                     </FormSection>
                   </div>
+                  {/* Prix produit */}
+                  <div className="w-1/4">
+                    <FormSection title="Cotes et poids">
+                      <div className="flex gap-3">
+                        <div>
+                          <div className="grid grid-cols-12 gap-2 py-2">
+                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                              Hauteur
+                            </span>
+                            {!isModify ? (
+                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                {product?.height}
+                                {product?.size_unit}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                id="height"
+                                onChange={handleChange}
+                                value={formData.height}
+                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                              />
+                            )}
+                          </div>
+                          <div className="grid grid-cols-12 gap-2 py-2">
+                            <span className="col-span-6 font-[700] text-slate-500 text-[13px] whitespace-nowrap">
+                              Longueur
+                            </span>
+                            {!isModify ? (
+                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                {product?.long}
+                                {product?.size_unit}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                id="long"
+                                onChange={handleChange}
+                                value={formData.long}
+                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                              />
+                            )}
+                          </div>
+                          <div className="grid grid-cols-12 gap-2 py-2">
+                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                              Largeur
+                            </span>
+                            {!isModify ? (
+                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                {product?.width}
+                                {product?.size_unit}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                id="width"
+                                onChange={handleChange}
+                                value={formData.width}
+                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                              />
+                            )}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="grid grid-cols-12 gap-2 py-2">
+                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                              Poids
+                            </span>
+                            {!isModify ? (
+                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                {product?.weight}
+                                {product?.weigth_unit}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                id="weight"
+                                onChange={handleChange}
+                                value={formData.weight}
+                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                              />
+                            )}
+                          </div>
+                          <div className="grid grid-cols-12 gap-2 py-2">
+                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                              Brut
+                            </span>
+                            {!isModify ? (
+                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                {product?.weight_brut}
+                                {product?.weigth_unit}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                id="weight_brut"
+                                onChange={handleChange}
+                                value={formData.weight_brut}
+                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                              />
+                            )}
+                          </div>
+                          <div className="grid grid-cols-12 gap-2 py-2">
+                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                              Net
+                            </span>
+                            {!isModify ? (
+                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                {product?.weight_net}
+                                {product?.weigth_unit}
+                              </span>
+                            ) : (
+                              <input
+                                type="text"
+                                id="width"
+                                onChange={handleChange}
+                                value={formData.weight_net}
+                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                              />
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </FormSection>
+                  </div>
+                </div>
+                <div className="mt-3 w-full">
+                  {!isModify && product.additional_fields.length > 0 && (
+                    <FormSection title="Champs additionnels">
+                      <div>
+                        {userFields
+                          .filter((field) => field.apply_to === "Produit")
+                          .map((field: any, index: number) => {
+                            const draftField = product.additional_fields.find(
+                              (draftField: any) =>
+                                draftField.label === field.label
+                            );
+
+                            return (
+                              <div
+                                key={index}
+                                className="grid grid-cols-12 gap-2 py-2"
+                              >
+                                <span className="col-span-2 font-[700] text-slate-500 text-[13px]">
+                                  {field.label} :
+                                </span>
+
+                                <span className="col-span-4 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                  {draftField?.value || "Non renseigné"}
+                                </span>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    </FormSection>
+                  )}
+                  {isModify && (
+                    <FormSection title="Champs additionnels">
+                      <div>
+                        {userFields && userFields.length > 0 && (
+                          <div className="mt-3">
+                            {userFields
+                              .filter((field) => field.apply_to === "Produit")
+                              .map((field) => (
+                                <div key={field._id} className="mb-6">
+                                  <h3 className="text-md font-semibold text-gray-800 mb-1">
+                                    {field.label}
+                                  </h3>
+                                  {field.additional_fields.map(
+                                    (customField, index) => (
+                                      <div
+                                        key={`${field._id}-${index}`}
+                                        className="mb-4"
+                                      >
+                                        <DynamicField
+                                          id={`${field._id}-${index}`}
+                                          name={customField.field_name}
+                                          fieldType={customField.field_type}
+                                          value={
+                                            fieldValues[
+                                              `${field._id}-${index}`
+                                            ] || ""
+                                          }
+                                          onChange={(e) =>
+                                            handleFieldChange(
+                                              field.label,
+                                              customField.field_type,
+                                              `${field._id}-${index}`,
+                                              e.target.value
+                                            )
+                                          }
+                                          options={customField.options}
+                                        />
+                                      </div>
+                                    )
+                                  )}
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                      </div>
+                    </FormSection>
+                  )}
+                </div>
+                <div className="mt-3">
+                  <FormSection title="Commentaire">
+                    <div>
+                      {!isModify ? (
+                        <p className="">{product.comment ? product.comment : "Aucun commentaire"}</p>
+                      ) : (
+                        <Input
+                          element="textarea"
+                          id="comment"
+                          label=""
+                          onChange={handleChange}
+                          value={formData.comment}
+                          validators={[]}
+                          placeholder="Tapez votre commentaire sur le produit"
+                          maxLength={3000}
+                          create
+                          gray
+                        />
+                      )}
+                    </div>
+                  </FormSection>
                 </div>
               </>
             )}
@@ -1497,14 +1838,14 @@ export default function SingleProductPage() {
                 )}
                 {onglet === "price" && product && (
                   <UVCPriceTable
-                  uvcPrices={formData.uvc_ids}
-                  brandLabel={product.brand_ids[0]?.label || ""}
-                  globalPrices={{
-                    peau: formData.peau,
-                    tbeu_pb: formData.tbeu_pb,
-                    tbeu_pmeu: formData.tbeu_pmeu,
-                  }}
-                />
+                    uvcPrices={formData.uvc_ids}
+                    brandLabel={product.brand_ids[0]?.label || ""}
+                    globalPrices={{
+                      peau: formData.peau,
+                      tbeu_pb: formData.tbeu_pb,
+                      tbeu_pmeu: formData.tbeu_pmeu,
+                    }}
+                  />
                 )}
                 {/* {onglet === "supplier" && product && (
                 <UVCSupplierTable

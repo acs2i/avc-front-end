@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import Card from "../../components/Shared/Card";
-import { Maximize2, Minimize2, Plus } from "lucide-react";
+import { ChevronLeft, Maximize2, Minimize2, Plus } from "lucide-react";
 import Button from "../../components/FormElements/Button";
 import useNotify from "../../utils/hooks/useToast";
 import { CircularProgress, Divider } from "@mui/material";
@@ -116,6 +116,7 @@ interface Unit {
   value: string;
   name: string;
   unit: string;
+  apply_to: string;
 }
 
 type TagOption = {
@@ -168,7 +169,8 @@ export default function CreateProductPage() {
   const [supplierModalIsOpen, setsupplierModalIsOpen] = useState(false);
   const [userFields, setUserFields] = useState<UserField[]>([]);
   const [fieldValues, setFieldValues] = useState<{ [key: string]: any }>({});
-  const [units, setUnits] = useState<[]>([]);
+  const [sizeUnits, setSizeUnits] = useState([]);
+  const [weightUnits, setWeightUnits] = useState([]);
   const [page, setPage] = useState("dimension");
   const [onglet, setOnglet] = useState("infos");
   const [brandLabel, setBrandLabel] = useState("");
@@ -567,13 +569,39 @@ export default function CreateProductPage() {
         },
       });
       const result = await response.json();
-      // Assurez-vous que les données sont bien formatées
-      const formattedUnits = result.data.map((unit: Unit) => ({
-        value: unit.unit,
-        label: unit.name,
-        name: unit.unit,
-      }));
-      setUnits(formattedUnits);
+
+      const sizeUnits = result.data
+        .filter((unit: Unit) => unit.apply_to === "size")
+        .map((unit: Unit) => ({
+          value: unit.unit,
+          label: unit.name,
+          name: unit.unit,
+        }));
+
+      const weightUnits = result.data
+        .filter((unit: Unit) => unit.apply_to === "weight")
+        .map((unit: Unit) => ({
+          value: unit.unit,
+          label: unit.name,
+          name: unit.unit,
+        }));
+
+      setSizeUnits(sizeUnits);
+      setWeightUnits(weightUnits);
+
+      if (sizeUnits.length > 0) {
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          size_unit: sizeUnits[0].value,
+        }));
+      }
+
+      if (weightUnits.length > 0) {
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          weigth_unit: weightUnits[0].value,
+        }));
+      }
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     } finally {
@@ -658,8 +686,6 @@ export default function CreateProductPage() {
     fetchUnits();
   }, []);
 
-  console.log(units);
-
   console.log(formData);
   return (
     <>
@@ -688,10 +714,15 @@ export default function CreateProductPage() {
         <div className="max-w-[2024px] mx-auto">
           <form onSubmit={handleSubmit} className="mb-[400px]">
             <div className="flex justify-between">
-              <div>
-                <h3 className="text-[32px] font-[800] text-gray-800">
-                  Création <span className="font-[200]">d'un article</span>
-                </h3>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                  <div onClick={() => navigate("/product")} className="cursor-pointer">
+                    <ChevronLeft />
+                  </div>
+                  <h3 className="text-[32px] font-[800] text-gray-800">
+                    Création <span className="font-[200]">d'un article</span>
+                  </h3>
+                </div>
                 {creatorId && (
                   <p className="text-[17px] text-gray-600 italic">
                     Création par{" "}
@@ -702,7 +733,7 @@ export default function CreateProductPage() {
               {!isLoading ? (
                 <div className="flex items-center justify-between gap-3 mt-[50px]">
                   <div className="flex gap-3">
-                    <Button size="small" cancel type="button">
+                    <Button size="small" cancel type="button"  onClick={() => navigate("/product")}>
                       Annuler
                     </Button>
                     <Button size="small" blue type="submit">
@@ -1013,7 +1044,7 @@ export default function CreateProductPage() {
                         onChange={handleChange}
                         create
                         gray
-                        options={units}
+                        options={sizeUnits}
                       />
                       <Input
                         element="input"
@@ -1060,7 +1091,7 @@ export default function CreateProductPage() {
                         placeholder="Sélectionnez une unité"
                         create
                         gray
-                        options={units}
+                        options={weightUnits}
                       />
                       <Input
                         element="input"
@@ -1073,7 +1104,7 @@ export default function CreateProductPage() {
                         create
                         gray
                       />
-                       <Input
+                      <Input
                         element="input"
                         id="weight_brut"
                         label="Brut :"
@@ -1095,7 +1126,6 @@ export default function CreateProductPage() {
                         create
                         gray
                       />
-                     
                     </div>
                   </div>
                 </FormSection>
@@ -1295,6 +1325,7 @@ export default function CreateProductPage() {
                 <button
                   className="w-full bg-[#9FA6B2] text-white py-2 rounded-md font-[600] hover:bg-[#bac3d4] hover:text-white shadow-md"
                   type="button"
+                  onClick={() => navigate("/product")}
                 >
                   Annuler
                 </button>

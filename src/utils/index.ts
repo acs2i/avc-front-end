@@ -58,6 +58,10 @@ export const LINKS: Link[] = [
                 link: "/draft/import",
               },
               {
+                name: "Importer informations fournisseur",
+                link: "/draft/import-supplier",
+              },
+              {
                 name: "Articles à traiter",
                 link: "/draft",
               },

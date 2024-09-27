@@ -3,7 +3,7 @@ import Input from "../../components/FormElements/Input";
 import { useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
-import { ChevronDown, ChevronUp, Plus, Trash } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronUp, Plus, Trash } from "lucide-react";
 import FormSection from "../../components/Formulaires/FormSection";
 import CreatableSelect from "react-select/creatable";
 import { ActionMeta, SingleValue } from "react-select";
@@ -324,10 +324,15 @@ export default function CreateSupplierPage() {
         <div className="max-w-[2024px] mx-auto">
           <form onSubmit={handleSubmit} className="mb-[400px]">
             <div className="flex justify-between">
-              <div>
-                <h3 className="text-[32px] font-[800] text-gray-800">
-                  Créer <span className="font-[200]">un fournisseur</span>
-                </h3>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                  <div onClick={() => navigate(-1)} className="cursor-pointer">
+                    <ChevronLeft />
+                  </div>
+                  <h3 className="text-[32px] font-[800] text-gray-800">
+                    Créer <span className="font-[200]">un fournisseur</span>
+                  </h3>
+                </div>
                 {creatorId && (
                   <p className="text-[17px] text-gray-600 italic">
                     Création par{" "}
@@ -338,7 +343,12 @@ export default function CreateSupplierPage() {
               {!isLoading ? (
                 <div className="flex items-center justify-between gap-3 mt-[50px]">
                   <div className="flex gap-3">
-                    <Button size="small" cancel type="button">
+                    <Button
+                      size="small"
+                      cancel
+                      type="button"
+                      onClick={() => navigate(-1)}
+                    >
                       Annuler
                     </Button>
                     <Button size="small" blue type="submit">
@@ -590,6 +600,7 @@ export default function CreateSupplierPage() {
                 <button
                   className="w-full bg-[#9FA6B2] text-white py-2 rounded-md font-[600] hover:bg-[#bac3d4] hover:text-white shadow-md"
                   type="button"
+                  onClick={() => navigate(-1)}
                 >
                   Annuler
                 </button>

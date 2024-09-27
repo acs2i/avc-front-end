@@ -9,15 +9,11 @@ import { useNavigate } from "react-router-dom";
 
 interface ImportData {
   Famille: string;
-  "Sous Famille": string;
-  "Sous Sous Famille": string;
-  "Type Produit": string;
-  Modèle: string;
   Référence: string;
-  Fournisseur: string;
-  Marque: string;
-  "Réf fournisseur": string;
-  "Collection actuelle": string;
+  "Nom référence": string;
+  Couleur: string;
+  Taille: string;
+  "Made In": string;
   Collection: string;
   "PA Net": string | number;
   "PV Conseillé": string | number;
@@ -75,7 +71,7 @@ interface FormData {
   uvc: Uvc[];
 }
 
-export default function DraftImportPage() {
+export default function SupplierImportPage() {
   const creatorId = useSelector((state: any) => state.auth.user);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -84,13 +80,14 @@ export default function DraftImportPage() {
   const [fileName, setFileName] = useState<string>("");
   const columnsToHighlight = [
     "Famille",
-    "Sous Famille",
-    "Sous Sous Famille",
     "Référence",
-    "Fournisseur",
+    "Nom référence",
+    "Collection",
+    "Couleur",
+    "Taille",
+    "Made In",
     "Marque",
     "Réf fournisseur",
-    "Collection",
   ];
   const [formData, setFormData] = useState<FormData[]>([]);
 
@@ -134,15 +131,12 @@ export default function DraftImportPage() {
           // Colonnes à garder et mappage dynamique
           const columnsToKeep = [
             "Famille",
-            "Sous Famille",
-            "Sous Sous Famille",
-            "Type Produit",
-            "Modèle",
             "Référence",
-            "Code Fournisseur",
-            "Code Marque",
-            "Réf fournisseur",
-            "Collection actuelle",
+            "Nom référence",
+            "Coll",
+            "Coul",
+            "Taille",
+            "Pays Origine",
             "Nouvelle Collection",
             "PA Net",
             "PV Conseillé",
@@ -161,17 +155,12 @@ export default function DraftImportPage() {
           const formattedData: ImportData[] = rows.map((row: any) => {
             const formattedRow: ImportData = {
               Famille: row[columnMap["Famille"]] || "",
-              "Sous Famille": row[columnMap["Sous Famille"]] || "",
-              "Sous Sous Famille": row[columnMap["Sous Sous Famille"]] || "",
-              "Type Produit": row[columnMap["Type Produit"]] || "",
-              Modèle: row[columnMap["Modèle"]] || "",
               Référence: row[columnMap["Référence"]] || "",
-              Fournisseur: row[columnMap["Code Fournisseur"]] || "",
-              Marque: row[columnMap["Code Marque"]] || "",
-              "Réf fournisseur": row[columnMap["Réf fournisseur"]] || "",
-              "Collection actuelle":
-                row[columnMap["Collection actuelle"]] || "",
-              Collection: row[columnMap["Nouvelle Collection"]] || "",
+              "Nom référence": row[columnMap["Nom référence"]] || "",
+              Collection: row[columnMap["Coll"]] || "",
+              Couleur: row[columnMap["Coul"]] || "",
+              Taille: row[columnMap["Taille"]] || "",
+              "Made In": row[columnMap["Pays Origine"]] || "",
               "PA Net": row[columnMap["PA Net"]] || 0,
               "PV Conseillé": row[columnMap["PV Conseillé"]] || 0,
             };
@@ -186,23 +175,19 @@ export default function DraftImportPage() {
             short_label: "",
             long_label: "",
             type: "Marchandise",
-            tag_ids: [
-              data.Famille,
-              data["Sous Famille"],
-              data["Sous Sous Famille"],
-            ],
+            tag_ids: [data.Famille],
             suppliers: [
               {
-                supplier_id: data.Fournisseur,
-                supplier_ref: data["Réf fournisseur"],
+                supplier_id: "",
+                supplier_ref: "",
                 pcb: "",
                 custom_cat: "",
                 made_in: "",
-                company_name: data.Fournisseur,
+                company_name: "",
               },
             ],
             dimension_types: "Couleur/Taille",
-            brand_ids: [data.Marque],
+            brand_ids: [],
             collection_ids: [data.Collection],
             peau: 0,
             tbeu_pb: 0,
@@ -267,7 +252,10 @@ export default function DraftImportPage() {
                     <ChevronLeft />
                   </div>
                   <h3 className="text-[32px] font-[800] text-gray-800">
-                    Importer <span className="font-[200]">un ou plusieurs article(s)</span>
+                    Importer{" "}
+                    <span className="font-[200]">
+                      les informations fournisseur
+                    </span>
                   </h3>
                 </div>
                 {creatorId && (
