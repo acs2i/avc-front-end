@@ -6,6 +6,7 @@ import { CircularProgress } from "@mui/material";
 import Button from "../../components/FormElements/Button";
 import { ChevronLeft, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import useNotify from "../../utils/hooks/useToast";
 
 interface ImportData {
   Famille: string;
@@ -73,6 +74,7 @@ interface FormData {
 
 export default function SupplierImportPage() {
   const creatorId = useSelector((state: any) => state.auth.user);
+  const { notifySuccess, notifyError } = useNotify();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [fileData, setFileData] = useState<ImportData[]>([]);
@@ -226,8 +228,38 @@ export default function SupplierImportPage() {
     }
   };
 
-  //Fontion de création
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/draft/batch`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
+      if (response.ok) {
+        setTimeout(() => {
+          notifySuccess("Références créée !");
+          setIsLoading(false);
+          navigate("/draft");
+        }, 100);
+      } else {
+        notifyError("Erreur lors de la création !");
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+      setIsLoading(false);
+    }
+  };
+
+  //Fontion de création
   console.log(formData);
 
   const handleButtonClick = () => {

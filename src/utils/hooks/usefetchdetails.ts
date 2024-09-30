@@ -6,13 +6,12 @@ interface FetchDetailsParams {
 }
 
 interface Supplier {
-    supplier_id: string;
-    supplier_ref: string;
-    pcb: string;
-    custom_cat: string;
-    made_in: string;
-  }
-  
+  supplier_id: string;
+  supplier_ref: string;
+  pcb: string;
+  custom_cat: string;
+  made_in: string;
+}
 
 export const useFetchDetails = ({ token, draft }: FetchDetailsParams) => {
   const [tagDetails, setTagDetails] = useState<any[]>([]);
@@ -21,6 +20,11 @@ export const useFetchDetails = ({ token, draft }: FetchDetailsParams) => {
   const [supplierDetails, setSupplierDetails] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Fonction pour valider si un ID est un ObjectId MongoDB valide
+  const isValidObjectId = (id: string): boolean => {
+    return /^[a-fA-F0-9]{24}$/.test(id);
+  };
 
   const fetchDetail = async (url: string) => {
     try {
@@ -33,6 +37,10 @@ export const useFetchDetails = ({ token, draft }: FetchDetailsParams) => {
       });
 
       if (!response.ok) {
+        if (response.status === 500) {
+          console.error(`Erreur serveur: ${response.statusText}`);
+          return null;
+        }
         throw new Error(`Erreur HTTP: ${response.status}`);
       }
 
@@ -49,23 +57,37 @@ export const useFetchDetails = ({ token, draft }: FetchDetailsParams) => {
     setLoading(true);
 
     try {
-      const tagDetailsPromise = draft.tag_ids.map((tagId: any) =>
-        fetchDetail(`${process.env.REACT_APP_URL_DEV}/api/v1/tag/${tagId}`)
-      );
-      const brandDetailsPromise = draft.brand_ids.map((brandId: any) =>
-        fetchDetail(`${process.env.REACT_APP_URL_DEV}/api/v1/brand/${brandId}`)
-      );
-      const collectionDetailsPromise = draft.collection_ids.map(
-        (collectionId: any) =>
+      const tagDetailsPromise = draft.tag_ids
+        .filter((tagId: string) => isValidObjectId(tagId)) // Filtrer avec isValidObjectId
+        .map((tagId: string) =>
           fetchDetail(
-            `${process.env.REACT_APP_URL_DEV}/api/v1/collection/${collectionId}`
+            `${process.env.REACT_APP_URL_DEV}/api/v1/tag/${encodeURIComponent(tagId)}`
           )
-      );
-      const supplierDetailsPromise = draft.suppliers.map((supplier: Supplier) =>
-        fetchDetail(
-          `${process.env.REACT_APP_URL_DEV}/api/v1/supplier/${supplier.supplier_id}`
-        )
-      );
+        );
+
+      const brandDetailsPromise = draft.brand_ids
+        .filter((brandId: string) => isValidObjectId(brandId)) // Filtrer avec isValidObjectId
+        .map((brandId: string) =>
+          fetchDetail(
+            `${process.env.REACT_APP_URL_DEV}/api/v1/brand/${encodeURIComponent(brandId)}`
+          )
+        );
+
+      const collectionDetailsPromise = draft.collection_ids
+        .filter((collectionId: string) => isValidObjectId(collectionId)) // Filtrer avec isValidObjectId
+        .map((collectionId: string) =>
+          fetchDetail(
+            `${process.env.REACT_APP_URL_DEV}/api/v1/collection/${encodeURIComponent(collectionId)}`
+          )
+        );
+
+      const supplierDetailsPromise = draft.suppliers
+        .filter((supplier: Supplier) => isValidObjectId(supplier.supplier_id)) // Filtrer avec isValidObjectId
+        .map((supplier: Supplier) =>
+          fetchDetail(
+            `${process.env.REACT_APP_URL_DEV}/api/v1/supplier/${encodeURIComponent(supplier.supplier_id)}`
+          )
+        );
 
       const [
         tagDetailsResult,

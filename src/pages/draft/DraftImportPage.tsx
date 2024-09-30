@@ -6,13 +6,14 @@ import { CircularProgress } from "@mui/material";
 import Button from "../../components/FormElements/Button";
 import { ChevronLeft, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import useNotify from "../../utils/hooks/useToast";
 
 interface ImportData {
   Famille: string;
   "Sous Famille": string;
   "Sous Sous Famille": string;
   "Type Produit": string;
-  Modèle: string;
+  "Libellé": string;
   Référence: string;
   Fournisseur: string;
   Marque: string;
@@ -77,8 +78,10 @@ interface FormData {
 
 export default function DraftImportPage() {
   const creatorId = useSelector((state: any) => state.auth.user);
+  const { notifySuccess, notifyError } = useNotify();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [itemsIds, setItemIds] = useState([])
   const [fileData, setFileData] = useState<ImportData[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
   const [fileName, setFileName] = useState<string>("");
@@ -88,11 +91,23 @@ export default function DraftImportPage() {
     "Sous Sous Famille",
     "Référence",
     "Fournisseur",
+    "Libellé",
     "Marque",
     "Réf fournisseur",
     "Collection",
   ];
   const [formData, setFormData] = useState<FormData[]>([]);
+
+  const cleanFormData = (data: FormData[]): FormData[] => {
+    return data.map((draft) => ({
+      ...draft,
+      reference: draft.reference || "N/A",
+      tag_ids: draft.tag_ids.filter((id) => id),
+      suppliers: draft.suppliers.filter((supplier) => supplier.supplier_id),
+      brand_ids: draft.brand_ids.filter((brand) => brand),
+      collection_ids: draft.collection_ids.filter((collection) => collection),
+    }));
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -105,7 +120,7 @@ export default function DraftImportPage() {
         reader.onload = (e) => {
           const data = new Uint8Array(e.target?.result as ArrayBuffer);
           const workbook = XLSX.read(data, { type: "array" });
-          const sheetName = workbook.SheetNames[0]; // Sélectionne la première feuille
+          const sheetName = workbook.SheetNames[0]
           const worksheet = workbook.Sheets[sheetName];
 
           // Transformation des données en JSON
@@ -164,7 +179,7 @@ export default function DraftImportPage() {
               "Sous Famille": row[columnMap["Sous Famille"]] || "",
               "Sous Sous Famille": row[columnMap["Sous Sous Famille"]] || "",
               "Type Produit": row[columnMap["Type Produit"]] || "",
-              Modèle: row[columnMap["Modèle"]] || "",
+              "Libellé": row[columnMap["Modèle"]] || "",
               Référence: row[columnMap["Référence"]] || "",
               Fournisseur: row[columnMap["Code Fournisseur"]] || "",
               Marque: row[columnMap["Code Marque"]] || "",
@@ -178,13 +193,14 @@ export default function DraftImportPage() {
 
             return formattedRow;
           });
+         
 
           const updatedFormData = formattedData.map((data) => ({
             creator_id: creatorId._id,
             reference: data.Référence,
             name: "",
             short_label: "",
-            long_label: "",
+            long_label: data["Libellé"],
             type: "Marchandise",
             tag_ids: [
               data.Famille,
@@ -241,7 +257,40 @@ export default function DraftImportPage() {
     }
   };
 
+  
+
   //Fontion de création
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    const cleanedData = cleanFormData(formData); // Nettoyage des données avant envoi
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/draft/batch`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ drafts: cleanedData, creator_id: creatorId._id }),
+        }
+      );
+
+      if (response.ok) {
+        notifySuccess("Références créées !");
+        navigate("/draft");
+      } else {
+        notifyError("Erreur lors de la création !");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+      notifyError("Une erreur est survenue !");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   console.log(formData);
 
@@ -256,7 +305,7 @@ export default function DraftImportPage() {
     <>
       <section className="w-full bg-slate-50 p-7 min-h-screen">
         <div className="max-w-[2024px] mx-auto">
-          <form className="">
+          <form className="" onSubmit={handleSubmit}>
             <div className="flex justify-between">
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">

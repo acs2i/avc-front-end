@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { DRAFT_CATEGORY, LINKCARD_DRAFT} from "../../utils/index";
+import { DRAFT_CATEGORY, LINKCARD_DRAFT } from "../../utils/index";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
@@ -90,7 +90,9 @@ export default function DraftPage() {
   const filteredDrafts = drafts.filter((draft) => draft.status === "A");
   const filteredInProgress = drafts.filter((draft) => draft.status === "I");
   const filteredDone = drafts.filter((draft) => draft.status === "D");
-
+  const isValidObjectId = (id: string): boolean => {
+    return /^[a-fA-F0-9]{24}$/.test(id);
+  };
   const formatDate = (timestamp: any) => {
     return format(new Date(timestamp), "dd/MM/yyyy HH:mm:ss");
   };
@@ -156,6 +158,10 @@ export default function DraftPage() {
   };
 
   const fetchBrandDetails = async (brandId: string) => {
+    if (!isValidObjectId(brandId)) {
+      return null;
+    }
+
     try {
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/brand/${brandId}`,
@@ -184,6 +190,9 @@ export default function DraftPage() {
   };
 
   const fetchSupplierDetails = async (supplierId: string) => {
+    if (!isValidObjectId(supplierId)) {
+      return null;
+    }
     try {
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/supplier/${supplierId}`,
@@ -212,6 +221,10 @@ export default function DraftPage() {
   };
 
   const fetchTagDetails = async (tagId: string) => {
+    if (!isValidObjectId(tagId)) {
+      return null;
+    }
+
     try {
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/tag/${tagId}`,
@@ -252,13 +265,26 @@ export default function DraftPage() {
 
           return {
             ...draft,
-            brandName: brandDetails ? brandDetails.label : "Marque inconnue",
-            familyName: familyDetails ? familyDetails.name : "Famille inconnue",
-            subFamilyName: familyDetails
+            brandName:
+              brandDetails && brandDetails.label
+                ? brandDetails.label
+                : draft.collection_ids.length > 0
+                ? draft.collection_ids[0]
+                : "Marque inconnue",
+            familyName: familyDetails
               ? familyDetails.name
+              : draft.tag_ids.length > 0
+              ? draft.tag_ids[0]
               : "Famille inconnue",
+            subFamilyName: subFamilyDetails
+              ? subFamilyDetails.name
+              : draft.tag_ids.length > 1
+              ? draft.tag_ids[1]
+              : "Sous famille inconnue",
             supplierName: supplierDetails
               ? supplierDetails.company_name
+              : draft.suppliers.length > 0
+              ? draft.suppliers[0].supplier_id
               : "Fournisseur inconnu",
           };
         })
@@ -325,17 +351,28 @@ export default function DraftPage() {
           <div className="mt-7">
             {currentStep === 1 && (
               <h3 className="text-[32px] font-[800] text-gray-800 capitalize">
-                à<span className="font-[200]"> traiter ({filteredDrafts.length})</span>
+                à
+                <span className="font-[200]">
+                  {" "}
+                  traiter ({filteredDrafts.length})
+                </span>
               </h3>
             )}
             {currentStep === 2 && (
               <h3 className="text-[32px] font-[800] text-gray-800">
-                En<span className="font-[200]"> cours de validation ({filteredInProgress.length})</span>
+                En
+                <span className="font-[200]">
+                  {" "}
+                  cours de validation ({filteredInProgress.length})
+                </span>
               </h3>
             )}
             {currentStep === 3 && (
               <h3 className="text-[32px] font-[800] text-gray-800">
-                V<span className="font-[200]">alidées ({filteredDone.length})</span>
+                V
+                <span className="font-[200]">
+                  alidées ({filteredDone.length})
+                </span>
               </h3>
             )}
             <div className="flex items-center gap-7 mt-[20px]">
@@ -467,7 +504,9 @@ export default function DraftPage() {
                     <td className="px-6 py-2 text-blue-500">
                       {product.reference}
                     </td>
-                    <td className="px-6 py-2">{truncateText(product.long_label, 20)}</td>
+                    <td className="px-6 py-2">
+                      {truncateText(product.long_label, 20)}
+                    </td>
                     <td className="px-6 py-2">{product.brandName}</td>
                     <td className="px-6 py-2">{product.supplierName}</td>
                     <td className="px-6 py-2">{product.familyName}</td>

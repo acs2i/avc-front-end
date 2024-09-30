@@ -289,10 +289,11 @@ export default function DraftUpdatePage() {
 
   const handleGridChange = (grid: string[][]) => {
     const updatedUVCs: Uvc[] = [];
-
+  
     grid.forEach((row, colorIndex) => {
       row.forEach((dimension, sizeIndex) => {
-        if (dimension) {
+        // Vérification que dimension existe et est une chaîne avant d'appeler split()
+        if (dimension && typeof dimension === "string" && dimension.includes(",")) {
           const [color, size] = dimension.split(",");
           updatedUVCs.push({
             code: `${color}/${size}`,
@@ -313,15 +314,19 @@ export default function DraftUpdatePage() {
             eans: [],
             status: "",
           });
+        } else {
+          // Si dimension n'est pas correcte ou ne peut pas être splittée, tu peux ajouter un traitement ici
+          console.warn(`La dimension est incorrecte ou vide : ${dimension}`);
         }
       });
     });
-
+  
     setFormData((prevFormData) => ({
       ...prevFormData,
       uvc: updatedUVCs,
     }));
   };
+  
 
   const fetchField = async () => {
     try {
@@ -386,41 +391,55 @@ export default function DraftUpdatePage() {
   }, []);
 
   useEffect(() => {
-    if (draft && draft.uvc) {
+    if (draft && Array.isArray(draft.uvc) && draft.uvc.length > 0) {
       // Extraire les tailles et les couleurs
-      const extractedColors = draft?.uvc
+      const extractedColors = draft.uvc
         ? [
             ...new Set(
-              draft.uvc.map((uvc) => uvc.dimensions?.[0]?.split("/")[0])
+              draft.uvc
+                .map((uvc) => uvc?.dimensions?.[0]?.split("/")[0])
+                .filter(Boolean) // Filtrer les valeurs undefined ou null
             ),
           ]
         : [];
-
-      const extractedSizes = draft?.uvc
+  
+      const extractedSizes = draft.uvc
         ? [
             ...new Set(
-              draft.uvc.map((uvc) => uvc.dimensions?.[0]?.split("/")[1])
+              draft.uvc
+                .map((uvc) => uvc?.dimensions?.[0]?.split("/")[1])
+                .filter(Boolean) // Filtrer les valeurs undefined ou null
             ),
           ]
         : [];
-
+  
       // Construire la grille initiale
       const initialGrid = extractedColors.map((color) =>
         extractedSizes.map(
           (size) =>
             draft?.uvc?.some((uvc) => {
-              const [uvcColor, uvcSize] = uvc.dimensions[0].split("/");
-              return uvcColor === color && uvcSize === size;
-            }) || false // Si la valeur est undefined, elle sera remplacée par false
+              const dimension = uvc?.dimensions?.[0];
+              if (dimension) {
+                const [uvcColor, uvcSize] = dimension.split("/");
+                return uvcColor === color && uvcSize === size;
+              }
+              return false;
+            }) || false
         )
       );
-
+  
       // Mettre à jour les états
       setSizes(extractedSizes);
       setColors(extractedColors);
       setUvcGrid(initialGrid);
+    } else {
+      // Si il n'y a pas d'uvc, on met les états à des valeurs par défaut
+      setSizes([]);
+      setColors([]);
+      setUvcGrid([]);
     }
   }, [draft]);
+  
 
   // Handle CreatableSelect for Brand
   const handleChangeBrand = (selectedOption: SingleValue<BrandOption>) => {
