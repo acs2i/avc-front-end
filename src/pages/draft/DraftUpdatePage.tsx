@@ -193,7 +193,6 @@ export default function DraftUpdatePage() {
   useEffect(() => {
     fetchDraft();
   }, []);
-
   const {
     tagDetails,
     brandDetails,
@@ -201,6 +200,9 @@ export default function DraftUpdatePage() {
     supplierDetails,
     loading,
   } = useFetchDetails({ token, draft });
+  const isValidObjectId = (id: string): boolean => {
+    return /^[a-fA-F0-9]{24}$/.test(id);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -289,11 +291,15 @@ export default function DraftUpdatePage() {
 
   const handleGridChange = (grid: string[][]) => {
     const updatedUVCs: Uvc[] = [];
-  
+
     grid.forEach((row, colorIndex) => {
       row.forEach((dimension, sizeIndex) => {
         // Vérification que dimension existe et est une chaîne avant d'appeler split()
-        if (dimension && typeof dimension === "string" && dimension.includes(",")) {
+        if (
+          dimension &&
+          typeof dimension === "string" &&
+          dimension.includes(",")
+        ) {
           const [color, size] = dimension.split(",");
           updatedUVCs.push({
             code: `${color}/${size}`,
@@ -320,13 +326,12 @@ export default function DraftUpdatePage() {
         }
       });
     });
-  
+
     setFormData((prevFormData) => ({
       ...prevFormData,
       uvc: updatedUVCs,
     }));
   };
-  
 
   const fetchField = async () => {
     try {
@@ -402,7 +407,7 @@ export default function DraftUpdatePage() {
             ),
           ]
         : [];
-  
+
       const extractedSizes = draft.uvc
         ? [
             ...new Set(
@@ -412,7 +417,7 @@ export default function DraftUpdatePage() {
             ),
           ]
         : [];
-  
+
       // Construire la grille initiale
       const initialGrid = extractedColors.map((color) =>
         extractedSizes.map(
@@ -427,7 +432,7 @@ export default function DraftUpdatePage() {
             }) || false
         )
       );
-  
+
       // Mettre à jour les états
       setSizes(extractedSizes);
       setColors(extractedColors);
@@ -439,7 +444,6 @@ export default function DraftUpdatePage() {
       setUvcGrid([]);
     }
   }, [draft]);
-  
 
   // Handle CreatableSelect for Brand
   const handleChangeBrand = (selectedOption: SingleValue<BrandOption>) => {
@@ -778,7 +782,6 @@ export default function DraftUpdatePage() {
     }
   };
 
-  // Fonction de mise a jour du brouillon
   const handleUpdateDraft = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -1228,10 +1231,23 @@ export default function DraftUpdatePage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-3 text-gray-600 text-[14px]">
-                                {brandDetails && brandDetails.length > 0 ? (
-                                  brandDetails.map((brand, index) => (
-                                    <p key={index}>{brand.label}</p>
-                                  ))
+                                {draft.brand_ids.length > 0 ? (
+                                  draft.brand_ids.map(
+                                    (brandId: string, index: number) => {
+                                      if (isValidObjectId(brandId)) {
+                                        return brandDetails &&
+                                          brandDetails.length > 0 ? (
+                                          brandDetails.map((brand, index) => (
+                                            <p key={index}>{brand.label}</p>
+                                          ))
+                                        ) : (
+                                          <CircleSlash2 size={15} />
+                                        );
+                                      } else {
+                                        return <p key={index}>{brandId}</p>;
+                                      }
+                                    }
+                                  )
                                 ) : (
                                   <CircleSlash2 size={15} />
                                 )}
@@ -1255,8 +1271,16 @@ export default function DraftUpdatePage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
-                                {tagDetails && tagDetails.length > 0 ? (
-                                  `${tagDetails[0].code} - ${tagDetails[0].name}`
+                                {draft.tag_ids && draft.tag_ids[0] ? (
+                                  isValidObjectId(draft.tag_ids[0]) ? (
+                                    tagDetails && tagDetails[0] ? (
+                                      <p>{`${tagDetails[0].code} - ${tagDetails[0].name}`}</p>
+                                    ) : (
+                                      <CircleSlash2 size={15} />
+                                    )
+                                  ) : (
+                                    <p>{draft.tag_ids[0]}</p>
+                                  )
                                 ) : (
                                   <CircleSlash2 size={15} />
                                 )}
@@ -1280,8 +1304,16 @@ export default function DraftUpdatePage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
-                                {tagDetails && tagDetails.length > 0 ? (
-                                  `${tagDetails[1].code} - ${tagDetails[1].name}`
+                                {draft.tag_ids && draft.tag_ids[1] ? (
+                                  isValidObjectId(draft.tag_ids[1]) ? (
+                                    tagDetails && tagDetails[1] ? (
+                                      <p>{`${tagDetails[1].code} - ${tagDetails[1].name}`}</p>
+                                    ) : (
+                                      <CircleSlash2 size={15} />
+                                    )
+                                  ) : (
+                                    <p>{draft.tag_ids[1]}</p>
+                                  )
                                 ) : (
                                   <CircleSlash2 size={15} />
                                 )}
@@ -1305,8 +1337,16 @@ export default function DraftUpdatePage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
-                                {tagDetails && tagDetails.length > 0 ? (
-                                  `${tagDetails[2].code} - ${tagDetails[2].name}`
+                                {draft.tag_ids && draft.tag_ids[2] ? (
+                                  isValidObjectId(draft.tag_ids[2]) ? (
+                                    tagDetails && tagDetails[2] ? (
+                                      <p>{`${tagDetails[2].code} - ${tagDetails[2].name}`}</p>
+                                    ) : (
+                                      <CircleSlash2 size={15} />
+                                    )
+                                  ) : (
+                                    <p>{draft.tag_ids[2]}</p>
+                                  )
                                 ) : (
                                   <CircleSlash2 size={15} />
                                 )}

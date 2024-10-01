@@ -81,7 +81,7 @@ export default function DraftImportPage() {
   const { notifySuccess, notifyError } = useNotify();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [itemsIds, setItemIds] = useState([])
+
   const [fileData, setFileData] = useState<ImportData[]>([]);
   const [isExpanded, setIsExpanded] = useState(false);
   const [fileName, setFileName] = useState<string>("");
@@ -193,7 +193,9 @@ export default function DraftImportPage() {
 
             return formattedRow;
           });
-         
+
+
+               
 
           const updatedFormData = formattedData.map((data) => ({
             creator_id: creatorId._id,
@@ -316,7 +318,7 @@ export default function DraftImportPage() {
                     <ChevronLeft />
                   </div>
                   <h3 className="text-[32px] font-[800] text-gray-800">
-                    Importer <span className="font-[200]">un ou plusieurs article(s)</span>
+                    Importer <span className="font-[200]">des articles</span>
                   </h3>
                 </div>
                 {creatorId && (
