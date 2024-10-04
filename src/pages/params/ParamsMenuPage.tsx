@@ -19,6 +19,12 @@ import GridCreatePage from "./GridCreatePage";
 import UserFieldCreatePage from "./UserFieldCreatePage";
 import UserFieldPage from "./UserFieldPage";
 import UserFieldUpdatePage from "./UserFieldUpdatePage";
+import TaxPage from "./TaxPage";
+import TaxCreatePage from "./TaxCreatePage";
+import TaxUpdatePage from "./TaxUpdatePage";
+import BlockPage from "./BlockPage";
+import BlockCreatePage from "./BlockCreatePage";
+import BlockUpdatePage from "./BlockUpdatePage";
 
 interface Tag {
   _id: string;
@@ -75,12 +81,28 @@ interface Field {
   additional_fields: CustomField[];
 }
 
-
 interface Grid {
   _id: string;
   label: string;
   type: string;
   dimensions: string[];
+}
+
+interface Tax {
+  _id: string;
+  code: string;
+  label: string;
+  rate: string;
+  status: string;
+  creator_id: any;
+}
+
+interface Block {
+  _id: string;
+  code: number;
+  label: string;
+  status: string;
+  creator_id: any;
 }
 
 function ParamsMenuPage() {
@@ -91,6 +113,8 @@ function ParamsMenuPage() {
   const [selectedGrid, setSelectedGrid] = useState<Grid | null>(null);
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [selectedField, setSelectedField] = useState<Field | null>(null);
+  const [selectedTax, setSelectedTax] = useState<Tax | null>(null);
+  const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
   const [selectedCollection, setSelectedCollection] =
     useState<Collection | null>(null);
   const [selectedDimension, setSelectedDimension] = useState<Dimension | null>(
@@ -121,6 +145,15 @@ function ParamsMenuPage() {
 
   const handleCloseField = () => {
     setSelectedField(null);
+  };
+
+  const handleCloseTax = () => {
+    setSelectedTax(null);
+  };
+
+  
+  const handleCloseBlock = () => {
+    setSelectedBlock(null);
   };
 
   const handleOpenCreatePanel = () => {
@@ -168,6 +201,8 @@ function ParamsMenuPage() {
             {page === "collection" && "une collection"}
             {page === "brand" && "une marque"}
             {page === "field" && "un champs utilisateur"}
+            {page === "tax" && "une taxe"}
+            {page === "block" && "un blocage"}
           </button>
         </div>
         <div className="relative w-full">
@@ -278,6 +313,22 @@ function ParamsMenuPage() {
                 resetHighlightedUserFieldId={resetHighlightedId}
               />
             )}
+            {page === "tax" && (
+              <TaxPage
+                onSelectTax={setSelectedTax}
+                shouldRefetch={shouldRefetch}
+                highlightedUserFieldId={highlightedId}
+                resetHighlightedUserFieldId={resetHighlightedId}
+              />
+            )}
+            {page === "block" && (
+              <BlockPage
+                onSelectBlock={setSelectedBlock}
+                shouldRefetch={shouldRefetch}
+                highlightedUserFieldId={highlightedId}
+                resetHighlightedUserFieldId={resetHighlightedId}
+              />
+            )}
           </div>
 
           {/* Partie mise à jour composant */}
@@ -317,11 +368,29 @@ function ParamsMenuPage() {
               />
             </div>
           )}
-           {selectedField && (
+          {selectedField && (
             <div className="w-full bg-white rounded-lg border shadow-md">
               <UserFieldUpdatePage
                 selectedField={selectedField}
                 onClose={handleCloseField}
+                onUpdate={handleRefetch}
+              />
+            </div>
+          )}
+          {selectedTax && (
+            <div className="w-full bg-white rounded-lg border shadow-md">
+              <TaxUpdatePage
+                selectedTax={selectedTax}
+                onClose={handleCloseTax}
+                onUpdate={handleRefetch}
+              />
+            </div>
+          )}
+          {selectedBlock && (
+            <div className="w-full bg-white rounded-lg border shadow-md">
+              <BlockUpdatePage
+                selectedBlock={selectedBlock}
+                onClose={handleCloseBlock}
                 onUpdate={handleRefetch}
               />
             </div>
@@ -362,6 +431,18 @@ function ParamsMenuPage() {
               )}
               {page === "field" && (
                 <UserFieldCreatePage
+                  onClose={handleCloseCreatePanel}
+                  onCreate={handleCreate}
+                />
+              )}
+              {page === "tax" && (
+                <TaxCreatePage
+                  onClose={handleCloseCreatePanel}
+                  onCreate={handleCreate}
+                />
+              )}
+              {page === "block" && (
+                <BlockCreatePage
                   onClose={handleCloseCreatePanel}
                   onCreate={handleCreate}
                 />

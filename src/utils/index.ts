@@ -28,6 +28,7 @@ import {
   HandCoins,
   Euro,
   RectangleEllipsis,
+  ShieldBan,
 } from "lucide-react";
 
 export const LINKS: Link[] = [
@@ -140,29 +141,23 @@ export const LINKS_Params: Params[] = [
     icon: Captions,
     page: "brand",
   },
-  // {
-  //   name: "Tarifs",
-  //   link: "/parameters/brand",
-  //   icon: Tag,
-  //   page: "tarif",
-  // },
-  // {
-  //   name: "Regime de taxe",
-  //   link: "/parameters/brand",
-  //   icon: HandCoins,
-  //   page: "tax_1",
-  // },
-  // {
-  //   name: "Taxes",
-  //   link: "/parameters/brand",
-  //   icon: HandCoins,
-  //   page: "tax_2",
-  // },
   {
     name: "Champs utilisateur",
     link: "/parameters/brand",
     icon: RectangleEllipsis,
     page: "field",
+  },
+  {
+    name: "Taxes",
+    link: "/parameters/brand",
+    icon: HandCoins,
+    page: "tax",
+  },
+  {
+    name: "Blocages",
+    link: "/parameters/brand",
+    icon: ShieldBan,
+    page: "block",
   },
 ];
 
