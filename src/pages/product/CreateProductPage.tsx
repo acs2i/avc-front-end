@@ -74,6 +74,7 @@ interface FormData {
   dimension_types: string;
   brand_ids: any[];
   collection_ids: any[];
+  tax: string;
   peau: number;
   tbeu_pb: number;
   tbeu_pmeu: number;
@@ -165,6 +166,8 @@ export default function CreateProductPage() {
   const creatorId = useSelector((state: any) => state.auth.user);
   const token = useSelector((state: any) => state.auth.token);
   const { notifySuccess, notifyError } = useNotify();
+  const [taxs, setTaxs] = useState([]);
+  const [selectedTax, setSelectedTax] = useState("");
   const location = useLocation();
   const [supplierModalIsOpen, setsupplierModalIsOpen] = useState(false);
   const [userFields, setUserFields] = useState<UserField[]>([]);
@@ -214,18 +217,19 @@ export default function CreateProductPage() {
     dimension_types: "Couleur/Taille",
     brand_ids: [],
     collection_ids: [],
+    tax: "",
     peau: 0,
     tbeu_pb: 0,
     tbeu_pmeu: 0,
-    height: "",
-    width: "",
-    long: "",
+    height: "0",
+    width: "0",
+    long: "0",
     comment: "",
     size_unit: "",
     weigth_unit: "",
-    weight: "",
-    weight_brut: "",
-    weight_net: "",
+    weight: "0",
+    weight_brut: "0",
+    weight_net: "0",
     imgPath: "",
     status: "A",
     uvc: [
@@ -267,6 +271,7 @@ export default function CreateProductPage() {
     addBrandField,
     removeBrandField,
   } = useBrands("", 10);
+
   // Fonction qui fetch les collections pour l'input creatable select (collection)
   const {
     inputValueCollection,
@@ -609,12 +614,50 @@ export default function CreateProductPage() {
     }
   };
 
+  const fetchTax = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tax`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await response.json();
+      const formattedTaxs = data.data.map((tax: any) => ({
+        value: tax.rate.toString(),
+        name: tax.label,
+      }));
+
+      setTaxs(formattedTaxs);
+
+      // Rechercher la TVA à 20% et la définir comme valeur par défaut
+      const tva20 = formattedTaxs.find((tax: any) => tax.value === "20");
+      if (tva20) {
+        setSelectedTax(tva20.value);
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          tax: tva20.value,
+        }));
+      }
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const toggleFullScreen = () => {
     setIsFullScreen((prevState) => !prevState);
   };
 
   // Fonction qui récupère les données de tout les autres champs
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setFormData({
       ...formData,
       [e.target.id]: e.target.value,
@@ -623,6 +666,11 @@ export default function CreateProductPage() {
           ? e.target.value.substring(0, 15)
           : formData.short_label,
     });
+
+    // Si c'est le champ 'tax', on met à jour `selectedTax`
+    if (e.target.id === "tax") {
+      setSelectedTax(e.target.value);
+    }
   };
 
   // Use Effect pour ajouter l'id des creatable select au formdata
@@ -686,6 +734,10 @@ export default function CreateProductPage() {
     fetchUnits();
   }, []);
 
+  useEffect(() => {
+    fetchTax();
+  }, []);
+
   console.log(formData);
   return (
     <>
@@ -716,7 +768,10 @@ export default function CreateProductPage() {
             <div className="flex justify-between">
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
-                  <div onClick={() => navigate("/product")} className="cursor-pointer">
+                  <div
+                    onClick={() => navigate("/product")}
+                    className="cursor-pointer"
+                  >
                     <ChevronLeft />
                   </div>
                   <h3 className="text-[32px] font-[800] text-gray-800">
@@ -733,7 +788,12 @@ export default function CreateProductPage() {
               {!isLoading ? (
                 <div className="flex items-center justify-between gap-3 mt-[50px]">
                   <div className="flex gap-3">
-                    <Button size="small" cancel type="button"  onClick={() => navigate("/product")}>
+                    <Button
+                      size="small"
+                      cancel
+                      type="button"
+                      onClick={() => navigate("/product")}
+                    >
                       Annuler
                     </Button>
                     <Button size="small" blue type="submit">
@@ -991,6 +1051,9 @@ export default function CreateProductPage() {
                       label="Taxes :"
                       validators={[]}
                       placeholder=""
+                      onChange={handleChange}
+                      options={taxs}
+                      value={selectedTax}
                       create
                       gray
                     />
@@ -1192,9 +1255,9 @@ export default function CreateProductPage() {
             {/* Partie onglets */}
             <div className="mt-[30px] flex mb-[50px]">
               <div className="w-[30%] border-t-[1px] border-gray-300">
-                {LINKS_Product.map((link) => (
+                {LINKS_Product.map((link, index) => (
                   <div
-                    key={link.page}
+                    key={index}
                     className={`relative border-r-[1px] border-b-[1px] border-gray-300 py-4 flex items-center gap-3 cursor-pointer ${
                       page === link.page ? "text-blue-500" : "text-gray-500"
                     } hover:text-blue-500`}
@@ -1260,9 +1323,9 @@ export default function CreateProductPage() {
                 >
                   <div className="flex items-center justify-between">
                     <ul className="flex items-center py-3 gap-3">
-                      {LINKS_UVC.map((link) => (
+                      {LINKS_UVC.map((link, index) => (
                         <li
-                          key={link.page}
+                          key={index}
                           className={`text-[13px] font-[700] cursor-pointer ${
                             onglet === link.page
                               ? "text-blue-500"
@@ -1285,27 +1348,25 @@ export default function CreateProductPage() {
                       )}
                     </div>
                   </div>
-                  {formData.uvc.map((uvc, index) => (
-                    <div key={index}>
-                      {/* {onglet === "infos" && (
-                        <UVCInfosTable
-                          uvcDimension={formData.uvc.map((uvc) => ({
-                            code: uvc.code,
-                            dimensions: uvc.dimensions,
-                          }))}
-                          brandLabel={selectedOptionBrand?.label || ""}
-                        />
-                      )} */}
-                      {/* {onglet === "price" && (
-                          <UVCPriceTable
-                            uvcPrices={uvc.prices}
-                            productReference={formData.reference || ""}
-                            handleChangePrice={(priceIndex, field, value) =>
-                              handleChangePriceUVC(index, priceIndex, field, value)
-                            }
-                          />
-                        )} */}
-                      {/* {onglet === "supplier" && (
+
+                  {onglet === "infos" && (
+                    <UVCInfosTable
+                      uvcDimension={formData.uvc}
+                      brandLabel={formData.brand_ids[0]?.label || ""}
+                    />
+                  )}
+                  {onglet === "price" && (
+                    <UVCPriceTable
+                      uvcPrices={formData.uvc}
+                      brandLabel={formData.brand_ids[0]?.label || ""}
+                      globalPrices={{
+                        peau: formData.peau,
+                        tbeu_pb: formData.tbeu_pb,
+                        tbeu_pmeu: formData.tbeu_pmeu,
+                      }}
+                    />
+                  )}
+                  {/* {onglet === "supplier" && (
                           <UVCSupplierTable
                             uvcDimensions={uvc.dimensions || []}
                             productReference={formData.reference || ""}
@@ -1314,8 +1375,6 @@ export default function CreateProductPage() {
                             }
                           />
                         )} */}
-                    </div>
-                  ))}
                 </div>
               )}
             </div>

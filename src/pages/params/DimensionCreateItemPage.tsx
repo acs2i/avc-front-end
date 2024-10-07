@@ -77,7 +77,7 @@ export default function DimensionCreateItemPage({
     }
   };
 
-  console.log(formData)
+
   return (
     <section className="w-full p-4">
       <form className="mb-[50px]" onSubmit={handleSubmit}>

@@ -16,7 +16,7 @@ interface CustomField {
 }
 
 interface FormData {
-  code: number;  // Updated to number
+  code: number | null;
   label: string;
   apply_to: string;
   additional_fields: CustomField[];
@@ -38,7 +38,7 @@ export default function UserFieldCreatePage({
   const user = useSelector((state: any) => state.auth.user);
   const { notifySuccess, notifyError } = useNotify();
   const [formData, setFormData] = useState<FormData>({
-    code: 1,
+    code: null,
     label: "",
     apply_to: "",
     additional_fields: [
@@ -143,6 +143,10 @@ export default function UserFieldCreatePage({
       if (response.ok) {
         const data = await response.json();
         const newFieldId = data._id;
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          code: data.code,
+        }));
         setTimeout(() => {
           notifySuccess("Champ utilisateur créé avec succès !");
           setIsLoading(false);
@@ -171,12 +175,6 @@ export default function UserFieldCreatePage({
         </div>
         <div className="mt-[30px] flex flex-col justify-between">
           <div className="flex flex-col">
-            <div className="mt-2">
-              <label className="text-sm font-semibold text-gray-700">
-                Numéro
-              </label>
-              <p className="text-lg font-bold">{formData.code}</p> 
-            </div>
             <Input
               element="input"
               id="label"

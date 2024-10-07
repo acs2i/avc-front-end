@@ -129,7 +129,7 @@ export default function UserFieldPage({
             <tr>
               <th scope="col" className="px-6 py-4 w-1/3">
                 <div className="flex items-center">
-                  <span>Numéro</span>
+                  <span>Code</span>
                   <div className="cursor-pointer">
                     <ChevronsUpDown size={13} />
                   </div>

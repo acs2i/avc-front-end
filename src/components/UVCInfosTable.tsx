@@ -1,7 +1,7 @@
 import React from "react";
 
 interface UVCInfosTableProps {
-  uvcDimension: { code: string; dimensions: string[] }[];  // Mise à jour du type
+  uvcDimension: { code: string; dimensions: string[] }[];
   brandLabel: string;
 }
 

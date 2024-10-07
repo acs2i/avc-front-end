@@ -100,7 +100,7 @@ export default function BrandCreatePage({
               element="input"
               id="label"
               type="text"
-              placeholder="Nom de la collection"
+              placeholder="Nom de la marque"
               label="Libellé"
               onChange={handleChange}
               validators={[VALIDATOR_REQUIRE()]}

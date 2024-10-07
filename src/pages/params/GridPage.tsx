@@ -9,6 +9,7 @@ import Header from "../../components/Navigation/Header";
 interface Grid {
   _id: string;
   label: string;
+  code: string;
   type: string;
   dimensions: string[];
   status: string;
@@ -97,7 +98,7 @@ export default function GridPage({
       <table className="w-full text-left">
         <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700 uppercase">
           <tr>
-            <th scope="col" className="px-6 py-4 w-1/3">
+            <th scope="col" className="px-6 py-4 w-[50px]">
               <div className="flex items-center">
                 <span>type</span>
                 <div className="cursor-pointer">
@@ -105,7 +106,15 @@ export default function GridPage({
                 </div>
               </div>
             </th>
-            <th scope="col" className="px-6 py-4 w-1/3">
+            <th scope="col" className="px-6 py-4 w-[50px]">
+              <div className="flex items-center">
+                <span>code</span>
+                <div className="cursor-pointer">
+                  <ChevronsUpDown size={13} />
+                </div>
+              </div>
+            </th>
+            <th scope="col" className="px-6 py-4 w-[50px]">
               <div className="flex items-center">
                 <span>libellé</span>
                 <div className="cursor-pointer">
@@ -113,7 +122,7 @@ export default function GridPage({
                 </div>
               </div>
             </th>
-            <th scope="col" className="px-6 py-4 w-1/3">
+            <th scope="col" className="px-6 py-4w-[100px]">
               <div className="flex items-center">
                 <span>dimensions</span>
               </div>
@@ -138,6 +147,7 @@ export default function GridPage({
                   onClick={() => onSelectGrid(grid)}
                 >
                   <td className="px-6 py-2">{grid.type}</td>
+                  <td className="px-6 py-2">{grid.code}</td>
                   <td className="px-6 py-2">{grid.label}</td>
                   <td className="px-6 py-2">
                     <div className="grid grid-cols-10 gap-1">

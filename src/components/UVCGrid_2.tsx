@@ -3,7 +3,7 @@ import { Maximize2, Palette, Plus, Ruler } from "lucide-react";
 import Modal from "./Shared/Modal";
 
 interface UVCGrid2Props {
-  onDimensionsChange: (dimensions: { color: string, size: string }[]) => void;
+  onDimensionsChange: (dimensions: { color: string; size: string }[]) => void;
   initialSizes?: string[];
   initialColors?: string[];
   initialGrid?: boolean[][];
@@ -18,6 +18,7 @@ interface UVCGrid2Props {
 
 interface Grid {
   _id: string;
+  code: string;
   type: string;
   label: string;
   dimensions: string[];
@@ -34,7 +35,7 @@ const UVCGrid2: React.FC<UVCGrid2Props> = ({
   sizes,
   colors,
   uvcGrid,
-  isFullScreen
+  isFullScreen,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [grids, setGrids] = useState<Grid[]>([]);
@@ -46,11 +47,13 @@ const UVCGrid2: React.FC<UVCGrid2Props> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    if (initialSizes && initialColors && initialGrid) {
-      setSizes(initialSizes);
-      setColors(initialColors);
-      setUvcGrid(initialGrid);
-      updateDimensions(initialGrid, initialColors, initialSizes);
+    if (sizes.length === 0 && colors.length === 0 && uvcGrid.length === 0) {
+      if (initialSizes && initialColors && initialGrid) {
+        setSizes(initialSizes);
+        setColors(initialColors);
+        setUvcGrid(initialGrid);
+        updateDimensions(initialGrid, initialColors, initialSizes);
+      }
     }
   }, [initialSizes, initialColors, initialGrid]);
 
@@ -62,8 +65,12 @@ const UVCGrid2: React.FC<UVCGrid2Props> = ({
     updateDimensions(newGrid, colors, sizes);
   };
 
-  const updateDimensions = (grid: boolean[][], colors: string[], sizes: string[]) => {
-    const dimensions: { color: string, size: string }[] = [];
+  const updateDimensions = (
+    grid: boolean[][],
+    colors: string[],
+    sizes: string[]
+  ) => {
+    const dimensions: { color: string; size: string }[] = [];
     grid.forEach((row, i) => {
       row.forEach((col, j) => {
         if (col) {
@@ -71,7 +78,7 @@ const UVCGrid2: React.FC<UVCGrid2Props> = ({
         }
       });
     });
-    console.log('Updated dimensions:', dimensions); // Log dimensions
+    console.log("Updated dimensions:", dimensions); // Log dimensions
     onDimensionsChange(dimensions);
   };
 
@@ -202,88 +209,94 @@ const UVCGrid2: React.FC<UVCGrid2Props> = ({
         onClose={() => setIsModalOpen(false)}
         header="Grille de dimensions"
       >
-        {showSizeGridOptions && (
-          <div className="mb-4 p-2">
-            <h4 className="text-[18px] font-[700] text-gray-700">
-              Choisissez une grille de tailles :
-            </h4>
-            <div className="relative overflow-x-auto bg-white">
-              <table className="w-full text-left">
-                <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
-                  <tr>
-                    <th scope="col" className="px-6 py-2 w-1/2">
-                      Libellé
-                    </th>
-                    <th scope="col" className="px-6 py-2 w-1/2">
-                      Dimensions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {grids
-                    .filter((grid) => grid.type === "Taille")
-                    .map((grid) => (
-                      <tr
-                        key={grid._id}
-                        className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap"
-                        onClick={() => handleImportSizes(grid._id)}
-                      >
-                        <td className="px-6 py-4">{grid.label}</td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center flex-wrap gap-2">
-                            {grid.dimensions.map((dimension) => (
-                              <span className="bg-orange-200 w-[30px] h-[30px] rounded-full flex items-center justify-center text-gray-800">{removePrefix([dimension], "Taille")}</span>
-                            ))}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
+        <div className="max-h-[500px] overflow-y-auto">
+          {showSizeGridOptions && (
+            <div className="mb-4 p-2">
+              <h4 className="text-[18px] font-[700] text-gray-700">
+                Choisissez une grille de tailles :
+              </h4>
+              <div className="relative overflow-x-auto bg-white">
+                <table className="w-full text-left">
+                  <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
+                    <tr>
+                      <th scope="col" className="px-6 py-2 w-1/2">
+                        Code
+                      </th>
+                      <th scope="col" className="px-6 py-2 w-1/2">
+                        Dimensions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {grids
+                      .filter((grid) => grid.type === "taille")
+                      .map((grid) => (
+                        <tr
+                          key={grid._id}
+                          className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap"
+                          onClick={() => handleImportSizes(grid._id)}
+                        >
+                          <td className="px-6 py-4">{grid.code}</td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center flex-wrap gap-2">
+                              {grid.dimensions.map((dimension) => (
+                                <span className="bg-orange-200 w-[30px] h-[30px] rounded-full flex items-center justify-center text-gray-800">
+                                  {removePrefix([dimension], "Taille")}
+                                </span>
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        )}
-        {showColorGridOptions && (
-          <div className="mb-4 p-2">
-            <h4 className="text-[18px] font-[700] text-gray-700">
-              Choisissez une grille de couleurs :
-            </h4>
-            <div className="relative overflow-x-auto bg-white">
-              <table className="w-full text-left">
-                <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
-                  <tr>
-                    <th scope="col" className="px-6 py-2 w-1/2">
-                      Libellé
-                    </th>
-                    <th scope="col" className="px-6 py-2 w-1/2">
-                      Dimensions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {grids
-                    .filter((grid) => grid.type === "Couleur")
-                    .map((grid) => (
-                      <tr
-                        key={grid._id}
-                        className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap"
-                        onClick={() => handleImportColors(grid._id)}
-                      >
-                        <td className="px-6 py-4">{grid.label}</td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center flex-wrap gap-2">
-                            {grid.dimensions.map((dimension) => (
-                              <span className="bg-orange-200 w-[30px] h-[30px] rounded-full flex items-center justify-center text-gray-800">{removePrefix([dimension], "Couleur")}</span>
-                            ))}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
+          )}
+          {showColorGridOptions && (
+            <div className="mb-4 p-2">
+              <h4 className="text-[18px] font-[700] text-gray-700">
+                Choisissez une grille de couleurs :
+              </h4>
+              <div className="relative overflow-x-auto bg-white">
+                <table className="w-full text-left">
+                  <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
+                    <tr>
+                      <th scope="col" className="px-6 py-2 w-1/2">
+                        Code
+                      </th>
+                      <th scope="col" className="px-6 py-2 w-1/2">
+                        Dimensions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {grids
+                      .filter((grid) => grid.type === "couleur")
+                      .map((grid) => (
+                        <tr
+                          key={grid._id}
+                          className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap"
+                          onClick={() => handleImportColors(grid._id)}
+                        >
+                          <td className="px-6 py-4">{grid.code}</td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center flex-wrap gap-2">
+                              {grid.dimensions.map((dimension) => (
+                                <span className="bg-orange-200 w-[30px] h-[30px] rounded-full flex items-center justify-center text-gray-800">
+                                  {removePrefix([dimension], "Couleur")}
+                                </span>
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </Modal>
       <div className="flex items-center justify-between">
         <div className="flex gap-4 mb-3 mt-3">
@@ -304,17 +317,28 @@ const UVCGrid2: React.FC<UVCGrid2Props> = ({
             Associer une grille de couleurs
           </button>
           <div className="h-[30px] w-[2px] bg-gray-300"></div>
-          <button onClick={addNewSize} type="button" className="flex items-center gap-2 text-[12px] text-green-500">
+          <button
+            onClick={addNewSize}
+            type="button"
+            className="flex items-center gap-2 text-[12px] text-green-500"
+          >
             <Plus size={17} />
             Ajouter une taille
           </button>
-          <button onClick={addNewColor} type="button" className="flex items-center gap-2 text-[12px] text-green-500">
+          <button
+            onClick={addNewColor}
+            type="button"
+            className="flex items-center gap-2 text-[12px] text-green-500"
+          >
             <Plus size={17} />
             Ajouter une couleur
           </button>
         </div>
-        <div onClick={isFullScreen} className="cursor-pointer hover:text-gray-400">
-          <Maximize2 size={17}/>
+        <div
+          onClick={isFullScreen}
+          className="cursor-pointer hover:text-gray-400"
+        >
+          <Maximize2 size={17} />
         </div>
       </div>
       <div className="overflow-x-auto">

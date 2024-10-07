@@ -37,7 +37,7 @@ interface Product {
   _id: string;
   creator_id: any;
   reference: string;
-  name: string;
+  alias: string;
   short_label: string;
   long_label: string;
   type: string;
@@ -270,27 +270,27 @@ export default function Home() {
                     <td className="p-4">
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-blue-600 dark:text-yellow-300">
-                          {product.long_label}
+                          {product.short_label}
                         </span>
                       </div>
                     </td>
                     <td className="p-4 text-xs">
-                      {product.tag_ids ? (
+                      {product.tag_ids && product.tag_ids[0] ? (
                         <div className="dark:text-white">
-                          <span>{product.tag_ids[0].code}</span>
+                          <span>{product.tag_ids[0].code || "-"}</span>
                           <span className="mx-1">-</span>
-                          <span>{product.tag_ids[0].name}</span>
+                          <span>{product.tag_ids[0].name || "-"}</span>
                         </div>
                       ) : (
                         <span>-</span>
                       )}
                     </td>
                     <td className="p-4 text-xs">
-                      {product.tag_ids ? (
+                      {product.tag_ids && product.tag_ids[1] ? (
                         <div className="dark:text-white">
-                          <span>{product.tag_ids[1].code}</span>
+                          <span>{product.tag_ids[1].code || "-"}</span>
                           <span className="mx-1">-</span>
-                          <span>{product.tag_ids[1].name}</span>
+                          <span>{product.tag_ids[1].name || "-"}</span>
                         </div>
                       ) : (
                         <span>-</span>

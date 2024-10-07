@@ -17,6 +17,7 @@ interface Dimension {
 }
 
 interface FormData {
+  code: string;
   label: string;
   type: string;
   dimensions: string[];
@@ -44,10 +45,11 @@ export default function GridCreatePage({
   const limit = 20;
   const [dropdownIsOpen, setDropdownIsOpen] = useState(false);
   const [formData, setFormData] = useState<FormData>({
+    code: "",
     label: "",
     type: "",
     dimensions: [],
-    status: "A"
+    status: "A",
   });
 
   const levelOptions = [
@@ -111,6 +113,14 @@ export default function GridCreatePage({
     setFormData({
       ...formData,
       type: selectedOption.value,
+    });
+  };
+
+  const handleSetCode = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLabel(e.target.value);
+    setFormData({
+      ...formData,
+      code: e.target.value,
     });
   };
 
@@ -180,6 +190,19 @@ export default function GridCreatePage({
           </h1>
         </div>
         <div className="mt-[30px]">
+          <div>
+            <Input
+              element="input"
+              id="code"
+              label="Code de la grille"
+              placeholder="ex: 2365"
+              validators={[]}
+              onChange={handleSetCode}
+              create
+              required
+              gray
+            />
+          </div>
           <div>
             <Input
               element="input"
