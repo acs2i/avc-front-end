@@ -80,13 +80,12 @@ interface FormData {
   tbeu_pmeu: number;
   height: string;
   width: string;
-  long: string;
+  length: string;
   comment: string;
   size_unit: string;
   weigth_unit: string;
-  weight: string;
-  weight_brut: string;
-  weight_net: string;
+  gross_weight: string;
+  net_weight: string;
   imgPath: string;
   status: string;
   additional_fields: any[];
@@ -223,13 +222,12 @@ export default function CreateProductPage() {
     tbeu_pmeu: 0,
     height: "0",
     width: "0",
-    long: "0",
+    length: "0",
     comment: "",
     size_unit: "",
     weigth_unit: "",
-    weight: "0",
-    weight_brut: "0",
-    weight_net: "0",
+    gross_weight: "0",
+    net_weight: "0",
     imgPath: "",
     status: "A",
     uvc: [
@@ -1122,9 +1120,9 @@ export default function CreateProductPage() {
                       />
                       <Input
                         element="input"
-                        id="long"
+                        id="length"
                         label="Longueur :"
-                        value={formData.long}
+                        value={formData.length}
                         onChange={handleChange}
                         validators={[]}
                         placeholder=""
@@ -1158,9 +1156,9 @@ export default function CreateProductPage() {
                       />
                       <Input
                         element="input"
-                        id="weight"
-                        label="Poids :"
-                        value={formData.weight}
+                        id="gross_weight"
+                        label="Poids Brut :"
+                        value={formData.gross_weight}
                         onChange={handleChange}
                         validators={[]}
                         placeholder=""
@@ -1169,20 +1167,9 @@ export default function CreateProductPage() {
                       />
                       <Input
                         element="input"
-                        id="weight_brut"
-                        label="Brut :"
-                        value={formData.weight_brut}
-                        onChange={handleChange}
-                        validators={[]}
-                        placeholder=""
-                        create
-                        gray
-                      />
-                      <Input
-                        element="input"
-                        id="weight_net"
-                        label="Net :"
-                        value={formData.weight_net}
+                        id="net_weight"
+                        label="Poids Net :"
+                        value={formData.net_weight}
                         onChange={handleChange}
                         validators={[]}
                         placeholder=""

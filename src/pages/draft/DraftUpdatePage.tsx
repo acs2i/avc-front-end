@@ -72,13 +72,12 @@ interface FormData {
   tbeu_pmeu: number;
   height: string;
   width: string;
-  long: string;
+  length: string;
   comment: string;
   size_unit: string;
   weigth_unit: string;
-  weight: string;
-  weight_brut: string;
-  weight_net: string;
+  gross_weight: string;
+  net_weight: string;
   imgPath: string;
   status: string;
   additional_fields: any[];
@@ -127,13 +126,12 @@ export default function DraftUpdatePage() {
     tbeu_pmeu: draft?.tbeu_pmeu || 0,
     height: draft?.height || "",
     width: draft?.width || "",
-    long: draft?.long || "",
+    length: draft?.length || "",
     comment: draft?.comment || "",
     size_unit: draft?.size_unit || "",
     weigth_unit: draft?.weigth_unit || "",
-    weight: draft?.weight || "",
-    weight_brut: draft?.weight_brut || "",
-    weight_net: draft?.weight_net || "",
+    gross_weight: draft?.gross_weight || "",
+    net_weight: draft?.net_weight || "",
     imgPath: "",
     status: "A",
     additional_fields: [],
@@ -373,13 +371,12 @@ export default function DraftUpdatePage() {
         tbeu_pmeu: draft.tbeu_pmeu || 0,
         height: draft?.height || "",
         width: draft?.width || "",
-        long: draft?.long || "",
+        length: draft?.length || "",
         comment: draft?.comment || "",
         size_unit: draft?.size_unit || "",
         weigth_unit: draft?.weigth_unit || "",
-        weight: draft?.weight || "",
-        weight_brut: draft?.weight_brut || "",
-        weight_net: draft?.weight_net || "",
+        gross_weight: draft?.gross_weight || "",
+        net_weight: draft?.net_weight || "",
         imgPath: draft.imgPath || "",
         status: draft.status || "A",
         additional_fields: draft.additional_fields || {},
@@ -1615,15 +1612,15 @@ export default function DraftUpdatePage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {draft.long}
+                                {draft.length}
                                 {draft.size_unit}
                               </span>
                             ) : (
                               <input
                                 type="text"
-                                id="long"
+                                id="length"
                                 onChange={handleChange}
-                                value={formData.long}
+                                value={formData.length}
                                 className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
                               />
                             )}
@@ -1651,57 +1648,38 @@ export default function DraftUpdatePage() {
                         <div>
                           <div className="grid grid-cols-12 gap-2 py-2">
                             <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                              Poids
+                             Poids Brut
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {draft.weight}
+                                {draft.gross_weight}
                                 {draft.weigth_unit}
                               </span>
                             ) : (
                               <input
                                 type="text"
-                                id="weight"
+                                id="gross_weight"
                                 onChange={handleChange}
-                                value={formData.weight}
+                                value={formData.gross_weight}
                                 className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
                               />
                             )}
                           </div>
                           <div className="grid grid-cols-12 gap-2 py-2">
                             <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                              Brut
+                              Poids Net
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {draft.weight_brut}
+                                {draft.net_weight}
                                 {draft.weigth_unit}
                               </span>
                             ) : (
                               <input
                                 type="text"
-                                id="weight_brut"
+                                id="net_weight"
                                 onChange={handleChange}
-                                value={formData.weight_brut}
-                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
-                              />
-                            )}
-                          </div>
-                          <div className="grid grid-cols-12 gap-2 py-2">
-                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                              Net
-                            </span>
-                            {!isModify ? (
-                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {draft.weight_net}
-                                {draft.weigth_unit}
-                              </span>
-                            ) : (
-                              <input
-                                type="text"
-                                id="width"
-                                onChange={handleChange}
-                                value={formData.weight_net}
+                                value={formData.net_weight}
                                 className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
                               />
                             )}
@@ -1712,7 +1690,7 @@ export default function DraftUpdatePage() {
                   </div>
                 </div>
                 <div className="mt-3 w-full">
-                  {!isModify && draft.additional_fields.length > 0 && (
+                  {!isModify && (
                     <FormSection title="Champs additionnels">
                       <div>
                         {userFields
@@ -1789,7 +1767,7 @@ export default function DraftUpdatePage() {
                     </FormSection>
                   )}
                 </div>
-                <div className="mt-3">
+                <div className="mt-5">
                   <FormSection title="Commentaire">
                     <div>
                       {!isModify ? (

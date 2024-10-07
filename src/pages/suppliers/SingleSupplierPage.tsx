@@ -506,7 +506,7 @@ export default function SingleSupplierPage() {
 
   console.log(formData);
   return (
-    <section className="w-full bg-slate-50 p-7">
+    <section className="w-full bg-slate-50 p-7 min-h-screen">
       <div className="max-w-[2024px] mx-auto">
         <form className="mb-[400px]" onSubmit={handleSubmit}>
           <div className="flex justify-between">

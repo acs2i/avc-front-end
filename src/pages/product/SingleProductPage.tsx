@@ -79,13 +79,12 @@ interface FormData {
   tbeu_pmeu: number;
   height: string;
   width: string;
-  long: string;
+  length: string;
   comment: string;
   size_unit: string;
   weigth_unit: string;
-  weight: string;
-  weight_brut: string;
-  weight_net: string;
+  gross_weight: string;
+  net_weight: string;
   imgPath: string;
   status: string;
   uvc_ids: Uvc[];
@@ -163,13 +162,12 @@ export default function SingleProductPage() {
     tbeu_pmeu: product?.tbeu_pmeu || 0,
     height: product?.height || "",
     width: product?.width || "",
-    long: product?.long || "",
+    length: product?.length || "",
     comment: product?.comment || "",
     size_unit: product?.size_unit || "",
     weigth_unit: product?.weigth_unit || "",
-    weight: product?.weight || "",
-    weight_brut: product?.weight_brut || "",
-    weight_net: product?.weight_net || "",
+    gross_weight: product?.gross_weight || "",
+    net_weight: product?.net_weight || "",
     imgPath: "",
     status: "A",
     uvc_ids: [],
@@ -229,13 +227,12 @@ export default function SingleProductPage() {
         tbeu_pmeu: product.tbeu_pmeu || 0,
         height: product?.height || "",
         width: product?.width || "",
-        long: product?.long || "",
+        length: product?.length || "",
         comment: product?.comment || "",
         size_unit: product?.size_unit || "",
         weigth_unit: product?.weigth_unit || "",
-        weight: product?.weight || "",
-        weight_brut: product?.weight_brut || "",
-        weight_net: product?.weight_net || "",
+        gross_weight: product?.gross_weight || "",
+        net_weight: product?.net_weight || "",
         imgPath: product.imgPath || "",
         status: product.status || "A",
         uvc_ids: product.uvc_ids || [],
@@ -917,6 +914,7 @@ export default function SingleProductPage() {
 
       const data = await response.json();
       setUserFields(data.data);
+      console.log(data.data);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     } finally {
@@ -926,7 +924,7 @@ export default function SingleProductPage() {
 
   const handleFieldChange = (
     label: string,
-    field_type: string, 
+    field_type: string,
     id: string,
     newValue: string
   ) => {
@@ -935,18 +933,20 @@ export default function SingleProductPage() {
       ...prevValues,
       [id]: newValue, // Met à jour l'état local du champ
     }));
-  
+
     // Vérifier si additional_fields est un tableau, sinon initialiser un tableau vide
     setFormData((prevFormData) => {
-      const updatedAdditionalFields = Array.isArray(prevFormData.additional_fields)
+      const updatedAdditionalFields = Array.isArray(
+        prevFormData.additional_fields
+      )
         ? [...prevFormData.additional_fields]
         : [];
-  
+
       // Vérifier si un champ avec ce label existe déjà
       const fieldIndex = updatedAdditionalFields.findIndex(
         (field) => field.label === label
       );
-  
+
       if (fieldIndex !== -1) {
         // Mettre à jour la valeur et le type si le champ existe
         updatedAdditionalFields[fieldIndex].value = newValue;
@@ -955,15 +955,15 @@ export default function SingleProductPage() {
         // Ajouter un nouveau champ s'il n'existe pas encore
         updatedAdditionalFields.push({ label, value: newValue, field_type });
       }
-  
+
       return {
         ...prevFormData,
         additional_fields: updatedAdditionalFields,
       };
     });
   };
-  
-console.log(formData)
+
+  console.log(formData);
   return (
     <>
       <Modal
@@ -1536,15 +1536,15 @@ console.log(formData)
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {product?.long}
+                                {product?.length}
                                 {product?.size_unit}
                               </span>
                             ) : (
                               <input
                                 type="text"
-                                id="long"
+                                id="length"
                                 onChange={handleChange}
-                                value={formData.long}
+                                value={formData.length}
                                 className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
                               />
                             )}
@@ -1572,57 +1572,38 @@ console.log(formData)
                         <div>
                           <div className="grid grid-cols-12 gap-2 py-2">
                             <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                              Poids
+                             Poids Brut
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {product?.weight}
+                                {product?.gross_weight}
                                 {product?.weigth_unit}
                               </span>
                             ) : (
                               <input
                                 type="text"
-                                id="weight"
+                                id="gross_weight"
                                 onChange={handleChange}
-                                value={formData.weight}
+                                value={formData.gross_weight}
                                 className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
                               />
                             )}
                           </div>
                           <div className="grid grid-cols-12 gap-2 py-2">
                             <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                              Brut
+                              Poids Net
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {product?.weight_brut}
+                                {product?.net_weight}
                                 {product?.weigth_unit}
                               </span>
                             ) : (
                               <input
                                 type="text"
-                                id="weight_brut"
+                                id="net_weight"
                                 onChange={handleChange}
-                                value={formData.weight_brut}
-                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
-                              />
-                            )}
-                          </div>
-                          <div className="grid grid-cols-12 gap-2 py-2">
-                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                              Net
-                            </span>
-                            {!isModify ? (
-                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {product?.weight_net}
-                                {product?.weigth_unit}
-                              </span>
-                            ) : (
-                              <input
-                                type="text"
-                                id="width"
-                                onChange={handleChange}
-                                value={formData.weight_net}
+                                value={formData.net_weight}
                                 className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
                               />
                             )}
@@ -1633,7 +1614,7 @@ console.log(formData)
                   </div>
                 </div>
                 <div className="mt-3 w-full">
-                  {!isModify && product.additional_fields.length > 0 && (
+                  {!isModify && (
                     <FormSection title="Champs additionnels">
                       <div>
                         {userFields
@@ -1654,6 +1635,7 @@ console.log(formData)
                                 </span>
 
                                 <span className="col-span-4 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                  {/* Affichage de "Non renseigné" si le champ n'est pas renseigné */}
                                   {draftField?.value || "Non renseigné"}
                                 </span>
                               </div>
@@ -1663,58 +1645,62 @@ console.log(formData)
                     </FormSection>
                   )}
                   {isModify && (
-                    <FormSection title="Champs additionnels">
-                      <div>
-                        {userFields && userFields.length > 0 && (
-                          <div className="mt-3">
-                            {userFields
-                              .filter((field) => field.apply_to === "Produit")
-                              .map((field) => (
-                                <div key={field._id} className="mb-6">
-                                  <h3 className="text-md font-semibold text-gray-800 mb-1">
-                                    {field.label}
-                                  </h3>
-                                  {field.additional_fields.map(
-                                    (customField, index) => (
-                                      <div
-                                        key={`${field._id}-${index}`}
-                                        className="mb-4"
-                                      >
-                                        <DynamicField
-                                          id={`${field._id}-${index}`}
-                                          name={customField.field_name}
-                                          fieldType={customField.field_type}
-                                          value={
-                                            fieldValues[
-                                              `${field._id}-${index}`
-                                            ] || ""
-                                          }
-                                          onChange={(e) =>
-                                            handleFieldChange(
-                                              field.label,
-                                              customField.field_type,
-                                              `${field._id}-${index}`,
-                                              e.target.value
-                                            )
-                                          }
-                                          options={customField.options}
-                                        />
-                                      </div>
-                                    )
-                                  )}
-                                </div>
-                              ))}
-                          </div>
-                        )}
-                      </div>
-                    </FormSection>
+                      <FormSection title="Champs additionnels">
+                        <div>
+                          {userFields && userFields.length > 0 && (
+                            <div className="mt-3">
+                              {userFields
+                                .filter((field) => field.apply_to === "Produit")
+                                .map((field) => (
+                                  <div key={field._id} className="mb-6">
+                                    <h3 className="text-md font-semibold text-gray-800 mb-1">
+                                      {field.label}
+                                    </h3>
+                                    {field.additional_fields.map(
+                                      (customField, index) => (
+                                        <div
+                                          key={`${field._id}-${index}`}
+                                          className="mb-4"
+                                        >
+                                          <DynamicField
+                                            id={`${field._id}-${index}`}
+                                            name={customField.field_name}
+                                            fieldType={customField.field_type}
+                                            value={
+                                              fieldValues[
+                                                `${field._id}-${index}`
+                                              ] || ""
+                                            }
+                                            onChange={(e) =>
+                                              handleFieldChange(
+                                                field.label,
+                                                customField.field_type,
+                                                `${field._id}-${index}`,
+                                                e.target.value
+                                              )
+                                            }
+                                            options={customField.options}
+                                          />
+                                        </div>
+                                      )
+                                    )}
+                                  </div>
+                                ))}
+                            </div>
+                          )}
+                        </div>
+                      </FormSection>
                   )}
                 </div>
-                <div className="mt-3">
+                <div className="mt-5">
                   <FormSection title="Commentaire">
                     <div>
                       {!isModify ? (
-                        <p className="">{product.comment ? product.comment : "Aucun commentaire"}</p>
+                        <p className="">
+                          {product.comment
+                            ? product.comment
+                            : "Aucun commentaire"}
+                        </p>
                       ) : (
                         <Input
                           element="textarea"
