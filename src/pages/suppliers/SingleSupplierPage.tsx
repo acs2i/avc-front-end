@@ -3,7 +3,7 @@ import Input from "../../components/FormElements/Input";
 import { useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate, useParams } from "react-router-dom";
-import { CircleSlash2, Plus, Trash, X } from "lucide-react";
+import { ChevronLeft, CircleSlash2, Plus, Trash, X } from "lucide-react";
 import CreatableSelect from "react-select/creatable";
 import { SingleValue } from "react-select";
 import Button from "../../components/FormElements/Button";
@@ -12,6 +12,8 @@ import { CircularProgress, Collapse } from "@mui/material";
 import FormSection from "../../components/Formulaires/FormSection";
 import BrandSection from "../../components/Formulaires/BrandSection";
 import DynamicField from "../../components/FormElements/DynamicField";
+import Modal from "../../components/Shared/Modal";
+import ContactFormComponent from "../../components/ContactFormComponent";
 
 interface BrandId {
   _id: string;
@@ -139,6 +141,16 @@ export default function SingleSupplierPage() {
   const [supplier, setSupplier] = useState<Supplier>();
   const creatorId = useSelector((state: any) => state.auth.user);
   const token = useSelector((state: any) => state.auth.token);
+  const [contactModalIsOpen, setContactModalIsOpen] = useState(false);
+  const [selectedContacts, setSelectedContacts] = useState<Contact[]>([]);
+  const [newContact, setNewContact] = useState<Contact>({
+    firstname: "",
+    lastname: "",
+    function: "",
+    phone: "",
+    mobile: "",
+    email: "",
+  });
   const limit = 10;
   const [currentPage, setCurrentPage] = useState(1);
   const [inputValueBrand, setInputValueBrand] = useState("");
@@ -406,40 +418,12 @@ export default function SingleSupplierPage() {
     }
   };
 
-  const handleContactChange =
-    (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { id, value } = e.target;
-      setFormData((prevData) => ({
-        ...prevData,
-        contacts: prevData.contacts.map((contact, i) =>
-          i === index ? { ...contact, [id]: value } : contact
-        ),
-      }));
-    };
-
-  const addContactField = () => {
-    setFormData((prevData) => ({
-      ...prevData,
-      contacts: [
-        ...prevData.contacts,
-        {
-          firstname: "",
-          lastname: "",
-          function: "",
-          phone: "",
-          mobile: "",
-          email: "",
-        },
-      ],
-    }));
-  };
-
-  const removeContactField = (index: number) => {
-    if (formData.contacts.length === 1) return;
-    setFormData((prevData) => ({
-      ...prevData,
-      contacts: prevData.contacts.filter((_, i) => i !== index),
-    }));
+  const handleContactChange = (field: keyof Contact, value: string) => {
+    setNewContact((prevContact) => {
+      const updatedContact = { ...prevContact, [field]: value };
+      console.log("Updated Contact:", updatedContact); // Pour le débogage
+      return updatedContact;
+    });
   };
 
   const fetchField = async () => {
@@ -500,623 +484,570 @@ export default function SingleSupplierPage() {
     });
   };
 
+  // Fonction qui ajoute un contact
+  const addContact = (newContact: Contact) => {
+    console.log("Adding contact:", newContact);
+    setFormData((prevFormData) => {
+      const updatedFormData = {
+        ...prevFormData,
+        contacts: [...prevFormData.contacts, newContact],
+      };
+      console.log("Updated FormData:", updatedFormData);
+      return updatedFormData;
+    });
+
+    setSelectedContacts((prevContacts) => [...prevContacts, newContact]);
+
+    setNewContact({
+      firstname: "",
+      lastname: "",
+      function: "",
+      phone: "",
+      mobile: "",
+      email: "",
+    });
+
+    setContactModalIsOpen(false);
+  };
+
   useEffect(() => {
     fetchField();
   }, []);
 
   console.log(formData);
   return (
-    <section className="w-full bg-slate-50 p-7 min-h-screen">
-      <div className="max-w-[2024px] mx-auto">
-        <form className="mb-[400px]" onSubmit={handleSubmit}>
-          <div className="flex justify-between">
-            <div>
-              {!isModify ? (
-                <h3 className="text-[32px] font-[800] text-gray-800">
-                  Fournisseur{" "}
-                  <span className="font-[200]">{supplier?.company_name} </span>
-                </h3>
-              ) : (
-                <h3 className="text-[32px] font-[800] text-gray-800">
-                  Modification
-                  <span className="font-[200]">
-                    {" "}
-                    du fournisseur : {supplier?.company_name}{" "}
-                  </span>
-                </h3>
-              )}
-              {isModify && creatorId && (
-                <p className="text-[17px] text-gray-600 italic">
-                  Modification par{" "}
-                  <span className="font-[600]">{creatorId.username}</span>
-                </p>
-              )}
-            </div>
-            {!isLoading ? (
-              <div className="flex items-center justify-between gap-3 mt-[50px]">
+    <>
+      <Modal
+        show={contactModalIsOpen}
+        onCancel={() => setContactModalIsOpen(false)}
+        onClose={() => setContactModalIsOpen(false)}
+        header="Ajouter un contact"
+      >
+        <ContactFormComponent
+          contact={newContact}
+          handleContactChange={handleContactChange}
+          addContact={addContact}
+          onCloseModal={() => setContactModalIsOpen(false)}
+        />
+      </Modal>
+      <section className="w-full bg-slate-50 p-7 min-h-screen">
+        <div className="max-w-[2024px] mx-auto">
+          <form className="mb-[400px]" onSubmit={handleSubmit}>
+            <div className="flex justify-between">
+              <div>
                 {!isModify ? (
                   <div className="flex items-center gap-2">
-                    <Button
-                      size="small"
-                      type="button"
-                      cancel
-                      onClick={(e) => {
-                        e.preventDefault();
-                        // setIsModalOpenConfirm(true);
-                      }}
+                    <div
+                      onClick={() => navigate(-1)}
+                      className="cursor-pointer"
                     >
-                      {supplier?.status === "A"
-                        ? "Désactiver le fournisseur"
-                        : "Réactiver le fournisseur"}
-                    </Button>
-                    <Button
-                      blue
-                      size="small"
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setIsModify(true);
-                      }}
-                      disabled={supplier?.status === "D"}
-                    >
-                      {isModify ? "Annuler la modification" : "Modifier"}
-                    </Button>
+                      <ChevronLeft />
+                    </div>
+                    <h1 className="text-[32px] font-[800]">
+                      Fournisseur{" "}
+                      <span className="font-[300]">
+                        : {supplier?.company_name}
+                      </span>
+                    </h1>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <Button
-                      size="small"
-                      cancel
-                      type="button"
-                      onClick={() => setIsModify(false)}
+                    <div
+                      onClick={() => navigate(-1)}
+                      className="cursor-pointer"
                     >
-                      Annuler
-                    </Button>
-                    <Button size="small" blue>
-                      Valider
-                    </Button>
+                      <ChevronLeft />
+                    </div>
+                    <h1 className="text-[32px] font-[800]">
+                      Modification{" "}
+                      <span className="font-[300]">
+                        du fournisseur : {supplier?.company_name}
+                      </span>
+                    </h1>
                   </div>
                 )}
-              </div>
-            ) : (
-              <div className="mt-3">
-                <CircularProgress />
-              </div>
-            )}
-          </div>
-
-          <div className="flex gap-4 mt-[80px]">
-            {/* Partie Infos */}
-
-            <FormSection
-              title="Identification"
-              size={`${!isModify ? "h-[400px]" : "h-[500px]"}`}
-            >
-              <div className="mt-3">
-                {isModify ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    <Input
-                      element="input"
-                      id="code"
-                      label="Code fournisseur :"
-                      value={formData.code}
-                      onChange={handleChange}
-                      validators={[]}
-                      placeholder={supplier?.code}
-                      create
-                      gray
-                    />
-                    <Input
-                      element="input"
-                      id="company_name"
-                      label="Raison sociale :"
-                      value={formData.company_name}
-                      onChange={handleChange}
-                      validators={[]}
-                      placeholder={supplier?.company_name}
-                      create
-                      gray
-                    />
-                    <Input
-                      element="input"
-                      id="siret"
-                      label="Siret :"
-                      value={formData.siret}
-                      onChange={handleChange}
-                      validators={[]}
-                      placeholder={supplier?.siret}
-                      create
-                      gray
-                    />
-                    <Input
-                      element="input"
-                      id="tva"
-                      label="N°TVA intracom :"
-                      value={formData.tva}
-                      onChange={handleChange}
-                      validators={[]}
-                      placeholder={supplier?.tva}
-                      create
-                      gray
-                    />
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-                    <div>
-                      <span className="font-bold text-gray-700">
-                        Code fournisseur :
-                      </span>
-                      <p className="font-[600] text-slate-500">
-                        {supplier?.code}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="font-bold text-gray-700">
-                        Raison sociale :
-                      </span>
-                      <p className="font-[600] text-slate-500">
-                        {supplier?.company_name}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="font-bold text-gray-700">Siret :</span>
-                      <p className="font-[600] text-slate-500">
-                        {supplier?.siret}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="font-bold text-gray-700">
-                        N°TVA intracom :
-                      </span>
-                      <p className="font-[600] text-slate-500">
-                        {supplier?.tva}
-                      </p>
-                    </div>
-                    <div className="mt-3">
-                      <span className="font-bold text-gray-700">
-                        Site web :
-                      </span>
-                      <p className="font-[600] text-slate-500">
-                        {supplier?.web_url}
-                      </p>
-                    </div>
-                    <div className="mt-3">
-                      <span className="font-bold text-gray-700">Email :</span>
-                      <p className="font-[600] text-slate-500">
-                        {supplier?.email}
-                      </p>
-                    </div>
-                    <div className="mt-3">
-                      <span className="font-bold text-gray-700">
-                        Telephone :
-                      </span>
-                      <p className="font-[600] text-slate-500">
-                        {supplier?.phone}
-                      </p>
-                    </div>
-                  </div>
-                )}
-                {isModify && (
-                  <>
-                    <Input
-                      element="input"
-                      id="web_url"
-                      label="Site web :"
-                      value={formData.web_url}
-                      onChange={handleChange}
-                      validators={[]}
-                      placeholder={supplier?.web_url}
-                      create
-                      gray
-                    />
-                    <Input
-                      element="input"
-                      type="email"
-                      id="email"
-                      label="Email :"
-                      value={formData.email}
-                      onChange={handleChange}
-                      validators={[]}
-                      placeholder={supplier?.email}
-                      create
-                      gray
-                    />
-                    <Input
-                      element="phone"
-                      id="phone"
-                      label="Téléphone :"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      validators={[]}
-                      placeholder={supplier?.phone}
-                      create
-                      gray
-                    />
-                  </>
+                {isModify && creatorId && (
+                  <p className="text-[17px] text-gray-600 italic">
+                    Modification par{" "}
+                    <span className="font-[600]">{creatorId.username}</span>
+                  </p>
                 )}
               </div>
-            </FormSection>
-            <FormSection
-              title="Adresse"
-              size={`${!isModify ? "h-[400px]" : "h-[500px]"}`}
-            >
-              <div className="mt-3">
-                {isModify ? (
-                  <>
-                    <Input
-                      element="input"
-                      id="address_1"
-                      label="Adresse 1 :"
-                      value={formData.address_1}
-                      onChange={handleChange}
-                      validators={[]}
-                      placeholder={supplier?.address_1}
-                      gray
-                    />
-                    <Input
-                      element="input"
-                      id="address_2"
-                      label="Adresse 2 :"
-                      value={formData.address_2}
-                      onChange={handleChange}
-                      validators={[]}
-                      placeholder={supplier?.address_2}
-                      create
-                      gray
-                    />
-                    <Input
-                      element="input"
-                      id="address_3"
-                      label="Adresse 3 :"
-                      value={formData.address_3}
-                      onChange={handleChange}
-                      validators={[]}
-                      placeholder={supplier?.address_3}
-                      create
-                      gray
-                    />
-                    <Input
-                      element="input"
-                      id="city"
-                      label="Ville :"
-                      value={formData.city}
-                      onChange={handleChange}
-                      validators={[]}
-                      placeholder={supplier?.city}
-                      create
-                      gray
-                    />
-                    <Input
-                      element="input"
-                      id="postal"
-                      label="Code postal :"
-                      value=""
-                      onChange={handleChange}
-                      validators={[]}
-                      placeholder={supplier?.postal}
-                      create
-                      gray
-                    />
-                    <Input
-                      element="input"
-                      id="country"
-                      label="Pays :"
-                      value=""
-                      onChange={handleChange}
-                      validators={[]}
-                      placeholder={supplier?.country}
-                      create
-                      gray
-                    />
-                  </>
-                ) : (
-                  <>
-                    <div className="mt-3">
-                      <span className="font-bold text-gray-700">
-                        Adresse 1 :
-                      </span>
-                      <p className="font-[600] text-slate-500">
-                        {supplier?.address_1}
-                      </p>
+              {!isLoading ? (
+                <div className="flex items-center justify-between gap-3 mt-[50px]">
+                  {!isModify ? (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="small"
+                        type="button"
+                        cancel
+                        onClick={(e) => {
+                          e.preventDefault();
+                          // setIsModalOpenConfirm(true);
+                        }}
+                      >
+                        {supplier?.status === "A"
+                          ? "Désactiver le fournisseur"
+                          : "Réactiver le fournisseur"}
+                      </Button>
+                      <Button
+                        blue
+                        size="small"
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setIsModify(true);
+                        }}
+                        disabled={supplier?.status === "D"}
+                      >
+                        {isModify ? "Annuler la modification" : "Modifier"}
+                      </Button>
                     </div>
-                    <div className="mt-3">
-                      <span className="font-bold text-gray-700">
-                        Adresse 2 :
-                      </span>
-                      <p className="font-[600] text-slate-500">
-                        {supplier?.address_2}
-                      </p>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="small"
+                        cancel
+                        type="button"
+                        onClick={() => setIsModify(false)}
+                      >
+                        Annuler
+                      </Button>
+                      <Button size="small" blue>
+                        Valider
+                      </Button>
                     </div>
-                    <div className="mt-3">
-                      <span className="font-bold text-gray-700">
-                        Adresse 3 :
-                      </span>
-                      {supplier?.address_3 ? (
-                        <p className="font-[600] text-slate-500">
-                          {supplier?.address_3}
-                        </p>
-                      ) : (
-                        <div className="font-[600] text-slate-500">
-                          <CircleSlash2 size={15} />
-                        </div>
-                      )}
-                    </div>
-                    <div className="mt-3">
-                      <span className="font-bold text-gray-700">Ville :</span>
-                      <p className="font-[600] text-slate-500">
-                        {supplier?.city}
-                      </p>
-                    </div>
-                    <div className="mt-3">
-                      <span className="font-bold text-gray-700">
-                        Code postal :
-                      </span>
-                      <p className="font-[600] text-slate-500">
-                        {supplier?.postal}
-                      </p>
-                    </div>
-                    <div className="mt-3">
-                      <span className="font-bold text-gray-700">Pays :</span>
-                      {supplier?.country ? (
-                        <p className="font-[600] text-slate-500">
-                          {supplier?.country}
-                        </p>
-                      ) : (
-                        <div className="text-slate-400">
-                          <CircleSlash2 size={20} />
-                        </div>
-                      )}
-                    </div>
-                  </>
-                )}
-              </div>
-            </FormSection>
-          </div>
-          <div className="flex gap-4 mt-[30px]">
-            {/* Partie tarifs */}
+                  )}
+                </div>
+              ) : (
+                <div className="mt-3">
+                  <CircularProgress />
+                </div>
+              )}
+            </div>
 
-            <FormSection title="Contatcts">
-              {isModify ? (
-                <div>
-                  {formData.contacts.map((contact, index) => (
-                    <div className="mt-3" key={index}>
-                      <div className="mt-5 flex items-center gap-2">
-                        <span className="italic text-gray-600 text-[12px] font-[700]">
-                          Contact {index + 1}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Input
-                          element="input"
-                          id="firstname"
-                          label="Prénom :"
-                          value={contact.firstname}
-                          onChange={handleContactChange(index)}
-                          validators={[]}
-                          placeholder={
-                            supplier?.contacts &&
-                            supplier.contacts[index]?.firstname
-                              ? supplier.contacts[index].firstname
-                              : ""
-                          }
-                          create
-                          gray
-                        />
-                        <Input
-                          element="input"
-                          id="lastname"
-                          label="Nom :"
-                          value={contact.lastname}
-                          onChange={handleContactChange(index)}
-                          validators={[]}
-                          placeholder={
-                            supplier?.contacts &&
-                            supplier.contacts[index]?.lastname
-                              ? supplier.contacts[index].lastname
-                              : ""
-                          }
-                          create
-                          gray
-                        />
-                      </div>
+            <div className="flex gap-4 mt-[80px]">
+              {/* Partie Infos */}
+
+              <FormSection
+                title="Identification"
+                size={`${!isModify ? "h-[400px]" : "h-[500px]"}`}
+              >
+                <div className="mt-3">
+                  {isModify ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       <Input
                         element="input"
-                        id="function"
-                        label="Fonction :"
-                        value={contact.function}
-                        onChange={handleContactChange(index)}
+                        id="code"
+                        label="Code fournisseur :"
+                        value={formData.code}
+                        onChange={handleChange}
                         validators={[]}
-                        placeholder={
-                          supplier?.contacts &&
-                          supplier.contacts[index]?.function
-                            ? supplier.contacts[index].function
-                            : ""
-                        }
+                        placeholder={supplier?.code}
                         create
                         gray
                       />
-                      <div className="grid grid-cols-2 gap-2">
-                        <Input
-                          element="input"
-                          id="phone"
-                          label="Téléphone :"
-                          value={contact.phone}
-                          onChange={handleContactChange(index)}
-                          validators={[]}
-                          placeholder={
-                            supplier?.contacts &&
-                            supplier.contacts[index]?.phone
-                              ? supplier.contacts[index].phone
-                              : ""
-                          }
-                          create
-                          gray
-                        />
-                        <Input
-                          element="input"
-                          id="mobile"
-                          label="Mobile :"
-                          value={contact.mobile}
-                          onChange={handleContactChange(index)}
-                          validators={[]}
-                          placeholder={
-                            supplier?.contacts &&
-                            supplier.contacts[index]?.mobile
-                              ? supplier.contacts[index].mobile
-                              : ""
-                          }
-                          create
-                          gray
-                        />
+                      <Input
+                        element="input"
+                        id="company_name"
+                        label="Raison sociale :"
+                        value={formData.company_name}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder={supplier?.company_name}
+                        create
+                        gray
+                      />
+                      <Input
+                        element="input"
+                        id="siret"
+                        label="Siret :"
+                        value={formData.siret}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder={supplier?.siret}
+                        create
+                        gray
+                      />
+                      <Input
+                        element="input"
+                        id="tva"
+                        label="N°TVA intracom :"
+                        value={formData.tva}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder={supplier?.tva}
+                        create
+                        gray
+                      />
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                      <div>
+                        <span className="font-bold text-gray-700">
+                          Code fournisseur :
+                        </span>
+                        <p className="font-[600] text-slate-500">
+                          {supplier?.code}
+                        </p>
                       </div>
+                      <div>
+                        <span className="font-bold text-gray-700">
+                          Raison sociale :
+                        </span>
+                        <p className="font-[600] text-slate-500">
+                          {supplier?.company_name}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="font-bold text-gray-700">Siret :</span>
+                        <p className="font-[600] text-slate-500">
+                          {supplier?.siret}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="font-bold text-gray-700">
+                          N°TVA intracom :
+                        </span>
+                        <p className="font-[600] text-slate-500">
+                          {supplier?.tva}
+                        </p>
+                      </div>
+                      <div className="mt-3">
+                        <span className="font-bold text-gray-700">
+                          Site web :
+                        </span>
+                        <p className="font-[600] text-slate-500">
+                          {supplier?.web_url}
+                        </p>
+                      </div>
+                      <div className="mt-3">
+                        <span className="font-bold text-gray-700">Email :</span>
+                        <p className="font-[600] text-slate-500">
+                          {supplier?.email}
+                        </p>
+                      </div>
+                      <div className="mt-3">
+                        <span className="font-bold text-gray-700">
+                          Telephone :
+                        </span>
+                        <p className="font-[600] text-slate-500">
+                          {supplier?.phone}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                  {isModify && (
+                    <>
+                      <Input
+                        element="input"
+                        id="web_url"
+                        label="Site web :"
+                        value={formData.web_url}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder={supplier?.web_url}
+                        create
+                        gray
+                      />
                       <Input
                         element="input"
                         type="email"
                         id="email"
                         label="Email :"
-                        value={contact.email}
-                        onChange={handleContactChange(index)}
+                        value={formData.email}
+                        onChange={handleChange}
                         validators={[]}
-                        placeholder={
-                          supplier?.contacts && supplier.contacts[index]?.email
-                            ? supplier.contacts[index].email
-                            : ""
-                        }
+                        placeholder={supplier?.email}
                         create
                         gray
                       />
-                      <button
-                        type="button"
-                        onClick={() => removeContactField(index)}
-                        className="flex items-center gap-2 text-[12px] text-red-500 mt-3"
-                      >
-                        <Trash size={17} />
-                        Supprimer ce contact
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => addContactField()}
-                    className="flex items-center gap-2 text-[12px] text-orange-500 mt-3"
-                  >
-                    <Plus size={17} />
-                    Ajouter un contact
-                  </button>
+                      <Input
+                        element="phone"
+                        id="phone"
+                        label="Téléphone :"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder={supplier?.phone}
+                        create
+                        gray
+                      />
+                    </>
+                  )}
                 </div>
-              ) : (
-                <div>
-                  {supplier?.contacts.map((contact, index) => (
-                    <div className="mt-3" key={index}>
-                      <div className="mb-3">
-                        <div className="mt-5 flex items-center gap-2">
-                          <span className="italic text-gray-600 text-[12px] font-[700]">
-                            Contact {index + 1}
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="mt-3">
-                            <span className="font-bold text-gray-700">
-                              Prénom :
-                            </span>
-                            <p className="font-[600] text-slate-500">
-                              {contact?.firstname}
-                            </p>
-                          </div>
-                          <div className="mt-3">
-                            <span className="font-bold text-gray-700">
-                              Nom de famille :
-                            </span>
-                            <p className="font-[600] text-slate-500">
-                              {contact?.lastname}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="mt-3">
-                          <span className="font-bold text-gray-700">
-                            Fonction :
-                          </span>
+              </FormSection>
+              <FormSection
+                title="Adresse"
+                size={`${!isModify ? "h-[400px]" : "h-[500px]"}`}
+              >
+                <div className="mt-3">
+                  {isModify ? (
+                    <>
+                      <Input
+                        element="input"
+                        id="address_1"
+                        label="Adresse 1 :"
+                        value={formData.address_1}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder={supplier?.address_1}
+                        create
+                        gray
+                      />
+                      <Input
+                        element="input"
+                        id="address_2"
+                        label="Adresse 2 :"
+                        value={formData.address_2}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder={supplier?.address_2}
+                        create
+                        gray
+                      />
+                      <Input
+                        element="input"
+                        id="address_3"
+                        label="Adresse 3 :"
+                        value={formData.address_3}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder={supplier?.address_3}
+                        create
+                        gray
+                      />
+                      <Input
+                        element="input"
+                        id="city"
+                        label="Ville :"
+                        value={formData.city}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder={supplier?.city}
+                        create
+                        gray
+                      />
+                      <Input
+                        element="input"
+                        id="postal"
+                        label="Code postal :"
+                        value=""
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder={supplier?.postal}
+                        create
+                        gray
+                      />
+                      <Input
+                        element="input"
+                        id="country"
+                        label="Pays :"
+                        value=""
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder={supplier?.country}
+                        create
+                        gray
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <div className="mt-3 flex items-center gap-3">
+                        <span className="font-bold text-gray-700">
+                          Adresse 1 :
+                        </span>
+                        {supplier?.address_1 ? (
                           <p className="font-[600] text-slate-500">
-                            {contact?.function}
+                            {supplier?.address_1}
                           </p>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="mt-3">
-                            <span className="font-bold text-gray-700">
-                              Téléphone :
-                            </span>
-                            <p className="font-[600] text-slate-500">
-                              {contact?.phone}
-                            </p>
+                        ) : (
+                          <div className="font-[600] text-slate-500">
+                            <CircleSlash2 size={13} />
                           </div>
-                          <div className="mt-3">
-                            <span className="font-bold text-gray-700">
-                              Mobile :
-                            </span>
-                            <p className="font-[600] text-slate-500">
-                              {contact?.mobile}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="mt-3">
-                          <span className="font-bold text-gray-700">
-                            Email :
-                          </span>
-                          <p className="font-[600] text-slate-500">
-                            {contact?.email}
-                          </p>
-                        </div>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                      <div className="mt-3 flex items-center gap-3">
+                        <span className="font-bold text-gray-700">
+                          Adresse 2 :
+                        </span>
+                        {supplier?.address_2 ? (
+                          <p className="font-[600] text-slate-500">
+                            {supplier?.address_2}
+                          </p>
+                        ) : (
+                          <div className="font-[600] text-slate-500">
+                            <CircleSlash2 size={13} />
+                          </div>
+                        )}
+                      </div>
+                      <div className="mt-3 flex items-center gap-3">
+                        <span className="font-bold text-gray-700">
+                          Adresse 3 :
+                        </span>
+                        {supplier?.address_3 ? (
+                          <p className="font-[600] text-slate-500">
+                            {supplier?.address_3}
+                          </p>
+                        ) : (
+                          <div className="font-[600] text-slate-500">
+                            <CircleSlash2 size={13} />
+                          </div>
+                        )}
+                      </div>
+                      <div className="mt-3 flex items-center gap-3">
+                        <span className="font-bold text-gray-700">Ville :</span>
+                        {supplier?.city ? (
+                          <p className="font-[600] text-slate-500">
+                            {supplier?.city}
+                          </p>
+                        ) : (
+                          <div className="font-[600] text-slate-500">
+                            <CircleSlash2 size={13} />
+                          </div>
+                        )}
+                      </div>
+                      <div className="mt-3 flex items-center gap-3">
+                        <span className="font-bold text-gray-700">
+                          Code postal :
+                        </span>
+                        {supplier?.postal ? (
+                          <p className="font-[600] text-slate-500">
+                            {supplier?.postal}
+                          </p>
+                        ) : (
+                          <div className="font-[600] text-slate-500">
+                            <CircleSlash2 size={13} />
+                          </div>
+                        )}
+                      </div>
+                      <div className="mt-3 flex items-center gap-3">
+                        <span className="font-bold text-gray-700">Pays :</span>
+                        {supplier?.country ? (
+                          <p className="font-[600] text-slate-500">
+                            {supplier?.country}
+                          </p>
+                        ) : (
+                          <div className="font-[600] text-slate-500">
+                            <CircleSlash2 size={13} />
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
                 </div>
-              )}
-            </FormSection>
-            <FormSection title="Marques">
-              <div className="mt-3">
-                {isModify && (
-                  <BrandSection
-                    brands={brands}
-                    optionsBrand={optionsBrand}
-                    handleChangeBrand={handleChangeBrand}
-                    removeBrandField={removeBrandField}
-                    addBrandField={addBrandField}
-                    handleInputChangeBrand={handleInputChangeBrand}
-                    inputValueBrand={inputValueBrand}
-                    customStyles={customStyles}
-                  />
-                )}
+              </FormSection>
+            </div>
+            <div className="flex gap-4 mt-[30px]">
+              {/* Partie tarifs */}
 
-                {/* Afficher les marques ajoutées */}
-                {supplier?.brand_id.map((brand, index) => (
+              <FormSection title="Contacts">
+                <div className="flex flex-col gap-2 mt-3">
+                  {/* Combinez les contacts enregistrés et les contacts sélectionnés */}
+                  {(supplier?.contacts && supplier.contacts.length > 0) ||
+                  (selectedContacts && selectedContacts.length > 0) ? (
+                    <>
+                      {/* Affichez les contacts enregistrés */}
+                      {supplier?.contacts &&
+                        supplier.contacts.length > 0 &&
+                        supplier.contacts.map((contact, index) => (
+                          <div
+                            key={`stored-${index}`}
+                            className="text-center rounded-md cursor-pointer hover:brightness-125 shadow-md bg-slate-400"
+                          >
+                            <span className="text-[20px] text-white font-bold">
+                              {contact.firstname} {contact.lastname}
+                            </span>
+                          </div>
+                        ))}
+
+                      {/* Affichez les contacts sélectionnés */}
+                      {selectedContacts &&
+                        selectedContacts.length > 0 &&
+                        selectedContacts.map((contact, index) => (
+                          <div
+                            key={`selected-${index}`}
+                            className="text-center rounded-md cursor-pointer hover:brightness-125 shadow-md bg-slate-400"
+                          >
+                            <span className="text-[20px] text-white font-bold">
+                              {contact.firstname} {contact.lastname}
+                            </span>
+                          </div>
+                        ))}
+                    </>
+                  ) : !isModify ? (
+                    <p className="text-gray-400 font-bold text-xs">
+                      Aucun contact enregistré pour ce fournisseur
+                    </p>
+                  ) : null}
+                </div>
+
+                {/* Afficher le bouton "Ajouter un contact" seulement en mode modification */}
+                {isModify && (
                   <div
-                    key={index}
-                    className="flex items-center gap-2 mt-2 bg-gray-600 justify-center py-3 relative rounded-md"
+                    className="flex flex-col items-center justify-center p-[20px] text-orange-400 hover:text-orange-300 cursor-pointer"
+                    onClick={() => setContactModalIsOpen(true)}
                   >
-                    <span className="font-[600] text-white capitalize">
-                      {brand?.label}
-                    </span>
-                    <button
-                      type="button"
-                      className="text-white hover:text-gray-300 absolute right-[13px]"
-                    >
-                      <X size={18} />
-                    </button>
+                    <div className="flex items-center gap-2 text-[12px] mt-3">
+                      <Plus size={30} />
+                    </div>
+                    <p className="font-[700]">Ajouter un contact</p>
                   </div>
-                ))}
-              </div>
-            </FormSection>
-          </div>
-          <div className="mt-[30px] w-[50%]">
-            {!isModify &&
-              supplier &&
-              supplier?.additional_fields.length > 0 && (
+                )}
+              </FormSection>
+
+              <FormSection title="Marques">
+                <div className="mt-3">
+                  {isModify ? (
+                    <BrandSection
+                      brands={brands}
+                      optionsBrand={optionsBrand}
+                      handleChangeBrand={handleChangeBrand}
+                      removeBrandField={removeBrandField}
+                      addBrandField={addBrandField}
+                      handleInputChangeBrand={handleInputChangeBrand}
+                      inputValueBrand={inputValueBrand}
+                      customStyles={customStyles}
+                      addBrand
+                      displayTrash
+                    />
+                  ) : supplier?.brand_id && supplier?.brand_id.length > 0 ? (
+                    <div>
+                      {supplier?.brand_id.map((brand, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center gap-2 mt-2 bg-gray-600 justify-center py-3 relative rounded-md"
+                        >
+                          <span className="font-[600] text-white capitalize">
+                            {brand?.label}
+                          </span>
+                          <button
+                            type="button"
+                            className="text-white hover:text-gray-300 absolute right-[13px]"
+                          >
+                            <X size={18} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-gray-400 font-bold text-xs">
+                        Aucune marque associée à ce fournisseur
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </FormSection>
+            </div>
+            <div className="mt-[30px]">
+              {!isModify && (
                 <FormSection title="Champs additionnels">
                   <div>
                     {userFields
                       .filter((field) => field.apply_to === "Fournisseur")
                       .map((field: any, index: number) => {
-                        const supplierField = supplier.additional_fields.find(
+                        const supplierField = supplier?.additional_fields.find(
                           (supField: any) => supField.label === field.label
                         );
 
@@ -1125,11 +1056,11 @@ export default function SingleSupplierPage() {
                             key={index}
                             className="grid grid-cols-12 gap-2 py-2"
                           >
-                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                            <span className="col-span-3 font-[700] text-slate-500 text-[13px]">
                               {field.label} :
                             </span>
 
-                            <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                            <span className="col-span-3 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
                               {supplierField?.value || "Non renseigné"}
                             </span>
                           </div>
@@ -1138,85 +1069,87 @@ export default function SingleSupplierPage() {
                   </div>
                 </FormSection>
               )}
-            {isModify && (
-              <FormSection title="Champs additionnels">
-                <div>
-                  {userFields && userFields.length > 0 && (
-                    <div className="mt-3">
-                      {userFields
-                        .filter((field) => field.apply_to === "Fournisseur")
-                        .map((field) => (
-                          <div key={field._id} className="mb-6">
-                            <h3 className="text-md font-semibold text-gray-800 mb-1">
-                              {field.label}
-                            </h3>
-                            {field.additional_fields.map(
-                              (customField, index) => (
-                                <div
-                                  key={`${field._id}-${index}`}
-                                  className="mb-4"
-                                >
-                                  <DynamicField
-                                    id={`${field._id}-${index}`}
-                                    name={customField.field_name}
-                                    fieldType={customField.field_type}
-                                    value={
-                                      fieldValues[`${field._id}-${index}`] || ""
-                                    }
-                                    onChange={(e) =>
-                                      handleFieldChange(
-                                        field.label,
-                                        customField.field_type,
-                                        `${field._id}-${index}`,
-                                        e.target.value
-                                      )
-                                    }
-                                    options={customField.options}
-                                  />
-                                </div>
-                              )
-                            )}
-                          </div>
-                        ))}
-                    </div>
-                  )}
-                </div>
-              </FormSection>
-            )}
-          </div>
-          {!isLoading ? (
-            <div className="mt-[50px] flex gap-2">
               {isModify && (
-                <>
-                  <button
-                    className="w-full bg-[#9FA6B2] text-white py-2 rounded-md font-[600] hover:bg-[#bac3d4] hover:text-white shadow-md"
-                    type="button"
-                  >
-                    Annuler
-                  </button>
-                  <button
-                    className="w-full bg-[#3B71CA] text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
-                    type="submit"
-                  >
-                    Modifier le fournisseur
-                  </button>
-                </>
+                <FormSection title="Champs additionnels">
+                  <div>
+                    {userFields && userFields.length > 0 && (
+                      <div className="mt-3">
+                        {userFields
+                          .filter((field) => field.apply_to === "Fournisseur")
+                          .map((field) => (
+                            <div key={field._id} className="mb-6">
+                              <h3 className="text-md font-semibold text-gray-800 mb-1">
+                                {field.label}
+                              </h3>
+                              {field.additional_fields.map(
+                                (customField, index) => (
+                                  <div
+                                    key={`${field._id}-${index}`}
+                                    className="mb-4"
+                                  >
+                                    <DynamicField
+                                      id={`${field._id}-${index}`}
+                                      name={customField.field_name}
+                                      fieldType={customField.field_type}
+                                      value={
+                                        fieldValues[`${field._id}-${index}`] ||
+                                        ""
+                                      }
+                                      onChange={(e) =>
+                                        handleFieldChange(
+                                          field.label,
+                                          customField.field_type,
+                                          `${field._id}-${index}`,
+                                          e.target.value
+                                        )
+                                      }
+                                      options={customField.options}
+                                    />
+                                  </div>
+                                )
+                              )}
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                  </div>
+                </FormSection>
               )}
             </div>
-          ) : (
-            <div className="relative flex justify-center mt-7 px-7 gap-2">
-              <CircularProgress size={100} />
-              <div className="absolute h-[60px] w-[80px] top-[50%] translate-y-[-50%]">
-                <img
-                  src="/img/logo.png"
-                  alt="logo"
-                  className="w-full h-full animate-pulse"
-                />
+            {!isLoading ? (
+              <div className="mt-[50px] flex gap-2">
+                {isModify && (
+                  <>
+                    <button
+                      className="w-full bg-[#9FA6B2] text-white py-2 rounded-md font-[600] hover:bg-[#bac3d4] hover:text-white shadow-md"
+                      type="button"
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      className="w-full bg-[#3B71CA] text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
+                      type="submit"
+                    >
+                      Modifier le fournisseur
+                    </button>
+                  </>
+                )}
               </div>
-            </div>
-          )}
-        </form>
-      </div>
-    </section>
+            ) : (
+              <div className="relative flex justify-center mt-7 px-7 gap-2">
+                <CircularProgress size={100} />
+                <div className="absolute h-[60px] w-[80px] top-[50%] translate-y-[-50%]">
+                  <img
+                    src="/img/logo.png"
+                    alt="logo"
+                    className="w-full h-full animate-pulse"
+                  />
+                </div>
+              </div>
+            )}
+          </form>
+        </div>
+      </section>
+    </>
   );
 }

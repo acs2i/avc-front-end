@@ -362,7 +362,7 @@ export default function SuppliersList() {
                     {supplier.address_1 ? (
                       supplier.address_1
                     ) : (
-                      <CircleSlash2 size={15} />
+                      <CircleSlash2 size={13} />
                     )}
                   </td>
 
@@ -370,17 +370,17 @@ export default function SuppliersList() {
                     {supplier.postal ? (
                       supplier.postal
                     ) : (
-                      <CircleSlash2 size={15} />
+                      <CircleSlash2 size={13} />
                     )}
                   </td>
                   <td className="px-6 py-2">
-                    {supplier.city ? supplier.city : <CircleSlash2 size={15} />}
+                    {supplier.city ? supplier.city : <CircleSlash2 size={13} />}
                   </td>
                   <td className="px-6 py-2">
                     {supplier.country ? (
                       supplier.country
                     ) : (
-                      <CircleSlash2 size={15} />
+                      <CircleSlash2 size={13} />
                     )}
                   </td>
                   <td className="px-6 py-2 uppercase">

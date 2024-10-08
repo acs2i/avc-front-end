@@ -65,7 +65,7 @@ interface Supplier {
 interface FormData {
   creator_id: any;
   reference: string;
-  name: string;
+  alias: string;
   short_label: string;
   long_label: string;
   type: string;
@@ -207,7 +207,7 @@ export default function CreateProductPage() {
   const [formData, setFormData] = useState<FormData>({
     creator_id: creatorId._id,
     reference: "",
-    name: "",
+    alias: "",
     short_label: "",
     long_label: "",
     type: "Marchandise",
@@ -823,9 +823,9 @@ export default function CreateProductPage() {
                     />
                     <Input
                       element="input"
-                      id="name"
+                      id="alias"
                       label="Nom d'appel :"
-                      value={formData.name}
+                      value={formData.alias}
                       onChange={handleChange}
                       validators={[]}
                       placeholder="Ajouter le nom d'appel du produit"

@@ -65,7 +65,7 @@ interface UserField {
 interface FormData {
   creator_id: any;
   reference: string;
-  name: string;
+  alias: string;
   short_label: string;
   long_label: string;
   type: string;
@@ -148,7 +148,7 @@ export default function SingleProductPage() {
   const [formData, setFormData] = useState<FormData>({
     creator_id: creatorId._id,
     reference: "",
-    name: "",
+    alias: "",
     short_label: "",
     long_label: "",
     type: "Marchandise",
@@ -213,7 +213,7 @@ export default function SingleProductPage() {
       setFormData({
         creator_id: creatorId._id,
         reference: product.reference || "",
-        name: product.name || "",
+        alias: product.alias || "",
         short_label: product.short_label || "",
         long_label: product.long_label || "",
         type: product.type || "Marchandise",
@@ -1138,8 +1138,8 @@ export default function SingleProductPage() {
                           </span>
                           {!isModify ? (
                             <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
-                              {product.name ? (
-                                product.name
+                              {product.alias ? (
+                                product.alias
                               ) : (
                                 <CircleSlash2 size={15} />
                               )}
@@ -1147,10 +1147,10 @@ export default function SingleProductPage() {
                           ) : (
                             <input
                               type="text"
-                              id="name"
+                              id="alias"
                               onChange={handleChange}
-                              placeholder={product?.name}
-                              value={formData.name}
+                              placeholder={product?.alias}
+                              value={formData.alias}
                               className="col-span-3 border rounded-md p-1 bg-white py-2 focus:outline-none focus:border-blue-500"
                             />
                           )}
@@ -1224,6 +1224,7 @@ export default function SingleProductPage() {
                               onInputChange={handleInputChangeBrand}
                               options={optionsBrand}
                               inputValue={inputValueBrand}
+                              placeholder={product?.brand_ids[0].label || ""}
                               isClearable
                             />
                           )}
@@ -1249,6 +1250,11 @@ export default function SingleProductPage() {
                               onInputChange={handleInputChangeFamily}
                               options={optionsFamily}
                               inputValue={inputValueFamily}
+                              placeholder={
+                                product?.tag_ids?.[0]
+                                  ? `${product.tag_ids[0].code} - ${product.tag_ids[0].name}`
+                                  : "Sélectionnez une famille"
+                              }
                               isClearable
                             />
                           )}
@@ -1275,6 +1281,11 @@ export default function SingleProductPage() {
                               onInputChange={handleInputChangeSubFamily}
                               options={optionsSubFamily}
                               inputValue={inputSubValueFamily}
+                              placeholder={
+                                product?.tag_ids?.[1] 
+                                  ? `${product.tag_ids[1].code} - ${product.tag_ids[1].name}` 
+                                  : 'Sélectionnez une sous famille'
+                              }
                               isClearable
                             />
                           )}
@@ -1301,6 +1312,11 @@ export default function SingleProductPage() {
                               onInputChange={handleInputChangeSubSubFamily}
                               options={optionsSubSubFamily}
                               inputValue={inputValueSubSubFamily}
+                              placeholder={
+                                product?.tag_ids?.[2] 
+                                  ? `${product.tag_ids[2].code} - ${product.tag_ids[2].name}` 
+                                  : 'Sélectionnez une sous sous famille'
+                              }
                               isClearable
                             />
                           )}
@@ -1438,6 +1454,10 @@ export default function SingleProductPage() {
                               onInputChange={handleInputChangeCollection}
                               options={optionsCollection}
                               inputValue={inputValueCollection}
+                              placeholder={
+                                product?.collection_ids?.[0]?.label ||
+                                "Selectionnez une collection"
+                              }
                               isClearable
                             />
                           )}
@@ -1572,7 +1592,7 @@ export default function SingleProductPage() {
                         <div>
                           <div className="grid grid-cols-12 gap-2 py-2">
                             <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                             Poids Brut
+                              Poids Brut
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
@@ -1645,58 +1665,58 @@ export default function SingleProductPage() {
                     </FormSection>
                   )}
                   {isModify && (
-                      <FormSection title="Champs additionnels">
-                        <div>
-                          {userFields && userFields.length > 0 && (
-                            <div className="mt-3">
-                              {userFields
-                                .filter((field) => field.apply_to === "Produit")
-                                .map((field) => (
-                                  <div key={field._id} className="mb-6">
-                                    <h3 className="text-md font-semibold text-gray-800 mb-1">
-                                      {field.label}
-                                    </h3>
-                                    {field.additional_fields.map(
-                                      (customField, index) => (
-                                        <div
-                                          key={`${field._id}-${index}`}
-                                          className="mb-4"
-                                        >
-                                          <DynamicField
-                                            id={`${field._id}-${index}`}
-                                            name={customField.field_name}
-                                            fieldType={customField.field_type}
-                                            value={
-                                              fieldValues[
-                                                `${field._id}-${index}`
-                                              ] || ""
-                                            }
-                                            onChange={(e) =>
-                                              handleFieldChange(
-                                                field.label,
-                                                customField.field_type,
-                                                `${field._id}-${index}`,
-                                                e.target.value
-                                              )
-                                            }
-                                            options={customField.options}
-                                          />
-                                        </div>
-                                      )
-                                    )}
-                                  </div>
-                                ))}
-                            </div>
-                          )}
-                        </div>
-                      </FormSection>
+                    <FormSection title="Champs additionnels">
+                      <div>
+                        {userFields && userFields.length > 0 && (
+                          <div className="mt-3">
+                            {userFields
+                              .filter((field) => field.apply_to === "Produit")
+                              .map((field) => (
+                                <div key={field._id} className="mb-6">
+                                  <h3 className="text-md font-semibold text-gray-800 mb-1">
+                                    {field.label}
+                                  </h3>
+                                  {field.additional_fields.map(
+                                    (customField, index) => (
+                                      <div
+                                        key={`${field._id}-${index}`}
+                                        className="mb-4"
+                                      >
+                                        <DynamicField
+                                          id={`${field._id}-${index}`}
+                                          name={customField.field_name}
+                                          fieldType={customField.field_type}
+                                          value={
+                                            fieldValues[
+                                              `${field._id}-${index}`
+                                            ] || ""
+                                          }
+                                          onChange={(e) =>
+                                            handleFieldChange(
+                                              field.label,
+                                              customField.field_type,
+                                              `${field._id}-${index}`,
+                                              e.target.value
+                                            )
+                                          }
+                                          options={customField.options}
+                                        />
+                                      </div>
+                                    )
+                                  )}
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                      </div>
+                    </FormSection>
                   )}
                 </div>
                 <div className="mt-5">
                   <FormSection title="Commentaire">
                     <div>
                       {!isModify ? (
-                        <p className="">
+                        <p className="text-sm text-gray-500 font-[600]">
                           {product.comment
                             ? product.comment
                             : "Aucun commentaire"}

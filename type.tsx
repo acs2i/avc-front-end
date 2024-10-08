@@ -127,7 +127,7 @@ export type Product = {
   _id: string;
   creator_id: any;
   reference: string;
-  name: string;
+  alias: string;
   short_label: string;
   long_label: string;
   type: string;
