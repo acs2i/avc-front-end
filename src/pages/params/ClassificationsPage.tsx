@@ -141,7 +141,7 @@ function ClassificationsPage({
   }, [shouldRefetch]);
 
   return (
-    <div className="relative overflow-x-auto w-full">
+    <div className="relative overflow-x-auto">
       <table className="w-full text-left">
         <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700 uppercase">
           <tr>

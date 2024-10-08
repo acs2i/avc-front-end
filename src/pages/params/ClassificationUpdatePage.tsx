@@ -160,7 +160,7 @@ export default function ClassificationUpdatePage({
       setIsLoading(false);
     }
   };
-  console.log(formData);
+
   return (
     <section className="w-full p-4">
       <Modal

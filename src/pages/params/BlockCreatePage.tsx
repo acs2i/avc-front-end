@@ -90,7 +90,7 @@ export default function BlockCreatePage({
             <ChevronLeft />
           </div>
           <h1 className="text-[20px] font-[800] text-gray-800">
-            Créer <span className="font-[300]">une taxe</span>
+            Créer <span className="font-[300]">un blocage</span>
           </h1>
         </div>
         <div className="mt-[30px] flex flex-col justify-between">

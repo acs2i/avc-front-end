@@ -115,11 +115,8 @@ function ParamsMenuPage() {
   const [selectedField, setSelectedField] = useState<Field | null>(null);
   const [selectedTax, setSelectedTax] = useState<Tax | null>(null);
   const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
-  const [selectedCollection, setSelectedCollection] =
-    useState<Collection | null>(null);
-  const [selectedDimension, setSelectedDimension] = useState<Dimension | null>(
-    null
-  );
+  const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null);
+  const [selectedDimension, setSelectedDimension] = useState<Dimension | null>(null);
   const [isCreatePanelOpen, setIsCreatePanelOpen] = useState(false);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
@@ -151,18 +148,27 @@ function ParamsMenuPage() {
     setSelectedTax(null);
   };
 
-  
   const handleCloseBlock = () => {
     setSelectedBlock(null);
   };
 
   const handleOpenCreatePanel = () => {
     setIsCreatePanelOpen(true);
+
+    // Fermer tous les panneaux de mise à jour
+    setSelectedFamily(null);
+    setSelectedDimension(null);
+    setSelectedCollection(null);
+    setSelectedBrand(null);
+    setSelectedField(null);
+    setSelectedTax(null);
+    setSelectedBlock(null);
   };
 
   const handleCloseCreatePanel = () => {
     setIsCreatePanelOpen(false);
   };
+
   const handleCreate = (newFamilyId: string) => {
     setHighlightedId(newFamilyId);
     setShouldRefetch((prev) => !prev);
@@ -170,6 +176,42 @@ function ParamsMenuPage() {
 
   const resetHighlightedId = () => {
     setHighlightedId(null);
+  };
+
+  // Fermer le panneau de création lors de la sélection d'un élément à mettre à jour
+  const onSelectFamily = (family: Tag | null) => {
+    setSelectedFamily(family);
+    setIsCreatePanelOpen(false);
+  };
+
+  const onSelectDimension = (dimension: Dimension | null) => {
+    setSelectedDimension(dimension);
+    setIsCreatePanelOpen(false);
+  };
+
+  const onSelectCollection = (collection: Collection | null) => {
+    setSelectedCollection(collection);
+    setIsCreatePanelOpen(false);
+  };
+
+  const onSelectBrand = (brand: Brand | null) => {
+    setSelectedBrand(brand);
+    setIsCreatePanelOpen(false);
+  };
+
+  const onSelectField = (field: Field | null) => {
+    setSelectedField(field);
+    setIsCreatePanelOpen(false);
+  };
+
+  const onSelectTax = (tax: Tax | null) => {
+    setSelectedTax(tax);
+    setIsCreatePanelOpen(false);
+  };
+
+  const onSelectBlock = (block: Block | null) => {
+    setSelectedBlock(block);
+    setIsCreatePanelOpen(false);
   };
 
   useEffect(() => {
@@ -184,8 +226,7 @@ function ParamsMenuPage() {
       <div className="flex items-center gap-3 mb-4">
         <Settings2 size={20} />
         <h3 className="text-[25px] font-[800]">
-          Création{" "}
-          <span className="font-[200]">et modification des paramètres</span>
+          Création <span className="font-[200]">et modification des paramètres</span>
         </h3>
       </div>
       <div className="h-[70px] mb-3 flex items-center gap-4 w-full relative z-10">
@@ -200,7 +241,7 @@ function ParamsMenuPage() {
             {page === "grid" && "une grille"}
             {page === "collection" && "une collection"}
             {page === "brand" && "une marque"}
-            {page === "field" && "un champs utilisateur"}
+            {page === "field" && "un champ utilisateur"}
             {page === "tax" && "une taxe"}
             {page === "block" && "un blocage"}
           </button>
@@ -243,9 +284,7 @@ function ParamsMenuPage() {
               onClick={() => setPage(link.page)}
             >
               {React.createElement(link.icon, {
-                size: new RegExp(`^${link.link}(/.*)?$`).test(location.pathname)
-                  ? 20
-                  : 15,
+                size: new RegExp(`^${link.link}(/.*)?$`).test(location.pathname) ? 20 : 15,
               })}
               <span className="text-xs font-[600]">{link.name}</span>
               {page === link.page && (
@@ -267,7 +306,7 @@ function ParamsMenuPage() {
           <div className="w-full">
             {page === "classe" && (
               <ClassificationsPage
-                onSelectFamily={setSelectedFamily}
+                onSelectFamily={onSelectFamily}
                 shouldRefetch={shouldRefetch}
                 highlightedFamilyId={highlightedId}
                 resetHighlightedFamilyId={resetHighlightedId}
@@ -275,7 +314,7 @@ function ParamsMenuPage() {
             )}
             {page === "dimension" && (
               <DimensionPage
-                onSelectDimension={setSelectedDimension}
+                onSelectDimension={onSelectDimension}
                 shouldRefetch={shouldRefetch}
                 highlightedDimensionId={highlightedId}
                 resetHighlightedDimensionId={resetHighlightedId}
@@ -291,7 +330,7 @@ function ParamsMenuPage() {
             )}
             {page === "collection" && (
               <CollectionPage
-                onSelectCollection={setSelectedCollection}
+                onSelectCollection={onSelectCollection}
                 shouldRefetch={shouldRefetch}
                 highlightedCollectionId={highlightedId}
                 resetHighlightedCollectionId={resetHighlightedId}
@@ -299,7 +338,7 @@ function ParamsMenuPage() {
             )}
             {page === "brand" && (
               <BrandPage
-                onSelectBrand={setSelectedBrand}
+                onSelectBrand={onSelectBrand}
                 shouldRefetch={shouldRefetch}
                 highlightedBrandId={highlightedId}
                 resetHighlightedBrandId={resetHighlightedId}
@@ -307,7 +346,7 @@ function ParamsMenuPage() {
             )}
             {page === "field" && (
               <UserFieldPage
-                onSelectUserField={setSelectedField}
+                onSelectUserField={onSelectField}
                 shouldRefetch={shouldRefetch}
                 highlightedUserFieldId={highlightedId}
                 resetHighlightedUserFieldId={resetHighlightedId}
@@ -315,7 +354,7 @@ function ParamsMenuPage() {
             )}
             {page === "tax" && (
               <TaxPage
-                onSelectTax={setSelectedTax}
+                onSelectTax={onSelectTax}
                 shouldRefetch={shouldRefetch}
                 highlightedUserFieldId={highlightedId}
                 resetHighlightedUserFieldId={resetHighlightedId}
@@ -323,7 +362,7 @@ function ParamsMenuPage() {
             )}
             {page === "block" && (
               <BlockPage
-                onSelectBlock={setSelectedBlock}
+                onSelectBlock={onSelectBlock}
                 shouldRefetch={shouldRefetch}
                 highlightedUserFieldId={highlightedId}
                 resetHighlightedUserFieldId={resetHighlightedId}
