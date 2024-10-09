@@ -208,6 +208,7 @@ export default function SingleProductPage() {
     made_in: "",
     company_name: "",
   });
+
   useEffect(() => {
     if (product) {
       setFormData({
@@ -241,20 +242,23 @@ export default function SingleProductPage() {
         initialColors: ["000"],
         initialGrid: [[true]],
       });
+  
+      // Mapping des suppliers avec vérifications
       const suppliersMapped = product.suppliers.map((supplier: any) => ({
-        _id: supplier.supplier_id._id,
-        value: supplier.supplier_id._id,
-        label: supplier.supplier_id.company_name,
-        company_name: supplier.supplier_id.company_name,
-        supplier_ref: supplier.supplier_ref,
-        pcb: supplier.pcb,
-        custom_cat: supplier.custom_cat,
-        made_in: supplier.made_in,
+        _id: supplier?.supplier_id?._id || "",
+        value: supplier?.supplier_id?._id || "",
+        label: supplier?.supplier_id?.company_name || "Nom inconnu",
+        company_name: supplier?.supplier_id?.company_name || "Nom inconnu",
+        supplier_ref: supplier?.supplier_ref || "Référence inconnue",
+        pcb: supplier?.pcb || "PCB inconnue",
+        custom_cat: supplier?.custom_cat || "Catégorie inconnue",
+        made_in: supplier?.made_in || "Pays d'origine inconnu",
       }));
-
+  
       setSelectedSuppliers(suppliersMapped);
     }
   }, [product, creatorId._id]);
+  
 
   const [sizes, setSizes] = useState<string[]>(formData.initialSizes);
   const [colors, setColors] = useState<string[]>(formData.initialColors);
@@ -963,7 +967,7 @@ export default function SingleProductPage() {
     });
   };
 
-  console.log(formData);
+  console.log(product);
   return (
     <>
       <Modal

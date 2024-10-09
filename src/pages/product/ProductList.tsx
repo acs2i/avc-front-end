@@ -349,7 +349,11 @@ export default function ProductList() {
           </Button>
         </div>
       </Header>
-
+      {products && products.length === 0 && (
+        <div className="absolute left-[50%] top-[600px] translate-x-[50%]">
+          {totalItem === null ? <Spinner /> : "Aucun Résultat"}
+        </div>
+      )}
       {/* Table des résultats */}
       <div className="overflow-x-auto bg-white">
         <table className="w-full text-left">
@@ -412,7 +416,8 @@ export default function ProductList() {
             </tr>
           </thead>
           <tbody>
-            {products && products.length > 0 ? (
+            {products &&
+              products.length > 0 &&
               products.map((product: Product) => (
                 <tr
                   key={product._id}
@@ -513,20 +518,7 @@ export default function ProductList() {
                     )}
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={6} className="px-6 py-4 text-center">
-                  {totalItem === null ? (
-                    <div className="flex justify-center overflow-hidden p-[30px]">
-                      <Spinner />
-                    </div>
-                  ) : (
-                    "Aucun Résultat"
-                  )}
-                </td>
-              </tr>
-            )}
+              ))}
           </tbody>
         </table>
 
