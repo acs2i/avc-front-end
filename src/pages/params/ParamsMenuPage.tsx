@@ -214,13 +214,18 @@ function ParamsMenuPage() {
     setIsCreatePanelOpen(false);
   };
 
+  // Fermer tous les panneaux lors du changement de page (onglet)
   useEffect(() => {
     setSelectedFamily(null);
     setSelectedDimension(null);
     setSelectedCollection(null);
     setSelectedBrand(null);
+    setSelectedField(null);
+    setSelectedTax(null);
+    setSelectedBlock(null);
+    setIsCreatePanelOpen(false); // Ferme également le panneau de création
   }, [page]);
-
+  
   return (
     <section className="w-full min-h-screen bg-slate-50 p-7 flex flex-col relative overflow-hidden">
       <div className="flex items-center gap-3 mb-4">
