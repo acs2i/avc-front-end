@@ -214,7 +214,7 @@ function ParamsMenuPage() {
     setIsCreatePanelOpen(false);
   };
 
-  // Fermer tous les panneaux lors du changement de page (onglet)
+ 
   useEffect(() => {
     setSelectedFamily(null);
     setSelectedDimension(null);
@@ -223,7 +223,7 @@ function ParamsMenuPage() {
     setSelectedField(null);
     setSelectedTax(null);
     setSelectedBlock(null);
-    setIsCreatePanelOpen(false); // Ferme également le panneau de création
+    setIsCreatePanelOpen(false);
   }, [page]);
   
   return (
