@@ -21,6 +21,7 @@ interface UVCGridProps {
 interface Grid {
   _id: string;
   type: string;
+  code: string;
   label: string;
   dimensions: string[];
 }
@@ -38,7 +39,7 @@ const UVCGrid: React.FC<UVCGridProps> = ({
   uvcGrid,
   isFullScreen,
   isModify,
-  isEditable,
+  isEditable = true, // Permettre par défaut l'édition
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [grids, setGrids] = useState<Grid[]>([]);
@@ -48,27 +49,18 @@ const UVCGrid: React.FC<UVCGridProps> = ({
   const [showSizeGridOptions, setShowSizeGridOptions] = useState(false);
   const [showColorGridOptions, setShowColorGridOptions] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [savedUvcGrid, setSavedUvcGrid] = useState<boolean[][]>([]);
-
 
   useEffect(() => {
     updateDimensions(uvcGrid);
   }, [sizes, colors, uvcGrid]);
 
   const toggleCheckbox = (colorIndex: number, sizeIndex: number) => {
-    if (!isEditable && uvcGrid[colorIndex][sizeIndex]) {
-      return;
-    }
-  
     const newGrid = uvcGrid.map((row, i) =>
-      row.map((col, j) =>
-        i === colorIndex && j === sizeIndex ? !col : col
-      )
+      row.map((col, j) => (i === colorIndex && j === sizeIndex ? !col : col))
     );
     setUvcGrid(newGrid);
     updateDimensions(newGrid);
   };
-  
 
   const updateDimensions = (grid: boolean[][]) => {
     const dimensions = grid.map((row, i) =>
@@ -206,92 +198,94 @@ const UVCGrid: React.FC<UVCGridProps> = ({
         onClose={() => setIsModalOpen(false)}
         header="Grille de dimensions"
       >
-        {showSizeGridOptions && (
-          <div className="mb-4 p-2">
-            <h4 className="text-[18px] font-[700] text-gray-700">
-              Choisissez une grille de tailles :
-            </h4>
-            <div className="relative overflow-x-auto bg-white">
-              <table className="w-full text-left">
-                <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
-                  <tr>
-                    <th scope="col" className="px-6 py-2 w-1/2">
-                      Libellé
-                    </th>
-                    <th scope="col" className="px-6 py-2 w-1/2">
-                      Dimensions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {grids
-                    .filter((grid) => grid.type === "Taille")
-                    .map((grid) => (
-                      <tr
-                        key={grid._id}
-                        className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap"
-                        onClick={() => handleImportSizes(grid._id)}
-                      >
-                        <td className="px-6 py-4">{grid.label}</td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center flex-wrap gap-2">
-                            {grid.dimensions.map((dimension) => (
-                              <span className="bg-orange-200 w-[30px] h-[30px] rounded-full flex items-center justify-center text-gray-800">
-                                {removePrefix([dimension], "Taille")}
-                              </span>
-                            ))}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
+        <div className="max-h-[500px] overflow-y-auto">
+          {showSizeGridOptions && (
+            <div className="mb-4 p-2">
+              <h4 className="text-[18px] font-[700] text-gray-700">
+                Choisissez une grille de tailles :
+              </h4>
+              <div className="relative overflow-x-auto bg-white">
+                <table className="w-full text-left">
+                  <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
+                    <tr>
+                      <th scope="col" className="px-6 py-2 w-1/2">
+                        Code
+                      </th>
+                      <th scope="col" className="px-6 py-2 w-1/2">
+                        Dimensions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {grids
+                      .filter((grid) => grid.type === "taille")
+                      .map((grid) => (
+                        <tr
+                          key={grid._id}
+                          className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap"
+                          onClick={() => handleImportSizes(grid._id)}
+                        >
+                          <td className="px-6 py-4">{grid.code}</td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center flex-wrap gap-2">
+                              {grid.dimensions.map((dimension) => (
+                                <span className="bg-orange-200 w-[30px] h-[30px] rounded-full flex items-center justify-center text-gray-800">
+                                  {removePrefix([dimension], "Taille")}
+                                </span>
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        )}
-        {showColorGridOptions && (
-          <div className="mb-4 p-2">
-            <h4 className="text-[18px] font-[700] text-gray-700">
-              Choisissez une grille de couleurs :
-            </h4>
-            <div className="relative overflow-x-auto bg-white">
-              <table className="w-full text-left">
-                <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
-                  <tr>
-                    <th scope="col" className="px-6 py-2 w-1/2">
-                      Libellé
-                    </th>
-                    <th scope="col" className="px-6 py-2 w-1/2">
-                      Dimensions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {grids
-                    .filter((grid) => grid.type === "Couleur")
-                    .map((grid) => (
-                      <tr
-                        key={grid._id}
-                        className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap"
-                        onClick={() => handleImportColors(grid._id)}
-                      >
-                        <td className="px-6 py-4">{grid.label}</td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center flex-wrap gap-2">
-                            {grid.dimensions.map((dimension) => (
-                              <span className="bg-orange-200 w-[30px] h-[30px] rounded-full flex items-center justify-center text-gray-800">
-                                {removePrefix([dimension], "Couleur")}
-                              </span>
-                            ))}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
+          )}
+          {showColorGridOptions && (
+            <div className="mb-4 p-2">
+              <h4 className="text-[18px] font-[700] text-gray-700">
+                Choisissez une grille de couleurs :
+              </h4>
+              <div className="relative overflow-x-auto bg-white">
+                <table className="w-full text-left">
+                  <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700">
+                    <tr>
+                      <th scope="col" className="px-6 py-2 w-1/2">
+                        Code
+                      </th>
+                      <th scope="col" className="px-6 py-2 w-1/2">
+                        Dimensions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {grids
+                      .filter((grid) => grid.type === "couleur")
+                      .map((grid) => (
+                        <tr
+                          key={grid._id}
+                          className="border-y-[1px] border-gray-200 bg-white cursor-pointer hover:bg-slate-200 capitalize text-xs text-gray-800 even:bg-slate-50 whitespace-nowrap"
+                          onClick={() => handleImportColors(grid._id)}
+                        >
+                          <td className="px-6 py-4">{grid.code}</td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center flex-wrap gap-2">
+                              {grid.dimensions.map((dimension) => (
+                                <span className="bg-orange-200 w-[30px] h-[30px] rounded-full flex items-center justify-center text-gray-800">
+                                  {removePrefix([dimension], "Couleur")}
+                                </span>
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </Modal>
       <div className="flex items-center justify-between">
         {isModify && (

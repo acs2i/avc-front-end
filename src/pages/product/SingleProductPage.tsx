@@ -1801,7 +1801,7 @@ export default function SingleProductPage() {
                   uvcGrid={uvcGrid}
                   isFullScreen={toggleFullScreen}
                   isModify={isModify}
-                  isEditable={false}
+                  isEditable={true}
                 />
               </div>
             )}
