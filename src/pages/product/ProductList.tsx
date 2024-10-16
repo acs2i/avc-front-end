@@ -410,7 +410,7 @@ export default function ProductList() {
               </th>
               <th scope="col" className="px-6">
                 <div className="flex items-center">
-                  <span>Status</span>
+                  <span>Statut</span>
                 </div>
               </th>
             </tr>

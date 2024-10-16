@@ -29,6 +29,7 @@ import {
   Euro,
   RectangleEllipsis,
   ShieldBan,
+  Flag,
 } from "lucide-react";
 
 export const LINKS: Link[] = [
@@ -159,6 +160,12 @@ export const LINKS_Params: Params[] = [
     icon: ShieldBan,
     page: "block",
   },
+  {
+    name: "Pays",
+    link: "/parameters/brand",
+    icon: Flag,
+    page: "country",
+  },
 ];
 
 export const LINKS_Product: Params[] = [
@@ -212,6 +219,12 @@ export const LINKS_UVC: Params[] = [
     link: "",
     icon: "",
     page: "bloc",
+  },
+  {
+    name: "Pays",
+    link: "",
+    icon: "",
+    page: "country",
   },
   {
     name: "Champs utilisateur",

@@ -25,6 +25,9 @@ import TaxUpdatePage from "./TaxUpdatePage";
 import BlockPage from "./BlockPage";
 import BlockCreatePage from "./BlockCreatePage";
 import BlockUpdatePage from "./BlockUpdatePage";
+import CountryPage from "./CountryPage";
+import CountryCreatePage from "./CountryCreatePage";
+import CountryUpdatePage from "./CountryUpdatePage";
 
 interface Tag {
   _id: string;
@@ -105,6 +108,18 @@ interface Block {
   creator_id: any;
 }
 
+interface Country {
+  _id: string;
+  countryName: string;
+  alpha2Code: string;
+  alpha3Code: string;
+  numeric: string;
+  status: string;
+  creator_id: any;
+}
+
+const LAST_PAGE_KEY = "lastSelectedParamsPage";
+
 function ParamsMenuPage() {
   const location = useLocation();
   const [page, setPage] = useState("classe");
@@ -115,8 +130,12 @@ function ParamsMenuPage() {
   const [selectedField, setSelectedField] = useState<Field | null>(null);
   const [selectedTax, setSelectedTax] = useState<Tax | null>(null);
   const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
-  const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null);
-  const [selectedDimension, setSelectedDimension] = useState<Dimension | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
+  const [selectedCollection, setSelectedCollection] =
+    useState<Collection | null>(null);
+  const [selectedDimension, setSelectedDimension] = useState<Dimension | null>(
+    null
+  );
   const [isCreatePanelOpen, setIsCreatePanelOpen] = useState(false);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
@@ -150,6 +169,10 @@ function ParamsMenuPage() {
 
   const handleCloseBlock = () => {
     setSelectedBlock(null);
+  };
+
+  const handleCloseCountry = () => {
+    setSelectedCountry(null);
   };
 
   const handleOpenCreatePanel = () => {
@@ -214,7 +237,11 @@ function ParamsMenuPage() {
     setIsCreatePanelOpen(false);
   };
 
- 
+  const onSelectCountry = (country: Country | null) => {
+    setSelectedCountry(country);
+    setIsCreatePanelOpen(false);
+  };
+
   useEffect(() => {
     setSelectedFamily(null);
     setSelectedDimension(null);
@@ -225,13 +252,26 @@ function ParamsMenuPage() {
     setSelectedBlock(null);
     setIsCreatePanelOpen(false);
   }, [page]);
-  
+
+  const handlePageChange = (newPage: string) => {
+    setPage(newPage);
+    localStorage.setItem(LAST_PAGE_KEY, newPage); 
+  };
+
+  useEffect(() => {
+    const savedPage = localStorage.getItem(LAST_PAGE_KEY);
+    if (savedPage) {
+      setPage(savedPage); 
+    }
+  }, []);
+
   return (
     <section className="w-full min-h-screen bg-slate-50 p-7 flex flex-col relative overflow-hidden">
       <div className="flex items-center gap-3 mb-4">
         <Settings2 size={20} />
         <h3 className="text-[25px] font-[800]">
-          Création <span className="font-[200]">et modification des paramètres</span>
+          Création{" "}
+          <span className="font-[200]">et modification des paramètres</span>
         </h3>
       </div>
       <div className="h-[70px] mb-3 flex items-center gap-4 w-full relative z-10">
@@ -249,6 +289,7 @@ function ParamsMenuPage() {
             {page === "field" && "un champ utilisateur"}
             {page === "tax" && "une taxe"}
             {page === "block" && "un blocage"}
+            {page === "country" && "un pays"}
           </button>
         </div>
         <div className="relative w-full">
@@ -286,10 +327,12 @@ function ParamsMenuPage() {
               className={`relative border-r-[1px] border-b-[1px] border-gray-300 py-3 flex items-center gap-3 cursor-pointer ${
                 page === link.page ? "text-blue-500" : "text-gray-500"
               } hover:text-blue-500`}
-              onClick={() => setPage(link.page)}
+              onClick={() => handlePageChange(link.page)}
             >
               {React.createElement(link.icon, {
-                size: new RegExp(`^${link.link}(/.*)?$`).test(location.pathname) ? 20 : 15,
+                size: new RegExp(`^${link.link}(/.*)?$`).test(location.pathname)
+                  ? 20
+                  : 15,
               })}
               <span className="text-xs font-[600]">{link.name}</span>
               {page === link.page && (
@@ -373,6 +416,14 @@ function ParamsMenuPage() {
                 resetHighlightedUserFieldId={resetHighlightedId}
               />
             )}
+            {page === "country" && (
+              <CountryPage
+                onSelectCountry={onSelectCountry}
+                shouldRefetch={shouldRefetch}
+                highlightedUserFieldId={highlightedId}
+                resetHighlightedUserFieldId={resetHighlightedId}
+              />
+            )}
           </div>
 
           {/* Partie mise à jour composant */}
@@ -440,6 +491,16 @@ function ParamsMenuPage() {
             </div>
           )}
 
+          {selectedCountry && (
+            <div className="w-full bg-white rounded-lg border shadow-md">
+              <CountryUpdatePage
+                selectedCountry={selectedCountry}
+                onClose={handleCloseCountry}
+                onUpdate={handleRefetch}
+              />
+            </div>
+          )}
+
           {/* Partie création composant */}
           {isCreatePanelOpen && (
             <div className="w-full bg-white rounded-lg border shadow-md">
@@ -487,6 +548,12 @@ function ParamsMenuPage() {
               )}
               {page === "block" && (
                 <BlockCreatePage
+                  onClose={handleCloseCreatePanel}
+                  onCreate={handleCreate}
+                />
+              )}
+              {page === "country" && (
+                <CountryCreatePage
                   onClose={handleCloseCreatePanel}
                   onCreate={handleCreate}
                 />

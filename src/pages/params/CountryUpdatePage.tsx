@@ -9,44 +9,49 @@ import Modal from "../../components/Shared/Modal";
 import { ChevronLeft } from "lucide-react";
 import { useSelector } from "react-redux";
 
-interface Block {
+interface Country {
   _id: string;
-  code: number;
-  label: string;
+  countryName: string;
+  alpha2Code: string;
+  alpha3Code: string;
+  numeric: string;
   status: string;
   creator_id: any;
-
 }
 
 interface ClassificationUpdatePageProps {
-  selectedBlock: Block;
+  selectedCountry: Country;
   onUpdate: () => void;
   onClose: () => void;
 }
 
 interface FormData {
   creator_id: any;
-  code: any;
-  label: string;
+  countryName: string;
+  alpha2Code: string;
+  alpha3Code: string;
+  numeric: string;
   status: string;
 }
 
-export default function BlockUpdatePage({
-  selectedBlock,
+export default function CountryUpdatePage({
+  selectedCountry,
   onUpdate,
   onClose,
 }: ClassificationUpdatePageProps) {
-  const id = selectedBlock._id;
+  const id = selectedCountry._id;
   const user = useSelector((state: any) => state.auth.user);
   const [isLoading, setIsLoading] = useState(false);
   const [isModify, setIsModify] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
-  const [block, setBlock] = useState<Block>();
+  const [country, setCountry] = useState<Country>();
   const [formData, setFormData] = useState<FormData>({
     creator_id: user._id,
-    code: block?.code,
-    label: block?.label || "",
+    alpha2Code: country?.alpha2Code || "",
+    alpha3Code: country?.alpha3Code || "",
+    numeric: country?.numeric || "",
+    countryName: country?.countryName || "",
     status: "A",
   });
 
@@ -61,16 +66,16 @@ export default function BlockUpdatePage({
   };
 
   useEffect(() => {
-    if (selectedBlock) {
-      setBlock(selectedBlock);
+    if (selectedCountry) {
+      setCountry(selectedCountry);
     }
-  }, [selectedBlock]);
+  }, [selectedCountry]);
 
   const fetchTax = async () => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/block/${id}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/iso-code/${id}`,
         {
           method: "GET",
           headers: {
@@ -80,13 +85,15 @@ export default function BlockUpdatePage({
       );
 
       const data = await response.json();
-      setBlock(data);
+      setCountry(data);
 
       // Mettez à jour formData avec les données récupérées
       setFormData({
         creator_id: data.creator_id || user._id,
-        code: data.code || "",
-        label: data.label || "",
+        alpha2Code: data.alpha2Code || "",
+        alpha3Code: data.alpha3Code || "",
+        numeric: data.numeric || "",
+        countryName: data.countryName || "",
         status: data.status || "A",
       });
     } catch (error) {
@@ -107,7 +114,7 @@ export default function BlockUpdatePage({
     try {
       console.log("Submitting form data:", formData);
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/block/${id}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/country/${id}`,
         {
           method: "PUT",
           headers: {
@@ -181,7 +188,7 @@ export default function BlockUpdatePage({
               <ChevronLeft />
             </div>
             <h1 className="text-[20px] font-[800] text-gray-800">
-              Code <span className="font-[300]">{block?.code}</span>{" "}
+              Pays <span className="font-[300]">{country?.countryName}</span>{" "}
             </h1>
           </div>
           {!isModify && (
@@ -197,22 +204,12 @@ export default function BlockUpdatePage({
           <div className="flex flex-col">
             {isModify ? (
               <div>
-              <Input
-                  element="input"
-                  id="code"
-                  label="Code"
-                  value={block?.code}
-                  placeholder={block?.code.toString()}
-                  disabled
-                  validators={[]}
-                  gray
-                />
                 <Input
                   element="input"
                   id="label"
                   label="Libellé"
-                  value={formData.label} 
-                  placeholder={block?.label}
+                  value={formData.countryName} 
+                  placeholder={country?.countryName}
                   validators={[]}
                   gray
                   create
@@ -223,20 +220,10 @@ export default function BlockUpdatePage({
               <div>
                 <Input
                   element="input"
-                  id="code"
-                  label="ex: 09"
-                  value={block?.code}
-                  placeholder={block?.code.toString()}
-                  disabled
-                  validators={[]}
-                  gray
-                />
-                <Input
-                  element="input"
                   id="label"
                   label="Libellé"
-                  value={block?.label}
-                  placeholder={block?.label}
+                  value={country?.countryName}
+                  placeholder={country?.countryName}
                   disabled
                   validators={[]}
                   gray

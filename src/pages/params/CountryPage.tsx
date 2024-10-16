@@ -4,26 +4,27 @@ import Stack from "@mui/material/Stack";
 import Spinner from "../../components/Shared/Spinner";
 import { SortProvider, useSortContext, SortHeader } from "../../components/SortContext";
 
-interface Tax {
+interface Country {
   _id: string;
-  code: string;
-  label: string;
-  rate: string;
+  countryName: string;
+  alpha2Code: string;
+  alpha3Code: string;
+  numeric: string;
   status: string;
   creator_id: any;
 }
 
-interface TaxPageProps {
-  onSelectTax: (tax: Tax) => void;
+interface CountryPageProps {
+  onSelectCountry: (country: Country) => void;
   shouldRefetch: boolean;
   highlightedUserFieldId: string | null;
   resetHighlightedUserFieldId: () => void;
 }
 
-const TAX_LIST_ID = 'tax-list';
+const COUNTRY_LIST_ID = 'country-list'; // Identifiant unique pour la liste des pays
 
-const TaxPageContent: React.FC<TaxPageProps> = ({
-  onSelectTax,
+const CountryPageContent: React.FC<CountryPageProps> = ({
+  onSelectCountry,
   shouldRefetch,
   highlightedUserFieldId,
   resetHighlightedUserFieldId,
@@ -31,9 +32,9 @@ const TaxPageContent: React.FC<TaxPageProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItem, setTotalItem] = useState<number | null>(null);
-  const [taxes, setTaxes] = useState<Tax[]>([]);
+  const [countries, setCountries] = useState<Country[]>([]);
   const { getSortState } = useSortContext();
-  const sortState = getSortState(TAX_LIST_ID);
+  const sortState = getSortState(COUNTRY_LIST_ID);
 
   const limit = 20;
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
@@ -45,11 +46,11 @@ const TaxPageContent: React.FC<TaxPageProps> = ({
     setCurrentPage(value);
   };
 
-  const fetchTaxes = async () => {
+  const fetchCountries = async () => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/tax`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/iso-code?page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -59,7 +60,7 @@ const TaxPageContent: React.FC<TaxPageProps> = ({
       );
 
       const data = await response.json();
-      setTaxes(data.data);
+      setCountries(data.data);
       setTotalItem(data.total);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
@@ -76,26 +77,17 @@ const TaxPageContent: React.FC<TaxPageProps> = ({
   }, [highlightedUserFieldId, resetHighlightedUserFieldId]);
 
   useEffect(() => {
-    fetchTaxes();
-  }, [shouldRefetch]);
+    fetchCountries();
+  }, [shouldRefetch, currentPage]);
 
-  const sortedTaxes = useMemo(() => {
-    if (!sortState.column) return taxes;
+  const sortedCountries = useMemo(() => {
+    if (!sortState.column) return countries;
 
-    return [...taxes].sort((a, b) => {
-      const aValue = a[sortState.column as keyof Tax];
-      const bValue = b[sortState.column as keyof Tax];
+    return [...countries].sort((a, b) => {
+      const aValue = a[sortState.column as keyof Country];
+      const bValue = b[sortState.column as keyof Country];
       
-      if (sortState.column === 'code') {
-        // Tri numérique pour le code
-        const aNum = parseInt(aValue, 10);
-        const bNum = parseInt(bValue, 10);
-        return sortState.direction === 'asc' ? aNum - bNum : bNum - aNum;
-      } else if (sortState.column === 'rate') {
-        return sortState.direction === 'asc'
-          ? parseFloat(aValue) - parseFloat(bValue)
-          : parseFloat(bValue) - parseFloat(aValue);
-      } else if (typeof aValue === 'string' && typeof bValue === 'string') {
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
         return sortState.direction === 'asc'
           ? aValue.localeCompare(bValue)
           : bValue.localeCompare(aValue);
@@ -103,7 +95,7 @@ const TaxPageContent: React.FC<TaxPageProps> = ({
       
       return 0;
     });
-  }, [taxes, sortState]);
+  }, [countries, sortState]);
 
   if (isLoading) {
     return (
@@ -119,46 +111,36 @@ const TaxPageContent: React.FC<TaxPageProps> = ({
         <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700 uppercase">
           <tr>
             <th scope="col" className="px-6 py-4 w-1/3">
-              <SortHeader listId={TAX_LIST_ID} column="code" label="Code" />
+              <SortHeader listId={COUNTRY_LIST_ID} column="countryName" label="Libellé" />
             </th>
             <th scope="col" className="px-6 py-4 w-[300px]">
-              <SortHeader listId={TAX_LIST_ID} column="label" label="Libellé" />
+              <SortHeader listId={COUNTRY_LIST_ID} column="alpha2Code" label="Iso-2" />
             </th>
             <th scope="col" className="px-6 py-4 w-[300px]">
-              <SortHeader listId={TAX_LIST_ID} column="rate" label="Taux" />
+              <SortHeader listId={COUNTRY_LIST_ID} column="alpha3Code" label="Iso-3" />
             </th>
             <th scope="col" className="px-6 py-4 w-[50px]">
-              <SortHeader listId={TAX_LIST_ID} column="status" label="Statut" />
+              <SortHeader listId={COUNTRY_LIST_ID} column="numeric" label="Iso-N" />
             </th>
           </tr>
         </thead>
         <tbody>
-          {sortedTaxes.length > 0 ? (
-            sortedTaxes.map((tax) => (
+          {sortedCountries.length > 0 ? (
+            sortedCountries.map((country) => (
               <tr
-                key={tax._id}
+                key={country._id}
                 className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 whitespace-nowrap ${
-                  tax._id === highlightedUserFieldId
+                  country._id === highlightedUserFieldId
                     ? "bg-orange-300 text-white"
                     : ""
                 }`}
-                onClick={() => onSelectTax(tax)}
+                onClick={() => onSelectCountry(country)}
               >
-                <td className="px-6 py-2">{tax.code}</td>
-                <td className="px-6 py-2">{tax.label}</td>
-                <td className="px-6 py-2">{tax.rate} %</td>
-                <td className="px-6 py-2 uppercase text-[10px]">
-                  {tax.status === "A" ? (
-                    <div className="text-center bg-green-200 text-green-600 border border-green-400 py-1 rounded-md max-w-[50px]">
-                      <span>Actif</span>
-                    </div>
-                  ) : (
-                    <div className="text-center bg-gray-200 text-gray-600 border border-gray-400 py-1 rounded-md max-w-[60px]">
-                      <span>Inactif</span>
-                    </div>
-                  )}
-                </td>
-                {tax._id === highlightedUserFieldId && (
+                <td className="px-6 py-2">{country.countryName}</td>
+                <td className="px-6 py-2">{country.alpha2Code}</td>
+                <td className="px-6 py-2">{country.alpha3Code}</td>
+                <td className="px-6 py-2">{country.numeric}</td>
+                {country._id === highlightedUserFieldId && (
                   <td className="px-6 py-2">Nouveau</td>
                 )}
               </tr>
@@ -172,30 +154,32 @@ const TaxPageContent: React.FC<TaxPageProps> = ({
           )}
         </tbody>
       </table>
-      <div className="px-4 py-2 flex justify-between items-center">
-        <h4 className="text-sm whitespace-nowrap">
-          <span className="font-bold">{totalItem}</span> Taxes
-        </h4>
-        {taxes.length > 0 && (
-          <Stack spacing={2}>
-            <Pagination
-              count={totalPages}
-              page={currentPage}
-              onChange={handlePageChange}
-              color="primary"
-              size="small"
-            />
-          </Stack>
-        )}
+      <div className="px-4 py-2 flex flex-col gap-2">
+        <div className="w-full flex justify-between items-center">
+          <h4 className="text-sm whitespace-nowrap">
+            <span className="font-bold">{totalItem}</span> Pays
+          </h4>
+          {countries.length > 0 && (
+            <Stack spacing={2}>
+              <Pagination
+                count={totalPages}
+                page={currentPage}
+                onChange={handlePageChange}
+                color="primary"
+                size="small"
+              />
+            </Stack>
+          )}
+        </div>
       </div>
     </div>
   );
 };
 
-const TaxPage: React.FC<TaxPageProps> = (props) => (
+const CountryPage: React.FC<CountryPageProps> = (props) => (
   <SortProvider>
-    <TaxPageContent {...props} />
+    <CountryPageContent {...props} />
   </SortProvider>
 );
 
-export default TaxPage;
+export default CountryPage;

@@ -122,7 +122,7 @@ export default function DimensionPage({
             </th>
             <th scope="col" className="px-6 py-4 w-[50px]">
               <div className="flex items-center">
-                <span className="leading-3">status</span>
+                <span className="leading-3">statut</span>
               </div>
             </th>
           </tr>
@@ -151,11 +151,11 @@ export default function DimensionPage({
                 <td className="px-6 py-2 uppercase text-[10px]">
                   {dimension.status === "A" ? (
                     <div className="text-center bg-green-200 text-green-600 border border-green-400  py-1 rounded-md max-w-[50px]">
-                      <span>Active</span>
+                      <span>Actif</span>
                     </div>
                   ) : (
                     <div className="text-center bg-gray-200 text-gray-600 border border-gray-400  py-1 rounded-md max-w-[60px]">
-                      <span>Innactive</span>
+                      <span>Inactif</span>
                     </div>
                   )}
                 </td>

@@ -10,7 +10,7 @@ import { ChevronLeft } from "lucide-react";
 
 interface FormData {
   code: number | null;
-  label: string;
+  countryName: string;
   creator_id: any;
   status: string;
 }
@@ -20,7 +20,7 @@ interface UserFieldCreatePageProps {
   onClose: () => void;
 }
 
-export default function BlockCreatePage({
+export default function CountryCreatePage({
   onCreate,
   onClose,
 }: UserFieldCreatePageProps) {
@@ -30,7 +30,7 @@ export default function BlockCreatePage({
   const { notifySuccess, notifyError } = useNotify();
   const [formData, setFormData] = useState<FormData>({
     code: null,
-    label: "",
+    countryName: "",
     creator_id: user._id,
     status: "A",
   });
@@ -50,7 +50,7 @@ export default function BlockCreatePage({
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/block`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/iso-code`,
         {
           method: "POST",
           headers: {
@@ -90,23 +90,12 @@ export default function BlockCreatePage({
             <ChevronLeft />
           </div>
           <h1 className="text-[20px] font-[800] text-gray-800">
-            Créer <span className="font-[300]">un blocage</span>
+            Créer <span className="font-[300]">un code iso</span>
           </h1>
         </div>
         <div className="mt-[30px] flex flex-col justify-between">
           <div className="flex flex-col">
-          <Input
-              element="input"
-              id="code"
-              type="text"
-              placeholder="ex: Code"
-              label="Libellé"
-              onChange={handleChange}
-              validators={[VALIDATOR_REQUIRE()]}
-              required
-              create
-              gray
-            />
+     
             <Input
               element="input"
               id="label"
@@ -131,7 +120,7 @@ export default function BlockCreatePage({
                   Annuler
                 </Button>
                 <Button size="small" blue type="submit">
-                  Créer le blocage
+                  Créer le code iso
                 </Button>
               </div>
             ) : (

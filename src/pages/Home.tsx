@@ -247,7 +247,7 @@ export default function Home() {
                   Sous-famille
                 </th>
                 <th scope="col" className="px-6 w-[50px]">
-                  Status
+                  Statut
                 </th>
                 <th scope="col" className="px-6 w-[150px] text-center">
                   Date
