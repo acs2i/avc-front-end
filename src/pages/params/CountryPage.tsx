@@ -111,16 +111,16 @@ const CountryPageContent: React.FC<CountryPageProps> = ({
         <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700 uppercase">
           <tr>
             <th scope="col" className="px-6 py-4 w-1/3">
-              <SortHeader listId={COUNTRY_LIST_ID} column="countryName" label="Libellé" />
+              {/* <SortHeader listId={COUNTRY_LIST_ID} column="countryName" label="Libellé" /> */}
             </th>
             <th scope="col" className="px-6 py-4 w-[300px]">
-              <SortHeader listId={COUNTRY_LIST_ID} column="alpha2Code" label="Iso-2" />
+              {/* <SortHeader listId={COUNTRY_LIST_ID} column="alpha2Code" label="Iso-2" /> */}
             </th>
             <th scope="col" className="px-6 py-4 w-[300px]">
-              <SortHeader listId={COUNTRY_LIST_ID} column="alpha3Code" label="Iso-3" />
+              {/* <SortHeader listId={COUNTRY_LIST_ID} column="alpha3Code" label="Iso-3" /> */}
             </th>
             <th scope="col" className="px-6 py-4 w-[50px]">
-              <SortHeader listId={COUNTRY_LIST_ID} column="numeric" label="Iso-N" />
+              {/* <SortHeader listId={COUNTRY_LIST_ID} column="numeric" label="Iso-N" /> */}
             </th>
           </tr>
         </thead>

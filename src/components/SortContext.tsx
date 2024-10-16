@@ -58,25 +58,27 @@ export const useSortContext = () => {
 };
 
 interface SortHeaderProps {
-  listId: string;
-  column: string;
-  label: string;
-}
+    listId: string;
+    column: string;
+    label: string;
+    onSort: (column: string) => void;
+  }
 
-export const SortHeader: React.FC<SortHeaderProps> = ({ listId, column, label }) => {
-  const { getSortState, setSortState } = useSortContext();
-  const sortState = getSortState(listId);
-
-  const handleSort = () => {
-    if (sortState.column !== column) {
-      setSortState(listId, { column, direction: 'asc' });
-    } else {
-      setSortState(listId, {
-        column,
-        direction: sortState.direction === 'asc' ? 'desc' : 'asc'
-      });
-    }
-  };
+export const SortHeader: React.FC<SortHeaderProps> = ({ listId, column, label, onSort }) => {
+    const { getSortState, setSortState } = useSortContext();
+    const sortState = getSortState(listId);
+  
+    const handleSort = () => {
+      if (sortState.column !== column) {
+        setSortState(listId, { column, direction: 'asc' });
+      } else {
+        setSortState(listId, {
+          column,
+          direction: sortState.direction === 'asc' ? 'desc' : 'asc'
+        });
+      }
+      onSort(column);
+    };
 
   return (
     <div className="flex items-center cursor-pointer" onClick={handleSort}>

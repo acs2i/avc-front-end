@@ -1,10 +1,7 @@
-import Card from "../../components/Shared/Card";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Collapse, Pagination, Stack } from "@mui/material";
-import Button from "../../components/FormElements/Button";
-import Spinner from "@/src/components/Shared/Spinner";
-import { ChevronsUpDown, Plus } from "lucide-react";
-import Header from "../../components/Navigation/Header";
+import Spinner from "../../components/Shared/Spinner";
+import { SortProvider, useSortContext, SortHeader } from "../../components/SortContext";
 
 interface Grid {
   _id: string;
@@ -22,21 +19,25 @@ interface GridPageProps {
   resetHighlightedGridId: () => void;
 }
 
-export default function GridPage({
+const GRID_LIST_ID = 'grid-list';
+
+const GridPageContent: React.FC<GridPageProps> = ({
   onSelectGrid,
   shouldRefetch,
   highlightedGridId,
   resetHighlightedGridId,
-}: GridPageProps) {
+}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [grids, setGrids] = useState<Grid[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const limit = 20;
-  const [totalItem, setTotalItem] = useState(null);
+  const [totalItem, setTotalItem] = useState<number | null>(null);
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
-  const [prevSearchValue, setPrevSearchValue] = useState("");
   const [expandedGrid, setExpandedGrid] = useState<Grid | null>(null);
   const N = 10;
+
+  const { getSortState } = useSortContext();
+  const sortState = getSortState(GRID_LIST_ID);
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -45,11 +46,8 @@ export default function GridPage({
     setCurrentPage(value);
   };
 
-  useEffect(() => {
-    fetchGrids();
-  }, [currentPage]);
-
   const fetchGrids = async () => {
+    setIsLoading(true);
     try {
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/dimension-grid?page=${currentPage}&limit=${limit}`,
@@ -73,17 +71,14 @@ export default function GridPage({
 
   useEffect(() => {
     if (highlightedGridId) {
-      const timer = setTimeout(() => {
-        resetHighlightedGridId();
-      }, 3000);
-
+      const timer = setTimeout(resetHighlightedGridId, 3000);
       return () => clearTimeout(timer);
     }
   }, [highlightedGridId, resetHighlightedGridId]);
 
   useEffect(() => {
     fetchGrids();
-  }, [shouldRefetch]);
+  }, [shouldRefetch, currentPage]);
 
   const handleViewMore = (grid: Grid) => {
     setExpandedGrid(grid);
@@ -93,50 +88,69 @@ export default function GridPage({
     return str.replace(/^\D+\s*/, "");
   };
 
+  const sortedGrids = useMemo(() => {
+    if (!sortState.column) return grids;
+  
+    return [...grids].sort((a, b) => {
+      const aValue = a[sortState.column as keyof Grid];
+      const bValue = b[sortState.column as keyof Grid];
+      
+      if (sortState.column === 'code') {
+        // Assurez-vous que aValue et bValue sont des chaînes avant de les convertir en nombres
+        const aNum = typeof aValue === 'string' ? parseInt(aValue, 10) : 0;
+        const bNum = typeof bValue === 'string' ? parseInt(bValue, 10) : 0;
+        return sortState.direction === 'asc' ? aNum - bNum : bNum - aNum;
+      } else if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortState.direction === 'asc'
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      } else if (Array.isArray(aValue) && Array.isArray(bValue)) {
+        // Si les valeurs sont des tableaux, comparez leur première valeur (ou une chaîne vide si le tableau est vide)
+        const aString = aValue[0] || '';
+        const bString = bValue[0] || '';
+        return sortState.direction === 'asc'
+          ? aString.localeCompare(bString)
+          : bString.localeCompare(aString);
+      }
+      
+      // Si les types ne correspondent pas ou ne sont pas gérables, ne pas modifier l'ordre
+      return 0;
+    });
+  }, [grids, sortState]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center overflow-hidden p-[30px]">
+        <Spinner />
+      </div>
+    );
+  }
+
   return (
     <div className="relative overflow-x-auto">
       <table className="w-full text-left">
         <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700 uppercase">
           <tr>
             <th scope="col" className="px-6 py-4 w-[50px]">
-              <div className="flex items-center">
-                <span>type</span>
-                <div className="cursor-pointer">
-                  <ChevronsUpDown size={13} />
-                </div>
-              </div>
+              {/* <SortHeader listId={GRID_LIST_ID} column="type" label="Type" /> */}
             </th>
             <th scope="col" className="px-6 py-4 w-[50px]">
-              <div className="flex items-center">
-                <span>code</span>
-                <div className="cursor-pointer">
-                  <ChevronsUpDown size={13} />
-                </div>
-              </div>
+              {/* <SortHeader listId={GRID_LIST_ID} column="code" label="Code" /> */}
             </th>
             <th scope="col" className="px-6 py-4 w-[50px]">
-              <div className="flex items-center">
-                <span>libellé</span>
-                <div className="cursor-pointer">
-                  <ChevronsUpDown size={13} />
-                </div>
-              </div>
+              {/* <SortHeader listId={GRID_LIST_ID} column="label" label="Libellé" /> */}
             </th>
             <th scope="col" className="px-6 py-4w-[100px]">
-              <div className="flex items-center">
-                <span>dimensions</span>
-              </div>
+              <span>Dimensions</span>
             </th>
             <th scope="col" className="px-6 py-4 w-[50px]">
-              <div className="flex items-center">
-                <span>statut</span>
-              </div>
+              <span>Statut</span>
             </th>
           </tr>
         </thead>
         <tbody>
-          {grids && grids.length > 0
-            ? grids.map((grid) => (
+          {sortedGrids.length > 0
+            ? sortedGrids.map((grid) => (
                 <tr
                   key={grid._id}
                   className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 whitespace-nowrap ${
@@ -207,36 +221,39 @@ export default function GridPage({
                   )}
                 </tr>
               ))
-            : ""}
+            : (
+              <tr>
+                <td colSpan={5} className="px-6 py-7 text-center">
+                  Aucun Résultat
+                </td>
+              </tr>
+            )}
         </tbody>
       </table>
-      <div className="px-4 py-2 flex flex-col gap-2">
-        <div className="w-full flex justify-between items-center">
-          <div className="flex items-center">
-            <h4 className="text-sm whitespace-nowrap">
-              <span className="font-bold">{totalItem}</span> Grilles
-            </h4>
-            {prevSearchValue && (
-              <span className="text-sm italic ml-2">{`"${prevSearchValue}"`}</span>
-            )}
-          </div>
-          <div className="flex justify-end w-full">
-            {grids && grids.length > 0 && (
-              <div className="flex justify-center">
-                <Stack spacing={2}>
-                  <Pagination
-                    count={totalPages}
-                    page={currentPage}
-                    onChange={handlePageChange}
-                    color="primary"
-                    size="small"
-                  />
-                </Stack>
-              </div>
-            )}
-          </div>
-        </div>
+      <div className="px-4 py-2 flex justify-between items-center">
+        <h4 className="text-sm whitespace-nowrap">
+          <span className="font-bold">{totalItem}</span> Grilles
+        </h4>
+        {grids.length > 0 && (
+          <Stack spacing={2}>
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={handlePageChange}
+              color="primary"
+              size="small"
+            />
+          </Stack>
+        )}
       </div>
     </div>
   );
-}
+};
+
+const GridPage: React.FC<GridPageProps> = (props) => (
+  <SortProvider>
+    <GridPageContent {...props} />
+  </SortProvider>
+);
+
+export default GridPage;

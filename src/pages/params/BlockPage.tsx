@@ -105,13 +105,13 @@ const BlockPageContent: React.FC<BlockPageProps> = ({
         <thead className="border-y-[1px] border-gray-200 text-sm font-[800] text-gray-700 uppercase">
           <tr>
             <th scope="col" className="px-6 py-4 w-1/3">
-              <SortHeader listId={BLOCK_LIST_ID} column="code" label="Code" />
+              {/* <SortHeader listId={BLOCK_LIST_ID} column="code" label="Code" /> */}
             </th>
             <th scope="col" className="px-6 py-4 w-[300px]">
-              <SortHeader listId={BLOCK_LIST_ID} column="label" label="Libellé" />
+              {/* <SortHeader listId={BLOCK_LIST_ID} column="label" label="Libellé" /> */}
             </th>
             <th scope="col" className="px-6 py-4 w-[50px]">
-              <SortHeader listId={BLOCK_LIST_ID} column="status" label="Statut" />
+              {/* <SortHeader listId={BLOCK_LIST_ID} column="status" label="Statut" /> */}
             </th>
           </tr>
         </thead>
