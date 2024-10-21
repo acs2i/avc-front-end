@@ -18,17 +18,11 @@ const BarChart: React.FC<BarChartProps> = ({ data1, data2, labels }) => {
     labels: chartLabels,
     datasets: [
       {
-        label: 'Projection',
+        label: 'Collection',
         data: data1,
         backgroundColor: '#5a80d8',
         barThickness: 10,
-      },
-      {
-        label: 'Actuel',
-        data: data2,
-        backgroundColor: '#7EC8E3',
-        barThickness: 10,
-      },
+      }
     ],
   };
 

@@ -10,6 +10,11 @@ import CardHome from "../components/Shared/CardHome";
 import { useProducts } from "../utils/hooks/useProducts";
 import { useNavigate } from "react-router-dom";
 import { CARD, GRAPH } from "../utils";
+import { useActiveInactiveProductGraph } from "../utils/hooks/dashboard/useActiveInactiveProductGraphs";
+import useCardsHook from "../utils/hooks/dashboard/useCards";
+import { Card } from "@/type";
+import {Mosaic, OrbitProgress} from "react-loading-indicators"
+
 
 interface Supplier {
   _id: string;
@@ -72,28 +77,79 @@ interface CardType {
 }
 
 export default function Home() {
-  const data1 = [12, 19, 14, 5, 16, 19];
-  const data2 = [14, 16, 20, 5, 18, 22];
+  
+  const limit = 10;
+
   const navigate = useNavigate();
-  const labels = ["January", "February", "March", "April", "May", "June"];
-  const colors = ["#088F8F", "#6495ED", "#89CFF0"];
+
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItem, setTotalItem] = useState<number | null>(null);
-  const limit = 10;
-  const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
-  const [submittedSearchParams, setSubmittedSearchParams] =
-    useState<SearchParams>({});
+  const [submittedSearchParams, setSubmittedSearchParams] = useState<SearchParams>({});
   const { data: products, refetch: refetchProducts } = useProducts(
     limit,
     currentPage,
     submittedSearchParams
   );
 
+  const [numberValidatedOfProducts, setNumberValidatedOfProducts] = useState<number>(0)
+  const [numberDraftsWaiting, setNumberDraftsWaiting] = useState<number>(0)
+
+  const {cards, isLoadingCards}: {cards: Card[], isLoadingCards: boolean} = useCardsHook()
+
+  const totalPages = Math.ceil((totalItem ?? 0) / limit);
+  const data1 = [12, 19, 14, 5, 16, 19];
+  const data2 = [14, 16, 20, 5, 18, 22];
+  const labels = ["January", "February", "March", "April", "May", "June"];
+  const colors = ["#088F8F", "#6495ED", "#89CFF0"];
+
   useEffect(() => {
     fetchSuppliers();
   }, [currentPage]);
+
+  useEffect(() => {
+    (async () => {
+    
+     const response = await fetch(
+       `${
+         process.env.REACT_APP_URL_DEV
+       }/api/v1/product/search?creation_date=2020-02-01T00:00:00Z`,
+       {
+         method: "GET",
+         headers: {
+           "Content-Type": "application/json",
+         },
+       }
+     ) 
+     const {data, total} = await response.json();
+
+     setNumberValidatedOfProducts(total);
+     })();
+ },[])
+
+ 
+ useEffect(() => {
+  (async () => {
+  
+   const response = await fetch(
+     `${
+       process.env.REACT_APP_URL_DEV
+     }/api/v1/draft/status`,
+     {
+       method: "GET",
+       headers: {
+         "Content-Type": "application/json",
+       },
+     }
+   ) 
+   const data = await response.json();
+   setNumberDraftsWaiting(data.length);
+   })();
+},[])
+
+
+
 
   const fetchSuppliers = async () => {
     try {
@@ -116,6 +172,8 @@ export default function Home() {
       setIsLoading(false);
     }
   };
+
+
 
   // Fictitious data for the new indicators
   const indicatorsData = {
@@ -153,7 +211,7 @@ export default function Home() {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-lg font-bold">
-                    57 nouveaux produits
+                    {numberValidatedOfProducts} Nouveaux Produits
                   </span>
                   <span className="text-xs">Awaiting processing</span>
                 </div>
@@ -163,19 +221,19 @@ export default function Home() {
                   <Pause size={20} />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-lg font-bold">57 new orders</span>
+                  <span className="text-lg font-bold">{numberDraftsWaiting} Brouillons attendent la validation </span>
                   <span className="text-xs">Awaiting processing</span>
                 </div>
               </div>
-              <div className="flex items-center gap-5">
+              {/* <div className="flex items-center gap-5">
                 <div className="w-[30px] h-[30px] flex items-center justify-center rounded-full bg-red-100 text-red-500">
                   <X size={20} />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-lg font-bold">57 new orders</span>
+                  <span className="text-lg font-bold">0 new orders</span>
                   <span className="text-xs">Awaiting processing</span>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -206,17 +264,26 @@ export default function Home() {
           </div>
         </div>
         <div className="w-[70%] flex flex-wrap justify-end gap-6">
-          {CARD.map((card) => (
-            <CardHome
-              key={card.title}
-              title={card.title}
-              subtitle={card.subtitle}
-              data1={card.data1}
-              data2={card.data2}
-              labels={card.labels}
-              chartType={card.chartType}
-            />
-          ))}
+          {isLoadingCards 
+          ?
+             <div className="m-auto">
+              <OrbitProgress color="#fff" size="large" text="" textColor="" />
+              </div> 
+            : <React.Fragment>
+              {cards?.map((card: Card) => {
+                return <CardHome 
+                  key={card.id}
+                  title={card.title}
+                  subtitle={card.subtitle}
+                  data1={card.data1}
+                  data2={card.data2}
+                  labels={card.labels}
+                  chartType={card.chartType}
+                  />
+              })}
+            </React.Fragment>
+          }
+    
         </div>
       </section>
 

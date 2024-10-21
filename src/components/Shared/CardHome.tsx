@@ -16,6 +16,7 @@ type InFosCard = {
 
 export default function CardHome({ title, subtitle, data1, data2, labels, chartType }: InFosCard) {
   const colors = [['#4682B4', '	#B0C4DE']];
+  let total = 0;
 
   const renderChart = () => {
     if (chartType === "line") {
@@ -52,6 +53,9 @@ export default function CardHome({ title, subtitle, data1, data2, labels, chartT
       }
   };
 
+  if(data1) data1.forEach((d) => total += d );
+  if(data2) data2.forEach((d) => total += d );
+
   return (
     <div className="w-[300px] h-[300px] bg-white border rounded-lg shadow-md p-5">
       <div className="flex justify-between">
@@ -60,7 +64,7 @@ export default function CardHome({ title, subtitle, data1, data2, labels, chartT
           <p className="text-xs font-bold text-gray-500">{subtitle}</p>
         </div>
         <div>
-          <span className="text-xl font-bold text-gray-700">567888</span>
+          <span className="text-xl font-bold text-gray-700">{total}</span>
         </div>
       </div>
       <div className="w-full mt-5">{renderChart()}</div>

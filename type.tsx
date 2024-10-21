@@ -1,8 +1,9 @@
 export type Card = {
+  id: number
   title: string;
   subtitle: string;
   data1: number[];
-  data2: number[];
+  data2?: number[];
   labels: string[];
   chartType: string;
 };
