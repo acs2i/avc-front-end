@@ -1,13 +1,10 @@
-import Card from "../../components/Shared/Card";
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import useFetch from "../../utils/hooks/usefetch";
+import React, { useState, useEffect } from "react";
 import Input from "../../components/FormElements/Input";
 import Button from "../../components/FormElements/Button";
 import { CircularProgress, Divider } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
 import Modal from "../../components/Shared/Modal";
-import { ChevronLeft, RotateCcw, X } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 
 interface Collection {
   _id: string;
@@ -18,70 +15,35 @@ interface Collection {
 
 interface CollectionUpdatePageProps {
   selectedCollection: Collection;
-  onUpdate: () => void;
   onClose: () => void;
-}
-
-interface FormData {
-  code: string;
-  label: string;
+  onUpdateSuccess: () => void;
 }
 
 export default function CollectionUpdatePage({
   selectedCollection,
   onClose,
-  onUpdate,
+  onUpdateSuccess,
 }: CollectionUpdatePageProps) {
-  const id = selectedCollection._id;
-  const [collectionUpdate, setCollectionUpdate] = useState<Collection | null>(
-    null
-  );
-  const { notifySuccess, notifyError } = useNotify();
+  const [isLoading, setIsLoading] = useState(false);
   const [isModify, setIsModify] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const { data: collection } = useFetch<Collection>(
-    `${process.env.REACT_APP_URL_DEV}/api/v1/collection/${id}`
-  );
-  const [libelle, setLibelle] = useState("");
-  const [code, setCode] = useState("");
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState<FormData>({
-    code: "",
-    label: "",
-  });
-
-  const handleLibelleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLibelle(e.target.value);
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      label: e.target.value,
-    }));
-  };
+  const { notifySuccess, notifyError } = useNotify();
+  const [formData, setFormData] = useState<Collection>(selectedCollection);
 
   useEffect(() => {
-    if (collection) {
-      setLibelle(collection.label);
-      setCode(collection.code);
-      setFormData({
-        label: collection.label,
-        code: collection.code,
-      });
-    }
-  }, [collection]);
-
-  useEffect(() => {
-    if (selectedCollection) {
-      setCollectionUpdate(selectedCollection);
-    }
+    setFormData(selectedCollection);
   }, [selectedCollection]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleUpdate = async () => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/collection/${id}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/collection/${formData._id}`,
         {
           method: "PUT",
           headers: {
@@ -91,19 +53,29 @@ export default function CollectionUpdatePage({
         }
       );
       if (response.ok) {
-        setTimeout(() => {
-          notifySuccess("Collection modifiée avec succès !");
-          setIsLoading(false);
-          onUpdate();
-          onClose();
-        }, 100);
+        const data = await response.json();
+        console.log("Updated data:", data);
+        notifySuccess("Collection modifiée avec succès !");
+        setIsModify(false);
+        setIsModalOpen(false);
+        onUpdateSuccess();
+        onClose();
       } else {
-        notifyError("Erreur lors de la modif !");
+        const errorData = await response.json();
+        console.error("Error response:", errorData);
+        notifyError("Erreur lors de la modification");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Erreur lors de la soumission", error);
+      notifyError("Erreur lors de la soumission");
     } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsModalOpen(true);
   };
 
   return (
@@ -113,7 +85,7 @@ export default function CollectionUpdatePage({
         onCancel={() => setIsModalOpen(false)}
         onClose={() => setIsModalOpen(false)}
         header="Confirmation de modification de la collection"
-        onSubmit={handleSubmit}
+        onSubmit={handleUpdate}
         icon="?"
       >
         <div className="px-7 mb-5">
@@ -132,7 +104,7 @@ export default function CollectionUpdatePage({
             >
               Non
             </Button>
-            <Button size="small" blue type="submit">
+            <Button size="small" blue onClick={handleUpdate} type="button">
               Oui
             </Button>
           </div>
@@ -142,18 +114,14 @@ export default function CollectionUpdatePage({
           </div>
         )}
       </Modal>
-
-      <form className="mb-[50px]">
+      <form onSubmit={handleSubmit}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div onClick={onClose} className="cursor-pointer">
               <ChevronLeft />
             </div>
             <h1 className="text-[20px] font-[800] text-gray-800">
-              Code {" "}
-              <span className="font-[300]">
-                de la collection : {collection?.code}
-              </span>
+              Code <span className="font-[300]">de la collection : {formData.code}</span>{" "}
             </h1>
           </div>
           {!isModify && (
@@ -167,62 +135,53 @@ export default function CollectionUpdatePage({
         </div>
         <div className="mt-5 flex flex-col justify-between">
           <div className="flex flex-col">
-            {isModify ? (
-              <div>
-                <Input
-                  element="input"
-                  id="label"
-                  type="text"
-                  placeholder="Modifier le libellé"
-                  value={libelle}
-                  label="Libellé"
-                  validators={[]}
-                  create
-                  onChange={handleLibelleChange}
-                  gray
-                />
-              </div>
-            ) : (
-              <div>
-                <Input
-                  element="input"
-                  id="label"
-                  type="text"
-                  placeholder="Modifier le libellé"
-                  value={libelle}
-                  label="Libellé"
-                  disabled
-                  validators={[]}
-                  create
-                  onChange={handleLibelleChange}
-                  gray
-                />
-              </div>
-            )}
+            <Input
+              element="input"
+              id="code"
+              label="Code"
+              value={formData.code}
+              placeholder={formData.code}
+              disabled
+              validators={[]}
+              gray
+              create
+            />
+            <Input
+              element="input"
+              id="label"
+              type="text"
+              placeholder="Modifier le libellé"
+              value={formData.label}
+              label="Libellé"
+              validators={[]}
+              create
+              onChange={handleInputChange}
+              gray
+              disabled={!isModify}
+            />
           </div>
-          {isModify && (
-            <div className="w-full mt-2">
-              <div className="flex items-center gap-2">
-                <Button
-                  size="small"
-                  cancel
-                  type="button"
-                  onClick={() => setIsModify(false)}
-                >
-                  Annuler
-                </Button>
-                <Button
-                  size="small"
-                  blue
-                  onClick={() => setIsModalOpen(true)}
-                  type="button"
-                >
-                  Modifier la collection
-                </Button>
-              </div>
-            </div>
-          )}
         </div>
+        {isModify && (
+          <div className="w-full mt-2">
+            <div className="flex items-center gap-2">
+              <Button
+                size="small"
+                cancel
+                type="button"
+                onClick={() => setIsModify(false)}
+              >
+                Annuler
+              </Button>
+              <Button
+                size="small"
+                blue
+                type="submit"
+              >
+                Modifier
+              </Button>
+            </div>
+          </div>
+        )}
       </form>
     </section>
   );

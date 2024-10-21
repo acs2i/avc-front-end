@@ -1,13 +1,10 @@
-import Card from "../../components/Shared/Card";
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import Input from "../../components/FormElements/Input";
 import Button from "../../components/FormElements/Button";
 import { CircularProgress, Divider } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
 import Modal from "../../components/Shared/Modal";
 import { ChevronLeft } from "lucide-react";
-import { useSelector } from "react-redux";
 
 interface Tag {
   _id: string;
@@ -21,116 +18,35 @@ interface Tag {
 
 interface ClassificationUpdatePageProps {
   selectedFamily: Tag;
-  onUpdate: () => void;
   onClose: () => void;
-}
-
-interface FormData {
-  creator_id: any;
-  code: string;
-  name: string;
-  level: string;
-  tag_grouping_id: any;
-  status: string;
+  onUpdateSuccess: () => void;
 }
 
 export default function ClassificationUpdatePage({
   selectedFamily,
-  onUpdate,
   onClose,
+  onUpdateSuccess,
 }: ClassificationUpdatePageProps) {
-  const id = selectedFamily._id;
-  const user = useSelector((state: any) => state.auth.user);
-  const [classification, setClassification] = useState<Tag | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isModify, setIsModify] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
-  const [family, setFamily] = useState<Tag>();
-  const [libelle, setLibelle] = useState("");
-  const [type, setType] = useState("");
-  const [code, setCode] = useState("");
-  const [formData, setFormData] = useState<FormData>({
-    creator_id: user._id,
-    code: "",
-    name: "",
-    level: "",
-    tag_grouping_id: "",
-    status: "A",
-  });
-
-  const handleLibelleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLibelle(e.target.value);
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      name: e.target.value,
-    }));
-  };
-
-  const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setType(e.target.value);
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      level: e.target.value,
-    }));
-  };
+  const [formData, setFormData] = useState<Tag>(selectedFamily);
 
   useEffect(() => {
-    if (family) {
-      setLibelle(family.name);
-      setCode(family.code);
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        level: family.level,
-        code: family.code,
-        name: family.name,
-        tag_grouping_id: family.tag_grouping_id,
-        status: family.status,
-      }));
-    }
-  }, [family]);
-
-  useEffect(() => {
-    if (selectedFamily) {
-      setClassification(selectedFamily);
-      setFamily(selectedFamily);
-    }
+    setFormData(selectedFamily);
   }, [selectedFamily]);
 
-  const fetchFamily = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/${id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const data = await response.json();
-      setFamily(data);
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-      notifyError("Erreur lors de la récupération des données");
-    } finally {
-      setIsLoading(false);
-    }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
   };
 
-  useEffect(() => {
-    fetchFamily();
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleUpdate = async () => {
     setIsLoading(true);
     try {
-      console.log("Submitting form data:", formData);
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/${id}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/${formData._id}`,
         {
           method: "PUT",
           headers: {
@@ -142,23 +58,27 @@ export default function ClassificationUpdatePage({
       if (response.ok) {
         const data = await response.json();
         console.log("Updated data:", data);
-        setTimeout(() => {
-          notifySuccess("Classification modifiée avec succès !");
-          setIsLoading(false);
-          onUpdate();
-          onClose();
-        }, 100);
+        notifySuccess("Classification modifiée avec succès !");
+        setIsModify(false);
+        setIsModalOpen(false);
+        onUpdateSuccess();
+        onClose();
       } else {
         const errorData = await response.json();
         console.error("Error response:", errorData);
         notifyError("Erreur lors de la modification");
-        setIsLoading(false);
       }
     } catch (error) {
       console.error("Erreur lors de la soumission", error);
       notifyError("Erreur lors de la soumission");
+    } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsModalOpen(true);
   };
 
   return (
@@ -168,7 +88,7 @@ export default function ClassificationUpdatePage({
         onCancel={() => setIsModalOpen(false)}
         onClose={() => setIsModalOpen(false)}
         header="Confirmation de modification de la classe"
-        onSubmit={handleSubmit}
+        onSubmit={handleUpdate}
         icon="?"
       >
         <div className="px-7 mb-5">
@@ -187,7 +107,7 @@ export default function ClassificationUpdatePage({
             >
               Non
             </Button>
-            <Button size="small" blue type="submit">
+            <Button size="small" blue onClick={handleUpdate} type="button">
               Oui
             </Button>
           </div>
@@ -197,15 +117,14 @@ export default function ClassificationUpdatePage({
           </div>
         )}
       </Modal>
-      <form className="mb-[50px]" onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div onClick={onClose} className="cursor-pointer">
               <ChevronLeft />
             </div>
             <h1 className="text-[20px] font-[800] text-gray-800">
-              Code <span className="font-[300]">de la {family?.level} : {family?.code}</span>{" "}
-              
+              Code <span className="font-[300]">de la {formData.level} : {formData.code}</span>{" "}
             </h1>
           </div>
           {!isModify && (
@@ -219,62 +138,30 @@ export default function ClassificationUpdatePage({
         </div>
         <div className="mt-5 flex flex-col justify-between">
           <div className="flex flex-col">
-            {isModify ? (
-              <div>
-                <Input
-                  element="input"
-                  id="level"
-                  label="Niveau"
-                  value={family?.level}
-                  placeholder={family?.level}
-                  disabled
-                  validators={[]}
-                  gray
-                  create
-                  onChange={handleTypeChange}
-                />
-                <Input
-                  element="input"
-                  id="label"
-                  type="text"
-                  placeholder="Modifier le libellé"
-                  value={libelle}
-                  label="Libellé"
-                  validators={[]}
-                  create
-                  onChange={handleLibelleChange}
-                  gray
-                />
-              </div>
-            ) : (
-              <div>
-                <Input
-                  element="input"
-                  id="level"
-                  label="Niveau"
-                  value={family?.level}
-                  placeholder={family?.level}
-                  disabled
-                  validators={[]}
-                  gray
-                  create
-                  onChange={handleTypeChange}
-                />
-                <Input
-                  element="input"
-                  id="label"
-                  type="text"
-                  placeholder="Modifier le libellé"
-                  value={libelle}
-                  label="Libellé"
-                  disabled
-                  validators={[]}
-                  create
-                  onChange={handleLibelleChange}
-                  gray
-                />
-              </div>
-            )}
+            <Input
+              element="input"
+              id="level"
+              label="Niveau"
+              value={formData.level}
+              placeholder={formData.level}
+              disabled
+              validators={[]}
+              gray
+              create
+            />
+            <Input
+              element="input"
+              id="name"
+              type="text"
+              placeholder="Modifier le libellé"
+              value={formData.name}
+              label="Libellé"
+              validators={[]}
+              create
+              onChange={handleInputChange}
+              gray
+              disabled={!isModify}
+            />
           </div>
         </div>
         {isModify && (
@@ -291,8 +178,7 @@ export default function ClassificationUpdatePage({
               <Button
                 size="small"
                 blue
-                onClick={() => setIsModalOpen(true)}
-                type="button"
+                type="submit"
               >
                 Modifier
               </Button>

@@ -166,7 +166,7 @@ export default function ProductList() {
     if (codeValue) params.reference = codeValue;
     if (labelValue) params.long_label = labelValue;
 
-    const selectedBrandLabel = brands.find((brand) => brand !== null)?.label;
+    const selectedBrandLabel = brands?.find((brand) => brand !== null)?.label;
     if (selectedBrandLabel) {
       params.brand = selectedBrandLabel;
     }
@@ -410,7 +410,7 @@ export default function ProductList() {
               </th>
               <th scope="col" className="px-6">
                 <div className="flex items-center">
-                  <span>Statut</span>
+                  <span>Status</span>
                 </div>
               </th>
             </tr>

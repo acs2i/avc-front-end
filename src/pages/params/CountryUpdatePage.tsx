@@ -1,6 +1,4 @@
-import Card from "../../components/Shared/Card";
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import Input from "../../components/FormElements/Input";
 import Button from "../../components/FormElements/Button";
 import { CircularProgress, Divider } from "@mui/material";
@@ -19,102 +17,38 @@ interface Country {
   creator_id: any;
 }
 
-interface ClassificationUpdatePageProps {
+interface CountryUpdatePageProps {
   selectedCountry: Country;
-  onUpdate: () => void;
   onClose: () => void;
-}
-
-interface FormData {
-  creator_id: any;
-  countryName: string;
-  alpha2Code: string;
-  alpha3Code: string;
-  numeric: string;
-  status: string;
+  onUpdateSuccess: () => void;
 }
 
 export default function CountryUpdatePage({
   selectedCountry,
-  onUpdate,
   onClose,
-}: ClassificationUpdatePageProps) {
-  const id = selectedCountry._id;
-  const user = useSelector((state: any) => state.auth.user);
+  onUpdateSuccess,
+}: CountryUpdatePageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isModify, setIsModify] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
-  const [country, setCountry] = useState<Country>();
-  const [formData, setFormData] = useState<FormData>({
-    creator_id: user._id,
-    alpha2Code: country?.alpha2Code || "",
-    alpha3Code: country?.alpha3Code || "",
-    numeric: country?.numeric || "",
-    countryName: country?.countryName || "",
-    status: "A",
-  });
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { id, value } = e.target;
-    setFormData({
-      ...formData,
-      [id]: value,
-    });
-  };
+  const [formData, setFormData] = useState<Country>(selectedCountry);
+  const user = useSelector((state: any) => state.auth.user);
 
   useEffect(() => {
-    if (selectedCountry) {
-      setCountry(selectedCountry);
-    }
+    setFormData(selectedCountry);
   }, [selectedCountry]);
 
-  const fetchTax = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/iso-code/${id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const data = await response.json();
-      setCountry(data);
-
-      // Mettez à jour formData avec les données récupérées
-      setFormData({
-        creator_id: data.creator_id || user._id,
-        alpha2Code: data.alpha2Code || "",
-        alpha3Code: data.alpha3Code || "",
-        numeric: data.numeric || "",
-        countryName: data.countryName || "",
-        status: data.status || "A",
-      });
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-      notifyError("Erreur lors de la récupération des données");
-    } finally {
-      setIsLoading(false);
-    }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
   };
 
-  useEffect(() => {
-    fetchTax();
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleUpdate = async () => {
     setIsLoading(true);
     try {
-      console.log("Submitting form data:", formData);
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/country/${id}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/iso-code/${formData._id}`,
         {
           method: "PUT",
           headers: {
@@ -126,33 +60,37 @@ export default function CountryUpdatePage({
       if (response.ok) {
         const data = await response.json();
         console.log("Updated data:", data);
-        setTimeout(() => {
-          notifySuccess("Classification modifiée avec succès !");
-          setIsLoading(false);
-          onUpdate();
-          onClose();
-        }, 100);
+        notifySuccess("Pays modifié avec succès !");
+        setIsModify(false);
+        setIsModalOpen(false);
+        onUpdateSuccess();
+        onClose();
       } else {
         const errorData = await response.json();
         console.error("Error response:", errorData);
         notifyError("Erreur lors de la modification");
-        setIsLoading(false);
       }
     } catch (error) {
       console.error("Erreur lors de la soumission", error);
       notifyError("Erreur lors de la soumission");
+    } finally {
       setIsLoading(false);
     }
   };
-  console.log(formData);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsModalOpen(true);
+  };
+
   return (
     <section className="w-full p-4">
       <Modal
         show={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         onClose={() => setIsModalOpen(false)}
-        header="Confirmation de modification de la classe"
-        onSubmit={handleSubmit}
+        header="Confirmation de modification du pays"
+        onSubmit={handleUpdate}
         icon="?"
       >
         <div className="px-7 mb-5">
@@ -171,7 +109,7 @@ export default function CountryUpdatePage({
             >
               Non
             </Button>
-            <Button size="small" blue type="submit">
+            <Button size="small" blue onClick={handleUpdate} type="button">
               Oui
             </Button>
           </div>
@@ -181,14 +119,14 @@ export default function CountryUpdatePage({
           </div>
         )}
       </Modal>
-      <form className="mb-[50px]" onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div onClick={onClose} className="cursor-pointer">
               <ChevronLeft />
             </div>
             <h1 className="text-[20px] font-[800] text-gray-800">
-              Pays <span className="font-[300]">{country?.countryName}</span>{" "}
+              Pays <span className="font-[300]">{formData.countryName}</span>{" "}
             </h1>
           </div>
           {!isModify && (
@@ -202,34 +140,50 @@ export default function CountryUpdatePage({
         </div>
         <div className="mt-5 flex flex-col justify-between">
           <div className="flex flex-col">
-            {isModify ? (
-              <div>
-                <Input
-                  element="input"
-                  id="label"
-                  label="Libellé"
-                  value={formData.countryName} 
-                  placeholder={country?.countryName}
-                  validators={[]}
-                  gray
-                  create
-                  onChange={handleChange}
-                />
-              </div>
-            ) : (
-              <div>
-                <Input
-                  element="input"
-                  id="label"
-                  label="Libellé"
-                  value={country?.countryName}
-                  placeholder={country?.countryName}
-                  disabled
-                  validators={[]}
-                  gray
-                />
-              </div>
-            )}
+            <Input
+              element="input"
+              id="countryName"
+              label="Nom du pays"
+              value={formData.countryName}
+              onChange={handleInputChange}
+              validators={[]}
+              gray
+              create
+              disabled={!isModify}
+            />
+            <Input
+              element="input"
+              id="alpha2Code"
+              label="Code Alpha-2"
+              value={formData.alpha2Code}
+              onChange={handleInputChange}
+              validators={[]}
+              gray
+              create
+              disabled={!isModify}
+            />
+            <Input
+              element="input"
+              id="alpha3Code"
+              label="Code Alpha-3"
+              value={formData.alpha3Code}
+              onChange={handleInputChange}
+              validators={[]}
+              gray
+              create
+              disabled={!isModify}
+            />
+            <Input
+              element="input"
+              id="numeric"
+              label="Code Numérique"
+              value={formData.numeric}
+              onChange={handleInputChange}
+              validators={[]}
+              gray
+              create
+              disabled={!isModify}
+            />
           </div>
         </div>
         {isModify && (
@@ -246,8 +200,7 @@ export default function CountryUpdatePage({
               <Button
                 size="small"
                 blue
-                onClick={() => setIsModalOpen(true)}
-                type="button"
+                type="submit"
               >
                 Modifier
               </Button>

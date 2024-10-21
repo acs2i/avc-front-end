@@ -1,6 +1,4 @@
-import Card from "../../components/Shared/Card";
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import Input from "../../components/FormElements/Input";
 import Button from "../../components/FormElements/Button";
 import { CircularProgress, Divider } from "@mui/material";
@@ -15,99 +13,40 @@ interface Block {
   label: string;
   status: string;
   creator_id: any;
-
 }
 
-interface ClassificationUpdatePageProps {
+interface BlockUpdatePageProps {
   selectedBlock: Block;
-  onUpdate: () => void;
   onClose: () => void;
-}
-
-interface FormData {
-  creator_id: any;
-  code: any;
-  label: string;
-  status: string;
+  onUpdateSuccess: () => void;
 }
 
 export default function BlockUpdatePage({
   selectedBlock,
-  onUpdate,
   onClose,
-}: ClassificationUpdatePageProps) {
-  const id = selectedBlock._id;
-  const user = useSelector((state: any) => state.auth.user);
+  onUpdateSuccess,
+}: BlockUpdatePageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isModify, setIsModify] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
-  const [block, setBlock] = useState<Block>();
-  const [formData, setFormData] = useState<FormData>({
-    creator_id: user._id,
-    code: block?.code,
-    label: block?.label || "",
-    status: "A",
-  });
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { id, value } = e.target;
-    setFormData({
-      ...formData,
-      [id]: value,
-    });
-  };
+  const [formData, setFormData] = useState<Block>(selectedBlock);
+  const user = useSelector((state: any) => state.auth.user);
 
   useEffect(() => {
-    if (selectedBlock) {
-      setBlock(selectedBlock);
-    }
+    setFormData(selectedBlock);
   }, [selectedBlock]);
 
-  const fetchTax = async () => {
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/block/${id}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      const data = await response.json();
-      setBlock(data);
-
-      // Mettez à jour formData avec les données récupérées
-      setFormData({
-        creator_id: data.creator_id || user._id,
-        code: data.code || "",
-        label: data.label || "",
-        status: data.status || "A",
-      });
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-      notifyError("Erreur lors de la récupération des données");
-    } finally {
-      setIsLoading(false);
-    }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
   };
 
-  useEffect(() => {
-    fetchTax();
-  }, []);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleUpdate = async () => {
     setIsLoading(true);
     try {
-      console.log("Submitting form data:", formData);
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/block/${id}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/block/${formData._id}`,
         {
           method: "PUT",
           headers: {
@@ -119,33 +58,37 @@ export default function BlockUpdatePage({
       if (response.ok) {
         const data = await response.json();
         console.log("Updated data:", data);
-        setTimeout(() => {
-          notifySuccess("Classification modifiée avec succès !");
-          setIsLoading(false);
-          onUpdate();
-          onClose();
-        }, 100);
+        notifySuccess("Blocage modifié avec succès !");
+        setIsModify(false);
+        setIsModalOpen(false);
+        onUpdateSuccess();
+        onClose();
       } else {
         const errorData = await response.json();
         console.error("Error response:", errorData);
         notifyError("Erreur lors de la modification");
-        setIsLoading(false);
       }
     } catch (error) {
       console.error("Erreur lors de la soumission", error);
       notifyError("Erreur lors de la soumission");
+    } finally {
       setIsLoading(false);
     }
   };
-  console.log(formData);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsModalOpen(true);
+  };
+
   return (
     <section className="w-full p-4">
       <Modal
         show={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         onClose={() => setIsModalOpen(false)}
-        header="Confirmation de modification de la classe"
-        onSubmit={handleSubmit}
+        header="Confirmation de modification du blocage"
+        onSubmit={handleUpdate}
         icon="?"
       >
         <div className="px-7 mb-5">
@@ -164,7 +107,7 @@ export default function BlockUpdatePage({
             >
               Non
             </Button>
-            <Button size="small" blue type="submit">
+            <Button size="small" blue onClick={handleUpdate} type="button">
               Oui
             </Button>
           </div>
@@ -174,14 +117,14 @@ export default function BlockUpdatePage({
           </div>
         )}
       </Modal>
-      <form className="mb-[50px]" onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div onClick={onClose} className="cursor-pointer">
               <ChevronLeft />
             </div>
             <h1 className="text-[20px] font-[800] text-gray-800">
-              Code <span className="font-[300]">{block?.code}</span>{" "}
+              Code <span className="font-[300]">{formData.code}</span>{" "}
             </h1>
           </div>
           {!isModify && (
@@ -195,54 +138,27 @@ export default function BlockUpdatePage({
         </div>
         <div className="mt-5 flex flex-col justify-between">
           <div className="flex flex-col">
-            {isModify ? (
-              <div>
-              <Input
-                  element="input"
-                  id="code"
-                  label="Code"
-                  value={block?.code}
-                  placeholder={block?.code.toString()}
-                  disabled
-                  validators={[]}
-                  gray
-                />
-                <Input
-                  element="input"
-                  id="label"
-                  label="Libellé"
-                  value={formData.label} 
-                  placeholder={block?.label}
-                  validators={[]}
-                  gray
-                  create
-                  onChange={handleChange}
-                />
-              </div>
-            ) : (
-              <div>
-                <Input
-                  element="input"
-                  id="code"
-                  label="ex: 09"
-                  value={block?.code}
-                  placeholder={block?.code.toString()}
-                  disabled
-                  validators={[]}
-                  gray
-                />
-                <Input
-                  element="input"
-                  id="label"
-                  label="Libellé"
-                  value={block?.label}
-                  placeholder={block?.label}
-                  disabled
-                  validators={[]}
-                  gray
-                />
-              </div>
-            )}
+            <Input
+              element="input"
+              id="code"
+              label="Code"
+              value={formData.code.toString()}
+              placeholder={formData.code.toString()}
+              disabled
+              validators={[]}
+              gray
+            />
+            <Input
+              element="input"
+              id="label"
+              label="Libellé"
+              value={formData.label}
+              onChange={handleInputChange}
+              validators={[]}
+              gray
+              create
+              disabled={!isModify}
+            />
           </div>
         </div>
         {isModify && (
@@ -259,8 +175,7 @@ export default function BlockUpdatePage({
               <Button
                 size="small"
                 blue
-                onClick={() => setIsModalOpen(true)}
-                type="button"
+                type="submit"
               >
                 Modifier
               </Button>

@@ -1,13 +1,10 @@
-import Card from "../../components/Shared/Card";
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import useFetch from "../../utils/hooks/usefetch";
+import React, { useState, useEffect } from "react";
 import Input from "../../components/FormElements/Input";
 import Button from "../../components/FormElements/Button";
 import { CircularProgress, Divider } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
 import Modal from "../../components/Shared/Modal";
-import { ChevronLeft, RotateCcw, X } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 
 interface Brand {
   _id: string;
@@ -20,68 +17,35 @@ interface Brand {
 
 interface BrandUpdatePageProps {
   selectedBrand: Brand;
-  onUpdate: () => void;
   onClose: () => void;
-}
-
-interface FormData {
-  code: string;
-  label: string;
+  onUpdateSuccess: () => void;
 }
 
 export default function BrandUpdatePage({
   selectedBrand,
-  onUpdate,
   onClose,
+  onUpdateSuccess,
 }: BrandUpdatePageProps) {
-  const id = selectedBrand._id;
-  const [brandUpdate, setBrandUpdate] = useState<Brand | null>(null);
-  const { notifySuccess, notifyError } = useNotify();
+  const [isLoading, setIsLoading] = useState(false);
   const [isModify, setIsModify] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const { data: brand } = useFetch<Brand>(
-    `${process.env.REACT_APP_URL_DEV}/api/v1/brand/${id}`
-  );
-  const [libelle, setLibelle] = useState("");
-  const [code, setCode] = useState("");
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState<FormData>({
-    code: "",
-    label: "",
-  });
-
-  const handleLibelleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLibelle(e.target.value);
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      label: e.target.value,
-    }));
-  };
+  const { notifySuccess, notifyError } = useNotify();
+  const [formData, setFormData] = useState<Brand>(selectedBrand);
 
   useEffect(() => {
-    if (brand) {
-      setLibelle(brand.label);
-      setCode(brand.code);
-      setFormData({
-        label: brand.label,
-        code: brand.code,
-      });
-    }
-  }, [brand]);
-
-  useEffect(() => {
-    if (selectedBrand) {
-      setBrandUpdate(selectedBrand);
-    }
+    setFormData(selectedBrand);
   }, [selectedBrand]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleUpdate = async () => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/brand/${id}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/brand/${formData._id}`,
         {
           method: "PUT",
           headers: {
@@ -91,22 +55,30 @@ export default function BrandUpdatePage({
         }
       );
       if (response.ok) {
-        setTimeout(() => {
-          notifySuccess("Brand modifiée avec succès !");
-          setIsLoading(false);
-          onUpdate();
-          onClose();
-        }, 100);
+        const data = await response.json();
+        console.log("Updated data:", data);
+        notifySuccess("Marque modifiée avec succès !");
+        setIsModify(false);
+        setIsModalOpen(false);
+        onUpdateSuccess();
+        onClose();
       } else {
-        notifyError("Erreur lors de la modif !");
+        const errorData = await response.json();
+        console.error("Error response:", errorData);
+        notifyError("Erreur lors de la modification");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Erreur lors de la soumission", error);
+      notifyError("Erreur lors de la soumission");
     } finally {
+      setIsLoading(false);
     }
   };
 
-  console.log(formData);
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsModalOpen(true);
+  };
 
   return (
     <section className="w-full p-4">
@@ -114,8 +86,8 @@ export default function BrandUpdatePage({
         show={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         onClose={() => setIsModalOpen(false)}
-        header="Confirmation de modification de la collection"
-        onSubmit={handleSubmit}
+        header="Confirmation de modification de la marque"
+        onSubmit={handleUpdate}
         icon="?"
       >
         <div className="px-7 mb-5">
@@ -134,7 +106,7 @@ export default function BrandUpdatePage({
             >
               Non
             </Button>
-            <Button size="small" blue type="submit">
+            <Button size="small" blue onClick={handleUpdate} type="button">
               Oui
             </Button>
           </div>
@@ -144,15 +116,14 @@ export default function BrandUpdatePage({
           </div>
         )}
       </Modal>
-
-      <form className="mb-[50px]">
+      <form onSubmit={handleSubmit}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div onClick={onClose} className="cursor-pointer">
               <ChevronLeft />
             </div>
-            <h1 className="text-[20px] font-bold text-gray-800">
-              Code<span className="font-[300]"> de la marque : {brand?.code}</span>
+            <h1 className="text-[20px] font-[800] text-gray-800">
+              Code <span className="font-[300]">de la marque : {formData.code}</span>{" "}
             </h1>
           </div>
           {!isModify && (
@@ -166,62 +137,53 @@ export default function BrandUpdatePage({
         </div>
         <div className="mt-5 flex flex-col justify-between">
           <div className="flex flex-col">
-            {isModify ? (
-              <div>
-                <Input
-                  element="input"
-                  id="label"
-                  type="text"
-                  placeholder="Modifier le libellé"
-                  value={libelle}
-                  label="Libellé"
-                  validators={[]}
-                  create
-                  onChange={handleLibelleChange}
-                  gray
-                />
-              </div>
-            ) : (
-              <div>
-                <Input
-                  element="input"
-                  id="label"
-                  type="text"
-                  placeholder="Modifier le libellé"
-                  value={libelle}
-                  label="Libellé"
-                  validators={[]}
-                  disabled
-                  create
-                  onChange={handleLibelleChange}
-                  gray
-                />
-              </div>
-            )}
+            <Input
+              element="input"
+              id="code"
+              label="Code"
+              value={formData.code}
+              placeholder={formData.code}
+              disabled
+              validators={[]}
+              gray
+              create
+            />
+            <Input
+              element="input"
+              id="label"
+              type="text"
+              placeholder="Modifier le libellé"
+              value={formData.label}
+              label="Libellé"
+              validators={[]}
+              create
+              onChange={handleInputChange}
+              gray
+              disabled={!isModify}
+            />
           </div>
-          {isModify && (
-            <div className="w-full mt-2">
-              <div className="flex items-center gap-2">
-                <Button
-                  size="small"
-                  cancel
-                  type="button"
-                  onClick={() => setIsModify(false)}
-                >
-                  Annuler
-                </Button>
-                <Button
-                  size="small"
-                  blue
-                  onClick={() => setIsModalOpen(true)}
-                  type="button"
-                >
-                  Modifier la marque
-                </Button>
-              </div>
-            </div>
-          )}
         </div>
+        {isModify && (
+          <div className="w-full mt-2">
+            <div className="flex items-center gap-2">
+              <Button
+                size="small"
+                cancel
+                type="button"
+                onClick={() => setIsModify(false)}
+              >
+                Annuler
+              </Button>
+              <Button
+                size="small"
+                blue
+                type="submit"
+              >
+                Modifier
+              </Button>
+            </div>
+          </div>
+        )}
       </form>
     </section>
   );

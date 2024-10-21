@@ -19,6 +19,7 @@ interface ButtonProps {
   gradient?: boolean;
   type?: "button" | "submit" | "reset" | undefined;
   onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
+  onKeyPress?: React.KeyboardEventHandler<HTMLButtonElement | HTMLAnchorElement>;
   disabled?: boolean;
   children: React.ReactNode;
 }

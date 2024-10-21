@@ -320,7 +320,7 @@ export default function CreateProductPage() {
       const updatedAdditionalFields = [...prevFormData.additional_fields];
 
       // Vérifier si un champ avec ce label existe déjà
-      const fieldIndex = updatedAdditionalFields.findIndex(
+      const fieldIndex = updatedAdditionalFields?.findIndex(
         (field) => field.label === label
       );
 
@@ -441,7 +441,7 @@ export default function CreateProductPage() {
     index: number,
     option: SuppliersOption
   ) => {
-    const selectedSupplier = optionsSupplier.find(
+    const selectedSupplier = optionsSupplier?.find(
       (supplier) => supplier.value === option?.value
     );
 
@@ -633,7 +633,7 @@ export default function CreateProductPage() {
       setTaxs(formattedTaxs);
 
       // Rechercher la TVA à 20% et la définir comme valeur par défaut
-      const tva20 = formattedTaxs.find((tax: any) => tax.value === "20");
+      const tva20 = formattedTaxs?.find((tax: any) => tax.value === "20");
       if (tva20) {
         setSelectedTax(tva20.value);
         setFormData((prevFormData) => ({
@@ -877,7 +877,7 @@ export default function CreateProductPage() {
                           Classification principale
                         </label>
                         <CreatableSelect
-                          value={classificationOptions.find(
+                          value={classificationOptions?.find(
                             (option) => option.value === classificationValue
                           )}
                           onChange={handleClassificationChange}

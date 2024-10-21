@@ -139,7 +139,11 @@ export default function SuppliersList() {
     }
   };
   
-  
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      handleSearch();
+    }
+  };
   
 
   console.log(statusValue);
@@ -165,6 +169,7 @@ export default function SuppliersList() {
               value={codeValue}
               onChange={(e) => setCodeValue(e.target.value)}
               autoComplete="off"
+              onKeyPress={handleKeyPress}
             />
           </div>
 
@@ -178,6 +183,7 @@ export default function SuppliersList() {
               value={labelValue}
               onChange={(e) => setLabelValue(e.target.value)}
               autoComplete="off"
+              onKeyPress={handleKeyPress}
             />
           </div>
 
@@ -191,6 +197,7 @@ export default function SuppliersList() {
               value={addressValue}
               onChange={(e) => setAddressValue(e.target.value)}
               autoComplete="off"
+              onKeyPress={handleKeyPress}
             />
           </div>
 
@@ -203,6 +210,7 @@ export default function SuppliersList() {
               value={postalValue}
               onChange={(e) => setPostalValue(e.target.value)}
               autoComplete="off"
+              onKeyPress={handleKeyPress}
             />
           </div>
 
@@ -215,6 +223,7 @@ export default function SuppliersList() {
               value={cityValue}
               onChange={(e) => setCityValue(e.target.value)}
               autoComplete="off"
+              onKeyPress={handleKeyPress}
             />
           </div>
 
@@ -227,6 +236,7 @@ export default function SuppliersList() {
               value={countryValue}
               onChange={(e) => setCountryValue(e.target.value)}
               autoComplete="off"
+              onKeyPress={handleKeyPress}
             />
           </div>
         </div>

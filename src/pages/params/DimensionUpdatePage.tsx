@@ -1,13 +1,10 @@
-import Card from "../../components/Shared/Card";
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import useFetch from "../../utils/hooks/usefetch";
+import React, { useState, useEffect } from "react";
 import Input from "../../components/FormElements/Input";
 import Button from "../../components/FormElements/Button";
 import { CircularProgress, Divider } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
 import Modal from "../../components/Shared/Modal";
-import { ChevronLeft, RotateCcw, X } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 
 interface Dimension {
   _id: string;
@@ -15,97 +12,39 @@ interface Dimension {
   label: string;
   type: string;
   status: string;
-  creator_id: any;
-  additional_fields?: any;
 }
 
 interface DimensionUpdatePageProps {
   selectedDimension: Dimension;
-  onUpdate: () => void;
   onClose: () => void;
-}
-
-interface FormData {
-  type: string;
-  code: string;
-  label: string;
+  onUpdateSuccess: () => void;
 }
 
 export default function DimensionUpdatePage({
   selectedDimension,
   onClose,
-  onUpdate,
+  onUpdateSuccess,
 }: DimensionUpdatePageProps) {
-  const id = selectedDimension._id;
-  const [dimensionUpdate, setDimensionUpadte] = useState<Dimension | null>(
-    null
-  );
   const [isLoading, setIsLoading] = useState(false);
   const [isModify, setIsModify] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
-
-  const { data: dimension } = useFetch<Dimension>(
-    `${process.env.REACT_APP_URL_DEV}/api/v1/dimension/${id}`
-  );
-  const [libelle, setLibelle] = useState("");
-  const [type, setType] = useState("");
-  const [code, setCode] = useState("");
-  const [formData, setFormData] = useState<FormData>({
-    type: "",
-    code: "",
-    label: "",
-  });
-
-  const handleLibelleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setLibelle(e.target.value);
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      label: e.target.value,
-    }));
-  };
-
-  const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setType(e.target.value);
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      type: e.target.value,
-    }));
-  };
-
-  const handleSetType = (type: string) => {
-    if (type === "DI1") {
-      setType("Couleur");
-    } else if (type === "DI2") {
-      setType("Taille");
-    }
-  };
+  const [formData, setFormData] = useState<Dimension>(selectedDimension);
 
   useEffect(() => {
-    if (dimension) {
-      setLibelle(dimension.label);
-      setCode(dimension.code);
-      handleSetType(dimension.type);
-      setFormData({
-        type: dimension.type,
-        code: dimension.code,
-        label: dimension.label,
-      });
-    }
-  }, [dimension]);
-
-  useEffect(() => {
-    if (selectedDimension) {
-      setDimensionUpadte(selectedDimension);
-    }
+    setFormData(selectedDimension);
   }, [selectedDimension]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleUpdate = async () => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/dimension/${id}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/dimension/${formData._id}`,
         {
           method: "PUT",
           headers: {
@@ -115,21 +54,30 @@ export default function DimensionUpdatePage({
         }
       );
       if (response.ok) {
-        setTimeout(() => {
-          notifySuccess("Dimension modifiée avec succés !");
-          setIsLoading(false);
-          onUpdate();
-          onClose();
-        }, 100);
+        const data = await response.json();
+        console.log("Updated data:", data);
+        notifySuccess("Dimension modifiée avec succès !");
+        setIsModify(false);
+        setIsModalOpen(false);
+        onUpdateSuccess();
+        onClose();
       } else {
+        const errorData = await response.json();
+        console.error("Error response:", errorData);
         notifyError("Erreur lors de la modification");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Erreur lors de la soumission", error);
+      notifyError("Erreur lors de la soumission");
     } finally {
+      setIsLoading(false);
     }
   };
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsModalOpen(true);
+  };
 
   return (
     <section className="w-full p-4">
@@ -138,7 +86,7 @@ export default function DimensionUpdatePage({
         onCancel={() => setIsModalOpen(false)}
         onClose={() => setIsModalOpen(false)}
         header="Confirmation de modification de la dimension"
-        onSubmit={handleSubmit}
+        onSubmit={handleUpdate}
         icon="?"
       >
         <div className="px-7 mb-5">
@@ -157,7 +105,7 @@ export default function DimensionUpdatePage({
             >
               Non
             </Button>
-            <Button size="small" blue type="submit">
+            <Button size="small" blue onClick={handleUpdate} type="button">
               Oui
             </Button>
           </div>
@@ -167,16 +115,14 @@ export default function DimensionUpdatePage({
           </div>
         )}
       </Modal>
-
-      <form className="mb-[50px]">
+      <form onSubmit={handleSubmit}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div onClick={onClose} className="cursor-pointer">
               <ChevronLeft />
             </div>
             <h1 className="text-[20px] font-[800] text-gray-800">
-              Code <span className="font-[300]">de la {dimension?.type} : {dimension?.code}</span>{" "}
-           
+              Code <span className="font-[300]">de la {formData.type} : {formData.code}</span>{" "}
             </h1>
           </div>
           {!isModify && (
@@ -190,62 +136,53 @@ export default function DimensionUpdatePage({
         </div>
         <div className="mt-5 flex flex-col justify-between">
           <div className="flex flex-col">
-            {isModify ? (
-              <div>
-                <Input
-                  element="input"
-                  id="label"
-                  type="text"
-                  placeholder="Modifier le libellé"
-                  value={libelle}
-                  label="Libellé"
-                  validators={[]}
-                  create
-                  onChange={handleLibelleChange}
-                  gray
-                />
-              </div>
-            ) : (
-              <div>
-                <Input
-                  element="input"
-                  id="label"
-                  type="text"
-                  placeholder="Modifier le libellé"
-                  value={libelle}
-                  label="Libellé"
-                  validators={[]}
-                  disabled
-                  create
-                  onChange={handleLibelleChange}
-                  gray
-                />
-              </div>
-            )}
+            <Input
+              element="input"
+              id="type"
+              label="Type"
+              value={formData.type}
+              placeholder={formData.type}
+              disabled
+              validators={[]}
+              gray
+              create
+            />
+            <Input
+              element="input"
+              id="label"
+              type="text"
+              placeholder="Modifier le libellé"
+              value={formData.label}
+              label="Libellé"
+              validators={[]}
+              create
+              onChange={handleInputChange}
+              gray
+              disabled={!isModify}
+            />
           </div>
-          {isModify && (
-            <div className="w-full mt-2">
-              <div className="flex items-center gap-2">
-                <Button
-                  size="small"
-                  cancel
-                  type="button"
-                  onClick={() => setIsModify(false)}
-                >
-                  Annuler
-                </Button>
-                <Button
-                  size="small"
-                  blue
-                  onClick={() => setIsModalOpen(true)}
-                  type="button"
-                >
-                  Modiifer {type}
-                </Button>
-              </div>
-            </div>
-          )}
         </div>
+        {isModify && (
+          <div className="w-full mt-2">
+            <div className="flex items-center gap-2">
+              <Button
+                size="small"
+                cancel
+                type="button"
+                onClick={() => setIsModify(false)}
+              >
+                Annuler
+              </Button>
+              <Button
+                size="small"
+                blue
+                type="submit"
+              >
+                Modifier
+              </Button>
+            </div>
+          </div>
+        )}
       </form>
     </section>
   );

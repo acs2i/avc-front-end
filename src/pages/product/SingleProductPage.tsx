@@ -242,7 +242,7 @@ export default function SingleProductPage() {
         initialColors: ["000"],
         initialGrid: [[true]],
       });
-  
+
       // Mapping des suppliers avec vérifications
       const suppliersMapped = product.suppliers.map((supplier: any) => ({
         _id: supplier?.supplier_id?._id || "",
@@ -254,11 +254,10 @@ export default function SingleProductPage() {
         custom_cat: supplier?.custom_cat || "Catégorie inconnue",
         made_in: supplier?.made_in || "Pays d'origine inconnu",
       }));
-  
+
       setSelectedSuppliers(suppliersMapped);
     }
   }, [product, creatorId._id]);
-  
 
   const [sizes, setSizes] = useState<string[]>(formData.initialSizes);
   const [colors, setColors] = useState<string[]>(formData.initialColors);
@@ -1286,9 +1285,9 @@ export default function SingleProductPage() {
                               options={optionsSubFamily}
                               inputValue={inputSubValueFamily}
                               placeholder={
-                                product?.tag_ids?.[1] 
-                                  ? `${product.tag_ids[1].code} - ${product.tag_ids[1].name}` 
-                                  : 'Sélectionnez une sous famille'
+                                product?.tag_ids?.[1]
+                                  ? `${product.tag_ids[1].code} - ${product.tag_ids[1].name}`
+                                  : "Sélectionnez une sous famille"
                               }
                               isClearable
                             />
@@ -1317,9 +1316,9 @@ export default function SingleProductPage() {
                               options={optionsSubSubFamily}
                               inputValue={inputValueSubSubFamily}
                               placeholder={
-                                product?.tag_ids?.[2] 
-                                  ? `${product.tag_ids[2].code} - ${product.tag_ids[2].name}` 
-                                  : 'Sélectionnez une sous sous famille'
+                                product?.tag_ids?.[2]
+                                  ? `${product.tag_ids[2].code} - ${product.tag_ids[2].name}`
+                                  : "Sélectionnez une sous sous famille"
                               }
                               isClearable
                             />
@@ -1641,30 +1640,38 @@ export default function SingleProductPage() {
                   {!isModify && (
                     <FormSection title="Champs additionnels">
                       <div>
-                        {userFields
-                          .filter((field) => field.apply_to === "Produit")
-                          .map((field: any, index: number) => {
-                            const draftField = product.additional_fields.find(
-                              (draftField: any) =>
-                                draftField.label === field.label
-                            );
+                        {product &&
+                          product.additional_fields &&
+                          userFields &&
+                          userFields.length > 0 &&
+                          userFields
+                            .filter((field) => field.apply_to === "Produit")
+                            .map((field: any, index: number) => {
+                              const draftField = Array.isArray(
+                                product.additional_fields
+                              )
+                                ? product.additional_fields.find(
+                                    (draftField: any) =>
+                                      draftField.label === field.label
+                                  )
+                                : product.additional_fields[field.label];
 
-                            return (
-                              <div
-                                key={index}
-                                className="grid grid-cols-12 gap-2 py-2"
-                              >
-                                <span className="col-span-2 font-[700] text-slate-500 text-[13px]">
-                                  {field.label} :
-                                </span>
+                              return (
+                                <div
+                                  key={index}
+                                  className="grid grid-cols-12 gap-2 py-2"
+                                >
+                                  <span className="col-span-2 font-[700] text-slate-500 text-[13px]">
+                                    {field.label} :
+                                  </span>
 
-                                <span className="col-span-4 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                  {/* Affichage de "Non renseigné" si le champ n'est pas renseigné */}
-                                  {draftField?.value || "Non renseigné"}
-                                </span>
-                              </div>
-                            );
-                          })}
+                                  <span className="col-span-4 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                    {/* Affichage de "Non renseigné" si le champ n'est pas renseigné */}
+                                    {draftField?.value || "Non renseigné"}
+                                  </span>
+                                </div>
+                              );
+                            })}
                       </div>
                     </FormSection>
                   )}
