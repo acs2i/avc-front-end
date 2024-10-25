@@ -463,14 +463,8 @@ function ParamsMenuPageContent() {
             onUpdateSuccess={handleUpdateSuccess}
           />
         );
-      case PAGE_TYPES.COUNTRIES:
-        return (
-          <CountryUpdatePage
-            selectedCountry={selectedItem as any}
-            onClose={() => setIsUpdateModalOpen(false)}
-            onUpdateSuccess={handleUpdateSuccess}
-          />
-        );
+        case PAGE_TYPES.COUNTRIES:
+          return null;
       default:
         return null;
     }
@@ -579,7 +573,7 @@ function ParamsMenuPageContent() {
       </>
     );
 
-    const specificFields: Record<PageTypeValue, JSX.Element> = {
+    const specificFieldsPrimary: Record<PageTypeValue, JSX.Element> = {
       [PAGE_TYPES.CLASSIFICATIONS]: (
         <div className="flex flex-col">
           <label className="text-sm font-bold mb-1">Niveau :</label>
@@ -612,6 +606,34 @@ function ParamsMenuPageContent() {
           />
         </div>
       ),
+      [PAGE_TYPES.GRIDS]: (
+        <div className="flex flex-col">
+          <label className="text-sm font-bold mb-1">Type :</label>
+          <input
+            type="text"
+            className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:ring-blue-500 transition-all focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
+            placeholder="Rechercher par type"
+            value={searchFields.type}
+            onChange={(e) =>
+              setSearchFields({ ...searchFields, type: e.target.value })
+            }
+            onKeyPress={handleKeyPress}
+            autoComplete="off"
+          />
+        </div>
+      ),
+      [PAGE_TYPES.COLLECTIONS]: <></>,
+      [PAGE_TYPES.BRANDS]: <></>,
+      [PAGE_TYPES.USER_FIELDS]: <></>,
+      [PAGE_TYPES.TAXES]: <></>,
+      [PAGE_TYPES.BLOCKS]: <></>,
+      [PAGE_TYPES.COUNTRIES]: <></>,
+    };
+
+    const specificFields: Record<PageTypeValue, JSX.Element> = {
+      [PAGE_TYPES.CLASSIFICATIONS]: <></>,
+      [PAGE_TYPES.DIMENSIONS]: <></>,
+      
       [PAGE_TYPES.GRIDS]: <></>,
       [PAGE_TYPES.COLLECTIONS]: <></>,
       [PAGE_TYPES.BRANDS]: <></>,
@@ -715,6 +737,7 @@ function ParamsMenuPageContent() {
 
     return (
       <div className="relative grid grid-cols-3 gap-6 text-gray-600">
+        {specificFieldsPrimary[page]}
         {page !== PAGE_TYPES.COUNTRIES && commonFields}
         {specificFields[page]}
       </div>
@@ -1018,6 +1041,7 @@ function ParamsMenuPageContent() {
         height="450px"
       >
         {renderSearchFields()}
+        {page && page !== "country" && (
         <div className="mt-3 flex items-center gap-2">
           <div className="flex items-center gap-2">
             <input
@@ -1059,6 +1083,7 @@ function ParamsMenuPageContent() {
             </label>
           </div>
         </div>
+        )}
         <div className="flex items-center justify-between w-full mt-3">
           <Button type="button" size="small" blue onClick={handleSearch}>
             Lancer la Recherche

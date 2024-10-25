@@ -3,8 +3,7 @@ import Input from "../../components/FormElements/Input";
 import Button from "../../components/FormElements/Button";
 import { CircularProgress, Divider } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
-import Modal from "../../components/Shared/Modal";
-import { ChevronLeft, Space, CircleDot, Binary, CalendarRange, Plus } from "lucide-react";
+import { ChevronLeft, Plus } from "lucide-react";
 
 interface CustomField {
   field_name: string;
@@ -35,7 +34,6 @@ export default function UserFieldUpdatePage({
 }: UserFieldUpdatePageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isModify, setIsModify] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
   const [formData, setFormData] = useState<Field>(selectedField);
 
@@ -87,7 +85,6 @@ export default function UserFieldUpdatePage({
       if (response.ok) {
         notifySuccess("Champ utilisateur modifié avec succès !");
         setIsModify(false);
-        setIsModalOpen(false);
         onUpdateSuccess();
         onClose();
       } else {
@@ -103,11 +100,6 @@ export default function UserFieldUpdatePage({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsModalOpen(true);
-  };
-
   const fieldTypeTranslations: { [key: string]: string } = {
     text: "Texte libre",
     multiple_choice: "Choix multiple",
@@ -117,168 +109,138 @@ export default function UserFieldUpdatePage({
 
   return (
     <section className="w-full p-4">
-      <Modal
-        show={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
-        onClose={() => setIsModalOpen(false)}
-        header="Confirmation de modification du champ utilisateur"
-        onSubmit={handleUpdate}
-        icon="?"
-      >
-        <div className="px-7 mb-5">
-          <p className="text-gray-800 text-xl">
-            Voulez-vous vraiment appliquer ces modifications ?
-          </p>
-        </div>
-        <Divider />
-        {!isLoading ? (
-          <div className="flex justify-end mt-7 px-7 gap-2">
-            <Button
-              size="small"
-              danger
-              type="button"
-              onClick={() => setIsModalOpen(false)}
-            >
-              Non
-            </Button>
-            <Button size="small" blue onClick={handleUpdate} type="button">
-              Oui
-            </Button>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div onClick={onClose} className="cursor-pointer">
+            <ChevronLeft />
           </div>
-        ) : (
-          <div className="flex justify-end mt-7 px-7 gap-2">
-            <CircularProgress />
+          <h1 className="text-[20px] font-[800] text-gray-800">
+            Numéro du champ utilisateur : {formData.code}
+          </h1>
+        </div>
+        {!isModify && (
+          <div onClick={() => setIsModify(true)} className="cursor-pointer">
+            <span className="text-[12px] text-blue-500">Modifier</span>
           </div>
         )}
-      </Modal>
-
-      <form onSubmit={handleSubmit}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div onClick={onClose} className="cursor-pointer">
-              <ChevronLeft />
-            </div>
-            <h1 className="text-[20px] font-[800] text-gray-800">
-              Numéro du champ utilisateur : {formData.code}
-            </h1>
-          </div>
-          {!isModify && (
-            <div onClick={() => setIsModify(true)} className="cursor-pointer">
-              <span className="text-[12px] text-blue-500">Modifier</span>
-            </div>
-          )}
+      </div>
+      <div className="mt-3">
+        <Divider />
+      </div>
+      <div className="mt-5 flex flex-col justify-between">
+        <div className="flex flex-col">
+          <Input
+            element="input"
+            id="label"
+            type="text"
+            placeholder="Nom du champ"
+            label="Nom du champ"
+            value={formData.label}
+            onChange={handleInputChange}
+            validators={[]}
+            create
+            gray
+            disabled={!isModify}
+          />
         </div>
-        <div className="mt-3">
-          <Divider />
-        </div>
-        <div className="mt-5 flex flex-col justify-between">
-          <div className="flex flex-col">
-            <Input
-              element="input"
-              id="label"
-              type="text"
-              placeholder="Nom du champ"
-              label="Nom du champ"
-              value={formData.label}
-              onChange={handleInputChange}
-              validators={[]}
-              create
-              gray
-              disabled={!isModify}
-            />
-          </div>
 
-          {isModify ? (
-            <div className="mt-5">
-              {formData.additional_fields.map((field, fieldIndex) => (
-                <div key={fieldIndex} className="mt-4">
-                  <label className="text-sm font-semibold text-gray-700">
-                    Type de champ
-                  </label>
-                  <div className="grid grid-cols-2 gap-4 mt-3">
-                    {/* ... (rest of the field type selection code) ... */}
-                  </div>
-
-                  {(field.field_type === "multiple_choice" ||
-                    field.field_type === "boolean") && (
-                    <div className="mt-4">
-                      {field.options!.map((option: any, optionIndex: any) => (
-                        <Input
-                          key={optionIndex}
-                          element="input"
-                          id={`option_${optionIndex}`}
-                          label={`Option ${optionIndex + 1}`}
-                          placeholder={`Option ${optionIndex + 1}`}
-                          value={option}
-                          onChange={(e) =>
-                            handleAdditionalFieldChange(
-                              optionIndex,
-                              fieldIndex,
-                              e as React.ChangeEvent<HTMLInputElement>
-                            )
-                          }
-                          validators={[]}
-                          create
-                          gray
-                          disabled={!isModify}
-                        />
-                      ))}
-                      {field.field_type === "multiple_choice" && isModify && (
-                        <div
-                          className="mt-3 flex items-center gap-2 text-orange-400 cursor-pointer hover:text-orange-300"
-                          onClick={() => addOption(fieldIndex)}
-                        >
-                          <Plus size={15} />
-                          <span className="font-bold text-[13px]">
-                            Ajouter une option
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  )}
+        {isModify ? (
+          <div className="mt-5">
+            {formData.additional_fields.map((field, fieldIndex) => (
+              <div key={fieldIndex} className="mt-4">
+                <label className="text-sm font-semibold text-gray-700">
+                  Type de champ
+                </label>
+                <div className="grid grid-cols-2 gap-4 mt-3">
+                  {/* Type selection options here */}
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="mt-4">
-              <h2 className="text-sm font-[700]">Type de champ</h2>
-              <div
-                className={`w-[100px] h-[100px] cursor-pointer p-4 border rounded-lg mt-2 flex items-center justify-center bg-gray-200 text-gray-700 shadow-[0_0_10px_rgba(0,0,0,0.3)]`}
-              >
-                <h3 className="text-md font-bold text-center capitalize">
-                  {formData.additional_fields[0]?.field_type
-                    ? fieldTypeTranslations[
-                        formData.additional_fields[0].field_type
-                      ] || formData.additional_fields[0].field_type
-                    : "Type inconnu"}
-                </h3>
-              </div>
-            </div>
-          )}
 
-          {isModify && (
-            <div className="w-full mt-6">
-              <div className="flex items-center gap-2">
-                <Button
-                  size="small"
-                  cancel
-                  type="button"
-                  onClick={() => setIsModify(false)}
-                >
-                  Annuler
-                </Button>
-                <Button
-                  size="small"
-                  blue
-                  type="submit"
-                >
-                  Modifier le champ utilisateur
-                </Button>
+                {(field.field_type === "multiple_choice" ||
+                  field.field_type === "boolean") && (
+                  <div className="mt-4">
+                    {field.options!.map((option: any, optionIndex: any) => (
+                      <Input
+                        key={optionIndex}
+                        element="input"
+                        id={`option_${optionIndex}`}
+                        label={`Option ${optionIndex + 1}`}
+                        placeholder={`Option ${optionIndex + 1}`}
+                        value={option}
+                        onChange={(e) =>
+                          handleAdditionalFieldChange(
+                            optionIndex,
+                            fieldIndex,
+                            e as React.ChangeEvent<HTMLInputElement>
+                          )
+                        }
+                        validators={[]}
+                        create
+                        gray
+                        disabled={!isModify}
+                      />
+                    ))}
+                    {field.field_type === "multiple_choice" && isModify && (
+                      <div
+                        className="mt-3 flex items-center gap-2 text-orange-400 cursor-pointer hover:text-orange-300"
+                        onClick={() => addOption(fieldIndex)}
+                      >
+                        <Plus size={15} />
+                        <span className="font-bold text-[13px]">
+                          Ajouter une option
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
+            ))}
+          </div>
+        ) : (
+          <div className="mt-4">
+            <h2 className="text-sm font-[700]">Type de champ</h2>
+            <div
+              className={`w-[100px] h-[100px] cursor-pointer p-4 border rounded-lg mt-2 flex items-center justify-center bg-gray-200 text-gray-700 shadow-[0_0_10px_rgba(0,0,0,0.3)]`}
+            >
+              <h3 className="text-md font-bold text-center capitalize">
+                {formData.additional_fields[0]?.field_type
+                  ? fieldTypeTranslations[
+                      formData.additional_fields[0].field_type
+                    ] || formData.additional_fields[0].field_type
+                  : "Type inconnu"}
+              </h3>
             </div>
-          )}
+          </div>
+        )}
+
+        {isModify && (
+          <div className="w-full mt-6">
+            <div className="flex items-center gap-2">
+              <Button
+                size="small"
+                cancel
+                type="button"
+                onClick={() => setIsModify(false)}
+              >
+                Annuler
+              </Button>
+              <Button
+                size="small"
+                blue
+                type="button"
+                onClick={() => handleUpdate()}
+              >
+                Modifier le champ utilisateur
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {isLoading && (
+        <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
+          <CircularProgress />
         </div>
-      </form>
+      )}
     </section>
   );
 }

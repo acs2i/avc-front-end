@@ -3,7 +3,6 @@ import Input from "../../components/FormElements/Input";
 import Button from "../../components/FormElements/Button";
 import { CircularProgress, Divider } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
-import Modal from "../../components/Shared/Modal";
 import { ChevronLeft } from "lucide-react";
 
 interface Tag {
@@ -29,7 +28,6 @@ export default function ClassificationUpdatePage({
 }: ClassificationUpdatePageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isModify, setIsModify] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
   const [formData, setFormData] = useState<Tag>(selectedFamily);
 
@@ -60,7 +58,6 @@ export default function ClassificationUpdatePage({
         console.log("Updated data:", data);
         notifySuccess("Classification modifiée avec succès !");
         setIsModify(false);
-        setIsModalOpen(false);
         onUpdateSuccess();
         onClose();
       } else {
@@ -76,116 +73,82 @@ export default function ClassificationUpdatePage({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsModalOpen(true);
-  };
-
   return (
     <section className="w-full p-4">
-      <Modal
-        show={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
-        onClose={() => setIsModalOpen(false)}
-        header="Confirmation de modification de la classe"
-        onSubmit={handleUpdate}
-        icon="?"
-      >
-        <div className="px-7 mb-5">
-          <p className="text-gray-800 text-xl">
-            Voulez-vous vraiment appliquer ces modifications ?
-          </p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div onClick={onClose} className="cursor-pointer">
+            <ChevronLeft />
+          </div>
+          <h1 className="text-[20px] font-[800] text-gray-800">
+            Code <span className="font-[300]">de la {formData.level} : {formData.code}</span>{" "}
+          </h1>
         </div>
+        {!isModify && (
+          <div onClick={() => setIsModify(true)} className="cursor-pointer">
+            <span className="text-[12px] text-blue-500">Modifier</span>
+          </div>
+        )}
+      </div>
+      <div className="mt-3">
         <Divider />
-        {!isLoading ? (
-          <div className="flex justify-end mt-7 px-7 gap-2">
+      </div>
+      <div className="mt-5 flex flex-col justify-between">
+        <div className="flex flex-col">
+          <Input
+            element="input"
+            id="level"
+            label="Niveau"
+            value={formData.level}
+            placeholder={formData.level}
+            disabled
+            validators={[]}
+            gray
+            create
+          />
+          <Input
+            element="input"
+            id="name"
+            type="text"
+            placeholder="Modifier le libellé"
+            value={formData.name}
+            label="Libellé"
+            validators={[]}
+            create
+            onChange={handleInputChange}
+            gray
+            disabled={!isModify}
+          />
+        </div>
+      </div>
+      {isModify && (
+        <div className="w-full mt-2">
+          <div className="flex items-center gap-2">
             <Button
               size="small"
-              danger
+              cancel
               type="button"
-              onClick={() => setIsModalOpen(false)}
+              onClick={() => setIsModify(false)}
             >
-              Non
+              Annuler
             </Button>
-            <Button size="small" blue onClick={handleUpdate} type="button">
-              Oui
+            <Button
+              size="small"
+              blue
+              type="button"
+              onClick={() => handleUpdate()}
+            >
+              Modifier
             </Button>
           </div>
-        ) : (
-          <div className="flex justify-end mt-7 px-7 gap-2">
-            <CircularProgress />
-          </div>
-        )}
-      </Modal>
-      <form onSubmit={handleSubmit}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div onClick={onClose} className="cursor-pointer">
-              <ChevronLeft />
-            </div>
-            <h1 className="text-[20px] font-[800] text-gray-800">
-              Code <span className="font-[300]">de la {formData.level} : {formData.code}</span>{" "}
-            </h1>
-          </div>
-          {!isModify && (
-            <div onClick={() => setIsModify(true)} className="cursor-pointer">
-              <span className="text-[12px] text-blue-500">Modifier</span>
-            </div>
-          )}
         </div>
-        <div className="mt-3">
-          <Divider />
+      )}
+
+      {isLoading && (
+        <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
+          <CircularProgress />
         </div>
-        <div className="mt-5 flex flex-col justify-between">
-          <div className="flex flex-col">
-            <Input
-              element="input"
-              id="level"
-              label="Niveau"
-              value={formData.level}
-              placeholder={formData.level}
-              disabled
-              validators={[]}
-              gray
-              create
-            />
-            <Input
-              element="input"
-              id="name"
-              type="text"
-              placeholder="Modifier le libellé"
-              value={formData.name}
-              label="Libellé"
-              validators={[]}
-              create
-              onChange={handleInputChange}
-              gray
-              disabled={!isModify}
-            />
-          </div>
-        </div>
-        {isModify && (
-          <div className="w-full mt-2">
-            <div className="flex items-center gap-2">
-              <Button
-                size="small"
-                cancel
-                type="button"
-                onClick={() => setIsModify(false)}
-              >
-                Annuler
-              </Button>
-              <Button
-                size="small"
-                blue
-                type="submit"
-              >
-                Modifier
-              </Button>
-            </div>
-          </div>
-        )}
-      </form>
+      )}
     </section>
   );
 }
