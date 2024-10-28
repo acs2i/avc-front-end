@@ -1042,7 +1042,7 @@ export default function SingleSupplierPage() {
             </div>
             <div className="mt-[30px]">
               {!isModify && (
-                <FormSection title="Champs additionnels">
+                <FormSection title="Champs utilisateurs">
                   <div>
                     {userFields
                       .filter((field) => field.apply_to === "Fournisseur")
@@ -1070,7 +1070,7 @@ export default function SingleSupplierPage() {
                 </FormSection>
               )}
               {isModify && (
-                <FormSection title="Champs additionnels">
+                <FormSection title="Champs utilisateurs">
                   <div>
                     {userFields && userFields.length > 0 && (
                       <div className="mt-3">
