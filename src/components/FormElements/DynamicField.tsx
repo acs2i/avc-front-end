@@ -8,9 +8,10 @@ interface DynamicFieldProps {
   id: string;
   name?: string;
   options?: string[];
+  placeholder?: string;
 }
 
-const DynamicField: React.FC<DynamicFieldProps> = ({ fieldType, value, onChange, id, name, options }) => {
+const DynamicField: React.FC<DynamicFieldProps> = ({ fieldType, value, onChange, id, name, options, placeholder }) => {
   switch (fieldType) {
     case "text":
       return (
@@ -21,7 +22,7 @@ const DynamicField: React.FC<DynamicFieldProps> = ({ fieldType, value, onChange,
           value={value}
           onChange={onChange}
           validators={[]}
-          placeholder="Saisir une valeur"
+          placeholder={placeholder}
           create
           gray
         />
@@ -35,7 +36,7 @@ const DynamicField: React.FC<DynamicFieldProps> = ({ fieldType, value, onChange,
           value={value}
           onChange={onChange}
           validators={[]}
-          placeholder="Saisir un nombre"
+          placeholder={placeholder}
           create
           gray
         />
@@ -48,7 +49,7 @@ const DynamicField: React.FC<DynamicFieldProps> = ({ fieldType, value, onChange,
           value={value}
           onChange={onChange}
           validators={[]}
-          placeholder="Saisir un texte"
+          placeholder={placeholder}
           create
           gray
         />

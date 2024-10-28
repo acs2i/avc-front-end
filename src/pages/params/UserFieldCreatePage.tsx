@@ -47,26 +47,26 @@ export default function UserFieldCreatePage({
   });
 
 
-  useEffect(() => {
-    const fetchLastCode = async () => {
-      try {
-        const response = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/user-field/last-code`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+  // useEffect(() => {
+  //   const fetchLastCode = async () => {
+  //     try {
+  //       const response = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/user-field/last-code`, {
+  //         method: "GET",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       });
 
-        const data = await response.json();
-        const lastCode = data.lastCode || 0; 
-        setFormData(prevFormData => ({ ...prevFormData, code: lastCode + 1 }));
-      } catch (error) {
-        console.error("Erreur lors de la récupération du dernier code", error);
-      }
-    };
+  //       const data = await response.json();
+  //       const lastCode = data.lastCode || 0; 
+  //       setFormData(prevFormData => ({ ...prevFormData, code: lastCode + 1 }));
+  //     } catch (error) {
+  //       console.error("Erreur lors de la récupération du dernier code", error);
+  //     }
+  //   };
 
-    fetchLastCode();
-  }, []);
+  //   fetchLastCode();
+  // }, []);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -181,19 +181,7 @@ export default function UserFieldCreatePage({
         </div>
         <div className="mt-[30px] flex flex-col justify-between">
           <div className="flex flex-col">
-            <Input
-              element="input"
-              id="label"
-              type="text"
-              placeholder="Nom du champ"
-              label="Nom du champ"
-              onChange={handleChange}
-              validators={[VALIDATOR_REQUIRE()]}
-              required
-              create
-              gray
-            />
-           <Input
+          <Input
               element="select"
               id="apply_to"
               label="S'applique à"
@@ -204,6 +192,18 @@ export default function UserFieldCreatePage({
                 { value: "Produit", label: "Produit", name: "Produit" },
                 { value: "Fournisseur", label: "Fournisseur", name: "Fournisseur" }
               ]}
+              required
+              create
+              gray
+            />
+            <Input
+              element="input"
+              id="label"
+              type="text"
+              placeholder="Nom du champ"
+              label="Nom du champ"
+              onChange={handleChange}
+              validators={[VALIDATOR_REQUIRE()]}
               required
               create
               gray
