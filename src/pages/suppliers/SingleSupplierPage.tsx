@@ -514,7 +514,57 @@ export default function SingleSupplierPage() {
     fetchField();
   }, []);
 
-  console.log(formData);
+  useEffect(() => {
+    if (supplier) {
+      setFormData((prevFormData) => ({
+        creator_id: creatorId._id,
+        code: supplier.code || "",
+        company_name: supplier.company_name || "",
+        phone: supplier.phone || "",
+        email: supplier.email || "",
+        web_url: supplier.web_url || "",
+        siret: supplier.siret || "",
+        tva: supplier.tva || "",
+        address_1: supplier.address_1 || "",
+        address_2: supplier.address_2 || "",
+        address_3: supplier.address_3 || "",
+        city: supplier.city || "",
+        postal: supplier.postal || "",
+        country: supplier.country || "",
+        currency: supplier.currency || "",
+        brand_id: supplier.brand_id.map((brand) => brand._id),
+        additional_fields: supplier.additional_fields?.length > 0
+          ? supplier.additional_fields
+          : prevFormData.additional_fields,
+        contacts: supplier.contacts || [
+          {
+            firstname: "",
+            lastname: "",
+            function: "",
+            phone: "",
+            mobile: "",
+            email: "",
+          },
+        ],
+        conditions: supplier.conditions || [
+          {
+            tarif: "",
+            currency: "",
+            rfa: "",
+            net_price: "",
+            labeling: "",
+            paiement_condition: "",
+            franco: "",
+            validate_tarif: "",
+            budget: "",
+          },
+        ],
+      }));
+    }
+  }, [supplier, creatorId]);
+  
+
+  console.log(supplier);
   return (
     <>
       <Modal
