@@ -854,60 +854,63 @@ export default function SingleProductPage() {
   const handleUpdateReference = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-  
+
     try {
       // Récupérez les UVC à créer et mappez-les
       const uvcPromises = formDataUvc.uvc.map(async (uvc) => {
-        const response = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/uvc`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(uvc),
-        });
-  
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/uvc`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(uvc),
+          }
+        );
+
         if (!response.ok) {
           throw new Error("Erreur lors de la création des UVC !");
         }
-  
+
         const createdUvc = await response.json();
         return createdUvc._id;
       });
-  
+
       const uvcIds = await Promise.all(uvcPromises);
-  
+
       // Mettez à jour l'ordre des fournisseurs
-      const formattedSuppliers: Supplier[] = selectedSuppliers.map((supplierOption) => ({
-        supplier_id: supplierOption.value,  // ou supplierOption._id selon votre structure
-        supplier_ref: supplierOption.supplier_ref || "", 
-        pcb: supplierOption.pcb || "",
-        custom_cat: supplierOption.custom_cat || "",
-        made_in: supplierOption.made_in || "",
-        company_name: supplierOption.company_name || "",
-      }));
-  
+      const formattedSuppliers: Supplier[] = selectedSuppliers.map(
+        (supplierOption) => ({
+          supplier_id: supplierOption.value, // ou supplierOption._id selon votre structure
+          supplier_ref: supplierOption.supplier_ref || "",
+          pcb: supplierOption.pcb || "",
+          custom_cat: supplierOption.custom_cat || "",
+          made_in: supplierOption.made_in || "",
+          company_name: supplierOption.company_name || "",
+        })
+      );
+
       // Données à mettre à jour dans le produit
       const updatedFormData = {
         ...formData,
         uvc_ids: uvcIds,
         suppliers: formattedSuppliers,
-        additional_fields: formData.additional_fields.map((field) => ({
-          label: field.label,
-          value: field.value,
-          field_type: field.field_type,
-        })),
       };
-  
-      const productResponse = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(updatedFormData),
-      });
-  
+
+      const productResponse = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(updatedFormData),
+        }
+      );
+
       if (productResponse.ok) {
         notifySuccess("Le produit à bien été mise à jour !");
         window.location.reload();
@@ -922,44 +925,50 @@ export default function SingleProductPage() {
       setIsModify(false);
     }
   };
-  
 
   // Fonction pour mettre à jour l'ordre des fournisseurs dans le produit
-  const updateProductSuppliersOrder = async (updatedSuppliers: SuppliersOption[]) => {
-    const formattedSuppliers: Supplier[] = updatedSuppliers.map((supplierOption) => ({
-      supplier_id: supplierOption.value,  // ou supplierOption._id selon votre structure
-      supplier_ref: supplierOption.supplier_ref || "", 
-      pcb: supplierOption.pcb || "",
-      custom_cat: supplierOption.custom_cat || "",
-      made_in: supplierOption.made_in || "",
-      company_name: supplierOption.company_name || "",
-    }));
-  
+  const updateProductSuppliersOrder = async (
+    updatedSuppliers: SuppliersOption[]
+  ) => {
+    const formattedSuppliers: Supplier[] = updatedSuppliers.map(
+      (supplierOption) => ({
+        supplier_id: supplierOption.value, // ou supplierOption._id selon votre structure
+        supplier_ref: supplierOption.supplier_ref || "",
+        pcb: supplierOption.pcb || "",
+        custom_cat: supplierOption.custom_cat || "",
+        made_in: supplierOption.made_in || "",
+        company_name: supplierOption.company_name || "",
+      })
+    );
+
     try {
-      const response = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          ...product,
-          suppliers: formattedSuppliers, // Utilisez le tableau formaté ici
-        }),
-      });
-  
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            ...product,
+            suppliers: formattedSuppliers, // Utilisez le tableau formaté ici
+          }),
+        }
+      );
+
       if (response.ok) {
         notifySuccess("Ordre des fournisseurs mis à jour avec succès !");
       } else {
-        notifyError("Erreur lors de la mise à jour de l'ordre des fournisseurs !");
+        notifyError(
+          "Erreur lors de la mise à jour de l'ordre des fournisseurs !"
+        );
       }
     } catch (error) {
       console.error("Erreur lors de la mise à jour", error);
       notifyError("Erreur lors de la mise à jour de l'ordre des fournisseurs");
     }
   };
-  
-
 
   const handleSupplierClick = (supplier: any, index: number) => {
     setSelectedSupplier(supplier);
@@ -976,18 +985,17 @@ export default function SingleProductPage() {
       const updatedSuppliers = [...selectedSuppliers];
       const [selected] = updatedSuppliers.splice(selectedSupplierIndex, 1);
       updatedSuppliers.unshift(selected);
-  
+
       // Mise à jour de l'état local et fermeture de la modal
       setSelectedSuppliers(updatedSuppliers);
       setSelectedSupplierIndex(0);
       setIsCheckboxChecked(false);
       setIsSupplierModalOpen(false);
-  
+
       // Appel de l'API pour mettre à jour l'ordre des fournisseurs dans le produit
       updateProductSuppliersOrder(updatedSuppliers);
     }
   };
-  
 
   const fetchField = async () => {
     try {
@@ -1013,7 +1021,7 @@ export default function SingleProductPage() {
 
   const handleFieldChange = (
     label: string,
-    field_type: string,
+    field_type: string, // Ajout du type de champ
     id: string,
     newValue: string
   ) => {
@@ -1023,13 +1031,9 @@ export default function SingleProductPage() {
       [id]: newValue, // Met à jour l'état local du champ
     }));
 
-    // Vérifier si additional_fields est un tableau, sinon initialiser un tableau vide
+    // Mettre à jour formData.additional_fields pour avoir un tableau d'objets
     setFormData((prevFormData) => {
-      const updatedAdditionalFields = Array.isArray(
-        prevFormData.additional_fields
-      )
-        ? [...prevFormData.additional_fields]
-        : [];
+      const updatedAdditionalFields = [...prevFormData.additional_fields];
 
       // Vérifier si un champ avec ce label existe déjà
       const fieldIndex = updatedAdditionalFields.findIndex(
@@ -1052,7 +1056,7 @@ export default function SingleProductPage() {
     });
   };
 
-  console.log(formData);
+  console.log(product);
   console.log(selectedSupplier);
   return (
     <>
@@ -1174,11 +1178,7 @@ export default function SingleProductPage() {
                     </span>
                   </label>
                   {isCheckboxChecked && (
-                    <Button
-                      size="small"
-                      blue
-                      onClick={handleSetAsMainSupplier}
-                    >
+                    <Button size="small" blue onClick={handleSetAsMainSupplier}>
                       Valider
                     </Button>
                   )}
@@ -1794,42 +1794,37 @@ export default function SingleProductPage() {
                     </FormSection>
                   </div>
                 </div>
-                <div className="mt-[30px] w-full">
+                <div className="mt-[30px]">
                   {!isModify && (
                     <FormSection title="Champs additionnels">
                       <div>
-                        {product &&
-                          product.additional_fields &&
-                          userFields &&
-                          userFields.length > 0 &&
-                          userFields
-                            .filter((field) => field.apply_to === "Produit")
-                            .map((field: any, index: number) => {
-                              const draftField = Array.isArray(
-                                product.additional_fields
-                              )
-                                ? product.additional_fields.find(
-                                    (draftField: any) =>
-                                      draftField.label === field.label
-                                  )
-                                : product.additional_fields[field.label];
+                        {userFields
+                          .filter((field) => field.apply_to === "Produit")
+                          .map((field: any, index: number) => {
+                            const supplierField = Array.isArray(
+                              product?.additional_fields
+                            )
+                              ? product.additional_fields.find(
+                                  (supField: any) =>
+                                    supField.label === field.label
+                                )
+                              : null;
 
-                              return (
-                                <div
-                                  key={index}
-                                  className="grid grid-cols-12 gap-2 py-2"
-                                >
-                                  <span className="col-span-2 font-[700] text-slate-500 text-[13px]">
-                                    {field.label} :
-                                  </span>
+                            return (
+                              <div
+                                key={index}
+                                className="grid grid-cols-12 gap-2 py-2"
+                              >
+                                <span className="col-span-3 font-[700] text-slate-500 text-[13px]">
+                                  {field.label} :
+                                </span>
 
-                                  <span className="col-span-4 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                    {/* Affichage de "Non renseigné" si le champ n'est pas renseigné */}
-                                    {draftField?.value || "Non renseigné"}
-                                  </span>
-                                </div>
-                              );
-                            })}
+                                <span className="col-span-3 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                                  {supplierField?.value || "Non renseigné"}
+                                </span>
+                              </div>
+                            );
+                          })}
                       </div>
                     </FormSection>
                   )}
@@ -1839,7 +1834,9 @@ export default function SingleProductPage() {
                         {userFields && userFields.length > 0 && (
                           <div className="mt-3">
                             {userFields
-                              .filter((field) => field.apply_to === "Produit")
+                              .filter(
+                                (field) => field.apply_to === "Produit"
+                              )
                               .map((field) => (
                                 <div key={field._id} className="mb-6">
                                   <h3 className="text-md font-semibold text-gray-800 mb-1">

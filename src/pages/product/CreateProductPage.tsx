@@ -625,6 +625,7 @@ export default function CreateProductPage() {
       );
 
       const data = await response.json();
+      console.log(data)
       const formattedTaxs = data.data.map((tax: any) => ({
         value: tax.rate.toString(),
         name: tax.label,
@@ -647,6 +648,8 @@ export default function CreateProductPage() {
       setIsLoading(false);
     }
   };
+
+
 
   const toggleFullScreen = () => {
     setIsFullScreen((prevState) => !prevState);
