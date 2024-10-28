@@ -20,7 +20,7 @@ interface Country {
 interface CountryUpdatePageProps {
   selectedCountry: Country;
   onClose: () => void;
-  onUpdateSuccess: () => void;
+  onUpdateSuccess: (itemId: string) => void;
 }
 
 export default function CountryUpdatePage({
@@ -63,7 +63,7 @@ export default function CountryUpdatePage({
         notifySuccess("Pays modifié avec succès !");
         setIsModify(false);
         setIsModalOpen(false);
-        onUpdateSuccess();
+        onUpdateSuccess(formData._id);
         onClose();
       } else {
         const errorData = await response.json();

@@ -18,7 +18,7 @@ interface Tag {
 interface ClassificationUpdatePageProps {
   selectedFamily: Tag;
   onClose: () => void;
-  onUpdateSuccess: () => void;
+  onUpdateSuccess: (itemId: string) => void;
 }
 
 export default function ClassificationUpdatePage({
@@ -58,7 +58,7 @@ export default function ClassificationUpdatePage({
         console.log("Updated data:", data);
         notifySuccess("Classification modifiée avec succès !");
         setIsModify(false);
-        onUpdateSuccess();
+        onUpdateSuccess(formData._id);
         onClose();
       } else {
         const errorData = await response.json();

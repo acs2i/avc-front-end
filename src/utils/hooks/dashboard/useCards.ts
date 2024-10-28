@@ -73,13 +73,13 @@ const useCardsHook = () => {
                 console.log("h")
 
                 const c: Card =   {
-                    id: 2,
-                    title: "UVC",
-                    data1: [activeNoEansUvcTotal, inactiveNoEansUvcTotal],
-                    subtitle: "Actifs avec/sans EAN",
-                    labels: ["Avec EAN", "Sans EAN"],
-                    chartType: "pie",
-                  };
+                  id: 2,
+                  title: "UVC",
+                  data1: [activeNoEansUvcTotal, inactiveNoEansUvcTotal],
+                  subtitle: "Actifs avec/sans EAN",
+                  labels: ["Avec EAN", "Sans EAN"],
+                  chartType: "pie",
+                };
     
                 setCards([...cards, c])
             }
@@ -133,40 +133,40 @@ const useCardsHook = () => {
 
     }, [activeSupplierTotal, inActiveSupplierTotal])
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        const doesExist: number = cards.findIndex((c: Card) => c.id === 5);
+    //     const doesExist: number = cards.findIndex((c: Card) => c.id === 5);
 
-        if(doesExist === -1) {
+    //     if(doesExist === -1) {
 
-            const data1: number[] = []
-            if(activeProductsByCollection) {
-                for(const entry of Object.values(activeProductsByCollection as any)) {
-                    data1.push(entry as unknown as number)
-                }
-                const labels = []
-                for(const entry of Object.keys(activeProductsByCollection as any)) {
-                    labels.push(entry)
-                }
+    //         const data1: number[] = []
+    //         if(activeProductsByCollection) {
+    //             for(const entry of Object.values(activeProductsByCollection as any)) {
+    //                 data1.push(entry as unknown as number)
+    //             }
+    //             const labels = []
+    //             for(const entry of Object.keys(activeProductsByCollection as any)) {
+    //                 labels.push(entry)
+    //             }
                 
     
-                const c: Card =   {
-                    id: 5,
-                    title: "Produits",
-                    subtitle: "Actifs par Collection",
-                    data1,
-                    labels,
-                    chartType: "bar",
-                  };
+    //             const c: Card =   {
+    //                 id: 5,
+    //                 title: "Produits",
+    //                 subtitle: "Actifs par Collection",
+    //                 data1,
+    //                 labels,
+    //                 chartType: "bar",
+    //               };
         
-                setCards([...cards,c])
-            }
+    //             setCards([...cards,c])
+    //         }
 
 
-        }
+    //     }
 
 
-    }, [activeProductsByCollection])
+    // }, [activeProductsByCollection])
 
     // useEffect(() => {
     //     console.log("C: " , activeProductsByCollection)
@@ -197,7 +197,7 @@ const useCardsHook = () => {
 
     // check to see if we should finally show cards
     useEffect(() => {
-        if(cards.length === 6) {
+        if(cards.length === 5) {
             setIsLoadingCards(false)
         }
     },[cards])

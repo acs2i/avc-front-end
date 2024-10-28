@@ -17,7 +17,7 @@ interface Block {
 interface BlockUpdatePageProps {
   selectedBlock: Block;
   onClose: () => void;
-  onUpdateSuccess: () => void;
+  onUpdateSuccess: (itemId: string) => void;
 }
 
 export default function BlockUpdatePage({
@@ -58,7 +58,7 @@ export default function BlockUpdatePage({
         console.log("Updated data:", data);
         notifySuccess("Blocage modifié avec succès !");
         setIsModify(false);
-        onUpdateSuccess();
+        onUpdateSuccess(formData._id);
         onClose();
       } else {
         const errorData = await response.json();

@@ -55,8 +55,9 @@ export default function BrandCreatePage({
         }
       );
 
+      const data = await response.json();
+
       if (response.ok) {
-        const data = await response.json();
         const newBrandId = data._id;
         setTimeout(() => {
           notifySuccess("Marque crée avec succés !");
@@ -64,6 +65,9 @@ export default function BrandCreatePage({
           onCreate(newBrandId);
           onClose();
         }, 100);
+      } else if (response.status === 409) { // Status Conflict
+        notifyError("Le code existe déjà"); // Utiliser le message du backend
+        setIsLoading(false);
       } else {
         notifyError("Erreur lors de la création");
       }

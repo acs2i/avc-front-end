@@ -17,7 +17,7 @@ interface Brand {
 interface BrandUpdatePageProps {
   selectedBrand: Brand;
   onClose: () => void;
-  onUpdateSuccess: () => void;
+  onUpdateSuccess: (itemId: string) => void;
 }
 
 export default function BrandUpdatePage({
@@ -57,7 +57,7 @@ export default function BrandUpdatePage({
         console.log("Updated data:", data);
         notifySuccess("Marque modifiée avec succès !");
         setIsModify(false);
-        onUpdateSuccess();
+        onUpdateSuccess(formData._id);
         onClose();
       } else {
         const errorData = await response.json();

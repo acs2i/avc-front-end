@@ -241,7 +241,7 @@ export default function Home() {
             <Divider />
           </div>
 
-          <div className="mt-[40px]">
+          {/* <div className="mt-[40px]">
             <div>
               <h3 className="text-[25px] font-bold text-gray-800 dark:text-white">
                 Evolution des ventes
@@ -261,7 +261,7 @@ export default function Home() {
                 />
               </Box>
             </Stack>
-          </div>
+          </div> */}
         </div>
         <div className="w-[70%] flex flex-wrap justify-end gap-6">
           {isLoadingCards 
