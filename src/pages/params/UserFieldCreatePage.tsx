@@ -45,6 +45,7 @@ export default function UserFieldCreatePage({
     ],
     status: "A",
   });
+  
 
 
   // useEffect(() => {
@@ -125,7 +126,6 @@ export default function UserFieldCreatePage({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (isLoading) return;
     setIsLoading(true);
 
     try {
@@ -153,8 +153,8 @@ export default function UserFieldCreatePage({
           onCreate(newFieldId);
           onClose();
         }, 100);
-      } else if (response.status === 409) { // Status Conflict
-        notifyError("Le code existe déjà"); // Utiliser le message du backend
+      } else if (response.status === 409) {
+        notifyError("Le code existe déjà");
         setIsLoading(false);
       } else {
         notifyError("Erreur lors de la création");

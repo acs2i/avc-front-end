@@ -334,34 +334,12 @@ function ParamsMenuPageContent() {
 
   const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
   
-  const handleCreate = async (updatedItemId: string) => {
-    try {
-      const endpoint = getApiEndpoint();
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/${endpoint}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+  const handleCreate = (newFieldId: string) => {
+    setHighlightedItemId(newFieldId);
+    fetchItems();
+    handleCreateClose();
+};
 
-      if (response.ok) {
-        const result = await response.json();
-        setHighlightedItemId(result.data._id);
-        handleCreateClose();
-        console.log("passed")
-      } else {
-        // Handle error
-        console.error("Error creating item");
-      }
-    } catch (error) {
-      console.error("Error during create request", error);
-    }
-  };
-  
 
   const handleUpdateSuccess = (updatedItemId: string) => {
     setHighlightedItemId(updatedItemId);
@@ -373,7 +351,7 @@ function ParamsMenuPageContent() {
     if (highlightedItemId) {
       const timer = setTimeout(() => {
         setHighlightedItemId(null);
-      }, 3000); // Le highlight disparaît après 3 secondes
+      }, 3000);
 
       return () => clearTimeout(timer);
     }
