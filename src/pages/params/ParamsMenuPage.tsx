@@ -332,7 +332,9 @@ function ParamsMenuPageContent() {
     };
   }, [isCreateModalOpen, isUpdateModalOpen, handleClickOutside]);
 
-  const handleCreate = async () => {
+  const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
+  
+  const handleCreate = async (updatedItemId: string) => {
     try {
       const endpoint = getApiEndpoint();
       const response = await fetch(
@@ -347,6 +349,8 @@ function ParamsMenuPageContent() {
       );
 
       if (response.ok) {
+        const result = await response.json();
+        setHighlightedItemId(updatedItemId);
         handleCreateClose();
       } else {
         // Handle error
@@ -356,11 +360,23 @@ function ParamsMenuPageContent() {
       console.error("Error during create request", error);
     }
   };
+  
 
-  const handleUpdateSuccess = () => {
+  const handleUpdateSuccess = (updatedItemId: string) => {
+    setHighlightedItemId(updatedItemId);
     setIsUpdateModalOpen(false);
-    fetchItems(); // Rafraîchir la liste des items
+    fetchItems();
   };
+
+  useEffect(() => {
+    if (highlightedItemId) {
+      const timer = setTimeout(() => {
+        setHighlightedItemId(null);
+      }, 3000); // Le highlight disparaît après 3 secondes
+
+      return () => clearTimeout(timer);
+    }
+  }, [highlightedItemId]);
 
   const renderCreateModal = () => {
     const commonProps = {
@@ -463,8 +479,8 @@ function ParamsMenuPageContent() {
             onUpdateSuccess={handleUpdateSuccess}
           />
         );
-        case PAGE_TYPES.COUNTRIES:
-          return null;
+      case PAGE_TYPES.COUNTRIES:
+        return null;
       default:
         return null;
     }
@@ -633,7 +649,7 @@ function ParamsMenuPageContent() {
     const specificFields: Record<PageTypeValue, JSX.Element> = {
       [PAGE_TYPES.CLASSIFICATIONS]: <></>,
       [PAGE_TYPES.DIMENSIONS]: <></>,
-      
+
       [PAGE_TYPES.GRIDS]: <></>,
       [PAGE_TYPES.COLLECTIONS]: <></>,
       [PAGE_TYPES.BRANDS]: <></>,
@@ -842,7 +858,9 @@ function ParamsMenuPageContent() {
     return sortedItems.map((item: Item) => (
       <tr
         key={item._id}
-        className="border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 whitespace-nowrap"
+        className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 whitespace-nowrap ${
+          item._id === highlightedItemId ? "bg-orange-300 text-white" : ""
+        }`}
         onClick={() => handleRowClick(item)}
       >
         {(() => {
@@ -1042,61 +1060,81 @@ function ParamsMenuPageContent() {
       >
         {renderSearchFields()}
         {page && page !== "country" && (
-        <div className="mt-3 flex items-center gap-2">
-          <div className="flex items-center gap-2">
-            <input
-              type="radio"
-              id="tous"
-              name="status"
-              value="all"
-              checked={searchFields.status === "all"}
-              onChange={() => setSearchFields({ ...searchFields, status: "all" })}
-            />
-            <label htmlFor="tous" className="text-[14px] font-bold text-gray-600">
-              Tous
-            </label>
+          <div className="mt-3 flex items-center gap-2">
+            <div className="flex items-center gap-2">
+              <input
+                type="radio"
+                id="tous"
+                name="status"
+                value="all"
+                checked={searchFields.status === "all"}
+                onChange={() =>
+                  setSearchFields({ ...searchFields, status: "all" })
+                }
+              />
+              <label
+                htmlFor="tous"
+                className="text-[14px] font-bold text-gray-600"
+              >
+                Tous
+              </label>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="radio"
+                id="actif"
+                name="status"
+                value="A"
+                checked={searchFields.status === "A"}
+                onChange={() =>
+                  setSearchFields({ ...searchFields, status: "A" })
+                }
+              />
+              <label
+                htmlFor="actif"
+                className="text-[14px] font-bold text-gray-600"
+              >
+                Actifs
+              </label>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="radio"
+                id="inactif"
+                name="status"
+                value="I"
+                checked={searchFields.status === "I"}
+                onChange={() =>
+                  setSearchFields({ ...searchFields, status: "I" })
+                }
+              />
+              <label
+                htmlFor="inactif"
+                className="text-[14px] font-bold text-gray-600"
+              >
+                Inactifs
+              </label>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="radio"
-              id="actif"
-              name="status"
-              value="A"
-              checked={searchFields.status === "A"}
-              onChange={() => setSearchFields({ ...searchFields, status: "A" })}
-            />
-            <label htmlFor="actif" className="text-[14px] font-bold text-gray-600">
-              Actifs
-            </label>
-          </div>
-          <div className="flex items-center gap-2">
-            <input
-              type="radio"
-              id="inactif"
-              name="status"
-              value="I"
-              checked={searchFields.status === "I"}
-              onChange={() => setSearchFields({ ...searchFields, status: "I" })}
-            />
-            <label htmlFor="inactif" className="text-[14px] font-bold text-gray-600">
-              Inactifs
-            </label>
-          </div>
-        </div>
         )}
         <div className="flex items-center justify-between w-full mt-3">
           <Button type="button" size="small" blue onClick={handleSearch}>
             Lancer la Recherche
           </Button>
           {page && page !== "country" && (
-            <Button type="button" size="small" green onClick={handleCreateClick}>
+            <Button
+              type="button"
+              size="small"
+              green
+              onClick={handleCreateClick}
+            >
               <Plus size={16} />
               Créer
             </Button>
           )}
         </div>
       </Header>
-  
+
       <div className="flex gap-4 flex-grow relative z-10 overflow-hidden">
         <div className="w-[300px] ml-4 h-full border-t-[1px] border-gray-300 flex flex-col overflow-auto">
           {Object.entries(PAGE_TYPES).map(([key, value]) => {
@@ -1129,7 +1167,7 @@ function ParamsMenuPageContent() {
             );
           })}
         </div>
-  
+
         <div className="w-full overflow-x-auto flex flex-col">
           <div className="w-full overflow-x-auto">
             <table className="w-full text-left">
@@ -1139,7 +1177,10 @@ function ParamsMenuPageContent() {
               <tbody>
                 {isLoading ? (
                   <tr>
-                    <td colSpan={Object.keys(PAGE_TYPES).length} className="text-center py-4">
+                    <td
+                      colSpan={Object.keys(PAGE_TYPES).length}
+                      className="text-center py-4"
+                    >
                       <Spinner />
                     </td>
                   </tr>
@@ -1147,7 +1188,10 @@ function ParamsMenuPageContent() {
                   renderTableRows()
                 ) : (
                   <tr>
-                    <td colSpan={Object.keys(PAGE_TYPES).length} className="text-center py-4">
+                    <td
+                      colSpan={Object.keys(PAGE_TYPES).length}
+                      className="text-center py-4"
+                    >
                       Aucun Résultat
                     </td>
                   </tr>
@@ -1157,7 +1201,7 @@ function ParamsMenuPageContent() {
           </div>
         </div>
       </div>
-  
+
       <div className="fixed z-50 bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-md">
         <div className="max-w-[2000px] mx-auto px-4 py-2 flex justify-between items-center">
           <h4 className="text-sm whitespace-nowrap">
@@ -1176,7 +1220,10 @@ function ParamsMenuPageContent() {
               </Stack>
             )}
             <div className="flex items-center gap-2">
-              <label htmlFor="itemsPerPage" className="text-sm font-medium text-gray-700">
+              <label
+                htmlFor="itemsPerPage"
+                className="text-sm font-medium text-gray-700"
+              >
                 Éléments par page :
               </label>
               <select
@@ -1194,12 +1241,18 @@ function ParamsMenuPageContent() {
           </div>
         </div>
       </div>
-  
-      <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)}>
+
+      <Modal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+      >
         {renderCreateModal()}
       </Modal>
-  
-      <Modal isOpen={isUpdateModalOpen} onClose={() => setIsUpdateModalOpen(false)}>
+
+      <Modal
+        isOpen={isUpdateModalOpen}
+        onClose={() => setIsUpdateModalOpen(false)}
+      >
         {renderUpdateModal()}
       </Modal>
     </section>

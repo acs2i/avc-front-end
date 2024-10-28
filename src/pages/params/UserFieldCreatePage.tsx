@@ -140,19 +140,25 @@ export default function UserFieldCreatePage({
             }
         );
 
-        if (response.ok) {
-            const data = await response.json();
-            const newFieldId = data._id;
-            setFormData((prevFormData) => ({
-                ...prevFormData,
-                code: data.code,
-            }));
-            notifySuccess("Champ utilisateur créé avec succès !");
-            onCreate(newFieldId);
-            onClose();
-        } else {
-            notifyError("Erreur lors de la création");
-        }
+      if (response.ok) {
+        const data = await response.json();
+        const newFieldId = data._id;
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          code: data.code,
+        }));
+        setTimeout(() => {
+          notifySuccess("Champ utilisateur créé avec succès !");
+          setIsLoading(false);
+          onCreate(newFieldId);
+          onClose();
+        }, 100);
+      } else if (response.status === 409) { // Status Conflict
+        notifyError("Le code existe déjà"); // Utiliser le message du backend
+        setIsLoading(false);
+      } else {
+        notifyError("Erreur lors de la création");
+      }
     } catch (error) {
         console.error("Erreur lors de la requête", error);
         notifyError("Erreur lors de la création");

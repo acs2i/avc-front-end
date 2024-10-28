@@ -16,7 +16,7 @@ interface Dimension {
 interface DimensionUpdatePageProps {
   selectedDimension: Dimension;
   onClose: () => void;
-  onUpdateSuccess: () => void;
+  onUpdateSuccess: (itemId: string) => void;
 }
 
 export default function DimensionUpdatePage({
@@ -56,7 +56,7 @@ export default function DimensionUpdatePage({
         console.log("Updated data:", data);
         notifySuccess("Dimension modifiée avec succès !");
         setIsModify(false);
-        onUpdateSuccess();
+        onUpdateSuccess(formData._id);
         onClose();
       } else {
         const errorData = await response.json();

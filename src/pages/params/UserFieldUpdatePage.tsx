@@ -24,7 +24,7 @@ interface Field {
 interface UserFieldUpdatePageProps {
   selectedField: Field;
   onClose: () => void;
-  onUpdateSuccess: () => void;
+  onUpdateSuccess: (itemId: string) => void;
 }
 
 export default function UserFieldUpdatePage({
@@ -85,7 +85,7 @@ export default function UserFieldUpdatePage({
       if (response.ok) {
         notifySuccess("Champ utilisateur modifié avec succès !");
         setIsModify(false);
-        onUpdateSuccess();
+        onUpdateSuccess(formData._id);
         onClose();
       } else {
         const errorData = await response.json();

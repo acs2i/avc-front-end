@@ -15,7 +15,7 @@ interface Collection {
 interface CollectionUpdatePageProps {
   selectedCollection: Collection;
   onClose: () => void;
-  onUpdateSuccess: () => void;
+  onUpdateSuccess: (itemId: string) => void;
 }
 
 export default function CollectionUpdatePage({
@@ -55,7 +55,7 @@ export default function CollectionUpdatePage({
         console.log("Updated data:", data);
         notifySuccess("Collection modifiée avec succès !");
         setIsModify(false);
-        onUpdateSuccess();
+        onUpdateSuccess(formData._id);
         onClose();
       } else {
         const errorData = await response.json();

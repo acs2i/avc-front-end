@@ -18,7 +18,7 @@ interface Tax {
 interface TaxUpdatePageProps {
   selectedTax: Tax;
   onClose: () => void;
-  onUpdateSuccess: () => void;
+  onUpdateSuccess: (itemId: string) => void;
 }
 
 export default function TaxUpdatePage({
@@ -59,7 +59,7 @@ export default function TaxUpdatePage({
         console.log("Updated data:", data);
         notifySuccess("Taxe modifiée avec succès !");
         setIsModify(false);
-        onUpdateSuccess();
+        onUpdateSuccess(formData._id);
         onClose();
       } else {
         const errorData = await response.json();
