@@ -891,7 +891,12 @@ export default function SingleProductPage() {
       const updatedFormData = {
         ...formData,
         uvc_ids: uvcIds,
-        suppliers: formattedSuppliers, // Utilisez le tableau formaté ici
+        suppliers: formattedSuppliers,
+        additional_fields: formData.additional_fields.map((field) => ({
+          label: field.label,
+          value: field.value,
+          field_type: field.field_type,
+        })),
       };
   
       const productResponse = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`, {
@@ -904,10 +909,10 @@ export default function SingleProductPage() {
       });
   
       if (productResponse.ok) {
-        notifySuccess("Référence et ordre des fournisseurs mis à jour avec succès !");
+        notifySuccess("Le produit à bien été mise à jour !");
         window.location.reload();
       } else {
-        notifyError("Erreur lors de la mise à jour de la référence et de l'ordre des fournisseurs !");
+        notifyError("Erreur lors de la mise à jour de la référence !");
       }
     } catch (error) {
       console.error("Erreur lors de la requête", error);
@@ -1047,7 +1052,7 @@ export default function SingleProductPage() {
     });
   };
 
-  console.log(product);
+  console.log(formData);
   console.log(selectedSupplier);
   return (
     <>
