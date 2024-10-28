@@ -64,11 +64,8 @@ export default function CollectionCreatePage({
           onCreate(newCollectionId);
           onClose();
         }, 100);
-      } else if (response.status === 409) { // Status Conflict
-        notifyError("Le code existe déjà"); // Utiliser le message du backend
-        setIsLoading(false);
       } else {
-        notifyError("Erreur lors de la création");
+        notifyError("Erreur lors de la création ou Code déja existant");
       }
     } catch (error) {
       console.error("Erreur lors de la requête", error);
