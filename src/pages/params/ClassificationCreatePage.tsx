@@ -128,7 +128,7 @@ function ClassificationCreatePage({
         notifyError("Le code existe déjà"); // Utiliser le message du backend
         setIsLoading(false);
       } else {
-        notifyError("Erreur lors de la création");
+        notifyError("Erreur lors de la création ou Code déja existant");
       }
     } catch (error) {
       console.error("Erreur lors de la requête", error);

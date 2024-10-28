@@ -350,8 +350,9 @@ function ParamsMenuPageContent() {
 
       if (response.ok) {
         const result = await response.json();
-        setHighlightedItemId(updatedItemId);
+        setHighlightedItemId(result.data._id);
         handleCreateClose();
+        console.log("passed")
       } else {
         // Handle error
         console.error("Error creating item");
