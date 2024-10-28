@@ -33,7 +33,7 @@ export default function BrandCreatePage({
     code: "",
     label: "",
     status: "A",
-    creator_id: user._id,
+    creator_id: user.id,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

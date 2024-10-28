@@ -125,42 +125,43 @@ export default function UserFieldCreatePage({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isLoading) return;
     setIsLoading(true);
+
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/user-field`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
+        const response = await fetch(
+            `${process.env.REACT_APP_URL_DEV}/api/v1/user-field`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            }
+        );
+
+        if (response.ok) {
+            const data = await response.json();
+            const newFieldId = data._id;
+            setFormData((prevFormData) => ({
+                ...prevFormData,
+                code: data.code,
+            }));
+            notifySuccess("Champ utilisateur créé avec succès !");
+            onCreate(newFieldId);
+            onClose();
+        } else {
+            notifyError("Erreur lors de la création");
         }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        const newFieldId = data._id;
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          code: data.code,
-        }));
-        setTimeout(() => {
-          notifySuccess("Champ utilisateur créé avec succès !");
-          setIsLoading(false);
-          onCreate(newFieldId);
-          onClose();
-        }, 100);
-      } else {
-        notifyError("Erreur lors de la création");
-      }
     } catch (error) {
-      console.error("Erreur lors de la requête", error);
-      setIsLoading(false);
+        console.error("Erreur lors de la requête", error);
+        notifyError("Erreur lors de la création");
+    } finally {
+        setIsLoading(false);
     }
-  };
+};
 
-  console.log(formData)
+
   return (
     <section className="w-full p-4">
       <form className="mb-[50px]" onSubmit={handleSubmit}>
@@ -181,7 +182,7 @@ export default function UserFieldCreatePage({
               placeholder="Nom du champ"
               label="Nom du champ"
               onChange={handleChange}
-              validators={[]}
+              validators={[VALIDATOR_REQUIRE()]}
               required
               create
               gray
@@ -191,7 +192,7 @@ export default function UserFieldCreatePage({
               id="apply_to"
               label="S'applique à"
               onChange={handleChange}
-              validators={[]}
+              validators={[VALIDATOR_REQUIRE()]}
               placeholder="Choisir la liaison"
               options={[
                 { value: "Produit", label: "Produit", name: "Produit" },
