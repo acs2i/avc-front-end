@@ -421,7 +421,7 @@ export default function SingleSupplierPage() {
   const handleContactChange = (field: keyof Contact, value: string) => {
     setNewContact((prevContact) => {
       const updatedContact = { ...prevContact, [field]: value };
-      console.log("Updated Contact:", updatedContact); // Pour le débogage
+      console.log("Updated Contact:", updatedContact);
       return updatedContact;
     });
   };
