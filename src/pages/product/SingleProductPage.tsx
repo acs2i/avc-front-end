@@ -141,6 +141,14 @@ export default function SingleProductPage() {
   const [selectedSuppliers, setSelectedSuppliers] = useState<SuppliersOption[]>(
     []
   );
+  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(
+    null
+  );
+  const [isSupplierModalOpen, setIsSupplierModalOpen] = useState(false);
+  const [selectedSupplierIndex, setSelectedSupplierIndex] = useState<
+    number | null
+  >(null);
+  const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
   const [userFields, setUserFields] = useState<UserField[]>([]);
   const [isModify, setIsModify] = useState(false);
   const [page, setPage] = useState("dimension");
@@ -846,53 +854,60 @@ export default function SingleProductPage() {
   const handleUpdateReference = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-
+  
     try {
+      // Récupérez les UVC à créer et mappez-les
       const uvcPromises = formDataUvc.uvc.map(async (uvc) => {
-        const response = await fetch(
-          `${process.env.REACT_APP_URL_DEV}/api/v1/uvc`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(uvc),
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Erreur lors de la création des UVC !");
-        }
-
-        const createdUvc = await response.json();
-        return createdUvc._id;
-      });
-
-      const uvcIds = await Promise.all(uvcPromises);
-
-      const updatedFormData = {
-        ...formData,
-        uvc_ids: uvcIds,
-      };
-
-      const productResponse = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`,
-        {
-          method: "PUT",
+        const response = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/uvc`, {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(updatedFormData),
+          body: JSON.stringify(uvc),
+        });
+  
+        if (!response.ok) {
+          throw new Error("Erreur lors de la création des UVC !");
         }
-      );
-
+  
+        const createdUvc = await response.json();
+        return createdUvc._id;
+      });
+  
+      const uvcIds = await Promise.all(uvcPromises);
+  
+      // Mettez à jour l'ordre des fournisseurs
+      const formattedSuppliers: Supplier[] = selectedSuppliers.map((supplierOption) => ({
+        supplier_id: supplierOption.value,  // ou supplierOption._id selon votre structure
+        supplier_ref: supplierOption.supplier_ref || "", 
+        pcb: supplierOption.pcb || "",
+        custom_cat: supplierOption.custom_cat || "",
+        made_in: supplierOption.made_in || "",
+        company_name: supplierOption.company_name || "",
+      }));
+  
+      // Données à mettre à jour dans le produit
+      const updatedFormData = {
+        ...formData,
+        uvc_ids: uvcIds,
+        suppliers: formattedSuppliers, // Utilisez le tableau formaté ici
+      };
+  
+      const productResponse = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updatedFormData),
+      });
+  
       if (productResponse.ok) {
-        notifySuccess("Référence mise à jour avec succès !");
+        notifySuccess("Référence et ordre des fournisseurs mis à jour avec succès !");
         window.location.reload();
       } else {
-        notifyError("Erreur lors de la mise à jour de la référence !");
+        notifyError("Erreur lors de la mise à jour de la référence et de l'ordre des fournisseurs !");
       }
     } catch (error) {
       console.error("Erreur lors de la requête", error);
@@ -902,6 +917,72 @@ export default function SingleProductPage() {
       setIsModify(false);
     }
   };
+  
+
+  // Fonction pour mettre à jour l'ordre des fournisseurs dans le produit
+  const updateProductSuppliersOrder = async (updatedSuppliers: SuppliersOption[]) => {
+    const formattedSuppliers: Supplier[] = updatedSuppliers.map((supplierOption) => ({
+      supplier_id: supplierOption.value,  // ou supplierOption._id selon votre structure
+      supplier_ref: supplierOption.supplier_ref || "", 
+      pcb: supplierOption.pcb || "",
+      custom_cat: supplierOption.custom_cat || "",
+      made_in: supplierOption.made_in || "",
+      company_name: supplierOption.company_name || "",
+    }));
+  
+    try {
+      const response = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...product,
+          suppliers: formattedSuppliers, // Utilisez le tableau formaté ici
+        }),
+      });
+  
+      if (response.ok) {
+        notifySuccess("Ordre des fournisseurs mis à jour avec succès !");
+      } else {
+        notifyError("Erreur lors de la mise à jour de l'ordre des fournisseurs !");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour", error);
+      notifyError("Erreur lors de la mise à jour de l'ordre des fournisseurs");
+    }
+  };
+  
+
+
+  const handleSupplierClick = (supplier: any, index: number) => {
+    setSelectedSupplier(supplier);
+    setSelectedSupplierIndex(index);
+    setIsSupplierModalOpen(true);
+  };
+
+  const handleCheckboxChange = () => {
+    setIsCheckboxChecked(!isCheckboxChecked);
+  };
+
+  const handleSetAsMainSupplier = () => {
+    if (selectedSupplierIndex !== null && selectedSupplierIndex > 0) {
+      const updatedSuppliers = [...selectedSuppliers];
+      const [selected] = updatedSuppliers.splice(selectedSupplierIndex, 1);
+      updatedSuppliers.unshift(selected);
+  
+      // Mise à jour de l'état local et fermeture de la modal
+      setSelectedSuppliers(updatedSuppliers);
+      setSelectedSupplierIndex(0);
+      setIsCheckboxChecked(false);
+      setIsSupplierModalOpen(false);
+  
+      // Appel de l'API pour mettre à jour l'ordre des fournisseurs dans le produit
+      updateProductSuppliersOrder(updatedSuppliers);
+    }
+  };
+  
 
   const fetchField = async () => {
     try {
@@ -967,6 +1048,7 @@ export default function SingleProductPage() {
   };
 
   console.log(product);
+  console.log(selectedSupplier);
   return (
     <>
       <Modal
@@ -1032,6 +1114,74 @@ export default function SingleProductPage() {
             </button>
           )}
         </div>
+      </Modal>
+      <Modal
+        show={isSupplierModalOpen}
+        onCancel={() => setIsSupplierModalOpen(false)}
+        onClose={() => setIsSupplierModalOpen(false)}
+        header="Détails du fournisseur"
+      >
+        {selectedSupplier && (
+          <div className="mt-1 px-6">
+            {selectedSupplierIndex === 0 && (
+              <h6 className="text-[#3B71CA] font-[600] text-[13px] italic">
+                Fournisseur Principal
+              </h6>
+            )}
+            <div className="flex flex-col gap-4 mt-3">
+              <p>
+                <span className="font-[700] text-gray-700">
+                  Raison Sociale :{" "}
+                </span>
+                {selectedSupplier.company_name}
+              </p>
+              <p>
+                <span className="font-[700] text-gray-700">
+                  Référence Produit :{" "}
+                </span>
+                {selectedSupplier.supplier_ref}
+              </p>
+              <p>
+                <span className="font-[700] text-gray-700">PCB : </span>
+                {selectedSupplier.pcb}
+              </p>
+              <p>
+                <span className="font-[700] text-gray-700">
+                  Catégorie Dounière :{" "}
+                </span>
+                {selectedSupplier.custom_cat ? selectedSupplier.custom_cat : ""}
+              </p>
+              <p>
+                <span className="font-[700] text-gray-700">Origine : </span>
+                {selectedSupplier.made_in}
+              </p>
+              {selectedSupplierIndex !== 0 && isModify && (
+                <div className="mt-4 flex items-center gap-2">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      onChange={handleCheckboxChange}
+                      className="form-checkbox"
+                      checked={isCheckboxChecked}
+                    />
+                    <span className="text-sm text-gray-600">
+                      Passer en fournisseur principal
+                    </span>
+                  </label>
+                  {isCheckboxChecked && (
+                    <Button
+                      size="small"
+                      blue
+                      onClick={handleSetAsMainSupplier}
+                    >
+                      Valider
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </Modal>
       <section className="w-full bg-slate-50 p-8 max-w-[2000px] mx-auto min-h-screen">
         <form onSubmit={handleUpdateReference}>
@@ -1369,6 +1519,9 @@ export default function SingleProductPage() {
                                 className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md ${
                                   index === 0 ? "bg-[#3B71CA]" : "bg-slate-400"
                                 }`}
+                                onClick={() =>
+                                  handleSupplierClick(supplier, index)
+                                }
                               >
                                 <span className="text-[20px] text-white font-bold capitalize">
                                   {supplier.label}
@@ -1636,7 +1789,7 @@ export default function SingleProductPage() {
                     </FormSection>
                   </div>
                 </div>
-                <div className="mt-3 w-full">
+                <div className="mt-[30px] w-full">
                   {!isModify && (
                     <FormSection title="Champs additionnels">
                       <div>

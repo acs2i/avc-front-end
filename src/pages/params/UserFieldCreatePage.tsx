@@ -20,7 +20,6 @@ interface FormData {
   label: string;
   apply_to: string;
   additional_fields: CustomField[];
-  creator_id: any;
   status: string;
 }
 
@@ -44,7 +43,6 @@ export default function UserFieldCreatePage({
     additional_fields: [
       { field_name: "", field_type: "text", options: [], value: "" }
     ],
-    creator_id: user._id,
     status: "A",
   });
 
@@ -162,6 +160,7 @@ export default function UserFieldCreatePage({
     }
   };
 
+  console.log(formData)
   return (
     <section className="w-full p-4">
       <form className="mb-[50px]" onSubmit={handleSubmit}>
@@ -182,7 +181,7 @@ export default function UserFieldCreatePage({
               placeholder="Nom du champ"
               label="Nom du champ"
               onChange={handleChange}
-              validators={[VALIDATOR_REQUIRE()]}
+              validators={[]}
               required
               create
               gray
@@ -192,7 +191,7 @@ export default function UserFieldCreatePage({
               id="apply_to"
               label="S'applique à"
               onChange={handleChange}
-              validators={[VALIDATOR_REQUIRE()]}
+              validators={[]}
               placeholder="Choisir la liaison"
               options={[
                 { value: "Produit", label: "Produit", name: "Produit" },
