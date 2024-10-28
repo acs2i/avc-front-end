@@ -1691,7 +1691,7 @@ export default function DraftUpdatePage() {
                 </div>
                 <div className="mt-3 w-full">
                   {!isModify && (
-                    <FormSection title="Champs additionnels">
+                    <FormSection title="Champs utilisateurs">
                       <div>
                         {userFields
                           .filter((field) => field.apply_to === "Produit")
@@ -1720,7 +1720,7 @@ export default function DraftUpdatePage() {
                     </FormSection>
                   )}
                   {isModify && (
-                    <FormSection title="Champs additionnels">
+                    <FormSection title="Champs utilisateurs">
                       <div>
                         {userFields && userFields.length > 0 && (
                           <div className="mt-3">
