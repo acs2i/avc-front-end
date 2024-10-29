@@ -798,7 +798,7 @@ function ParamsMenuPageContent() {
     return (
       <tr>
         {headers[page].map((header) => (
-          <th key={header.id} scope="col" className="px-6 py-4">
+          <th key={header.id} scope="col" className="px-6 py-3">
             <SortHeader
               listId={page}
               column={header.id}
@@ -1158,7 +1158,7 @@ function ParamsMenuPageContent() {
                   <tr>
                     <td
                       colSpan={Object.keys(PAGE_TYPES).length}
-                      className="text-center py-4"
+                      className="text-center py-3"
                     >
                       <Spinner />
                     </td>
@@ -1169,7 +1169,7 @@ function ParamsMenuPageContent() {
                   <tr>
                     <td
                       colSpan={Object.keys(PAGE_TYPES).length}
-                      className="text-center py-4"
+                      className="text-center py-3"
                     >
                       Aucun Résultat
                     </td>

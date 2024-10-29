@@ -533,9 +533,10 @@ export default function SingleSupplierPage() {
         country: supplier.country || "",
         currency: supplier.currency || "",
         brand_id: supplier.brand_id.map((brand) => brand._id),
-        additional_fields: supplier.additional_fields?.length > 0
-          ? supplier.additional_fields
-          : prevFormData.additional_fields,
+        additional_fields:
+          supplier.additional_fields?.length > 0
+            ? supplier.additional_fields
+            : prevFormData.additional_fields,
         contacts: supplier.contacts || [
           {
             firstname: "",
@@ -562,7 +563,6 @@ export default function SingleSupplierPage() {
       }));
     }
   }, [supplier, creatorId]);
-  
 
   console.log(supplier);
   return (
@@ -1127,7 +1127,6 @@ export default function SingleSupplierPage() {
                         {userFields
                           .filter((field) => field.apply_to === "Fournisseur")
                           .map((field) => (
-
                             <div key={field._id} className="mb-6">
                               <h3 className="text-md font-semibold text-gray-800 mb-1">
                                 {field.label}
@@ -1154,7 +1153,15 @@ export default function SingleSupplierPage() {
                                           e.target.value
                                         )
                                       }
-                                      placeholder={customField.field_type === "text" || customField.field_type === "number" || customField.field_type === "textarea" ? supplier?.additional_fields?.find(f => f.label === field.label)?.value : "Saisir un texte"}
+                                      placeholder={
+                                        customField.field_type === "text" ||
+                                        customField.field_type === "number" ||
+                                        customField.field_type === "textarea"
+                                          ? supplier?.additional_fields?.find(
+                                              (f) => f.label === field.label
+                                            )?.value
+                                          : "Saisir un texte"
+                                      }
                                       options={customField.options}
                                     />
                                   </div>
@@ -1166,6 +1173,20 @@ export default function SingleSupplierPage() {
                     )}
                   </div>
                 </FormSection>
+              )}
+            </div>
+            <div className="mt-[30px]">
+              {!isModify && (
+                <FormSection title="Conditions de vente">
+                  <div></div>
+                </FormSection>
+              )}
+              {isModify && (
+                <div className="mt-3">
+                  <Button blue size="small">
+                    Ajouter des conditions de vente
+                  </Button>
+                </div>
               )}
             </div>
             {!isLoading ? (
