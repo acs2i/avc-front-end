@@ -989,8 +989,50 @@ export default function SingleSupplierPage() {
               </FormSection>
             </div>
             <div className="flex gap-4 mt-[30px]">
-              {/* Partie tarifs */}
-
+          
+              <FormSection title="Marques">
+                <div className="mt-3">
+                  {isModify ? (
+                    <BrandSection
+                      brands={brands}
+                      optionsBrand={optionsBrand}
+                      handleChangeBrand={handleChangeBrand}
+                      removeBrandField={removeBrandField}
+                      addBrandField={addBrandField}
+                      handleInputChangeBrand={handleInputChangeBrand}
+                      inputValueBrand={inputValueBrand}
+                      customStyles={customStyles}
+                      addBrand
+                      displayTrash
+                    />
+                  ) : supplier?.brand_id && supplier?.brand_id.length > 0 ? (
+                    <div>
+                      {supplier?.brand_id.map((brand, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center gap-2 mt-2 bg-gray-600 justify-center py-3 relative rounded-md"
+                        >
+                          <span className="font-[600] text-white capitalize">
+                            {brand?.label}
+                          </span>
+                          <button
+                            type="button"
+                            className="text-white hover:text-gray-300 absolute right-[13px]"
+                          >
+                            <X size={18} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-gray-400 font-bold text-xs">
+                        Aucune marque associée à ce fournisseur
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </FormSection>
               <FormSection title="Contacts">
                 <div className="flex flex-col gap-2 mt-3">
                   {/* Combinez les contacts enregistrés et les contacts sélectionnés */}
@@ -1046,7 +1088,7 @@ export default function SingleSupplierPage() {
                 )}
               </FormSection>
 
-              <FormSection title="Marques">
+              <FormSection title="Gestionnaires">
                 <div className="mt-3">
                   {isModify ? (
                     <BrandSection
@@ -1083,7 +1125,7 @@ export default function SingleSupplierPage() {
                   ) : (
                     <div>
                       <p className="text-gray-400 font-bold text-xs">
-                        Aucune marque associée à ce fournisseur
+                        Aucun gestionnaire associé à ce fournisseur
                       </p>
                     </div>
                   )}
@@ -1177,14 +1219,14 @@ export default function SingleSupplierPage() {
             </div>
             <div className="mt-[30px]">
               {!isModify && (
-                <FormSection title="Conditions de vente">
+                <FormSection title="Conditions commerciales">
                   <div></div>
                 </FormSection>
               )}
               {isModify && (
                 <div className="mt-3">
-                  <Button blue size="small">
-                    Ajouter des conditions de vente
+                  <Button blue size="small" type="button">
+                    Ajouter une condition commerciale
                   </Button>
                 </div>
               )}
