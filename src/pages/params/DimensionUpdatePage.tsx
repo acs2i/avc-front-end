@@ -37,7 +37,7 @@ export default function DimensionUpdatePage({
   const [isModify, setIsModify] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
   const [formData, setFormData] = useState<Dimension>(selectedDimension);
-  const user = useSelector((state: any) => state.auth.user); // Assurez-vous que `user` existe dans votre état
+  const user = useSelector((state: any) => state.auth.user);
 
   useEffect(() => {
     setFormData(selectedDimension);
@@ -50,20 +50,20 @@ export default function DimensionUpdatePage({
 
   const handleUpdate = async () => {
     setIsLoading(true);
-  
+
     const updatedData = Object.entries(formData).reduce((acc, [key, value]) => {
       if (value !== selectedDimension[key as keyof Dimension]) {
         acc[key as keyof Dimension] = value;
       }
       return acc;
     }, {} as Partial<Dimension>);
-  
+
     const updateEntry: UpdateEntry = {
       updated_at: new Date(),
       updated_by: user.username,
       changes: updatedData,
     };
-  
+
     try {
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/dimension/${formData._id}`,
@@ -75,7 +75,7 @@ export default function DimensionUpdatePage({
           body: JSON.stringify({ ...updatedData, updateEntry }),
         }
       );
-  
+
       if (response.ok) {
         notifySuccess("Dimension modifiée avec succès !");
         setIsModify(false);
@@ -93,7 +93,6 @@ export default function DimensionUpdatePage({
       setIsLoading(false);
     }
   };
-  
 
   return (
     <section className="w-full p-4">
@@ -195,9 +194,14 @@ export default function DimensionUpdatePage({
                       par{" "}
                       <span className="capitalize">{update.updated_by}</span>
                     </p>
-                    <p className="text-[13px] text-gray-500 font-[500]">
-                      Modification : {update.changes.label}
-                    </p>
+                    <div className="text-[13px] text-gray-500 font-[500]">
+                      {Object.entries(update.changes).map(([key, value]) => (
+                        <p key={key}>
+                          Modification du Libellé en{" "}
+                          <span className="font-bold">{String(value)}</span>
+                        </p>
+                      ))}
+                    </div>
                     <p className="text-[13px] text-gray-500 font-[500]">
                       Fichier exporté : {update.file_name}
                     </p>

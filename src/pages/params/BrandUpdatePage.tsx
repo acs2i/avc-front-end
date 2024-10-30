@@ -4,6 +4,8 @@ import Button from "../../components/FormElements/Button";
 import { CircularProgress, Divider } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
 import { ChevronLeft } from "lucide-react";
+import { useSelector } from "react-redux";
+import { formatDate } from "../../utils/func/formatDate";
 
 interface Brand {
   _id: string;
@@ -12,6 +14,13 @@ interface Brand {
   status: string;
   creator_id: any;
   additional_fields?: any;
+  updates: any;
+}
+
+interface UpdateEntry {
+  updated_at: Date;
+  updated_by: string;
+  changes: Record<string, any>;
 }
 
 interface BrandUpdatePageProps {
@@ -29,6 +38,7 @@ export default function BrandUpdatePage({
   const [isModify, setIsModify] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
   const [formData, setFormData] = useState<Brand>(selectedBrand);
+  const user = useSelector((state: any) => state.auth.user);
 
   useEffect(() => {
     setFormData(selectedBrand);
@@ -36,11 +46,25 @@ export default function BrandUpdatePage({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-    setFormData(prev => ({ ...prev, [id]: value }));
+    setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
   const handleUpdate = async () => {
     setIsLoading(true);
+
+    const updatedData = Object.entries(formData).reduce((acc, [key, value]) => {
+      if (value !== selectedBrand[key as keyof Brand]) {
+        acc[key as keyof Brand] = value;
+      }
+      return acc;
+    }, {} as Partial<Brand>);
+
+    const updateEntry: UpdateEntry = {
+      updated_at: new Date(),
+      updated_by: user.username,
+      changes: updatedData,
+    };
+
     try {
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/brand/${formData._id}`,
@@ -49,7 +73,7 @@ export default function BrandUpdatePage({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({ ...updatedData, updateEntry }),
         }
       );
       if (response.ok) {
@@ -80,7 +104,8 @@ export default function BrandUpdatePage({
             <ChevronLeft />
           </div>
           <h1 className="text-[20px] font-[800] text-gray-800">
-            Code <span className="font-[300]">de la marque : {formData.code}</span>{" "}
+            Code{" "}
+            <span className="font-[300]">de la marque : {formData.code}</span>{" "}
           </h1>
         </div>
         {!isModify && (
@@ -139,6 +164,50 @@ export default function BrandUpdatePage({
             >
               Modifier
             </Button>
+          </div>
+        </div>
+      )}
+
+      {selectedBrand.updates && (
+        <div className="mt-[30px] flex flex-col gap-3 relative">
+          <h6 className="text-xs font-[700] text-gray-700">
+            Historique des modifications :
+          </h6>
+          <div className="border-l-2 border-blue-500 pl-4 relative">
+            {selectedBrand.updates
+              .slice() // Créer une copie pour éviter de muter les données d'origine
+              .sort((a: { updated_at: string }, b: { updated_at: string }) => {
+                return (
+                  new Date(b.updated_at).getTime() -
+                  new Date(a.updated_at).getTime()
+                );
+              }) // Trier du plus récent au plus ancien
+              .map((update: any, index: number) => (
+                <div key={index} className="relative mb-4 flex items-start">
+                  {/* Point ou cercle pour chaque item */}
+                  <div className="absolute left-[-22px] top-[50%] w-3 h-3 bg-blue-600 rounded-full"></div>
+                  <div className="bg-gray-100 w-full p-2 rounded-md shadow-md">
+                    <p className="text-[12px] italic">
+                      <span className="text-blue-500">
+                        Modifié le : {formatDate(update.updated_at)}
+                      </span>{" "}
+                      par{" "}
+                      <span className="capitalize">{update.updated_by}</span>
+                    </p>
+                    <div className="text-[13px] text-gray-500 font-[500]">
+                      {Object.entries(update.changes).map(([key, value]) => (
+                        <p key={key}>
+                          Modification du Libellé en{" "}
+                          <span className="font-bold">{String(value)}</span>
+                        </p>
+                      ))}
+                    </div>
+                    <p className="text-[13px] text-gray-500 font-[500]">
+                      Fichier exporté : {update.file_name}
+                    </p>
+                  </div>
+                </div>
+              ))}
           </div>
         </div>
       )}

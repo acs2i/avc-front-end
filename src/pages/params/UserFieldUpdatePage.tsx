@@ -4,6 +4,8 @@ import Button from "../../components/FormElements/Button";
 import { CircularProgress, Divider } from "@mui/material";
 import useNotify from "../../utils/hooks/useToast";
 import { ChevronLeft, Plus } from "lucide-react";
+import { useSelector } from "react-redux";
+import { formatDate } from "../../utils/func/formatDate";
 
 interface CustomField {
   field_name: string;
@@ -19,6 +21,13 @@ interface Field {
   status: string;
   creator_id: any;
   additional_fields: CustomField[];
+  updates: any;
+}
+
+interface UpdateEntry {
+  updated_at: Date;
+  updated_by: string;
+  changes: Record<string, any>;
 }
 
 interface UserFieldUpdatePageProps {
@@ -36,6 +45,7 @@ export default function UserFieldUpdatePage({
   const [isModify, setIsModify] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
   const [formData, setFormData] = useState<Field>(selectedField);
+  const user = useSelector((state: any) => state.auth.user);
 
   useEffect(() => {
     setFormData(selectedField);
@@ -43,7 +53,7 @@ export default function UserFieldUpdatePage({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-    setFormData(prev => ({ ...prev, [id]: value }));
+    setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
   const handleAdditionalFieldChange = (
@@ -71,6 +81,20 @@ export default function UserFieldUpdatePage({
 
   const handleUpdate = async () => {
     setIsLoading(true);
+
+    const updatedData = Object.entries(formData).reduce((acc, [key, value]) => {
+      if (value !== selectedField[key as keyof Field]) {
+        acc[key as keyof Field] = value;
+      }
+      return acc;
+    }, {} as Partial<Field>);
+
+    const updateEntry: UpdateEntry = {
+      updated_at: new Date(),
+      updated_by: user.username,
+      changes: updatedData,
+    };
+
     try {
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/user-field/${formData._id}`,
@@ -79,7 +103,7 @@ export default function UserFieldUpdatePage({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({ ...updatedData, updateEntry }),
         }
       );
       if (response.ok) {
@@ -145,16 +169,23 @@ export default function UserFieldUpdatePage({
         </div>
 
         {isModify ? (
-          <div className="mt-5">
+          <div className="mt-1">
             {formData.additional_fields.map((field, fieldIndex) => (
               <div key={fieldIndex} className="mt-4">
-                <label className="text-sm font-semibold text-gray-700">
-                  Type de champ
-                </label>
-                <div className="grid grid-cols-2 gap-4 mt-3">
-                  {/* Type selection options here */}
+                <div className="mt-4">
+                  <h2 className="text-sm font-[700]">Type de champ</h2>
+                  <div
+                    className={`w-[100px] h-[100px] cursor-pointer p-4 border rounded-lg mt-2 flex items-center justify-center bg-gray-200 text-gray-700 shadow-[0_0_10px_rgba(0,0,0,0.3)]`}
+                  >
+                    <h3 className="text-md font-bold text-center capitalize">
+                      {formData.additional_fields[0]?.field_type
+                        ? fieldTypeTranslations[
+                            formData.additional_fields[0].field_type
+                          ] || formData.additional_fields[0].field_type
+                        : "Type inconnu"}
+                    </h3>
+                  </div>
                 </div>
-
                 {(field.field_type === "multiple_choice" ||
                   field.field_type === "boolean") && (
                   <div className="mt-4">
@@ -235,6 +266,80 @@ export default function UserFieldUpdatePage({
           </div>
         )}
       </div>
+
+      {selectedField.updates && (
+        <div className="mt-[30px] flex flex-col gap-3 relative">
+          <h6 className="text-xs font-[700] text-gray-700">
+            Historique des modifications :
+          </h6>
+          <div className="border-l-2 border-blue-500 pl-4 relative">
+            {selectedField.updates
+              .slice()
+              .sort((a: { updated_at: string }, b: { updated_at: string }) => {
+                return (
+                  new Date(b.updated_at).getTime() -
+                  new Date(a.updated_at).getTime()
+                );
+              })
+              .map((update: any, index: number) => (
+                <div key={index} className="relative mb-4 flex items-start">
+                  {/* Point ou cercle pour chaque item */}
+                  <div className="absolute left-[-22px] top-[50%] w-3 h-3 bg-blue-600 rounded-full"></div>
+                  <div className="bg-gray-100 w-full p-2 rounded-md shadow-md">
+                    <p className="text-[12px] italic">
+                      <span className="text-blue-500">
+                        Modifié le : {formatDate(update.updated_at)}
+                      </span>{" "}
+                      par{" "}
+                      <span className="capitalize">{update.updated_by}</span>
+                    </p>
+                    <div className="text-[13px] text-gray-500 font-[500] mt-2">
+                      {Object.entries(update.changes).map(([key, value]) => (
+                        <div key={key} className="mb-2">
+                          {/* Vérification pour afficher les détails des objets comme additional_fields */}
+                          {key === "additional_fields" &&
+                          Array.isArray(value) ? (
+                            <div>
+                              <p className="font-bold">
+                                Modification des Champs Additionnels :
+                              </p>
+                              {value.map((field: any, idx: number) => (
+                                <div key={idx} className="ml-4">
+                                  {/* <p>Type de champ : {field.field_type}</p> */}
+                                  {/* <p>Valeur : {field.value}</p> */}
+                                  {field.options && (
+                                    <div>
+                                      Options :
+                                      <ul className="ml-4 list-disc">
+                                        {field.options.map(
+                                          (option: string, optIdx: number) => (
+                                            <li key={optIdx}>{option}</li>
+                                          )
+                                        )}
+                                      </ul>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p>
+                              {key} modifié en :{" "}
+                              <span className="font-bold">{String(value)}</span>
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-[13px] text-gray-500 font-[500] mt-2">
+                      Fichier exporté : {update.file_name}
+                    </p>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
 
       {isLoading && (
         <div className="absolute inset-0 bg-white/50 flex items-center justify-center">

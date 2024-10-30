@@ -194,11 +194,19 @@ export default function ClassificationUpdatePage({
                   <div className="absolute left-[-22px] top-[50%] w-3 h-3 bg-blue-600 rounded-full"></div>
                   <div className="bg-gray-100 w-full p-2 rounded-md shadow-md">
                     <p className="text-[12px] italic">
-                      <span className="text-blue-500">Modifié le : {formatDate(update.updated_at)}</span> par <span className="capitalize">{update.updated_by}</span>
+                      <span className="text-blue-500">
+                        Modifié le : {formatDate(update.updated_at)}
+                      </span>{" "}
+                      par{" "}
+                      <span className="capitalize">{update.updated_by}</span>
                     </p>
-                    <p className="text-[13px] text-gray-500 font-[500]">
-                      Modification : {update.changes.name}
-                    </p>
+                    <div className="text-[13px] text-gray-500 font-[500]">
+                      {Object.entries(update.changes).map(([key, value]) => (
+                        <p key={key}>
+                          Modification du Libellé en <span className="font-bold">{String(value)}</span>
+                        </p>
+                      ))}
+                    </div>
                     <p className="text-[13px] text-gray-500 font-[500]">
                       Fichier exporté : {update.file_name}
                     </p>
