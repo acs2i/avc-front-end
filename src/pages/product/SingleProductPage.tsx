@@ -883,7 +883,7 @@ export default function SingleProductPage() {
       // Mettez à jour l'ordre des fournisseurs
       const formattedSuppliers: Supplier[] = selectedSuppliers.map(
         (supplierOption) => ({
-          supplier_id: supplierOption.value, // ou supplierOption._id selon votre structure
+          supplier_id: supplierOption.value,
           supplier_ref: supplierOption.supplier_ref || "",
           pcb: supplierOption.pcb || "",
           custom_cat: supplierOption.custom_cat || "",

@@ -37,6 +37,12 @@ interface UserField {
   additional_fields: CustomField[];
 }
 
+interface Buyer {
+  family: string[];
+  user: string;
+}
+
+
 interface Supplier {
   creator_id: any;
   code: string;
@@ -57,6 +63,8 @@ interface Supplier {
   contacts: Contact[];
   conditions: Condition[];
   additional_fields: any[];
+  admin: string;
+  buyers: Buyer[];
   status: string;
 }
 
@@ -100,6 +108,8 @@ interface FormData {
   brand_id: any[];
   additional_fields: any[];
   contacts: Contact[];
+  admin: string;
+  buyers: Buyer[];
   conditions: Condition[];
 }
 
@@ -183,6 +193,8 @@ export default function SingleSupplierPage() {
     currency: supplier?.currency || "",
     additional_fields: [],
     brand_id: [],
+    admin: "",
+    buyers: [],
     contacts: [
       {
         firstname: "",
@@ -256,6 +268,8 @@ export default function SingleSupplierPage() {
         currency: supplier.currency || "",
         brand_id: supplier.brand_id.map((brand) => brand._id),
         additional_fields: [],
+        admin: "",
+        buyers: [],
         contacts: supplier.contacts || [
           {
             firstname: "",
@@ -532,6 +546,8 @@ export default function SingleSupplierPage() {
         postal: supplier.postal || "",
         country: supplier.country || "",
         currency: supplier.currency || "",
+        admin: supplier.admin || "",
+        buyers: [],
         brand_id: supplier.brand_id.map((brand) => brand._id),
         additional_fields:
           supplier.additional_fields?.length > 0
@@ -989,7 +1005,6 @@ export default function SingleSupplierPage() {
               </FormSection>
             </div>
             <div className="flex gap-4 mt-[30px]">
-          
               <FormSection title="Marques">
                 <div className="mt-3">
                   {isModify ? (
@@ -1089,44 +1104,47 @@ export default function SingleSupplierPage() {
               </FormSection>
 
               <FormSection title="Gestionnaires">
-                <div className="mt-3">
-                  {isModify ? (
-                    <BrandSection
-                      brands={brands}
-                      optionsBrand={optionsBrand}
-                      handleChangeBrand={handleChangeBrand}
-                      removeBrandField={removeBrandField}
-                      addBrandField={addBrandField}
-                      handleInputChangeBrand={handleInputChangeBrand}
-                      inputValueBrand={inputValueBrand}
-                      customStyles={customStyles}
-                      addBrand
-                      displayTrash
-                    />
-                  ) : supplier?.brand_id && supplier?.brand_id.length > 0 ? (
-                    <div>
-                      {supplier?.brand_id.map((brand, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center gap-2 mt-2 bg-gray-600 justify-center py-3 relative rounded-md"
-                        >
-                          <span className="font-[600] text-white capitalize">
-                            {brand?.label}
-                          </span>
-                          <button
-                            type="button"
-                            className="text-white hover:text-gray-300 absolute right-[13px]"
-                          >
-                            <X size={18} />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div>
-                      <p className="text-gray-400 font-bold text-xs">
-                        Aucun gestionnaire associé à ce fournisseur
-                      </p>
+                <div className="mt-2 flex flex-col">
+                  {supplier?.admin && (
+                    <p className="text-[13px]">
+                      Assistant(e) :{" "}
+                      <span className="capitalize font-bold">
+                        {supplier?.admin}
+                      </span>
+                    </p>
+                  )}
+
+                  {/* Acheteurs */}
+                  {supplier?.buyers && supplier?.buyers.length > 0 && (
+                    <div className="mt-4 overflow-x-auto">
+                      <table className="min-w-full bg-white border border-gray-300">
+                        <thead>
+                          <tr className="bg-gray-200 text-gray-700">
+                            <th className="py-2 px-4 border-b text-left font-semibold">
+                              Acheteur
+                            </th>
+                            <th className="py-2 px-4 border-b text-left font-semibold">
+                              Famille
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {supplier?.buyers.map((buyer, index) => (
+                            <tr key={index} className="hover:bg-gray-100">
+                              <td className="py-2 px-4 border-b">
+                                <span className="capitalize font-bold">
+                                  {buyer.user || "N/A"}
+                                </span>
+                              </td>
+                              <td className="py-2 px-4 border-b">
+                                <span className="capitalize font-bold">
+                                  {buyer.family?.join(" | ") || "N/A"}{" "}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                   )}
                 </div>
