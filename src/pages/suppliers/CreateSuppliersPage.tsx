@@ -31,7 +31,7 @@ interface Contact {
 }
 
 interface Buyer {
-  family: string;
+  family: string[];
   user: string;
 }
 
@@ -79,7 +79,7 @@ interface UserField {
 }
 
 interface Buyer {
-  family: string;
+  family: string[];
   user: string;
 }
 
@@ -122,7 +122,7 @@ export default function CreateSupplierPage() {
     { name: "", value: "" },
   ]);
   const [admin, setAdmin] = useState("");
-  const [buyers, setBuyers] = useState<Buyer[]>([{ family: "", user: "" }]);
+  const [buyers, setBuyers] = useState<Buyer[]>([{ family: [], user: "" }]);
   const [searchInputs, setSearchInputs] = useState<{ [key: string]: string }>(
     {}
   );
@@ -217,10 +217,19 @@ export default function CreateSupplierPage() {
   const handleBuyerChange = (
     index: number,
     field: keyof Buyer,
-    value: string
+    value: string | string[] // Champ pouvant être soit un tableau de chaînes soit une chaîne unique
   ) => {
     const updatedBuyers = [...buyers];
-    updatedBuyers[index][field] = value;
+
+    // Vérifier le type de champ attendu et assigner en conséquence
+    if (field === "family" && Array.isArray(value)) {
+      // Si c'est "family", on attend un tableau de chaînes
+      updatedBuyers[index][field] = value as string[];
+    } else if (field === "user" && typeof value === "string") {
+      // Si c'est "user", on attend une chaîne unique
+      updatedBuyers[index][field] = value as string;
+    }
+
     setBuyers(updatedBuyers);
     setFormData((prevFormData) => ({
       ...prevFormData,
@@ -346,7 +355,13 @@ export default function CreateSupplierPage() {
   };
 
   // Ajoute un nouvel acheteur
-  const addBuyer = (buyer: Buyer) => setBuyers((prev) => [...prev, buyer]);
+  const addBuyer = () => {
+    setBuyers((prev) => [...prev, { family: [], user: "" } as Buyer]); // family comme tableau vide
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      buyers: [...prevFormData.buyers, { family: [], user: "" } as Buyer], // family comme tableau vide
+    }));
+  };
 
   // Fonction de soumission du formulaire
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -428,7 +443,7 @@ export default function CreateSupplierPage() {
           handleBuyerChange={(index, field, value) =>
             handleBuyerChange(index, field, value)
           }
-          addBuyer={(buyer) => setBuyers([...buyers, buyer])}
+          addBuyer={addBuyer}
           onCloseModal={() => setGestionModalIsOpen(false)}
           userOptions={userOptions}
           handleUserSearchInput={(input, index) =>
@@ -676,10 +691,10 @@ export default function CreateSupplierPage() {
               </FormSection>
 
               <FormSection title="Gestionnaires">
-                <div className="mt-2 flex flex-col items-center">
+                <div className="mt-2 flex flex-col">
                   {formData.admin && (
-                    <p className="text-[20px]">
-                      Gestionnaire :{" "}
+                    <p className="text-[13px]">
+                      Assistant(e) :{" "}
                       <span className="capitalize font-bold">
                         {formData.admin}
                       </span>
@@ -688,26 +703,35 @@ export default function CreateSupplierPage() {
 
                   {/* Acheteurs */}
                   {formData.buyers && formData.buyers.length > 0 && (
-                    <div className="mt-1">
-                      {formData.buyers.map((buyer, index) => (
-                        <div
-                          key={index}
-                          className="text-[16px] mt-2 flex items-center gap-2"
-                        >
-                          <p>
-                            Acheteur :{" "}
-                            <span className="capitalize font-bold">
-                              {buyer.user || "N/A"}
-                            </span>
-                          </p>
-                          <p>
-                            Famille :{" "}
-                            <span className="capitalize font-bold">
-                              {buyer.family || "N/A"}
-                            </span>
-                          </p>
-                        </div>
-                      ))}
+                    <div className="mt-4 overflow-x-auto">
+                      <table className="min-w-full bg-white border border-gray-300">
+                        <thead>
+                          <tr className="bg-gray-200 text-gray-700">
+                            <th className="py-2 px-4 border-b text-left font-semibold">
+                              Acheteur
+                            </th>
+                            <th className="py-2 px-4 border-b text-left font-semibold">
+                              Famille
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {formData.buyers.map((buyer, index) => (
+                            <tr key={index} className="hover:bg-gray-100">
+                              <td className="py-2 px-4 border-b">
+                                <span className="capitalize font-bold">
+                                  {buyer.user || "N/A"}
+                                </span>
+                              </td>
+                              <td className="py-2 px-4 border-b">
+                                <span className="capitalize font-bold">
+                                  {buyer.family?.join(" | ") || "N/A"}{" "}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                   )}
                 </div>

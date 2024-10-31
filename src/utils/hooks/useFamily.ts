@@ -11,6 +11,7 @@ type TagOption = {
   value: string;
   label: string;
   name: string;
+  code: string
 };
 
 export const useFamily = (initialInputValue: string = "", limit = 10) => {
@@ -35,7 +36,8 @@ export const useFamily = (initialInputValue: string = "", limit = 10) => {
       const optionsFamily = data.data?.map((tag: Tag) => ({
         value: tag._id,
         label: tag.name,
-        name: tag.name
+        name: tag.name,
+        code: tag.code,
       }));
       setOptionsFamily(optionsFamily);
     } catch (error) {
@@ -47,30 +49,37 @@ export const useFamily = (initialInputValue: string = "", limit = 10) => {
   // Search families by input value
   const searchFamilies = async (inputValue: string) => {
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?name=${inputValue}&page=${currentPage}&limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
+        // Déterminer le paramètre de recherche, soit `name`, soit `code`
+        const searchParam = isNaN(Number(inputValue)) ? "name" : "code";
+        
+        const response = await fetch(
+            `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?${searchParam}=${inputValue}&page=${currentPage}&limit=${limit}`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-      );
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      const optionsFamily = data.data?.map((tag: Tag) => ({
-        value: tag._id,
-        label: tag.name,
-        name: tag.name
-      }));
-      setOptionsFamily(optionsFamily);
+
+        const data = await response.json();
+        const optionsFamily = data.data?.map((tag: Tag) => ({
+            value: tag._id,
+            label: tag.name, // ou utilisez `code` comme label si vous préférez
+            name: tag.name,
+            code: tag.code,
+        }));
+
+        setOptionsFamily(optionsFamily);
     } catch (error) {
-      console.error("Erreur lors de la recherche des familles :", error);
+        console.error("Erreur lors de la recherche des familles :", error);
     }
-  };
-  
+};
+
   // Handle input changes for family search
   const handleInputChangeFamily = async (inputValueFamily: string) => {
     setInputValueFamily(inputValueFamily);
