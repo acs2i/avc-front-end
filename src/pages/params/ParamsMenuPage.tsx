@@ -127,7 +127,9 @@ interface SearchFields {
 function ParamsMenuPageContent() {
   const location = useLocation();
   const pageStorage = localStorage.getItem(LAST_PAGE_KEY);
-  const [page, setPage] = useState<PageTypeValue>(pageStorage as PageTypeValue || PAGE_TYPES.CLASSIFICATIONS);
+  const [page, setPage] = useState<PageTypeValue>(
+    (pageStorage as PageTypeValue) || PAGE_TYPES.CLASSIFICATIONS
+  );
   const [isLoading, setIsLoading] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
   const [searchParams, setSearchParams] = useState<SearchFields | null>(null);
@@ -216,7 +218,7 @@ function ParamsMenuPageContent() {
         );
         const url = `${
           process.env.REACT_APP_URL_DEV
-        }/api/v1/${endpoint}/search?page=${currentPage}&limit=${limit}&${queryParams.toString()}`;
+        }/api/v1/${endpoint}/search?page=${currentPage}&limit=${limit}&${queryParams?.toString()}`;
         const response = await fetch(url, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
@@ -333,14 +335,15 @@ function ParamsMenuPageContent() {
     };
   }, [isCreateModalOpen, isUpdateModalOpen, handleClickOutside]);
 
-  const [highlightedItemId, setHighlightedItemId] = useState<string | null>(null);
-  
+  const [highlightedItemId, setHighlightedItemId] = useState<string | null>(
+    null
+  );
+
   const handleCreate = (newFieldId: string) => {
     setHighlightedItemId(newFieldId);
     fetchItems();
     handleCreateClose();
-};
-
+  };
 
   const handleUpdateSuccess = (updatedItemId: string) => {
     setHighlightedItemId(updatedItemId);
@@ -798,7 +801,7 @@ function ParamsMenuPageContent() {
 
     return (
       <tr>
-        {headers[page].map((header) => (
+        {headers[page]?.map((header) => (
           <th key={header.id} scope="col" className="px-6 py-3">
             <SortHeader
               listId={page}
@@ -835,7 +838,7 @@ function ParamsMenuPageContent() {
       );
     };
 
-    return sortedItems.map((item: Item) => (
+    return sortedItems?.map((item: Item) => (
       <tr
         key={item._id}
         className={`border-y-[1px] border-gray-200 cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 whitespace-nowrap ${
@@ -902,16 +905,17 @@ function ParamsMenuPageContent() {
                         <Collapse in={expandedGrid === gridItem}>
                           <div className="mt-1">
                             <div className="grid grid-cols-5 gap-1">
-                              {gridItem.dimensions
-                                .slice(N)
-                                .map((dim: string, index: number) => (
-                                  <span
-                                    key={index}
-                                    className="text-[10px] rounded-[5px]"
-                                  >
-                                    {extractNumbers(dim)}
-                                  </span>
-                                ))}
+                              {gridItem.dimensions &&
+                                gridItem.dimensions
+                                  .slice(N)
+                                  .map((dim: string, index: number) => (
+                                    <span
+                                      key={index}
+                                      className="text-[10px] rounded-[5px]"
+                                    >
+                                      {extractNumbers(dim)}
+                                    </span>
+                                  ))}
                             </div>
                             <button
                               onClick={(e) => {
@@ -1117,7 +1121,7 @@ function ParamsMenuPageContent() {
 
       <div className="flex gap-4 flex-grow relative z-10 overflow-hidden">
         <div className="w-[300px] ml-4 h-full border-t-[1px] border-gray-300 flex flex-col overflow-auto">
-          {Object.entries(PAGE_TYPES).map(([key, value]) => {
+          {Object.entries(PAGE_TYPES)?.map(([key, value]) => {
             const icon = getIconForPageType(value);
             return (
               <div
