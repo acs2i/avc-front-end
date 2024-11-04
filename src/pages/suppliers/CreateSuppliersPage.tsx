@@ -17,6 +17,9 @@ import DynamicField from "../../components/FormElements/DynamicField";
 import Modal from "../../components/Shared/Modal";
 import ContactFormComponent from "../../components/ContactFormComponent";
 import { useBrands } from "../../utils/hooks/useBrands";
+import GestionFormComponent from "../../components/GestionFormComponent";
+import { useUsers } from "../../utils/hooks/useUsers";
+import { useFamily } from "../../utils/hooks/useFamily";
 
 interface Contact {
   firstname: string;
@@ -25,6 +28,11 @@ interface Contact {
   phone: string;
   mobile: string;
   email: string;
+}
+
+interface Buyer {
+  family: string[];
+  user: string;
 }
 
 interface FormData {
@@ -47,6 +55,8 @@ interface FormData {
   discount: string;
   brand_id: string[];
   contacts: Contact[];
+  admin: string;
+  buyers: Buyer[];
   additional_fields: any[];
   status: string;
 }
@@ -66,6 +76,11 @@ interface UserField {
   status: string;
   creator_id: any;
   additional_fields: CustomField[];
+}
+
+interface Buyer {
+  family: string[];
+  user: string;
 }
 
 const customStyles = {
@@ -98,15 +113,28 @@ export default function CreateSupplierPage() {
   const navigate = useNavigate();
   const creatorId = useSelector((state: any) => state.auth.user);
   const token = useSelector((state: any) => state.auth.token);
+  const [adminOptions, setAdminOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
   const limit = 10;
   const [currentPage, setCurrentPage] = useState(1);
   const [additionalFields, setAdditionalFields] = useState([
     { name: "", value: "" },
   ]);
+  const [admin, setAdmin] = useState("");
+  const [buyers, setBuyers] = useState<Buyer[]>([{ family: [], user: "" }]);
+  const [searchInputs, setSearchInputs] = useState<{ [key: string]: string }>(
+    {}
+  );
   const [contactModalIsOpen, setContactModalIsOpen] = useState(false);
+  const [gestionModalIsOpen, setGestionModalIsOpen] = useState(false);
+  const [userOptions, setUserOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
   const [userFields, setUserFields] = useState<UserField[]>([]);
   const { notifySuccess, notifyError } = useNotify();
   const [isLoading, setIsLoading] = useState(false);
+  const [adminSearchInput, setAdminSearchInput] = useState("");
   const [addFieldIsVisible, setaddFieldIsVisible] = useState(false);
   const [fieldValues, setFieldValues] = useState<{ [key: string]: any }>({});
   const [formData, setFormData] = useState<FormData>({
@@ -129,6 +157,8 @@ export default function CreateSupplierPage() {
     discount: "",
     brand_id: [],
     contacts: [],
+    admin: "",
+    buyers: [],
     additional_fields: [],
     status: "A",
   });
@@ -141,7 +171,7 @@ export default function CreateSupplierPage() {
     email: "",
   });
   const [selectedContacts, setSelectedContacts] = useState<Contact[]>([]);
-  // Hook qui fetch les marques pour l'utiliser dans le creatable select
+
   const {
     inputValueBrand,
     optionsBrand,
@@ -151,6 +181,61 @@ export default function CreateSupplierPage() {
     addBrandField,
     removeBrandField,
   } = useBrands("", 10);
+
+  const {
+    inputValueUser,
+    optionsUser,
+    users,
+    handleChangeUser,
+    removeUserField,
+    addUserField,
+    handleInputChangeUser,
+  } = useUsers("", 10);
+
+  const {
+    inputValueFamily,
+    optionsFamily,
+    selectedFamily,
+    setOptionsFamily,
+    handleInputChangeFamily,
+    handleChangeFamily,
+  } = useFamily("", 10);
+
+  useEffect(() => {
+    setUserOptions(optionsUser);
+  }, [optionsUser]);
+
+  const handleSearchInputChange = (inputValue: string, field: string) => {
+    setSearchInputs((prev) => ({
+      ...prev,
+      [field]: inputValue,
+    }));
+
+    handleInputChangeUser(inputValue);
+  };
+
+  const handleBuyerChange = (
+    index: number,
+    field: keyof Buyer,
+    value: string | string[] // Champ pouvant être soit un tableau de chaînes soit une chaîne unique
+  ) => {
+    const updatedBuyers = [...buyers];
+
+    // Vérifier le type de champ attendu et assigner en conséquence
+    if (field === "family" && Array.isArray(value)) {
+      // Si c'est "family", on attend un tableau de chaînes
+      updatedBuyers[index][field] = value as string[];
+    } else if (field === "user" && typeof value === "string") {
+      // Si c'est "user", on attend une chaîne unique
+      updatedBuyers[index][field] = value as string;
+    }
+
+    setBuyers(updatedBuyers);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      buyers: updatedBuyers,
+    }));
+  };
 
   // Fonction qui fetch tout les champs utilisateurs
   const fetchField = async () => {
@@ -257,6 +342,27 @@ export default function CreateSupplierPage() {
     setContactModalIsOpen(false);
   };
 
+  const handleAdminChange = (value: string) => {
+    setAdmin(value); // Met à jour l'état local `admin`
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      admin: value,
+    }));
+  };
+
+  const handleUserSearchInput = (inputValue: string, index: number) => {
+    handleInputChangeUser(inputValue); // Effectue une recherche d'utilisateur avec l'input
+  };
+
+  // Ajoute un nouvel acheteur
+  const addBuyer = () => {
+    setBuyers((prev) => [...prev, { family: [], user: "" } as Buyer]); // family comme tableau vide
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      buyers: [...prevFormData.buyers, { family: [], user: "" } as Buyer], // family comme tableau vide
+    }));
+  };
+
   // Fonction de soumission du formulaire
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -318,6 +424,34 @@ export default function CreateSupplierPage() {
           handleContactChange={handleContactChange}
           addContact={addContact}
           onCloseModal={() => setContactModalIsOpen(false)}
+        />
+      </Modal>
+      <Modal
+        show={gestionModalIsOpen}
+        onCancel={() => setGestionModalIsOpen(false)}
+        onClose={() => setGestionModalIsOpen(false)}
+        header="Ajouter un(e) gestionnaire"
+      >
+        <GestionFormComponent
+          admin={admin}
+          buyers={buyers}
+          adminOptions={userOptions}
+          setAdminSearchInput={(input) =>
+            handleSearchInputChange(input, "admin")
+          }
+          handleAdminChange={handleAdminChange}
+          handleBuyerChange={(index, field, value) =>
+            handleBuyerChange(index, field, value)
+          }
+          addBuyer={addBuyer}
+          onCloseModal={() => setGestionModalIsOpen(false)}
+          userOptions={userOptions}
+          handleUserSearchInput={(input, index) =>
+            handleSearchInputChange(input, `buyer-${index}`)
+          }
+          // Ajoutez ces props pour la recherche de familles
+          familyOptions={optionsFamily}
+          handleFamilySearchInput={handleInputChangeFamily}
         />
       </Modal>
       <section className="w-full bg-slate-50 p-7">
@@ -518,6 +652,20 @@ export default function CreateSupplierPage() {
             </div>
 
             <div className="flex gap-4 mt-[30px]">
+              <FormSection title="Marques">
+                <BrandSection
+                  brands={brands}
+                  optionsBrand={optionsBrand}
+                  handleChangeBrand={handleChangeBrand}
+                  removeBrandField={removeBrandField}
+                  addBrandField={addBrandField}
+                  handleInputChangeBrand={handleInputChangeBrand}
+                  inputValueBrand={inputValueBrand}
+                  customStyles={customStyles}
+                  addBrand
+                  displayTrash
+                />
+              </FormSection>
               <FormSection title="Contacts">
                 <div className="flex flex-col gap-2">
                   {selectedContacts.map((contact, index) => (
@@ -542,19 +690,61 @@ export default function CreateSupplierPage() {
                 </div>
               </FormSection>
 
-              <FormSection title="Marques">
-                <BrandSection
-                  brands={brands}
-                  optionsBrand={optionsBrand}
-                  handleChangeBrand={handleChangeBrand}
-                  removeBrandField={removeBrandField}
-                  addBrandField={addBrandField}
-                  handleInputChangeBrand={handleInputChangeBrand}
-                  inputValueBrand={inputValueBrand}
-                  customStyles={customStyles}
-                  addBrand
-                  displayTrash
-                />
+              <FormSection title="Gestionnaires">
+                <div className="mt-2 flex flex-col">
+                  {formData.admin && (
+                    <p className="text-[13px]">
+                      Assistant(e) :{" "}
+                      <span className="capitalize font-bold">
+                        {formData.admin}
+                      </span>
+                    </p>
+                  )}
+
+                  {/* Acheteurs */}
+                  {formData.buyers && formData.buyers.length > 0 && (
+                    <div className="mt-4 overflow-x-auto">
+                      <table className="min-w-full bg-white border border-gray-300">
+                        <thead>
+                          <tr className="bg-gray-200 text-gray-700">
+                            <th className="py-2 px-4 border-b text-left font-semibold">
+                              Acheteur
+                            </th>
+                            <th className="py-2 px-4 border-b text-left font-semibold">
+                              Famille
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {formData.buyers.map((buyer, index) => (
+                            <tr key={index} className="hover:bg-gray-100">
+                              <td className="py-2 px-4 border-b">
+                                <span className="capitalize font-bold">
+                                  {buyer.user || "N/A"}
+                                </span>
+                              </td>
+                              <td className="py-2 px-4 border-b">
+                                <span className="capitalize font-bold">
+                                  {buyer.family?.join(" | ") || "N/A"}{" "}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+                <div
+                  className="flex flex-col items-center justify-center p-[20px] text-orange-400 hover:text-orange-300 cursor-pointer"
+                  onClick={() => setGestionModalIsOpen(true)}
+                >
+                  <div className="flex items-center gap-2 text-[12px] mt-3">
+                    <Plus size={30} />
+                  </div>
+                  <p className="font-[700]">Ajouter un(e) gestionnaire</p>
+                </div>
               </FormSection>
             </div>
 
