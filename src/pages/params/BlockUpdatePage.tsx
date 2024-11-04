@@ -48,15 +48,17 @@ export default function BlockUpdatePage({
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleUpdate = async () => {
+  const handleUpdate = async (isStatusUpdate = false, newStatus = '') => {
     setIsLoading(true);
 
-    const updatedData = Object.entries(formData).reduce((acc, [key, value]) => {
-      if (value !== selectedBlock[key as keyof Block]) {
-        acc[key as keyof Block] = value;
-      }
-      return acc;
-    }, {} as Partial<Block>);
+    const updatedData = isStatusUpdate
+      ? { status: newStatus || (formData.status === 'A' ? 'I' : 'A') }
+      : Object.entries(formData).reduce((acc, [key, value]) => {
+          if (value !== selectedBlock[key as keyof Block]) {
+            acc[key as keyof Block] = value;
+          }
+          return acc;
+        }, {} as Partial<Block>);
 
     const updateEntry: UpdateEntry = {
       updated_at: new Date(),
@@ -78,14 +80,26 @@ export default function BlockUpdatePage({
       if (response.ok) {
         const data = await response.json();
         console.log("Updated data:", data);
-        notifySuccess("Blocage modifié avec succès !");
+        let message = "Blocage modifié avec succès !";
+        if (isStatusUpdate) {
+          message = updatedData.status === 'A' 
+            ? "Blocage réactivé avec succès !" 
+            : "Blocage désactivé avec succès !";
+        }
+        notifySuccess(message);
         setIsModify(false);
         onUpdateSuccess(formData._id);
         onClose();
       } else {
         const errorData = await response.json();
         console.error("Error response:", errorData);
-        notifyError("Erreur lors de la modification");
+        let errorMessage = "Erreur lors de la modification";
+        if (isStatusUpdate) {
+          errorMessage = updatedData.status === 'A'
+            ? "Erreur lors de la réactivation"
+            : "Erreur lors de la désactivation";
+        }
+        notifyError(errorMessage);
       }
     } catch (error) {
       console.error("Erreur lors de la soumission", error);
@@ -106,11 +120,23 @@ export default function BlockUpdatePage({
             Code <span className="font-[300]">{formData.code}</span>{" "}
           </h1>
         </div>
-        {!isModify && (
-          <div onClick={() => setIsModify(true)} className="cursor-pointer">
-            <span className="text-[12px] text-blue-500">Modifier</span>
-          </div>
-        )}
+        <div className="flex items-center gap-4">
+          {!isModify && formData.status !== 'I' && (
+            <div onClick={() => setIsModify(true)} className="cursor-pointer">
+              <span className="text-[12px] text-blue-500">Modifier</span>
+            </div>
+          )}
+          {formData.status === 'I' && (
+            <div onClick={() => handleUpdate(true, 'A')} className="cursor-pointer">
+              <span className="text-[12px] text-green-500">Réactiver</span>
+            </div>
+          )}
+          {formData.status === 'A' && (
+            <div onClick={() => handleUpdate(true, 'I')} className="cursor-pointer">
+              <span className="text-[12px] text-red-500">Désactiver</span>
+            </div>
+          )}
+        </div>
       </div>
       <div className="mt-3">
         <Divider />
@@ -136,7 +162,7 @@ export default function BlockUpdatePage({
             validators={[]}
             gray
             create
-            disabled={!isModify}
+            disabled={!isModify || formData.status === 'I'}
           />
         </div>
       </div>
@@ -155,7 +181,7 @@ export default function BlockUpdatePage({
               size="small"
               blue
               type="button"
-              onClick={() => handleUpdate()}
+              onClick={() => handleUpdate(false)}
             >
               Modifier
             </Button>
@@ -170,16 +196,15 @@ export default function BlockUpdatePage({
           </h6>
           <div className="border-l-2 border-blue-500 pl-4 relative">
             {selectedBlock.updates
-              .slice() // Créer une copie pour éviter de muter les données d'origine
+              .slice()
               .sort((a: { updated_at: string }, b: { updated_at: string }) => {
                 return (
                   new Date(b.updated_at).getTime() -
                   new Date(a.updated_at).getTime()
                 );
-              }) // Trier du plus récent au plus ancien
+              })
               .map((update: any, index: number) => (
                 <div key={index} className="relative mb-4 flex items-start">
-                  {/* Point ou cercle pour chaque item */}
                   <div className="absolute left-[-22px] top-[50%] w-3 h-3 bg-blue-600 rounded-full"></div>
                   <div className="bg-gray-100 w-full p-2 rounded-md shadow-md">
                     <p className="text-[12px] italic">

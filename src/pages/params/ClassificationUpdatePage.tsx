@@ -50,18 +50,18 @@ export default function ClassificationUpdatePage({
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleUpdate = async () => {
+  const handleUpdate = async (isStatusUpdate = false, newStatus = '') => {
     setIsLoading(true);
 
-    const updatedData = Object.keys(formData).reduce((acc, key) => {
-      const typedKey = key as keyof Tag;
-
-      if (formData[typedKey] !== selectedFamily[typedKey]) {
-        acc[typedKey] = formData[typedKey];
-      }
-
-      return acc;
-    }, {} as Partial<Tag>);
+    const updatedData = isStatusUpdate
+      ? { status: newStatus || (formData.status === 'A' ? 'I' : 'A') }
+      : Object.keys(formData).reduce((acc, key) => {
+          const typedKey = key as keyof Tag;
+          if (formData[typedKey] !== selectedFamily[typedKey]) {
+            acc[typedKey] = formData[typedKey];
+          }
+          return acc;
+        }, {} as Partial<Tag>);
 
     const updateEntry: UpdateEntry = {
       updated_at: new Date(),
@@ -82,14 +82,26 @@ export default function ClassificationUpdatePage({
       );
 
       if (response.ok) {
-        notifySuccess("Classification modifiée avec succès !");
+        let message = "Classification modifiée avec succès !";
+        if (isStatusUpdate) {
+          message = updatedData.status === 'A' 
+            ? "Classification réactivée avec succès !" 
+            : "Classification désactivée avec succès !";
+        }
+        notifySuccess(message);
         setIsModify(false);
         onUpdateSuccess(formData._id);
         onClose();
       } else {
         const errorData = await response.json();
         console.error("Error response:", errorData);
-        notifyError("Erreur lors de la modification");
+        let errorMessage = "Erreur lors de la modification";
+        if (isStatusUpdate) {
+          errorMessage = updatedData.status === 'A'
+            ? "Erreur lors de la réactivation"
+            : "Erreur lors de la désactivation";
+        }
+        notifyError(errorMessage);
       }
     } catch (error) {
       console.error("Erreur lors de la soumission", error);
@@ -99,7 +111,6 @@ export default function ClassificationUpdatePage({
     }
   };
 
-  console.log(selectedFamily);
   return (
     <section className="w-full p-4">
       <div className="flex items-center justify-between">
@@ -114,11 +125,23 @@ export default function ClassificationUpdatePage({
             </span>{" "}
           </h1>
         </div>
-        {!isModify && (
-          <div onClick={() => setIsModify(true)} className="cursor-pointer">
-            <span className="text-[12px] text-blue-500">Modifier</span>
-          </div>
-        )}
+        <div className="flex items-center gap-4">
+          {!isModify && formData.status !== 'I' && (
+            <div onClick={() => setIsModify(true)} className="cursor-pointer">
+              <span className="text-[12px] text-blue-500">Modifier</span>
+            </div>
+          )}
+          {formData.status === 'I' && (
+            <div onClick={() => handleUpdate(true, 'A')} className="cursor-pointer">
+              <span className="text-[12px] text-green-500">Réactiver</span>
+            </div>
+          )}
+          {formData.status === 'A' && (
+            <div onClick={() => handleUpdate(true, 'I')} className="cursor-pointer">
+              <span className="text-[12px] text-red-500">Désactiver</span>
+            </div>
+          )}
+        </div>
       </div>
       <div className="mt-3">
         <Divider />
@@ -147,7 +170,7 @@ export default function ClassificationUpdatePage({
             create
             onChange={handleInputChange}
             gray
-            disabled={!isModify}
+            disabled={!isModify || formData.status === 'I'}
           />
         </div>
       </div>
@@ -166,7 +189,7 @@ export default function ClassificationUpdatePage({
               size="small"
               blue
               type="button"
-              onClick={() => handleUpdate()}
+              onClick={() => handleUpdate(false)}
             >
               Modifier
             </Button>
@@ -181,16 +204,15 @@ export default function ClassificationUpdatePage({
           </h6>
           <div className="border-l-2 border-blue-500 pl-4 relative">
             {selectedFamily.updates
-              .slice() // Créer une copie pour éviter de muter les données d'origine
+              .slice()
               .sort((a: { updated_at: string }, b: { updated_at: string }) => {
                 return (
                   new Date(b.updated_at).getTime() -
                   new Date(a.updated_at).getTime()
                 );
-              }) // Trier du plus récent au plus ancien
+              })
               .map((update: any, index: number) => (
                 <div key={index} className="relative mb-4 flex items-start">
-                  {/* Point ou cercle pour chaque item */}
                   <div className="absolute left-[-22px] top-[50%] w-3 h-3 bg-blue-600 rounded-full"></div>
                   <div className="bg-gray-100 w-full p-2 rounded-md shadow-md">
                     <p className="text-[12px] italic">

@@ -1428,8 +1428,9 @@ export default function SingleSupplierPage() {
                                       name={customField.field_name}
                                       fieldType={customField.field_type}
                                       value={
-                                        fieldValues[`${field._id}-${index}`] ||
-                                        ""
+                                        customField.field_type === "boolean" || customField.field_type === "multiple_choice" ? supplier?.additional_fields?.find(
+                                          (f) => f.label === field.label
+                                        )?.value : fieldValues[`${field._id}-${index}`]
                                       }
                                       onChange={(e) =>
                                         handleFieldChange(
