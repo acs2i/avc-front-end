@@ -1796,7 +1796,7 @@ export default function SingleProductPage() {
                 </div>
                 <div className="mt-[30px]">
                   {!isModify && (
-                    <FormSection title="Champs utilisateurs">
+                    <FormSection title="Champs additionnels">
                       <div>
                         {userFields
                           .filter((field) => field.apply_to === "Produit")
@@ -1829,7 +1829,7 @@ export default function SingleProductPage() {
                     </FormSection>
                   )}
                   {isModify && (
-                    <FormSection title="Champs utilisateurs">
+                    <FormSection title="Champs additionnels">
                       <div>
                         {userFields && userFields.length > 0 && (
                           <div className="mt-3">
