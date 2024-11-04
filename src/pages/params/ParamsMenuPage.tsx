@@ -126,7 +126,8 @@ interface SearchFields {
 
 function ParamsMenuPageContent() {
   const location = useLocation();
-  const [page, setPage] = useState<PageTypeValue>(PAGE_TYPES.CLASSIFICATIONS);
+  const pageStorage = localStorage.getItem(LAST_PAGE_KEY);
+  const [page, setPage] = useState<PageTypeValue>(pageStorage as PageTypeValue || PAGE_TYPES.CLASSIFICATIONS);
   const [isLoading, setIsLoading] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
   const [searchParams, setSearchParams] = useState<SearchFields | null>(null);
