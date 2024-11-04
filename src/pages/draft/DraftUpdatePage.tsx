@@ -110,7 +110,7 @@ export default function DraftUpdatePage() {
   const [isModalOpenConfirm, setIsModalOpenConfirm] = useState(false);
   const [onglet, setOnglet] = useState("infos");
   const [formData, setFormData] = useState<FormData>({
-    creator_id: creatorId._id,
+    creator_id: draft?.creator_id,
     reference: draft?.reference || "",
     name: draft?.name || "",
     short_label: draft?.short_label || "",
@@ -355,7 +355,7 @@ export default function DraftUpdatePage() {
   useEffect(() => {
     if (draft) {
       setFormData({
-        creator_id: draft.creator_id,
+        creator_id: draft?.creator_id,
         reference: draft.reference || "",
         name: draft.name || "",
         short_label: draft.short_label || "",
@@ -779,39 +779,7 @@ export default function DraftUpdatePage() {
     }
   };
 
-  const handleUpdateDraft = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/draft/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-
-      if (response.ok) {
-        notifySuccess("Brouillon modifié avec succès !");
-        window.location.reload();
-        setTimeout(() => {
-          setIsLoading(false);
-          setIsModify(false);
-          // fetchDraft();
-        }, 300);
-      } else {
-        notifyError("Erreur lors de la modification !");
-        setIsLoading(false);
-      }
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-      setError("Erreur lors de la mise à jour du brouillon");
-    }
-  };
+ 
 
   const updateDraftStatus = async (newStatus: string) => {
     setIsLoading(true);
@@ -957,7 +925,69 @@ export default function DraftUpdatePage() {
     });
   };
 
-  console.log(product);
+  const handleUpdateDraft = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/draft/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (response.ok) {
+        notifySuccess("Brouillon modifié avec succès !");
+        window.location.reload();
+        setTimeout(() => {
+          setIsLoading(false);
+          setIsModify(false);
+          // fetchDraft();
+        }, 300);
+      } else {
+        notifyError("Erreur lors de la modification !");
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+      setError("Erreur lors de la mise à jour du brouillon");
+    }
+  };
+
+  const createProduct = async () => {
+    setIsLoading(true);
+    try {
+        const response = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/product`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            },
+            body: JSON.stringify(formData),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Erreur lors de la création du produit : ${errorText}`);
+        }
+
+        const result = await response.json();
+        notifySuccess("Produit créé avec succès !");
+        navigate(`/drafts`);
+    } catch (error) {
+        console.error("Erreur lors de la création du produit :", error);
+        notifyError("Erreur lors de la création du produit");
+    } finally {
+        setIsLoading(false);
+    }
+};
+
+  console.log(draft);
 
   return (
     <>
@@ -1065,7 +1095,7 @@ export default function DraftUpdatePage() {
                       Valider le brouillon
                     </Button>
                   ) : (
-                    <Button size="small" type="button" green>
+                    <Button size="small" type="button" green  onClick={createProduct}>
                       Enregistrer la référence
                     </Button>
                   )}
@@ -1889,12 +1919,12 @@ export default function DraftUpdatePage() {
                 </div>
                 {/* {onglet === "infos" && draft && (
                   <UVCInfosTable
-                    uvcDimension={formData.dimension}
+                    uvcDimension={formData.uvc}
                     productReference={draft.reference || ""}
-                    brandLabel=""
+                    brandLabel={formData.brand_ids}
                   />
-                )}
-                {onglet === "price" && draft && (
+                )} */}
+                {/* {onglet === "price" && draft && (
                   <UVCPriceTable
                     uvcPrices={formData.dimension}
                     productReference={draft.reference || ""}

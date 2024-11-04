@@ -13,7 +13,7 @@ const ModalOverlay = (props: any) => {
   }
 
   const content = (
-    <div className="fixed z-[10000] top-[22vh] left-[25%] w-[50%] bg-gray-100 rounded-md shadow-xl">
+    <div className="fixed z-[500] top-[22vh] left-[25%] w-[50%] bg-gray-100 rounded-md shadow-xl">
       <header className="w-full flex items-center justify-between py-[1rem] px-[1rem] bg-gray-100 rounded-t-md border-b-[2px]">
         <div className="flex items-center gap-3">
           <h2 className="text-gray-500 font-bold text-xl">{props.header}</h2>

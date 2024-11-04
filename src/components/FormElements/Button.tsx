@@ -5,7 +5,7 @@ interface ButtonProps {
   href?: string;
   to?: string;
   exact?: boolean;
-  size?: "xs" | "small" | "medium" | "big";
+  size?: "xs" | "small" | "medium" | "big" | "100";
   inverse?: boolean;
   inverseBlue?: boolean;
   danger?: boolean;
@@ -31,6 +31,7 @@ const Button: React.FC<ButtonProps> = (props) => {
     ${props.size === "medium" ? "text-md py-[10px] px-[25px]" : ""}
     ${props.size === "xs" ? "text-xs py-[5px] px-[5px]" : ""}
     ${props.size === "big" ? "text-lg flex items-center justify-center gap-2.5 w-full" : ""}
+    ${props.size === "100" ? "text-md py-[10px] px-[25px] w-full" : ""}
     ${props.orange ? "bg-gradient-to-r from-orange-600 to-orange-400 border border-orange-500 text-white hover:brightness-125" : ""}
     ${props.green ? "bg-green-700 border border-green-600 text-white hover:brightness-125 font-bold" : ""}
     ${props.blue ? "bg-[#3B71CA] border border-sky-600 text-white hover:brightness-125 font-bold" : ""}

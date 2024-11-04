@@ -3,7 +3,15 @@ import Input from "../../components/FormElements/Input";
 import { useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronLeft, CircleSlash2, Plus, Trash, X } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronUp,
+  CircleSlash2,
+  Plus,
+  Trash,
+  X,
+} from "lucide-react";
 import CreatableSelect from "react-select/creatable";
 import { SingleValue } from "react-select";
 import Button from "../../components/FormElements/Button";
@@ -14,6 +22,10 @@ import BrandSection from "../../components/Formulaires/BrandSection";
 import DynamicField from "../../components/FormElements/DynamicField";
 import Modal from "../../components/Shared/Modal";
 import ContactFormComponent from "../../components/ContactFormComponent";
+import { useBrands } from "../../utils/hooks/useBrands";
+import { useCollections } from "../../utils/hooks/useCollection";
+import CollectionSection from "../../components/Formulaires/CollectionSection";
+import { formatDate } from "../../utils/func/formatDate";
 
 interface BrandId {
   _id: string;
@@ -42,8 +54,8 @@ interface Buyer {
   user: string;
 }
 
-
 interface Supplier {
+  _id: any;
   creator_id: any;
   code: string;
   company_name: string;
@@ -89,8 +101,59 @@ interface Condition {
   budget: string;
 }
 
+interface Commerciale {
+  supplier_id: any;
+  season: string;
+  code: string;
+  company_name: string;
+  phone: string;
+  email: string;
+  web_url: string;
+  siret: string;
+  tva: string;
+  address_1: string;
+  address_2: string;
+  address_3: string;
+  city: string;
+  postal: string;
+  country: string;
+  currency: string;
+  brand_id: any[];
+  additional_fields: any[];
+  contacts: Contact[];
+  admin: string;
+  buyers: Buyer[];
+  conditions: Condition[];
+  createdAt: any;
+}
+
 interface FormData {
   creator_id: any;
+  code: string;
+  company_name: string;
+  phone: string;
+  email: string;
+  web_url: string;
+  siret: string;
+  tva: string;
+  address_1: string;
+  address_2: string;
+  address_3: string;
+  city: string;
+  postal: string;
+  country: string;
+  currency: string;
+  brand_id: any[];
+  additional_fields: any[];
+  contacts: Contact[];
+  admin: string;
+  buyers: Buyer[];
+  conditions: Condition[];
+}
+
+interface FormDataCondition {
+  supplier_id: any;
+  season: string;
   code: string;
   company_name: string;
   phone: string;
@@ -143,16 +206,24 @@ const customStyles = {
     ...provided,
     color: "gray",
   }),
+  menuPortal: (provided: any) => ({
+    ...provided,
+    zIndex: 1000,
+  }),
 };
 
 export default function SingleSupplierPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const [supplier, setSupplier] = useState<Supplier>();
+  const [conditions, setConditions] = useState<Commerciale[]>([]);
+  const [supplierId, setSupplierId] = useState(supplier?._id);
   const creatorId = useSelector((state: any) => state.auth.user);
   const token = useSelector((state: any) => state.auth.token);
   const [contactModalIsOpen, setContactModalIsOpen] = useState(false);
+  const [conditionModalIsOpen, setConditionModalIsOpen] = useState(false);
   const [selectedContacts, setSelectedContacts] = useState<Contact[]>([]);
+  const [open, setOpen] = useState(false);
   const [newContact, setNewContact] = useState<Contact>({
     firstname: "",
     lastname: "",
@@ -219,6 +290,40 @@ export default function SingleSupplierPage() {
       },
     ],
   });
+  const [formDataCondition, setFormDataCondition] = useState<FormDataCondition>(
+    {
+      supplier_id: supplier?._id || "",
+      season: "",
+      code: supplier?.code || "",
+      company_name: supplier?.company_name || "",
+      siret: supplier?.siret || "",
+      tva: supplier?.tva || "",
+      web_url: supplier?.web_url || "",
+      email: supplier?.email || "",
+      phone: supplier?.phone || "",
+      address_1: supplier?.address_1 || "",
+      address_2: supplier?.address_2 || "",
+      address_3: supplier?.address_3 || "",
+      city: supplier?.city || "",
+      postal: supplier?.postal || "",
+      country: supplier?.country || "",
+      currency: supplier?.currency || "",
+      contacts: supplier?.contacts || [],
+      brand_id: supplier?.brand_id.map((brand) => brand._id) || [],
+      additional_fields: supplier?.additional_fields || [],
+      admin: supplier?.admin || "",
+      buyers: supplier?.buyers || [],
+      conditions: supplier?.conditions || [],
+    }
+  );
+
+  const {
+    inputValueCollection,
+    optionsCollection,
+    selectedCollection,
+    handleInputChangeCollection,
+    handleChangeCollection,
+  } = useCollections("", 10);
 
   const fetchSupplier = async () => {
     try {
@@ -297,38 +402,49 @@ export default function SingleSupplierPage() {
     }
   }, [supplier, creatorId]);
 
+  useEffect(() => {
+    if (supplier) {
+      setFormDataCondition({
+        supplier_id: supplier._id || "",
+        season: "",
+        code: supplier.code || "",
+        company_name: supplier.company_name || "",
+        siret: supplier.siret || "",
+        tva: supplier.tva || "",
+        web_url: supplier.web_url || "",
+        email: supplier.email || "",
+        phone: supplier.phone || "",
+        address_1: supplier.address_1 || "",
+        address_2: supplier.address_2 || "",
+        address_3: supplier.address_3 || "",
+        city: supplier.city || "",
+        postal: supplier.postal || "",
+        country: supplier.country || "",
+        currency: supplier.currency || "",
+        contacts: supplier.contacts || [],
+        brand_id: supplier.brand_id.map((brand) => brand._id) || [],
+        additional_fields: supplier.additional_fields || [],
+        admin: supplier.admin || "",
+        buyers: supplier.buyers || [],
+        conditions: supplier.conditions || [],
+      });
+    }
+  }, [supplier]);
+
+  useEffect(() => {
+    if (selectedCollection) {
+      setFormDataCondition((prev) => ({
+        ...prev,
+        season: selectedCollection.value || "",
+      }));
+    }
+  }, [selectedCollection]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.id]: e.target.value,
     });
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/supplier/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-      if (response.ok) {
-        notifySuccess("Fournisseur modifié avec succès !");
-        window.location.reload();
-        setIsLoading(false);
-      } else {
-        notifyError("Erreur lors de la modification !");
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-    }
   };
 
   const handleChangeBrand = (
@@ -497,7 +613,6 @@ export default function SingleSupplierPage() {
       };
     });
   };
-
   // Fonction qui ajoute un contact
   const addContact = (newContact: Contact) => {
     console.log("Adding contact:", newContact);
@@ -522,6 +637,89 @@ export default function SingleSupplierPage() {
     });
 
     setContactModalIsOpen(false);
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/supplier/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+      if (response.ok) {
+        notifySuccess("Fournisseur modifié avec succès !");
+        window.location.reload();
+        setIsLoading(false);
+      } else {
+        notifyError("Erreur lors de la modification !");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  };
+
+  const handleCreateCondition = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/condition`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formDataCondition),
+        }
+      );
+      if (response.ok) {
+        notifySuccess("Fournisseur modifié avec succès !");
+        window.location.reload();
+        setIsLoading(false);
+      } else {
+        notifyError("Erreur lors de la modification !");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+    }
+  };
+
+  const fetchCondition = async () => {
+    if (!supplier || !supplier._id) {
+      console.error("ID du fournisseur non disponible");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/condition/${supplier._id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log(result);
+        setConditions(result || []);
+        console.log("Conditions après setConditions:", conditions);
+      } else {
+        console.error("Erreur lors de la requête");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    }
   };
 
   useEffect(() => {
@@ -580,7 +778,12 @@ export default function SingleSupplierPage() {
     }
   }, [supplier, creatorId]);
 
-  console.log(supplier);
+  useEffect(() => {
+    if (supplier) {
+      fetchCondition();
+    }
+  }, [supplier]);
+
   return (
     <>
       <Modal
@@ -595,6 +798,29 @@ export default function SingleSupplierPage() {
           addContact={addContact}
           onCloseModal={() => setContactModalIsOpen(false)}
         />
+      </Modal>
+      <Modal
+        show={conditionModalIsOpen}
+        onCancel={() => setConditionModalIsOpen(false)}
+        onClose={() => setConditionModalIsOpen(false)}
+        header="Ajouter une condition commerciale"
+      >
+        <div className="px-3">
+          <label className="text-sm font-medium text-gray-600">Saison</label>
+          <CollectionSection
+            collection={selectedCollection}
+            optionsCollection={optionsCollection}
+            handleChangeCollection={handleChangeCollection}
+            handleInputChangeCollection={handleInputChangeCollection}
+            inputValueCollection={inputValueCollection}
+            customStyles={customStyles}
+          />
+          <div className="mt-3">
+            <Button blue size="100" onClick={handleCreateCondition}>
+              Générer la condition commerciale
+            </Button>
+          </div>
+        </div>
       </Modal>
       <section className="w-full bg-slate-50 p-7 min-h-screen">
         <div className="max-w-[2024px] mx-auto">
@@ -1238,11 +1464,74 @@ export default function SingleSupplierPage() {
             <div className="mt-[30px]">
               {!isModify && (
                 <FormSection title="Conditions commerciales">
-                  <div></div>
+                  <div>
+                    {conditions && conditions.length > 0 ? (
+                      conditions.map((condition, index) => {
+                        return (
+                          <div
+                            key={index}
+                            className="mb-2 border rounded-md bg-gray-50"
+                          >
+                            <div
+                              className="p-2 flex justify-between items-center cursor-pointer"
+                              onClick={() => setOpen(!open)}
+                            >
+                              <div className="flex items-center gap-2">
+                                <p className="font-bold text-lg">
+                                  Saison :{" "}
+                                  <span className="font-light">
+                                    {condition.season}
+                                  </span>
+                                </p>
+                                <p className="text-[12px] font-[600]">Crée le : <span className="text-blue-500">{formatDate(condition.createdAt)}</span></p>
+                              </div>
+                              {open ? (
+                                <ChevronUp size={20} />
+                              ) : (
+                                <ChevronDown size={20} />
+                              )}
+                            </div>
+                            <Collapse in={open}>
+                              <div className="p-1">
+                                {condition?.brand_id.map((brand, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex flex-col gap-2 px-4"
+                                  >
+                                    <p className="font-[600] text-black capitalize">
+                                      Marque : {brand?.label}
+                                    </p>
+                                  </div>
+                                ))}
+                                {condition?.contacts.map((contact, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex flex-col gap-2 px-4"
+                                  >
+                                    <p className="font-[600] text-black capitalize">
+                                      Contact : {contact.firstname}{" "}
+                                      {contact.lastname}
+                                    </p>
+                                  </div>
+                                ))}
+                              </div>
+                            </Collapse>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <p className="text-gray-500">
+                        Aucune condition commerciale n'a été enregistrée
+                      </p>
+                    )}
+                  </div>
                 </FormSection>
               )}
               {isModify && (
-                <div className="mt-3">
+                <div
+                  className="mt-3"
+                  onClick={() => setConditionModalIsOpen(true)}
+                >
                   <Button blue size="small" type="button">
                     Ajouter une condition commerciale
                   </Button>
