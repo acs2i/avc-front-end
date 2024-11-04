@@ -47,15 +47,17 @@ export default function CollectionUpdatePage({
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleUpdate = async () => {
+  const handleUpdate = async (isReactivation = false) => {
     setIsLoading(true);
 
-    const updatedData = Object.entries(formData).reduce((acc, [key, value]) => {
-      if (value !== selectedCollection[key as keyof Collection]) {
-        acc[key as keyof Collection] = value;
-      }
-      return acc;
-    }, {} as Partial<Collection>);
+    const updatedData = isReactivation 
+      ? { status: 'A' }
+      : Object.entries(formData).reduce((acc, [key, value]) => {
+          if (value !== selectedCollection[key as keyof Collection]) {
+            acc[key as keyof Collection] = value;
+          }
+          return acc;
+        }, {} as Partial<Collection>);
 
     const updateEntry: UpdateEntry = {
       updated_at: new Date(),
@@ -77,14 +79,14 @@ export default function CollectionUpdatePage({
       if (response.ok) {
         const data = await response.json();
         console.log("Updated data:", data);
-        notifySuccess("Collection modifiée avec succès !");
+        notifySuccess(isReactivation ? "Collection réactivée avec succès !" : "Collection modifiée avec succès !");
         setIsModify(false);
         onUpdateSuccess(formData._id);
         onClose();
       } else {
         const errorData = await response.json();
         console.error("Error response:", errorData);
-        notifyError("Erreur lors de la modification");
+        notifyError(isReactivation ? "Erreur lors de la réactivation" : "Erreur lors de la modification");
       }
     } catch (error) {
       console.error("Erreur lors de la soumission", error);
@@ -108,9 +110,14 @@ export default function CollectionUpdatePage({
             </span>{" "}
           </h1>
         </div>
-        {!isModify && (
+        {!isModify && formData.status !== 'I' && (
           <div onClick={() => setIsModify(true)} className="cursor-pointer">
             <span className="text-[12px] text-blue-500">Modifier</span>
+          </div>
+        )}
+        {formData.status === 'I' && (
+          <div onClick={() => handleUpdate(true)} className="cursor-pointer">
+            <span className="text-[12px] text-green-500">Réactiver</span>
           </div>
         )}
       </div>
@@ -141,7 +148,7 @@ export default function CollectionUpdatePage({
             create
             onChange={handleInputChange}
             gray
-            disabled={!isModify}
+            disabled={!isModify || formData.status === 'I'}
           />
         </div>
       </div>
@@ -160,7 +167,7 @@ export default function CollectionUpdatePage({
               size="small"
               blue
               type="button"
-              onClick={() => handleUpdate()}
+              onClick={() => handleUpdate(false)}
             >
               Modifier
             </Button>
@@ -175,16 +182,15 @@ export default function CollectionUpdatePage({
           </h6>
           <div className="border-l-2 border-blue-500 pl-4 relative">
             {selectedCollection.updates
-              .slice() // Créer une copie pour éviter de muter les données d'origine
+              .slice()
               .sort((a: { updated_at: string }, b: { updated_at: string }) => {
                 return (
                   new Date(b.updated_at).getTime() -
                   new Date(a.updated_at).getTime()
                 );
-              }) // Trier du plus récent au plus ancien
+              })
               .map((update: any, index: number) => (
                 <div key={index} className="relative mb-4 flex items-start">
-                  {/* Point ou cercle pour chaque item */}
                   <div className="absolute left-[-22px] top-[50%] w-3 h-3 bg-blue-600 rounded-full"></div>
                   <div className="bg-gray-100 w-full p-2 rounded-md shadow-md">
                     <p className="text-[12px] italic">
