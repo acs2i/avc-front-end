@@ -47,11 +47,11 @@ export default function CollectionUpdatePage({
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleUpdate = async (isReactivation = false) => {
+  const handleUpdate = async (isStatusUpdate = false, newStatus = '') => {
     setIsLoading(true);
 
-    const updatedData = isReactivation 
-      ? { status: 'A' }
+    const updatedData = isStatusUpdate
+      ? { status: newStatus || (formData.status === 'A' ? 'I' : 'A') }
       : Object.entries(formData).reduce((acc, [key, value]) => {
           if (value !== selectedCollection[key as keyof Collection]) {
             acc[key as keyof Collection] = value;
@@ -77,16 +77,26 @@ export default function CollectionUpdatePage({
         }
       );
       if (response.ok) {
-        const data = await response.json();
-        console.log("Updated data:", data);
-        notifySuccess(isReactivation ? "Collection réactivée avec succès !" : "Collection modifiée avec succès !");
+        let message = "Collection modifiée avec succès !";
+        if (isStatusUpdate) {
+          message = updatedData.status === 'A' 
+            ? "Collection réactivée avec succès !" 
+            : "Collection désactivée avec succès !";
+        }
+        notifySuccess(message);
         setIsModify(false);
         onUpdateSuccess(formData._id);
         onClose();
       } else {
         const errorData = await response.json();
         console.error("Error response:", errorData);
-        notifyError(isReactivation ? "Erreur lors de la réactivation" : "Erreur lors de la modification");
+        let errorMessage = "Erreur lors de la modification";
+        if (isStatusUpdate) {
+          errorMessage = updatedData.status === 'A'
+            ? "Erreur lors de la réactivation"
+            : "Erreur lors de la désactivation";
+        }
+        notifyError(errorMessage);
       }
     } catch (error) {
       console.error("Erreur lors de la soumission", error);
@@ -110,16 +120,23 @@ export default function CollectionUpdatePage({
             </span>{" "}
           </h1>
         </div>
-        {!isModify && formData.status !== 'I' && (
-          <div onClick={() => setIsModify(true)} className="cursor-pointer">
-            <span className="text-[12px] text-blue-500">Modifier</span>
-          </div>
-        )}
-        {formData.status === 'I' && (
-          <div onClick={() => handleUpdate(true)} className="cursor-pointer">
-            <span className="text-[12px] text-green-500">Réactiver</span>
-          </div>
-        )}
+        <div className="flex items-center gap-4">
+          {!isModify && formData.status !== 'I' && (
+            <div onClick={() => setIsModify(true)} className="cursor-pointer">
+              <span className="text-[12px] text-blue-500">Modifier</span>
+            </div>
+          )}
+          {formData.status === 'I' && (
+            <div onClick={() => handleUpdate(true, 'A')} className="cursor-pointer">
+              <span className="text-[12px] text-green-500">Réactiver</span>
+            </div>
+          )}
+          {formData.status === 'A' && (
+            <div onClick={() => handleUpdate(true, 'I')} className="cursor-pointer">
+              <span className="text-[12px] text-red-500">Désactiver</span>
+            </div>
+          )}
+        </div>
       </div>
       <div className="mt-3">
         <Divider />

@@ -79,15 +79,17 @@ export default function UserFieldUpdatePage({
     setFormData({ ...formData, additional_fields: updatedFields });
   };
 
-  const handleUpdate = async () => {
+  const handleUpdate = async (isStatusUpdate = false, newStatus = '') => {
     setIsLoading(true);
 
-    const updatedData = Object.entries(formData).reduce((acc, [key, value]) => {
-      if (value !== selectedField[key as keyof Field]) {
-        acc[key as keyof Field] = value;
-      }
-      return acc;
-    }, {} as Partial<Field>);
+    const updatedData = isStatusUpdate
+      ? { status: newStatus || (formData.status === 'A' ? 'I' : 'A') }
+      : Object.entries(formData).reduce((acc, [key, value]) => {
+          if (value !== selectedField[key as keyof Field]) {
+            acc[key as keyof Field] = value;
+          }
+          return acc;
+        }, {} as Partial<Field>);
 
     const updateEntry: UpdateEntry = {
       updated_at: new Date(),
@@ -107,14 +109,26 @@ export default function UserFieldUpdatePage({
         }
       );
       if (response.ok) {
-        notifySuccess("Champ utilisateur modifié avec succès !");
+        let message = "Champ utilisateur modifié avec succès !";
+        if (isStatusUpdate) {
+          message = updatedData.status === 'A' 
+            ? "Champ utilisateur réactivé avec succès !" 
+            : "Champ utilisateur désactivé avec succès !";
+        }
+        notifySuccess(message);
         setIsModify(false);
         onUpdateSuccess(formData._id);
         onClose();
       } else {
         const errorData = await response.json();
         console.error("Error response:", errorData);
-        notifyError("Erreur lors de la modification");
+        let errorMessage = "Erreur lors de la modification";
+        if (isStatusUpdate) {
+          errorMessage = updatedData.status === 'A'
+            ? "Erreur lors de la réactivation"
+            : "Erreur lors de la désactivation";
+        }
+        notifyError(errorMessage);
       }
     } catch (error) {
       console.error("Erreur lors de la soumission", error);
@@ -142,11 +156,23 @@ export default function UserFieldUpdatePage({
             Numéro du champ utilisateur : {formData.code}
           </h1>
         </div>
-        {!isModify && (
-          <div onClick={() => setIsModify(true)} className="cursor-pointer">
-            <span className="text-[12px] text-blue-500">Modifier</span>
-          </div>
-        )}
+        <div className="flex items-center gap-4">
+          {!isModify && formData.status !== 'I' && (
+            <div onClick={() => setIsModify(true)} className="cursor-pointer">
+              <span className="text-[12px] text-blue-500">Modifier</span>
+            </div>
+          )}
+          {formData.status === 'I' && (
+            <div onClick={() => handleUpdate(true, 'A')} className="cursor-pointer">
+              <span className="text-[12px] text-green-500">Réactiver</span>
+            </div>
+          )}
+          {formData.status === 'A' && (
+            <div onClick={() => handleUpdate(true, 'I')} className="cursor-pointer">
+              <span className="text-[12px] text-red-500">Désactiver</span>
+            </div>
+          )}
+        </div>
       </div>
       <div className="mt-3">
         <Divider />
@@ -164,7 +190,7 @@ export default function UserFieldUpdatePage({
             validators={[]}
             create
             gray
-            disabled={!isModify}
+            disabled={!isModify || formData.status === 'I'}
           />
         </div>
 
@@ -207,10 +233,10 @@ export default function UserFieldUpdatePage({
                         validators={[]}
                         create
                         gray
-                        disabled={!isModify}
+                        disabled={!isModify || formData.status === 'I'}
                       />
                     ))}
-                    {field.field_type === "multiple_choice" && isModify && (
+                    {field.field_type === "multiple_choice" && isModify && formData.status !== 'I' && (
                       <div
                         className="mt-3 flex items-center gap-2 text-orange-400 cursor-pointer hover:text-orange-300"
                         onClick={() => addOption(fieldIndex)}
@@ -258,7 +284,7 @@ export default function UserFieldUpdatePage({
                 size="small"
                 blue
                 type="button"
-                onClick={() => handleUpdate()}
+                onClick={() => handleUpdate(false)}
               >
                 Modifier le champ utilisateur
               </Button>
@@ -283,7 +309,6 @@ export default function UserFieldUpdatePage({
               })
               .map((update: any, index: number) => (
                 <div key={index} className="relative mb-4 flex items-start">
-                  {/* Point ou cercle pour chaque item */}
                   <div className="absolute left-[-22px] top-[50%] w-3 h-3 bg-blue-600 rounded-full"></div>
                   <div className="bg-gray-100 w-full p-2 rounded-md shadow-md">
                     <p className="text-[12px] italic">
@@ -296,7 +321,6 @@ export default function UserFieldUpdatePage({
                     <div className="text-[13px] text-gray-500 font-[500] mt-2">
                       {Object.entries(update.changes).map(([key, value]) => (
                         <div key={key} className="mb-2">
-                          {/* Vérification pour afficher les détails des objets comme additional_fields */}
                           {key === "additional_fields" &&
                           Array.isArray(value) ? (
                             <div>
@@ -305,8 +329,6 @@ export default function UserFieldUpdatePage({
                               </p>
                               {value.map((field: any, idx: number) => (
                                 <div key={idx} className="ml-4">
-                                  {/* <p>Type de champ : {field.field_type}</p> */}
-                                  {/* <p>Valeur : {field.value}</p> */}
                                   {field.options && (
                                     <div>
                                       Options :
