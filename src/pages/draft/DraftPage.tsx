@@ -360,19 +360,23 @@ export default function DraftPage() {
               </h3>
             )}
             {currentStep === 2 && (
-              <h3 className="text-[32px] font-[800] text-gray-800">
-                En
+              <h3 className="text-[32px] font-[800] text-gray-800 capitalize">
+                à
                 <span className="font-[200]">
                   {" "}
-                  cours de validation ({filteredInProgress.length})
+                  valider ({filteredInProgress.length})
                 </span>
               </h3>
             )}
             {currentStep === 3 && (
-              <h3 className="text-[32px] font-[800] text-gray-800">
-                V
+              <h3 className="text-[32px] font-[800] text-gray-800 capitalize">
+                h
                 <span className="font-[200]">
-                  alidées ({filteredDone.length})
+                  istorique des validations{" "}
+                  <span className="text-[15px] lowercase">
+                    (vous pouvez les retrouver dans la liste articles)
+                  </span>{" "}
+                  ({filteredDone.length})
                 </span>
               </h3>
             )}
@@ -531,7 +535,7 @@ export default function DraftPage() {
                     <span className="capitalize font-[800]">
                       {selectedUsername}
                     </span>{" "}
-                    n'a pas de références en cours de validation
+                    n'a pas de références à valider
                   </td>
                 </tr>
               ) : (
@@ -568,11 +572,11 @@ export default function DraftPage() {
                     <span className="capitalize font-[800]">
                       {selectedUsername}
                     </span>{" "}
-                    n'a pas de références validées
+                    n'a pas d'historique
                   </td>
                 </tr>
               ) : (
-                filteredInProgress.map((product, i) => (
+                filteredDone.map((product, i) => (
                   <tr
                     key={i}
                     className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 even:bg-slate-50 whitespace-nowrap border"
@@ -582,7 +586,10 @@ export default function DraftPage() {
                       {product.reference}
                     </td>
                     <td className="px-6 py-2">{product.long_label}</td>
-                    <td className="px-6 py-2">{product.brand_ids}</td>
+                    <td className="px-6 py-2">{product.brandName}</td>
+                    <td className="px-6 py-2">{product.supplierName}</td>
+                    <td className="px-6 py-2">{product.familyName}</td>
+                    <td className="px-6 py-2">{product.subFamilyName}</td>
                     <td className="px-6 py-2 text-blue-600">
                       {formatDate(product.createdAt)}
                     </td>

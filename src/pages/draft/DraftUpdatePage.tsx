@@ -37,6 +37,8 @@ import { useFetchDetails } from "../../utils/hooks/usefetchdetails";
 import DynamicField from "../../components/FormElements/DynamicField";
 import SupplierFormComponent from "../../components/SupplierFormComponent";
 import Input from "../../components/FormElements/Input";
+import Loader from "../../components/Shared/Loader";
+import Backdrop from "@mui/material/Backdrop";
 
 interface CustomField {
   field_name: string;
@@ -144,6 +146,7 @@ export default function DraftUpdatePage() {
     useState<SingleValue<BrandOption> | null>(null);
   const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
   const [fieldValues, setFieldValues] = useState<{ [key: string]: any }>({});
+  const [isCreate, setIsCreate] = useState(false);
   const [userFields, setUserFields] = useState<UserField[]>([]);
   const [inputValueBrand, setInputValueBrand] = useState("");
   const [brandLabel, setBrandLabel] = useState("");
@@ -779,8 +782,6 @@ export default function DraftUpdatePage() {
     }
   };
 
- 
-
   const updateDraftStatus = async (newStatus: number) => {
     setIsLoading(true);
     try {
@@ -960,48 +961,54 @@ export default function DraftUpdatePage() {
   };
 
   const handleCreateProduct = async () => {
-    setIsLoading(true);
-  
+    setIsCreate(true);
     try {
       // Étape 1 : Création des UVC et récupération des IDs
       const uvcPromises = formData.uvc.map(async (uvc) => {
-        const response = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/uvc`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(uvc),
-        });
-  
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/uvc`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(uvc),
+          }
+        );
+
         if (!response.ok) {
           throw new Error("Erreur lors de la création des UVC !");
         }
-  
+
         const createdUvc = await response.json();
         return createdUvc._id; // Récupère l'ID de chaque UVC créé
       });
-  
+
       const uvcIds = await Promise.all(uvcPromises);
-  
+
       // Étape 2 : Création du produit avec les IDs des UVC
       const productData = {
         ...formData,
         uvc_ids: uvcIds, // Inclure les identifiants des UVC
       };
-  
-      const productResponse = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/product`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(productData),
-      });
-      console.log(productResponse)
+
+      const productResponse = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/product`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(productData),
+        }
+      );
+
       if (productResponse.ok) {
+        updateDraftStatus(3);
         notifySuccess("Produit créé avec succès !");
-        navigate("/drafts"); // Redirection après création
+        navigate("/drafts");
       } else {
         notifyError("Erreur lors de la création du produit !");
       }
@@ -1009,13 +1016,9 @@ export default function DraftUpdatePage() {
       console.error("Erreur lors de la création du produit :", error);
       notifyError("Erreur lors de la création du produit !");
     } finally {
-      setIsLoading(false);
+      setIsCreate(false);
     }
   };
-  
-
-
-  console.log(draft);
 
   return (
     <>
@@ -1094,6 +1097,15 @@ export default function DraftUpdatePage() {
           )}
         </div>
       </Modal>
+      <Backdrop
+        sx={(theme) => ({ color: "#fff", zIndex: theme.zIndex.drawer + 1 })}
+        open={isCreate}
+      >
+        <div className="flex flex-col items-center gap-4">
+          <p className="text-[30px] animate-pulse">En cours de création</p>
+          <CircularProgress color="inherit" size={100} />
+        </div>
+      </Backdrop>
       <section className="w-full bg-slate-50 p-8 max-w-[2000px] mx-auto min-h-screen">
         <form onSubmit={handleUpdateDraft}>
           <div className="flex flex-col gap-5">
@@ -1117,41 +1129,50 @@ export default function DraftUpdatePage() {
                       type="button"
                       green
                       onClick={() => {
-                        updateDraftStatus(2);
+                        updateDraftStatus(2); // Passe à l'étape 2 pour validation
                       }}
                     >
                       Valider le brouillon
                     </Button>
-                  ) : (
-                    <Button size="small" type="button" green  onClick={handleCreateProduct}>
+                  ) : draft?.step === 2 ? (
+                    <Button
+                      size="small"
+                      type="button"
+                      green
+                      onClick={handleCreateProduct} // Action pour enregistrer la référence
+                    >
                       Enregistrer la référence
                     </Button>
+                  ) : null}
+                  {draft?.step !== 3 && (
+                    <>
+                      <Button
+                        size="small"
+                        type="button"
+                        cancel
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setIsModalOpenConfirm(true);
+                        }}
+                      >
+                        {draft?.status === "A"
+                          ? "Désactiver la référence"
+                          : "Réactiver la référence"}
+                      </Button>
+                      <Button
+                        blue
+                        size="small"
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setIsModify(true);
+                        }}
+                        disabled={product?.status === "D"}
+                      >
+                        {isModify ? "Annuler modification" : "Modifier"}
+                      </Button>
+                    </>
                   )}
-                  <Button
-                    size="small"
-                    type="button"
-                    cancel
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setIsModalOpenConfirm(true);
-                    }}
-                  >
-                    {product?.status === "A"
-                      ? "Désactiver la référence"
-                      : "Réactiver la référence"}
-                  </Button>
-                  <Button
-                    blue
-                    size="small"
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setIsModify(true);
-                    }}
-                    disabled={product?.status === "D"}
-                  >
-                    {isModify ? "Annuler modification" : "Modifier"}
-                  </Button>
                 </div>
               ) : !isLoading ? (
                 <div className="flex items-center gap-2">
@@ -1706,7 +1727,7 @@ export default function DraftUpdatePage() {
                         <div>
                           <div className="grid grid-cols-12 gap-2 py-2">
                             <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
-                             Poids Brut
+                              Poids Brut
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
