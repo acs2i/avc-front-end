@@ -85,6 +85,7 @@ interface DimensionItem extends BaseItem {
 interface GridItem extends BaseItem {
   type?: string;
   dimensions?: string[];
+  frn_labels?: string[];
 }
 
 interface UserFieldItem extends BaseItem {
@@ -876,7 +877,60 @@ function ParamsMenuPageContent() {
                 <>
                   <td className="px-6 py-2">{gridItem.type}</td>
                   <td className="px-6 py-2">{gridItem.code}</td>
-                  <td className="px-6 py-2">{gridItem.label}</td>
+                  <td className="px-6 py-2">
+                    {gridItem.frn_labels &&
+                      gridItem.frn_labels
+                        .slice(0, N)
+                        .map((dim: string, index: number) => (
+                          <span
+                            key={index}
+                            className="text-[10px] rounded-[5px] mr-1"
+                          >
+                            {dim}
+                          </span>
+                        ))}
+                    {gridItem.frn_labels && gridItem.frn_labels.length > N && (
+                      <>
+                        {expandedGrid !== gridItem && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleViewMore(gridItem);
+                            }}
+                            className="text-blue-600 text-[8px]"
+                          >
+                            Voir plus
+                          </button>
+                        )}
+                        <Collapse in={expandedGrid === gridItem}>
+                          <div className="mt-1">
+                            <div className="grid grid-cols-5 gap-1">
+                              {gridItem.frn_labels &&
+                                gridItem.frn_labels
+                                  .slice(N)
+                                  .map((dim: string, index: number) => (
+                                    <span
+                                      key={index}
+                                      className="text-[10px] rounded-[5px]"
+                                    >
+                                      {dim}
+                                    </span>
+                                  ))}
+                            </div>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setExpandedGrid(null);
+                              }}
+                              className="text-blue-600 text-[8px]"
+                            >
+                              Voir moins
+                            </button>
+                          </div>
+                        </Collapse>
+                      </>
+                    )}
+                  </td>
                   <td className="px-6 py-2">
                     {gridItem.dimensions &&
                       gridItem.dimensions
