@@ -158,7 +158,7 @@ export type Draft = {
   _id: string;
   creator_id: any;
   reference: string;
-  name: string;
+  alias: string;
   short_label: string;
   long_label: string;
   type: string;
@@ -178,6 +178,7 @@ export type Draft = {
   net_weight: string;
   imgPath: string;
   status: string;
+  step: number;
   additional_fields: any;
   suppliers: SupplierDetail[];
   dimension_types: string[];

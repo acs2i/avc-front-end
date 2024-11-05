@@ -54,6 +54,7 @@ interface Draft {
   imgPath: string;
   status: string;
   additional_fields: any;
+  step: number;
   uvc: Uvc[];
   createdAt: Date;
   updatedAt: Date;
@@ -87,9 +88,9 @@ export default function DraftPage() {
   const [selectedUsername, setSelectedUsername] = useState("");
   const draftsEnriched = useRef(false);
   const navigate = useNavigate();
-  const filteredDrafts = drafts.filter((draft) => draft.status === "A");
-  const filteredInProgress = drafts.filter((draft) => draft.status === "I");
-  const filteredDone = drafts.filter((draft) => draft.status === "D");
+  const filteredDrafts = drafts.filter((draft) => draft.step === 1);
+  const filteredInProgress = drafts.filter((draft) => draft.step === 2);
+  const filteredDone = drafts.filter((draft) => draft.step === 3);
   const isValidObjectId = (id: string): boolean => {
     return /^[a-fA-F0-9]{24}$/.test(id);
   };

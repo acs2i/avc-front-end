@@ -58,7 +58,7 @@ interface UserField {
 interface FormData {
   creator_id: any;
   reference: string;
-  name: string;
+  alias: string;
   short_label: string;
   long_label: string;
   type: string;
@@ -112,7 +112,7 @@ export default function DraftUpdatePage() {
   const [formData, setFormData] = useState<FormData>({
     creator_id: draft?.creator_id,
     reference: draft?.reference || "",
-    name: draft?.name || "",
+    alias: draft?.alias || "",
     short_label: draft?.short_label || "",
     long_label: draft?.long_label || "",
     type: "Marchandise",
@@ -357,7 +357,7 @@ export default function DraftUpdatePage() {
       setFormData({
         creator_id: draft?.creator_id,
         reference: draft.reference || "",
-        name: draft.name || "",
+        alias: draft.alias || "",
         short_label: draft.short_label || "",
         long_label: draft.long_label || "",
         type: draft.type || "Marchandise",
@@ -378,7 +378,7 @@ export default function DraftUpdatePage() {
         gross_weight: draft?.gross_weight || "",
         net_weight: draft?.net_weight || "",
         imgPath: draft.imgPath || "",
-        status: draft.status || "A",
+        status: draft.status === "A" ? "A" : "I",
         additional_fields: draft.additional_fields || {},
         uvc: draft.uvc || [],
         initialSizes: formData.initialSizes,
@@ -781,7 +781,7 @@ export default function DraftUpdatePage() {
 
  
 
-  const updateDraftStatus = async (newStatus: string) => {
+  const updateDraftStatus = async (newStatus: number) => {
     setIsLoading(true);
     try {
       const response = await fetch(
@@ -792,7 +792,7 @@ export default function DraftUpdatePage() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ status: newStatus }),
+          body: JSON.stringify({ step: newStatus }),
         }
       );
 
@@ -959,33 +959,61 @@ export default function DraftUpdatePage() {
     }
   };
 
-  const createProduct = async () => {
+  const handleCreateProduct = async () => {
     setIsLoading(true);
+  
     try {
-        const response = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/product`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` 
-            },
-            body: JSON.stringify(formData),
+      // Étape 1 : Création des UVC et récupération des IDs
+      const uvcPromises = formData.uvc.map(async (uvc) => {
+        const response = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/uvc`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(uvc),
         });
-
+  
         if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Erreur lors de la création du produit : ${errorText}`);
+          throw new Error("Erreur lors de la création des UVC !");
         }
-
-        const result = await response.json();
+  
+        const createdUvc = await response.json();
+        return createdUvc._id; // Récupère l'ID de chaque UVC créé
+      });
+  
+      const uvcIds = await Promise.all(uvcPromises);
+  
+      // Étape 2 : Création du produit avec les IDs des UVC
+      const productData = {
+        ...formData,
+        uvc_ids: uvcIds, // Inclure les identifiants des UVC
+      };
+  
+      const productResponse = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/product`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(productData),
+      });
+      console.log(productResponse)
+      if (productResponse.ok) {
         notifySuccess("Produit créé avec succès !");
-        navigate(`/drafts`);
+        navigate("/drafts"); // Redirection après création
+      } else {
+        notifyError("Erreur lors de la création du produit !");
+      }
     } catch (error) {
-        console.error("Erreur lors de la création du produit :", error);
-        notifyError("Erreur lors de la création du produit");
+      console.error("Erreur lors de la création du produit :", error);
+      notifyError("Erreur lors de la création du produit !");
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
-};
+  };
+  
+
 
   console.log(draft);
 
@@ -1083,19 +1111,19 @@ export default function DraftUpdatePage() {
               )}
               {!isModify ? (
                 <div className="flex items-center gap-2">
-                  {draft?.status === "A" ? (
+                  {draft?.step === 1 ? (
                     <Button
                       size="small"
                       type="button"
                       green
                       onClick={() => {
-                        updateDraftStatus("I");
+                        updateDraftStatus(2);
                       }}
                     >
                       Valider le brouillon
                     </Button>
                   ) : (
-                    <Button size="small" type="button" green  onClick={createProduct}>
+                    <Button size="small" type="button" green  onClick={handleCreateProduct}>
                       Enregistrer la référence
                     </Button>
                   )}
@@ -1189,8 +1217,8 @@ export default function DraftUpdatePage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
-                                {draft.name ? (
-                                  draft.name
+                                {draft.alias ? (
+                                  draft.alias
                                 ) : (
                                   <CircleSlash2 size={15} />
                                 )}
@@ -1198,10 +1226,10 @@ export default function DraftUpdatePage() {
                             ) : (
                               <input
                                 type="text"
-                                id="name"
+                                id="alias"
                                 onChange={handleChange}
-                                placeholder={draft?.name}
-                                value={formData.name}
+                                placeholder={draft?.alias}
+                                value={formData.alias}
                                 className="col-span-3 border rounded-md p-1 bg-white py-2 focus:outline-none focus:border-blue-500"
                               />
                             )}
