@@ -109,63 +109,44 @@ export default function DraftImportPage() {
     }));
   };
 
-  const fetchEntityIds = async (codes: string[]) => {
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/product/get-ids`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ codes}),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Erreur lors de la récupération des IDs : ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Erreur lors de l\'appel à la route /get-entity-ids :', error);
-      notifyError('Erreur lors de la récupération des IDs des entités');
-      return null;
-    }
-  };
-
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       setFileName(file.name);
       const fileExtension = file.name.split(".").pop()?.toLowerCase();
-  
+
       if (fileExtension === "xlsx" || fileExtension === "xls") {
         const reader = new FileReader();
-        reader.onload = async (e) => {
+        reader.onload = (e) => {
           const data = new Uint8Array(e.target?.result as ArrayBuffer);
           const workbook = XLSX.read(data, { type: "array" });
-          const sheetName = workbook.SheetNames[0];
+          const sheetName = workbook.SheetNames[0]
           const worksheet = workbook.Sheets[sheetName];
-  
+
+          // Transformation des données en JSON
           const jsonData = XLSX.utils.sheet_to_json(worksheet, {
             header: 1,
             defval: "",
           });
-  
+
+          // Trouver l'index de la ligne contenant les en-têtes
           const headerIndex = jsonData.findIndex(
-            (row: any) => row.includes("Famille") || row.includes("Sous Famille")
+            (row: any) =>
+              row.includes("Famille") || row.includes("Sous Famille")
           );
-  
+
           if (headerIndex === -1) {
-            console.error("Les colonnes nécessaires ne sont pas présentes dans le fichier.");
+            console.error(
+              "Les colonnes nécessaires ne sont pas présentes dans le fichier."
+            );
             return;
           }
-  
+
+          // Extraire les en-têtes et les lignes de données
           const headers = jsonData[headerIndex] as string[];
           const rows = jsonData.slice(headerIndex + 1);
-  
+
+          // Colonnes à garder et mappage dynamique
           const columnsToKeep = [
             "Famille",
             "Sous Famille",
@@ -181,104 +162,103 @@ export default function DraftImportPage() {
             "PA Net",
             "PV Conseillé",
           ];
-  
+
           const columnMap: { [key: string]: number } = {};
           columnsToKeep.forEach((col) => {
-            const index = headers.findIndex((header: string) => header.trim() === col);
+            const index = headers.findIndex(
+              (header: string) => header.trim() === col
+            );
             if (index !== -1) {
               columnMap[col] = index;
             }
           });
-  
-          const formattedData: ImportData[] = rows.map((row: any) => ({
-            Famille: row[columnMap["Famille"]] || "",
-            "Sous Famille": row[columnMap["Sous Famille"]] || "",
-            "Sous Sous Famille": row[columnMap["Sous Sous Famille"]] || "",
-            "Type Produit": row[columnMap["Type Produit"]] || "",
-            "Libellé": row[columnMap["Modèle"]] || "",
-            Référence: row[columnMap["Référence"]] || "",
-            Fournisseur: row[columnMap["Code Fournisseur"]] || "",
-            Marque: row[columnMap["Code Marque"]] || "",
-            "Réf fournisseur": row[columnMap["Réf fournisseur"]] || "",
-            "Collection actuelle": row[columnMap["Collection actuelle"]] || "",
-            Collection: row[columnMap["Nouvelle Collection"]] || "",
-            "PA Net": row[columnMap["PA Net"]] || 0,
-            "PV Conseillé": row[columnMap["PV Conseillé"]] || 0,
-          }));
-  
-          // Récupération des codes et marques uniques
-          const codes = Array.from(new Set(formattedData.flatMap(data => [data.Famille, data["Sous Famille"], data["Sous Sous Famille"]]).filter(Boolean)));
-          // const brands = Array.from(new Set(formattedData.map(data => data.Marque).filter(Boolean)));
-  
-          // Appel à la fonction pour récupérer les IDs
-          const idsData = await fetchEntityIds(codes);
-  
-          if (idsData) {
-            const { tagIdMap, brandIdMap } = idsData;
-  
-            // Mise à jour des données avec les IDs récupérés
-            const updatedFormData = formattedData.map((data) => ({
-              creator_id: creatorId._id,
-              reference: data.Référence,
-              name: data["Libellé"], // Ou une autre valeur appropriée
-              short_label: "", // Ajoutez une logique pour remplir cette valeur si nécessaire
-              long_label: data["Libellé"],
-              type: "Marchandise",
-              tag_ids: [
-                tagIdMap[data.Famille] || data.Famille,
-                tagIdMap[data["Sous Famille"]] || data["Sous Famille"],
-                tagIdMap[data["Sous Sous Famille"]] || data["Sous Sous Famille"],
-              ],
-              suppliers: [
-                {
-                  supplier_id: data.Fournisseur,
-                  supplier_ref: data["Réf fournisseur"],
-                  pcb: "",
-                  custom_cat: "",
-                  made_in: "",
-                  company_name: data.Fournisseur,
-                },
-              ],
-              dimension_types: "Couleur/Taille",
-              brand_ids: [brandIdMap[data.Marque] || data.Marque],
-              collection_ids: [data.Collection],
-              peau: 0,
-              tbeu_pb: 0,
-              tbeu_pmeu: 0,
-              imgPath: "",
-              status: "A",
-              additional_fields: [],
-              uvc: [
-                {
-                  code: "",
-                  dimensions: [],
-                  prices: [
-                    {
-                      tarif_id: "",
-                      currency: "",
-                      supplier_id: "",
-                      price: {
-                        peau: 0,
-                        tbeu_pb: 0,
-                        tbeu_pmeu: 0,
-                      },
-                      store: "",
+
+          const formattedData: ImportData[] = rows.map((row: any) => {
+            const formattedRow: ImportData = {
+              Référence: row[columnMap["Référence"]] || "",
+              Famille: row[columnMap["Famille"]] || "",
+              "Sous Famille": row[columnMap["Sous Famille"]] || "",
+              "Sous Sous Famille": row[columnMap["Sous Sous Famille"]] || "",
+              "Type Produit": row[columnMap["Type Produit"]] || "",
+              "Libellé": row[columnMap["Modèle"]] || "",
+              Fournisseur: row[columnMap["Code Fournisseur"]] || "",
+              Marque: row[columnMap["Code Marque"]] || "",
+              "Réf fournisseur": row[columnMap["Réf fournisseur"]] || "",
+              "Collection actuelle":
+                row[columnMap["Collection actuelle"]] || "",
+              Collection: row[columnMap["Nouvelle Collection"]] || "",
+              "PA Net": row[columnMap["PA Net"]] || 0,
+              "PV Conseillé": row[columnMap["PV Conseillé"]] || 0,
+            };
+
+            return formattedRow;
+          });
+
+
+               
+
+          const updatedFormData = formattedData.map((data) => ({
+            creator_id: creatorId._id,
+            reference: data.Référence,
+            name: "",
+            short_label: "",
+            long_label: data["Libellé"],
+            type: "Marchandise",
+            tag_ids: [
+              data.Famille,
+              data["Sous Famille"],
+              data["Sous Sous Famille"],
+            ],
+            suppliers: [
+              {
+                supplier_id: data.Fournisseur,
+                supplier_ref: data["Réf fournisseur"],
+                pcb: "",
+                custom_cat: "",
+                made_in: "",
+                company_name: data.Fournisseur,
+              },
+            ],
+            dimension_types: "Couleur/Taille",
+            brand_ids: [data.Marque],
+            collection_ids: [data.Collection],
+            peau: 0,
+            tbeu_pb: 0,
+            tbeu_pmeu: 0,
+            imgPath: "",
+            status: "A",
+            additional_fields: [],
+            uvc: [
+              {
+                code: "",
+                dimensions: [],
+                prices: [
+                  {
+                    tarif_id: "",
+                    currency: "",
+                    supplier_id: "",
+                    price: {
+                      peau: 0,
+                      tbeu_pb: 0,
+                      tbeu_pmeu: 0,
                     },
-                  ],
-                  eans: [],
-                  status: "",
-                },
-              ],
-            }));
-            setFormData(updatedFormData);
-            setFileData(formattedData);
-          }
+                    store: "",
+                  },
+                ],
+                eans: [],
+                status: "",
+              },
+            ],
+          }));
+
+          setFormData(updatedFormData);
+          setFileData(formattedData);
         };
         reader.readAsArrayBuffer(file);
       }
     }
   };
-  
+
   
 
   //Fontion de création
