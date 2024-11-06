@@ -52,7 +52,6 @@ interface Supplier {
   pcb: string;
   custom_cat: string;
   made_in: string;
-  company_name: string;
 }
 
 interface FormData {
@@ -216,7 +215,6 @@ export default function DraftImportPage() {
                 pcb: "",
                 custom_cat: "",
                 made_in: "",
-                company_name: data.Fournisseur,
               },
             ],
             dimension_types: "Couleur/Taille",
