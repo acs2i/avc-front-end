@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import Input from "../../components/FormElements/Input";
 import { ChevronRight, ChevronsUpDown } from "lucide-react";
 import truncateText from "../../utils/func/Formattext";
+import Button from "../../components/FormElements/Button";
 
 interface PriceItem {
   peau: number;
@@ -78,6 +79,10 @@ interface EnrichedDraft extends Draft {
 export default function DraftPage() {
   const user = useSelector((state: any) => state.auth.user._id);
   const token = useSelector((state: any) => state.auth.token);
+  const [isMultipleValidate, setIsMultipleValidate] = useState(false);
+  const [selectAll, setSelectAll] = useState(false);
+  const [selectedDrafts, setSelectedDrafts] = useState<string[]>([]);
+  const [lastSelectedDraft, setLastSelectedDraft] = useState<EnrichedDraft | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const steps = [1, 2, 3];
   const [page, setPage] = useState("draft");
@@ -101,6 +106,80 @@ export default function DraftPage() {
   const handleStepClick = (step: number) => {
     setCurrentStep(step);
   };
+
+  const toggleCheckboxVisibility = () => {
+    setIsMultipleValidate(!isMultipleValidate);
+  };
+
+  const handleSelectAll = () => {
+    setSelectAll(!selectAll);
+    if (!selectAll) {
+      // Ajoute tous les drafts filtrés à la sélection
+      setSelectedDrafts(filteredDrafts.map((draft) => draft._id));
+    } else {
+      // Vide la sélection
+      setSelectedDrafts([]);
+    }
+  };
+
+  const handleDraftSelection = (id: string) => {
+    setSelectedDrafts((prevSelected) =>
+      prevSelected.includes(id)
+        ? prevSelected.filter((draftId) => draftId !== id) // Retire si déjà sélectionné
+        : [...prevSelected, id] // Ajoute si non sélectionné
+    );
+  };
+
+  const updateSelectedDrafts = async () => {
+    try {
+      const payload = {
+        draftIds: selectedDrafts,
+        updateData: { step: 2 }, // Mise à jour du champ `step` à 2
+      };
+      console.log("Payload envoyé:", payload); // Vérifie le contenu du payload
+  
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/draft/bulkUpdate`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+  
+      if (!response.ok) {
+        // Gère les erreurs côté serveur
+        const errorResponse = await response.json();
+        console.error("Erreur de mise à jour en masse :", errorResponse);
+        return; // Sortie précoce en cas d'erreur
+      }
+  
+      const result = await response.json();
+      console.log("Mise à jour en masse réussie :", result);
+  
+      // Mettre à jour l'état local
+      setDrafts((prevDrafts) =>
+        prevDrafts.map((draft) =>
+          selectedDrafts.includes(draft._id) ? { ...draft, step: 2 } : draft
+        )
+      );
+      setSelectedDrafts([]); // Réinitialiser la sélection
+      setSelectAll(false); // Désélectionner "Tout sélectionner"
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour en masse :", error);
+    }
+  };
+  
+  
+
+  useEffect(() => {
+    setSelectAll(
+      filteredDrafts.length > 0 && selectedDrafts.length === filteredDrafts.length
+    );
+  }, [selectedDrafts, filteredDrafts]);
 
   useEffect(() => {
     fetchDraft();
@@ -306,7 +385,7 @@ export default function DraftPage() {
   return (
     <section>
       {/* Partie Header */}
-      <div className="w-full h-[300px] bg-slate-100 p-8 relative overflow-hidden">
+      <div className="w-full h-[320px] bg-slate-100 p-8 relative overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
@@ -420,6 +499,14 @@ export default function DraftPage() {
               </select>
             </div>
           </div>
+          <div className="mt-3 flex gap-3">
+            <Button blue size="small" onClick={toggleCheckboxVisibility}>
+              Validation multiple
+            </Button>
+            <Button blue size="small" onClick={updateSelectedDrafts}>
+              Validerla selection
+            </Button>
+          </div>
         </div>
       </div>
       {/* Partie Liste */}
@@ -427,6 +514,16 @@ export default function DraftPage() {
         <table className="w-full text-left">
           <thead className="border-y-[2px] border-slate-100 text-sm font-[900] text-black uppercase">
             <tr>
+              {isMultipleValidate && (
+                <td className="px-6 py-2 text-blue-500">
+                  <input
+                    type="checkbox"
+                    checked={selectAll}
+                    onChange={handleSelectAll}
+                    className="peer relative h-5 w-5 cursor-pointer rounded border border-slate-300 shadow hover:shadow-md transition-all"
+                  />
+                </td>
+              )}
               <th scope="col" className="px-6 py-4 w-[5%]">
                 <div className="flex items-center">
                   <span className="leading-3">Référence</span>
@@ -504,8 +601,20 @@ export default function DraftPage() {
                   <tr
                     key={i}
                     className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-[12px] text-gray-800 even:bg-slate-50 whitespace-nowrap border"
-                    onClick={() => navigate(`/draft/${product._id}`)}
+                    onClick={() =>
+                      !isMultipleValidate && navigate(`/draft/${product._id}`)
+                    }
                   >
+                    {isMultipleValidate && (
+                      <td className="px-6 py-2 text-blue-500">
+                        <input
+                          type="checkbox"
+                          checked={selectedDrafts.includes(product._id)}
+                          onChange={() => handleDraftSelection(product._id)}
+                          className="relative h-5 w-5 cursor-pointer rounded border border-slate-300 shadow hover:shadow-md transition-all"
+                        />
+                      </td>
+                    )}
                     <td className="px-6 py-2 text-blue-500">
                       {product.reference}
                     </td>
