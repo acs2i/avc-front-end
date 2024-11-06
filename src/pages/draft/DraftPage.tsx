@@ -153,13 +153,12 @@ export default function DraftPage() {
       if (!response.ok) {
         // Gère les erreurs côté serveur
         const errorResponse = await response.json();
-        console.error("Erreur de mise à jour en masse :", errorResponse);
         return; // Sortie précoce en cas d'erreur
       }
   
       const result = await response.json();
-      console.log("Mise à jour en masse réussie :", result);
-  
+      setCurrentStep(2)
+      setIsMultipleValidate(false)
       // Mettre à jour l'état local
       setDrafts((prevDrafts) =>
         prevDrafts.map((draft) =>
