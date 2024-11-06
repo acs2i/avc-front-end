@@ -174,12 +174,12 @@ export default function DraftImportPage() {
 
           const formattedData: ImportData[] = rows.map((row: any) => {
             const formattedRow: ImportData = {
-              Référence: row[columnMap["Référence"]] || "",
               Famille: row[columnMap["Famille"]] || "",
               "Sous Famille": row[columnMap["Sous Famille"]] || "",
               "Sous Sous Famille": row[columnMap["Sous Sous Famille"]] || "",
               "Type Produit": row[columnMap["Type Produit"]] || "",
               "Libellé": row[columnMap["Modèle"]] || "",
+              Référence: row[columnMap["Référence"]] || "",
               Fournisseur: row[columnMap["Code Fournisseur"]] || "",
               Marque: row[columnMap["Code Marque"]] || "",
               "Réf fournisseur": row[columnMap["Réf fournisseur"]] || "",
