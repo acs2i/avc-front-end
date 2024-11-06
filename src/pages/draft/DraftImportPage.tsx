@@ -13,7 +13,7 @@ interface ImportData {
   "Sous Famille": string;
   "Sous Sous Famille": string;
   "Type Produit": string;
-  "Libellé": string;
+  Libellé: string;
   Référence: string;
   Fournisseur: string;
   Marque: string;
@@ -119,7 +119,7 @@ export default function DraftImportPage() {
         reader.onload = (e) => {
           const data = new Uint8Array(e.target?.result as ArrayBuffer);
           const workbook = XLSX.read(data, { type: "array" });
-          const sheetName = workbook.SheetNames[0]
+          const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
 
           // Transformation des données en JSON
@@ -172,29 +172,31 @@ export default function DraftImportPage() {
             }
           });
 
-          const formattedData: ImportData[] = rows.map((row: any) => {
-            const formattedRow: ImportData = {
-              Famille: row[columnMap["Famille"]] || "",
-              "Sous Famille": row[columnMap["Sous Famille"]] || "",
-              "Sous Sous Famille": row[columnMap["Sous Sous Famille"]] || "",
-              "Type Produit": row[columnMap["Type Produit"]] || "",
-              "Libellé": row[columnMap["Modèle"]] || "",
-              Référence: row[columnMap["Référence"]] || "",
-              Fournisseur: row[columnMap["Code Fournisseur"]] || "",
-              Marque: row[columnMap["Code Marque"]] || "",
-              "Réf fournisseur": row[columnMap["Réf fournisseur"]] || "",
-              "Collection actuelle":
-                row[columnMap["Collection actuelle"]] || "",
-              Collection: row[columnMap["Nouvelle Collection"]] || "",
-              "PA Net": row[columnMap["PA Net"]] || 0,
-              "PV Conseillé": row[columnMap["PV Conseillé"]] || 0,
-            };
-
-            return formattedRow;
-          });
-
-
-               
+          const formattedData: ImportData[] = rows
+            .map((row: any) => {
+              if (row[columnMap["Référence"]]) {
+                const formattedRow: ImportData = {
+                  Famille: row[columnMap["Famille"]] || "",
+                  "Sous Famille": row[columnMap["Sous Famille"]] || "",
+                  "Sous Sous Famille":
+                    row[columnMap["Sous Sous Famille"]] || "",
+                  "Type Produit": row[columnMap["Type Produit"]] || "",
+                  Libellé: row[columnMap["Modèle"]] || "",
+                  Référence: row[columnMap["Référence"]].toString() || "",
+                  Fournisseur: row[columnMap["Code Fournisseur"]] || "",
+                  Marque: row[columnMap["Code Marque"]] || "",
+                  "Réf fournisseur": row[columnMap["Réf fournisseur"]] || "",
+                  "Collection actuelle":
+                    row[columnMap["Collection actuelle"]] || "",
+                  Collection: row[columnMap["Nouvelle Collection"]] || "",
+                  "PA Net": row[columnMap["PA Net"]] || 0,
+                  "PV Conseillé": row[columnMap["PV Conseillé"]] || 0,
+                };
+                return formattedRow;
+              }
+              return null;
+            })
+            .filter((row): row is ImportData => row !== null);
 
           const updatedFormData = formattedData.map((data) => ({
             creator_id: creatorId._id,
@@ -257,8 +259,6 @@ export default function DraftImportPage() {
     }
   };
 
-  
-
   //Fontion de création
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -274,7 +274,10 @@ export default function DraftImportPage() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ drafts: cleanedData, creator_id: creatorId._id }),
+          body: JSON.stringify({
+            drafts: cleanedData,
+            creator_id: creatorId._id,
+          }),
         }
       );
 
