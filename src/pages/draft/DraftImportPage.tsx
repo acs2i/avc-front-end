@@ -246,7 +246,7 @@ export default function DraftImportPage() {
                   },
                 ],
                 eans: [],
-                status: "",
+                status: "A",
               },
             ],
           }));
