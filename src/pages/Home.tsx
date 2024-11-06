@@ -337,7 +337,7 @@ export default function Home() {
                     <td className="p-4">
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-blue-600 dark:text-yellow-300">
-                          {product.short_label}
+                          {product.long_label}
                         </span>
                       </div>
                     </td>
