@@ -17,9 +17,9 @@ import DynamicField from "../../components/FormElements/DynamicField";
 import Modal from "../../components/Shared/Modal";
 import ContactFormComponent from "../../components/ContactFormComponent";
 import { useBrands } from "../../utils/hooks/useBrands";
-import GestionFormComponent from "../../components/GestionFormComponent";
 import { useUsers } from "../../utils/hooks/useUsers";
 import { useFamily } from "../../utils/hooks/useFamily";
+import GestionFormComponent from "../../components/GestionFormComponent";
 
 interface Contact {
   firstname: string;
@@ -749,7 +749,7 @@ export default function CreateSupplierPage() {
             </div>
 
             <div className="flex gap-4 mt-[30px]">
-              <FormSection title="Champs additionnels">
+              <FormSection title="Champs utilisateurs">
                 <div className="mt-3">
                   {userFields
                     .filter((field) => field.apply_to === "Fournisseur")

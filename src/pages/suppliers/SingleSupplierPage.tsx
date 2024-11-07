@@ -22,10 +22,13 @@ import BrandSection from "../../components/Formulaires/BrandSection";
 import DynamicField from "../../components/FormElements/DynamicField";
 import Modal from "../../components/Shared/Modal";
 import ContactFormComponent from "../../components/ContactFormComponent";
-import { useBrands } from "../../utils/hooks/useBrands";
 import { useCollections } from "../../utils/hooks/useCollection";
 import CollectionSection from "../../components/Formulaires/CollectionSection";
 import { formatDate } from "../../utils/func/formatDate";
+import GestionFormComponent from "../../components/GestionFormComponent";
+import { useBrands } from "../../utils/hooks/useBrands";
+import { useUsers } from "../../utils/hooks/useUsers";
+import { useFamily } from "../../utils/hooks/useFamily";
 
 interface BrandId {
   _id: string;
@@ -223,6 +226,7 @@ export default function SingleSupplierPage() {
   const [contactModalIsOpen, setContactModalIsOpen] = useState(false);
   const [conditionModalIsOpen, setConditionModalIsOpen] = useState(false);
   const [selectedContacts, setSelectedContacts] = useState<Contact[]>([]);
+  const [gestionModalIsOpen, setGestionModalIsOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const [newContact, setNewContact] = useState<Contact>({
     firstname: "",
@@ -234,15 +238,20 @@ export default function SingleSupplierPage() {
   });
   const limit = 10;
   const [currentPage, setCurrentPage] = useState(1);
-  const [inputValueBrand, setInputValueBrand] = useState("");
   const [isModify, setIsModify] = useState(false);
-  const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
+  const [admin, setAdmin] = useState("");
+  const [buyers, setBuyers] = useState<Buyer[]>([{ family: [], user: "" }]);
+  const [userOptions, setUserOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
+  const [searchInputs, setSearchInputs] = useState<{ [key: string]: string }>(
+    {}
+  );
   const [userFields, setUserFields] = useState<UserField[]>([]);
   const [fieldValues, setFieldValues] = useState<{ [key: string]: any }>({});
   const [selectedOptionBrand, setSelectedOptionBrand] =
     useState<SingleValue<BrandOption> | null>(null);
   const [brandLabel, setBrandLabel] = useState("");
-  const [brands, setBrands] = useState<SingleValue<BrandOption>[]>([]);
   const { notifySuccess, notifyError } = useNotify();
   const [isLoading, setIsLoading] = useState(false);
   const [addFieldIsVisible, setaddFieldIsVisible] = useState(false);
@@ -265,7 +274,7 @@ export default function SingleSupplierPage() {
     additional_fields: [],
     brand_id: [],
     admin: "",
-    buyers: [],
+    buyers: supplier?.buyers || [],
     contacts: [
       {
         firstname: "",
@@ -316,6 +325,39 @@ export default function SingleSupplierPage() {
       conditions: supplier?.conditions || [],
     }
   );
+
+  const {
+    inputValueUser,
+    optionsUser,
+    users,
+    handleChangeUser,
+    removeUserField,
+    addUserField,
+    handleInputChangeUser,
+  } = useUsers("", 10);
+
+  const {
+    inputValueBrand,
+    optionsBrand,
+    brands,
+    handleInputChangeBrand,
+    handleChangeBrand,
+    addBrandField,
+    removeBrandField,
+  } = useBrands("", 10);
+
+  const {
+    inputValueFamily,
+    optionsFamily,
+    selectedFamily,
+    setOptionsFamily,
+    handleInputChangeFamily,
+    handleChangeFamily,
+  } = useFamily("", 10);
+
+  useEffect(() => {
+    setUserOptions(optionsUser);
+  }, [optionsUser]);
 
   const {
     inputValueCollection,
@@ -404,16 +446,15 @@ export default function SingleSupplierPage() {
 
   useEffect(() => {
     if (supplier) {
-      setFormDataCondition({
-        supplier_id: supplier._id || "",
-        season: "",
+      setFormData((prevFormData) => ({
+        creator_id: creatorId._id,
         code: supplier.code || "",
         company_name: supplier.company_name || "",
+        phone: supplier.phone || "",
+        email: supplier.email || "",
+        web_url: supplier.web_url || "",
         siret: supplier.siret || "",
         tva: supplier.tva || "",
-        web_url: supplier.web_url || "",
-        email: supplier.email || "",
-        phone: supplier.phone || "",
         address_1: supplier.address_1 || "",
         address_2: supplier.address_2 || "",
         address_3: supplier.address_3 || "",
@@ -421,15 +462,40 @@ export default function SingleSupplierPage() {
         postal: supplier.postal || "",
         country: supplier.country || "",
         currency: supplier.currency || "",
-        contacts: supplier.contacts || [],
-        brand_id: supplier.brand_id.map((brand) => brand._id) || [],
-        additional_fields: supplier.additional_fields || [],
         admin: supplier.admin || "",
-        buyers: supplier.buyers || [],
-        conditions: supplier.conditions || [],
-      });
+        buyers: supplier.buyers || [], // Copier correctement buyers ici
+        brand_id: supplier.brand_id.map((brand) => brand._id),
+        additional_fields:
+          supplier.additional_fields?.length > 0
+            ? supplier.additional_fields
+            : prevFormData.additional_fields,
+        contacts: supplier.contacts || [
+          {
+            firstname: "",
+            lastname: "",
+            function: "",
+            phone: "",
+            mobile: "",
+            email: "",
+          },
+        ],
+        conditions: supplier.conditions || [
+          {
+            tarif: "",
+            currency: "",
+            rfa: "",
+            net_price: "",
+            labeling: "",
+            paiement_condition: "",
+            franco: "",
+            validate_tarif: "",
+            budget: "",
+          },
+        ],
+      }));
     }
-  }, [supplier]);
+  }, [supplier, creatorId]);
+  
 
   useEffect(() => {
     if (selectedCollection) {
@@ -445,107 +511,6 @@ export default function SingleSupplierPage() {
       ...formData,
       [e.target.id]: e.target.value,
     });
-  };
-
-  const handleChangeBrand = (
-    selectedOption: SingleValue<BrandOption>,
-    index: number
-  ) => {
-    if (!selectedOption || !selectedOption._id) {
-      console.error("Invalid brand selection");
-      return;
-    }
-
-    setBrands((prevBrands) => {
-      const updatedBrands = [...prevBrands];
-      updatedBrands[index] = selectedOption;
-      return updatedBrands;
-    });
-
-    setFormData((prevFormData) => {
-      const updatedBrandIds = [...prevFormData.brand_id];
-      updatedBrandIds[index] = selectedOption._id;
-      return {
-        ...prevFormData,
-        brand_id: updatedBrandIds,
-      };
-    });
-  };
-
-  const addBrandField = () => {
-    setBrands((prevBrands) => [...prevBrands, null]);
-
-    setFormData((prevFormData) => {
-      const newBrandIdArray = [...prevFormData.brand_id];
-
-      return {
-        ...prevFormData,
-        brand_id: newBrandIdArray,
-      };
-    });
-  };
-
-  const removeBrandField = (index: number) => {
-    setBrands((prevBrands) => prevBrands.filter((_, i) => i !== index));
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      brand_id: brands
-        .filter((_, i) => i !== index)
-        .map((brand) => brand?._id || ""),
-    }));
-  };
-
-  const handleInputChangeBrand = async (inputValueBrand: string) => {
-    setInputValueBrand(inputValueBrand);
-
-    if (inputValueBrand === "") {
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_URL_DEV}/api/v1/brand`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const data = await response.json();
-
-        const optionsBrand = data.data?.map((brand: BrandOption) => ({
-          value: brand.label,
-          label: brand.label,
-          _id: brand._id,
-        }));
-
-        setOptionsBrand(optionsBrand);
-      } catch (error) {
-        console.error("Erreur lors de la requête", error);
-      }
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/brand/search?label=${inputValueBrand}&page=${currentPage}&limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const data = await response.json();
-
-      const optionsBrand = data.data?.map((brand: BrandOption) => ({
-        value: brand.label,
-        label: brand.label,
-        _id: brand._id,
-      }));
-
-      setOptionsBrand(optionsBrand);
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-    }
   };
 
   const handleContactChange = (field: keyof Contact, value: string) => {
@@ -639,6 +604,54 @@ export default function SingleSupplierPage() {
     setContactModalIsOpen(false);
   };
 
+  const handleSearchInputChange = (inputValue: string, field: string) => {
+    setSearchInputs((prev) => ({
+      ...prev,
+      [field]: inputValue,
+    }));
+
+    handleInputChangeUser(inputValue);
+  };
+
+  const handleAdminChange = (value: string) => {
+    setAdmin(value); // Met à jour l'état local `admin`
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      admin: value,
+    }));
+  };
+
+  const handleBuyerChange = (
+    index: number,
+    field: keyof Buyer,
+    value: string | string[] // Champ pouvant être soit un tableau de chaînes soit une chaîne unique
+  ) => {
+    const updatedBuyers = [...buyers];
+
+    // Vérifier le type de champ attendu et assigner en conséquence
+    if (field === "family" && Array.isArray(value)) {
+      // Si c'est "family", on attend un tableau de chaînes
+      updatedBuyers[index][field] = value as string[];
+    } else if (field === "user" && typeof value === "string") {
+      // Si c'est "user", on attend une chaîne unique
+      updatedBuyers[index][field] = value as string;
+    }
+
+    setBuyers(updatedBuyers);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      buyers: updatedBuyers,
+    }));
+  };
+
+  const addBuyer = () => {
+    setBuyers((prev) => [...prev, { family: [], user: "" } as Buyer]);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      buyers: [...prevFormData.buyers, { family: [], user: "" } as Buyer],
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -723,6 +736,15 @@ export default function SingleSupplierPage() {
   };
 
   useEffect(() => {
+    if (isModify && supplier && supplier.buyers) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        buyers: supplier.buyers,
+      }));
+    }
+  }, [isModify, supplier]);
+
+  useEffect(() => {
     fetchField();
   }, []);
 
@@ -784,6 +806,7 @@ export default function SingleSupplierPage() {
     }
   }, [supplier]);
 
+  console.log(formData);
   return (
     <>
       <Modal
@@ -821,6 +844,34 @@ export default function SingleSupplierPage() {
             </Button>
           </div>
         </div>
+      </Modal>
+      <Modal
+        show={gestionModalIsOpen}
+        onCancel={() => setGestionModalIsOpen(false)}
+        onClose={() => setGestionModalIsOpen(false)}
+        header="Ajouter un(e) gestionnaire"
+      >
+        <GestionFormComponent
+          admin={admin}
+          buyers={buyers}
+          adminOptions={userOptions}
+          setAdminSearchInput={(input) =>
+            handleSearchInputChange(input, "admin")
+          }
+          handleAdminChange={handleAdminChange}
+          handleBuyerChange={(index, field, value) =>
+            handleBuyerChange(index, field, value)
+          }
+          addBuyer={addBuyer}
+          onCloseModal={() => setGestionModalIsOpen(false)}
+          userOptions={userOptions}
+          handleUserSearchInput={(input, index) =>
+            handleSearchInputChange(input, `buyer-${index}`)
+          }
+          // Ajoutez ces props pour la recherche de familles
+          familyOptions={optionsFamily}
+          handleFamilySearchInput={handleInputChangeFamily}
+        />
       </Modal>
       <section className="w-full bg-slate-50 p-7 min-h-screen">
         <div className="max-w-[2024px] mx-auto">
@@ -1331,18 +1382,30 @@ export default function SingleSupplierPage() {
 
               <FormSection title="Gestionnaires">
                 <div className="mt-2 flex flex-col">
+                  {/* Affichage de l'assistant(e) pour `supplier` et `formData` */}
                   {supplier?.admin && (
                     <p className="text-[13px]">
-                      Assistant(e) :{" "}
+                      Assistant(e) actuel(le) :{" "}
                       <span className="capitalize font-bold">
-                        {supplier?.admin}
+                        {supplier.admin}
+                      </span>
+                    </p>
+                  )}
+                  {formData?.admin && formData.admin !== supplier?.admin && (
+                    <p className="text-[13px]">
+                      Assistant(e) modifié(e) :{" "}
+                      <span className="capitalize font-bold">
+                        {formData.admin}
                       </span>
                     </p>
                   )}
 
-                  {/* Acheteurs */}
-                  {supplier?.buyers && supplier?.buyers.length > 0 && (
+                  {/* Affichage des acheteurs pour `supplier` */}
+                  {supplier?.buyers && supplier.buyers.length > 0 && (
                     <div className="mt-4 overflow-x-auto">
+                      <p className="text-gray-600 font-semibold mb-2">
+                        Acheteurs actuels :
+                      </p>
                       <table className="min-w-full bg-white border border-gray-300">
                         <thead>
                           <tr className="bg-gray-200 text-gray-700">
@@ -1355,7 +1418,7 @@ export default function SingleSupplierPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {supplier?.buyers.map((buyer, index) => (
+                          {supplier.buyers.map((buyer, index) => (
                             <tr key={index} className="hover:bg-gray-100">
                               <td className="py-2 px-4 border-b">
                                 <span className="capitalize font-bold">
@@ -1364,13 +1427,63 @@ export default function SingleSupplierPage() {
                               </td>
                               <td className="py-2 px-4 border-b">
                                 <span className="capitalize font-bold">
-                                  {buyer.family?.join(" | ") || "N/A"}{" "}
+                                  {buyer.family?.join(" | ") || "N/A"}
                                 </span>
                               </td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
+                    </div>
+                  )}
+
+                  {/* Affichage des acheteurs modifiés pour `formData` */}
+                  {formData?.buyers && formData.buyers.length > 0 && (
+                    <div className="mt-4 overflow-x-auto">
+                      <p className="text-gray-600 font-semibold mb-2">
+                        Acheteurs modifiés :
+                      </p>
+                      <table className="min-w-full bg-white border border-gray-300">
+                        <thead>
+                          <tr className="bg-gray-200 text-gray-700">
+                            <th className="py-2 px-4 border-b text-left font-semibold">
+                              Acheteur
+                            </th>
+                            <th className="py-2 px-4 border-b text-left font-semibold">
+                              Famille
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {formData.buyers.map((buyer, index) => (
+                            <tr key={index} className="hover:bg-gray-100">
+                              <td className="py-2 px-4 border-b">
+                                <span className="capitalize font-bold">
+                                  {buyer.user || "N/A"}
+                                </span>
+                              </td>
+                              <td className="py-2 px-4 border-b">
+                                <span className="capitalize font-bold">
+                                  {buyer.family?.join(" | ") || "N/A"}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  {/* Bouton pour ajouter un(e) gestionnaire en mode modification */}
+                  {isModify && (
+                    <div
+                      className="flex flex-col items-center justify-center p-[20px] text-orange-400 hover:text-orange-300 cursor-pointer"
+                      onClick={() => setGestionModalIsOpen(true)}
+                    >
+                      <div className="flex items-center gap-2 text-[12px] mt-3">
+                        <Plus size={30} />
+                      </div>
+                      <p className="font-[700]">Ajouter un(e) gestionnaire</p>
                     </div>
                   )}
                 </div>
@@ -1428,9 +1541,13 @@ export default function SingleSupplierPage() {
                                       name={customField.field_name}
                                       fieldType={customField.field_type}
                                       value={
-                                        customField.field_type === "boolean" || customField.field_type === "multiple_choice" ? supplier?.additional_fields?.find(
-                                          (f) => f.label === field.label
-                                        )?.value : fieldValues[`${field._id}-${index}`]
+                                        customField.field_type === "boolean" ||
+                                        customField.field_type ===
+                                          "multiple_choice"
+                                          ? supplier?.additional_fields?.find(
+                                              (f) => f.label === field.label
+                                            )?.value
+                                          : fieldValues[`${field._id}-${index}`]
                                       }
                                       onChange={(e) =>
                                         handleFieldChange(
@@ -1484,7 +1601,12 @@ export default function SingleSupplierPage() {
                                     {condition.season}
                                   </span>
                                 </p>
-                                <p className="text-[12px] font-[600]">Crée le : <span className="text-blue-500">{formatDate(condition.createdAt)}</span></p>
+                                <p className="text-[12px] font-[600]">
+                                  Crée le :{" "}
+                                  <span className="text-blue-500">
+                                    {formatDate(condition.createdAt)}
+                                  </span>
+                                </p>
                               </div>
                               {open ? (
                                 <ChevronUp size={20} />
