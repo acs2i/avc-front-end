@@ -15,6 +15,8 @@ import { LINKS_Product, LINKS_UVC } from "../../utils/index";
 import UVCInfosTable from "../../components/UVCInfosTable";
 import UVCPriceTable from "../../components/UVCPricesTable";
 import UVCSupplierTable from "../../components/UVCSupplierTable";
+import UVCMeasureTable from "../../components/UVCMeasureTable";
+import UVCEanTable from "../../components/UVCEanTable";
 import SupplierComponent from "../../components/SupplierComponent";
 import UVCGrid from "../../components/UVCGrid";
 import FormSection from "../../components/Formulaires/FormSection";
@@ -319,6 +321,7 @@ export default function DraftUpdatePage() {
               },
             ],
             eans: [],
+            ean: "",
             status: "",
           });
         } else {
@@ -1008,7 +1011,7 @@ export default function DraftUpdatePage() {
       if (productResponse.ok) {
         updateDraftStatus(3);
         notifySuccess("Produit créé avec succès !");
-        navigate("/drafts");
+        navigate("/product");
       } else {
         notifyError("Erreur lors de la création du produit !");
       }
@@ -1672,8 +1675,8 @@ export default function DraftUpdatePage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {draft.height}
-                                {draft.size_unit}
+                                {draft.height || "0"}
+                                {draft.size_unit || "m"}
                               </span>
                             ) : (
                               <input
@@ -1691,8 +1694,8 @@ export default function DraftUpdatePage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {draft.length}
-                                {draft.size_unit}
+                                {draft.length || "0"}
+                                {draft.size_unit || "m"}
                               </span>
                             ) : (
                               <input
@@ -1710,8 +1713,8 @@ export default function DraftUpdatePage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {draft.width}
-                                {draft.size_unit}
+                                {draft.width || "0"}
+                                {draft.size_unit || "m"}
                               </span>
                             ) : (
                               <input
@@ -1731,8 +1734,8 @@ export default function DraftUpdatePage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {draft.gross_weight}
-                                {draft.weigth_unit}
+                                {draft.gross_weight || "0"}
+                                {draft.weigth_unit || "kg"}
                               </span>
                             ) : (
                               <input
@@ -1750,8 +1753,8 @@ export default function DraftUpdatePage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {draft.net_weight}
-                                {draft.weigth_unit}
+                                {draft.net_weight || "0"}
+                                {draft.weigth_unit || "kg"}
                               </span>
                             ) : (
                               <input
@@ -1966,26 +1969,55 @@ export default function DraftUpdatePage() {
                     )}
                   </div>
                 </div>
-                {/* {onglet === "infos" && draft && (
+                {onglet === "infos" && draft && (
                   <UVCInfosTable
+                    reference={draft?.reference}
                     uvcDimension={formData.uvc}
-                    productReference={draft.reference || ""}
-                    brandLabel={formData.brand_ids}
+                    brandLabel={brandDetails[0].label}
                   />
-                )} */}
-                {/* {onglet === "price" && draft && (
+                )}
+                {onglet === "price" && draft && (
                   <UVCPriceTable
-                    uvcPrices={formData.dimension}
-                    productReference={draft.reference || ""}
+                    reference={draft?.reference}
+                    uvcPrices={formData.uvc}
+
+                    globalPrices={{
+                      peau: formData.peau,
+                      tbeu_pb: formData.tbeu_pb,
+                      tbeu_pmeu: formData.tbeu_pmeu,
+                    }}
                   />
-                )} */}
-                {/* {onglet === "supplier" && draft && (
+                )}
+                {onglet === "supplier" && draft && (
                   <UVCSupplierTable
-                    uvcDimensions={formData.dimension}
-                    productReference={draft.reference || ""}
-                    productSupplier={draft.princ_supplier_id || ""}
+                    reference={draft?.reference}
+                    uvcDimension={formData.uvc}
+                    supplierLabel={
+                      supplierDetails.length > 0 ? supplierDetails[0].company_name : "-"
+                    }
                   />
-                )} */}
+                )}
+                 {onglet === "weight" && draft && (
+                  <UVCMeasureTable
+                    reference={draft?.reference}
+                    uvcMeasure={formData.uvc}
+                    Measure={{
+                      height: draft?.height || "0",
+                      long: draft?.length || "0",
+                      width: draft?.width || "0",
+                      weight_brut: draft?.gross_weight || "0",
+                      weight_net: draft?.net_weight || "0",
+                    }}
+                    size_unit={draft?.size_unit || "m"}
+                    weight_unit={draft?.weigth_unit || "kg"}
+                  />
+                )}
+                 {onglet === "ean" && draft && (
+                  <UVCEanTable
+                    reference={draft?.reference}
+                    uvcDimension={formData.uvc}
+                  />
+                )}
               </div>
             )}
           </div>

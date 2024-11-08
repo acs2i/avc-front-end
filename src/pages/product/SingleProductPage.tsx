@@ -19,6 +19,8 @@ import UVCPriceTable from "../../components/UVCPricesTable";
 import SupplierComponent from "../../components/SupplierComponent";
 import UVCInfosTable from "../../components/UVCInfosTable";
 import UVCSupplierTable from "../../components/UVCSupplierTable";
+import UVCMeasureTable from "../../components/UVCMeasureTable";
+import UVCEanTable from "../../components/UVCEanTable";
 import { SingleValue } from "react-select";
 import FormSection from "../../components/Formulaires/FormSection";
 import {
@@ -204,6 +206,7 @@ export default function SingleProductPage() {
           },
         ],
         eans: [],
+        ean: "",
         status: "",
       },
     ],
@@ -764,6 +767,7 @@ export default function SingleProductPage() {
         },
       ],
       eans: [],
+      ean:"",
       status: "A",
     }));
 
@@ -1699,7 +1703,7 @@ export default function SingleProductPage() {
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
                                 {product?.height}
-                                {product?.size_unit}
+                                {product?.size_unit || "m"}
                               </span>
                             ) : (
                               <input
@@ -1718,7 +1722,7 @@ export default function SingleProductPage() {
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
                                 {product?.length}
-                                {product?.size_unit}
+                                {product?.size_unit || "m"}
                               </span>
                             ) : (
                               <input
@@ -1737,7 +1741,7 @@ export default function SingleProductPage() {
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
                                 {product?.width}
-                                {product?.size_unit}
+                                {product?.size_unit || "m"}
                               </span>
                             ) : (
                               <input
@@ -1758,7 +1762,7 @@ export default function SingleProductPage() {
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
                                 {product?.gross_weight}
-                                {product?.weigth_unit}
+                                {product?.weigth_unit || "kg"}
                               </span>
                             ) : (
                               <input
@@ -1777,7 +1781,7 @@ export default function SingleProductPage() {
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
                                 {product?.net_weight}
-                                {product?.weigth_unit}
+                                {product?.weigth_unit || "kg"}
                               </span>
                             ) : (
                               <input
@@ -1834,9 +1838,7 @@ export default function SingleProductPage() {
                         {userFields && userFields.length > 0 && (
                           <div className="mt-3">
                             {userFields
-                              .filter(
-                                (field) => field.apply_to === "Produit"
-                              )
+                              .filter((field) => field.apply_to === "Produit")
                               .map((field) => (
                                 <div key={field._id} className="mb-6">
                                   <h3 className="text-md font-semibold text-gray-800 mb-1">
@@ -2004,14 +2006,15 @@ export default function SingleProductPage() {
                 </div>
                 {onglet === "infos" && product && (
                   <UVCInfosTable
+                    reference={product?.reference}
                     uvcDimension={formData.uvc_ids}
                     brandLabel={product.brand_ids[0]?.label || ""}
                   />
                 )}
                 {onglet === "price" && product && (
                   <UVCPriceTable
+                    reference={product?.reference}
                     uvcPrices={formData.uvc_ids}
-                    brandLabel={product.brand_ids[0]?.label || ""}
                     globalPrices={{
                       peau: formData.peau,
                       tbeu_pb: formData.tbeu_pb,
@@ -2019,13 +2022,36 @@ export default function SingleProductPage() {
                     }}
                   />
                 )}
-                {/* {onglet === "supplier" && product && (
-                <UVCSupplierTable
-                  uvcDimensions={formData.dimension}
-                  productReference={product.reference || ""}
-                  productSupplier={product.princ_supplier_id || ""}
-                />
-              )} */}
+                {onglet === "supplier" && product && (
+                  <UVCSupplierTable
+                    reference={product?.reference}
+                    uvcDimension={formData.uvc_ids}
+                    supplierLabel={
+                      product.suppliers[0].supplier_id.company_name || ""
+                    }
+                  />
+                )}
+                {onglet === "weight" && product && (
+                  <UVCMeasureTable
+                    reference={product?.reference}
+                    uvcMeasure={formData.uvc_ids}
+                    Measure={{
+                      height: product.height || "0",
+                      long: product.length || "0",
+                      width: product.width || "0",
+                      weight_brut: product.gross_weight || "0",
+                      weight_net: product.net_weight || "0",
+                    }}
+                    size_unit={product.size_unit || "m"}
+                    weight_unit={product.weigth_unit || "kg"}
+                  />
+                )}
+                {onglet === "ean" && product && (
+                  <UVCEanTable
+                    reference={product?.reference}
+                    uvcDimension={formData.uvc_ids}
+                  />
+                )}
               </div>
             )}
           </div>

@@ -176,13 +176,13 @@ export default function DraftImportPage() {
             .map((row: any) => {
               if (row[columnMap["Référence"]]) {
                 const formattedRow: ImportData = {
+                  Référence: row[columnMap["Référence"]].toString() || "",
                   Famille: row[columnMap["Famille"]] || "",
                   "Sous Famille": row[columnMap["Sous Famille"]] || "",
                   "Sous Sous Famille":
                     row[columnMap["Sous Sous Famille"]] || "",
                   "Type Produit": row[columnMap["Type Produit"]] || "",
                   Libellé: row[columnMap["Modèle"]] || "",
-                  Référence: row[columnMap["Référence"]].toString() || "",
                   Fournisseur: row[columnMap["Code Fournisseur"]] || "",
                   Marque: row[columnMap["Code Marque"]] || "",
                   "Réf fournisseur": row[columnMap["Réf fournisseur"]] || "",

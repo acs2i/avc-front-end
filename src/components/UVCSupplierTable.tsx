@@ -1,34 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
 
-interface UVCInfosTableProps {
-  uvcDimensions: string[];
-  productReference: string;
-  productSupplier: {
-    _id: string;
-    code: string;
-    company_name: string;
-  };
+interface UVCSupplierTableProps {
+  reference: string;
+  uvcDimension: { code: string; dimensions: string[] }[];
+  supplierLabel: any;
 }
 
-const UVCSupplierTable: React.FC<UVCInfosTableProps> = ({
-  uvcDimensions,
-  productReference,
-  productSupplier,
+const UVCSupplierTable: React.FC<UVCSupplierTableProps> = ({
+  reference,
+  uvcDimension,
+  supplierLabel
 }) => {
-  const [collections, setCollections] = useState<{ [key: string]: string }>(
-    uvcDimensions.reduce((acc, dimension) => {
-      acc[dimension] = "";
-      return acc;
-    }, {} as { [key: string]: string })
-  );
-
-  const handleSupplierChange = (dimension: string, value: string) => {
-    setCollections((prevSupplier) => ({
-      ...prevSupplier,
-      [dimension]: value,
-    }));
-  };
-
   return (
     <table className="w-full border">
       <thead>
@@ -40,21 +22,17 @@ const UVCSupplierTable: React.FC<UVCInfosTableProps> = ({
         </tr>
       </thead>
       <tbody>
-        {uvcDimensions.map((dimension, index) => {
-          const [couleur, taille] = dimension.split(",");
-          const codeUVC = `${productReference}${couleur}${taille}`;
+        {uvcDimension.map((uvc, index) => {
+          // Extraire la couleur et la taille à partir de dimensions
+          const [couleur, taille] = uvc.dimensions[0].split("/");
+          const uvcReference = `${reference}${couleur}${taille}`;
+
           return (
             <tr key={index} className="text-[11px]">
-              <td className="border px-4 py-1 text-center">{codeUVC}</td>
+              <td className="border px-4 py-1 text-center">{uvcReference}</td>
               <td className="border px-4 py-1 text-center">{couleur}</td>
               <td className="border px-4 py-1 text-center">{taille}</td>
-              <td className="border px-4 py-1 text-center">
-                <div>
-                  <span>{productSupplier.code}</span>
-                  <span className="mx-1">-</span>
-                  <span>{productSupplier.company_name}</span>
-                </div>
-              </td>
+              <td className="border px-4 py-1 text-center">{supplierLabel}</td>
             </tr>
           );
         })}

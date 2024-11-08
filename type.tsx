@@ -207,6 +207,7 @@ export type Uvc = {
   dimensions: string[];
   prices: Price[];
   eans: string[];
+  ean: string;
   status: string;
 }
 
@@ -215,6 +216,7 @@ export type DatalakeUvc = {
   code: string;
   dimensions: string[];
   prices: Price[];
+  ean: string;
   eans: string[];
   status: string;
 }

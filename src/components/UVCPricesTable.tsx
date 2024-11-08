@@ -1,11 +1,11 @@
 import React from "react";
 
 interface UVCPriceTableProps {
+  reference: string;
   uvcPrices: {
     code: string;
     dimensions: string[];
   }[];
-  brandLabel: string;
   globalPrices: {
     peau: number;
     tbeu_pb: number;
@@ -13,7 +13,7 @@ interface UVCPriceTableProps {
   };
 }
 
-const UVCPriceTable: React.FC<UVCPriceTableProps> = ({ uvcPrices, brandLabel, globalPrices }) => {
+const UVCPriceTable: React.FC<UVCPriceTableProps> = ({ uvcPrices, globalPrices, reference }) => {
   return (
     <table className="w-full border">
       <thead>
@@ -30,10 +30,11 @@ const UVCPriceTable: React.FC<UVCPriceTableProps> = ({ uvcPrices, brandLabel, gl
         {uvcPrices.map((uvc, index) => {
           // Extraire la couleur et la taille à partir des dimensions
           const [couleur, taille] = uvc.dimensions[0].split("/");
+          const uvcReference = `${reference}${couleur}${taille}`;
 
           return (
             <tr key={index} className="text-[11px]">
-              <td className="border px-4 py-1 text-center">{uvc.code}</td>
+              <td className="border px-4 py-1 text-center">{uvcReference}</td>
               <td className="border px-4 py-1 text-center">{couleur}</td>
               <td className="border px-4 py-1 text-center">{taille}</td>
               {/* Utiliser les prix globaux */}

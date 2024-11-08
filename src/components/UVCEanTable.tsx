@@ -1,15 +1,13 @@
 import React from "react";
 
-interface UVCInfosTableProps {
+interface UVCEanTableProps {
   reference: string;
-  uvcDimension: { code: string; dimensions: string[] }[];
-  brandLabel: string;
+  uvcDimension: { code: string; dimensions: string[]; ean: string; eans: string[] }[];
 }
 
-const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
+const UVCEanTable: React.FC<UVCEanTableProps> = ({
   reference,
   uvcDimension,
-  brandLabel
 }) => {
   return (
     <table className="w-full border">
@@ -18,7 +16,10 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
           <th className="border px-4 py-2 w-[50px]">Code UVC</th>
           <th className="border px-4 py-2 w-[50px]">Couleur</th>
           <th className="border px-4 py-2 w-[50px]">Taille</th>
-          <th className="border px-4 py-2 w-[50px]">Marque</th>
+          <th className="border px-4 py-2 w-[50px]">EAN Principal</th>
+          <th className="border px-4 py-2 w-[50px]">EAN 2</th>
+          <th className="border px-4 py-2 w-[50px]">EAN 3</th>
+          <th className="border px-4 py-2 w-[50px]">EAN 4</th>
         </tr>
       </thead>
       <tbody>
@@ -32,7 +33,10 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
               <td className="border px-4 py-1 text-center">{uvcReference}</td>
               <td className="border px-4 py-1 text-center">{couleur}</td>
               <td className="border px-4 py-1 text-center">{taille}</td>
-              <td className="border px-4 py-1 text-center">{brandLabel}</td>
+              <td className="border px-4 py-1 text-center">{uvc.ean || "-"}</td>
+              <td className="border px-4 py-1 text-center">{uvc.eans[0] || "-"}</td>
+              <td className="border px-4 py-1 text-center">{uvc.eans[1] || "-"}</td>
+              <td className="border px-4 py-1 text-center">{uvc.eans[2] || "-"}</td>
             </tr>
           );
         })}
@@ -41,4 +45,4 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
   );
 };
 
-export default UVCInfosTable;
+export default UVCEanTable;

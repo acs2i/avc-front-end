@@ -82,7 +82,8 @@ export default function DraftPage() {
   const [isMultipleValidate, setIsMultipleValidate] = useState(false);
   const [selectAll, setSelectAll] = useState(false);
   const [selectedDrafts, setSelectedDrafts] = useState<string[]>([]);
-  const [lastSelectedDraft, setLastSelectedDraft] = useState<EnrichedDraft | null>(null);
+  const [lastSelectedDraft, setLastSelectedDraft] =
+    useState<EnrichedDraft | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const steps = [1, 2, 3];
   const [page, setPage] = useState("draft");
@@ -123,10 +124,11 @@ export default function DraftPage() {
   };
 
   const handleDraftSelection = (id: string) => {
-    setSelectedDrafts((prevSelected) =>
-      prevSelected.includes(id)
-        ? prevSelected.filter((draftId) => draftId !== id) // Retire si déjà sélectionné
-        : [...prevSelected, id] // Ajoute si non sélectionné
+    setSelectedDrafts(
+      (prevSelected) =>
+        prevSelected.includes(id)
+          ? prevSelected.filter((draftId) => draftId !== id) // Retire si déjà sélectionné
+          : [...prevSelected, id] // Ajoute si non sélectionné
     );
   };
 
@@ -137,7 +139,7 @@ export default function DraftPage() {
         updateData: { step: 2 }, // Mise à jour du champ `step` à 2
       };
       console.log("Payload envoyé:", payload); // Vérifie le contenu du payload
-  
+
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/draft/bulkUpdate`,
         {
@@ -149,16 +151,16 @@ export default function DraftPage() {
           body: JSON.stringify(payload),
         }
       );
-  
+
       if (!response.ok) {
         // Gère les erreurs côté serveur
         const errorResponse = await response.json();
         return; // Sortie précoce en cas d'erreur
       }
-  
+
       const result = await response.json();
-      setCurrentStep(2)
-      setIsMultipleValidate(false)
+      setCurrentStep(2);
+      setIsMultipleValidate(false);
       // Mettre à jour l'état local
       setDrafts((prevDrafts) =>
         prevDrafts.map((draft) =>
@@ -171,12 +173,11 @@ export default function DraftPage() {
       console.error("Erreur lors de la mise à jour en masse :", error);
     }
   };
-  
-  
 
   useEffect(() => {
     setSelectAll(
-      filteredDrafts.length > 0 && selectedDrafts.length === filteredDrafts.length
+      filteredDrafts.length > 0 &&
+        selectedDrafts.length === filteredDrafts.length
     );
   }, [selectedDrafts, filteredDrafts]);
 
@@ -218,7 +219,7 @@ export default function DraftPage() {
   const fetchDraft = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/draft/user/${userId}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/draft/user/${userId}/enrichie`,
         {
           method: "GET",
           headers: {
@@ -228,154 +229,19 @@ export default function DraftPage() {
         }
       );
 
-      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(`Erreur lors de la requête : ${response.statusText}`);
+      }
+
+      const data: EnrichedDraft[] = await response.json();
       setDrafts(data);
-      draftsEnriched.current = false; // Reset the enriched flag
-    } catch (error) {
-      console.error("Erreur lors de la requête", error);
-    }
-  };
-
-  const fetchBrandDetails = async (brandId: string) => {
-    if (!isValidObjectId(brandId)) {
-      return null;
-    }
-
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/brand/${brandId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        console.error(`Erreur HTTP: ${response.status}`);
-        return null;
-      }
-
-      const data = await response.json();
-      return data;
     } catch (error) {
       console.error(
-        "Erreur lors de la requête pour récupérer les détails de la marque",
+        "Erreur lors de la requête pour récupérer les brouillons enrichis",
         error
       );
-      return null;
     }
   };
-
-  const fetchSupplierDetails = async (supplierId: string) => {
-    if (!isValidObjectId(supplierId)) {
-      return null;
-    }
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/supplier/${supplierId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        console.error(`Erreur HTTP: ${response.status}`);
-        return null;
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error(
-        "Erreur lors de la requête pour récupérer les détails du fournisseur",
-        error
-      );
-      return null;
-    }
-  };
-
-  const fetchTagDetails = async (tagId: string) => {
-    if (!isValidObjectId(tagId)) {
-      return null;
-    }
-
-    try {
-      const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/${tagId}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        console.error(`Erreur HTTP: ${response.status}`);
-        return null;
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error(
-        "Erreur lors de la requête pour récupérer les détails du fournisseur",
-        error
-      );
-      return null;
-    }
-  };
-
-  useEffect(() => {
-    async function enrichDrafts() {
-      const enrichedDrafts = await Promise.all(
-        drafts.map(async (draft) => {
-          const brandDetails = await fetchBrandDetails(draft.brand_ids[0]);
-          const familyDetails = await fetchTagDetails(draft.tag_ids[0]);
-          const subFamilyDetails = await fetchTagDetails(draft.tag_ids[1]);
-          const supplierDetails = await fetchSupplierDetails(
-            draft.suppliers[0]?.supplier_id
-          );
-
-          return {
-            ...draft,
-            brandName:
-              brandDetails && brandDetails.label
-                ? brandDetails.label
-                : draft.collection_ids.length > 0
-                ? draft.collection_ids[0]
-                : "Marque inconnue",
-            familyName: familyDetails
-              ? familyDetails.name
-              : draft.tag_ids.length > 0
-              ? draft.tag_ids[0]
-              : "Famille inconnue",
-            subFamilyName: subFamilyDetails
-              ? subFamilyDetails.name
-              : draft.tag_ids.length > 1
-              ? draft.tag_ids[1]
-              : "Sous famille inconnue",
-            supplierName: supplierDetails
-              ? supplierDetails.company_name
-              : draft.suppliers.length > 0
-              ? draft.suppliers[0].supplier_id
-              : "Fournisseur inconnu",
-          };
-        })
-      );
-      setDrafts(enrichedDrafts);
-      draftsEnriched.current = true;
-    }
-
-    if (drafts.length > 0 && !draftsEnriched.current) {
-      enrichDrafts();
-    }
-  }, [drafts]);
 
   const handleUserChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setUserId(event.target.value);
