@@ -217,7 +217,7 @@ const customStyles = {
 
 export default function SingleSupplierPage() {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id} = useParams();
   const [supplier, setSupplier] = useState<Supplier>();
   const [conditions, setConditions] = useState<Commerciale[]>([]);
   const [supplierId, setSupplierId] = useState(supplier?._id);
@@ -806,7 +806,7 @@ export default function SingleSupplierPage() {
     }
   }, [supplier]);
 
-  console.log(formData);
+ console.log(formData);
   return (
     <>
       <Modal

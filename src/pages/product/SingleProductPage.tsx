@@ -1702,7 +1702,7 @@ export default function SingleProductPage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {product?.height}
+                                {product?.height || "0"}
                                 {product?.size_unit || "m"}
                               </span>
                             ) : (
@@ -1721,7 +1721,7 @@ export default function SingleProductPage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {product?.length}
+                                {product?.length || "0"}
                                 {product?.size_unit || "m"}
                               </span>
                             ) : (
@@ -1740,7 +1740,7 @@ export default function SingleProductPage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {product?.width}
+                                {product?.width || "0"}
                                 {product?.size_unit || "m"}
                               </span>
                             ) : (
@@ -1761,7 +1761,7 @@ export default function SingleProductPage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {product?.gross_weight}
+                                {product?.gross_weight || "0"}
                                 {product?.weigth_unit || "kg"}
                               </span>
                             ) : (
@@ -1780,7 +1780,7 @@ export default function SingleProductPage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {product?.net_weight}
+                                {product?.net_weight || "0"}
                                 {product?.weigth_unit || "kg"}
                               </span>
                             ) : (

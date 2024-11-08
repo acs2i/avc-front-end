@@ -247,6 +247,8 @@ export default function DraftPage() {
     setUserId(event.target.value);
   };
 
+  console.log(drafts)
+
   return (
     <section>
       {/* Partie Header */}

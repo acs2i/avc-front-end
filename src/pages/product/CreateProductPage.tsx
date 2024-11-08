@@ -51,6 +51,7 @@ interface Uvc {
   dimensions: string[];
   prices: Price[];
   eans: string[];
+  ean: string;
   status: string;
 }
 interface Supplier {
@@ -248,6 +249,7 @@ export default function CreateProductPage() {
           },
         ],
         eans: [],
+        ean:"",
         status: "",
       },
     ],
@@ -364,6 +366,7 @@ export default function CreateProductPage() {
           },
         ],
         eans: [],
+        ean: "",
         status: "",
         additional_fields: {},
       };
@@ -1339,7 +1342,7 @@ export default function CreateProductPage() {
                     </div>
                   </div>
 
-                  {onglet === "infos" && (
+                  {/* {onglet === "infos" && (
                     <UVCInfosTable
                       uvcDimension={formData.uvc}
                       brandLabel={formData.brand_ids[0]?.label || ""}
@@ -1355,7 +1358,7 @@ export default function CreateProductPage() {
                         tbeu_pmeu: formData.tbeu_pmeu,
                       }}
                     />
-                  )}
+                  )} */}
                   {/* {onglet === "supplier" && (
                           <UVCSupplierTable
                             uvcDimensions={uvc.dimensions || []}

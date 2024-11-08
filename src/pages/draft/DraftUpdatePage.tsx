@@ -147,6 +147,7 @@ export default function DraftUpdatePage() {
   const [selectedOptionBrand, setSelectedOptionBrand] =
     useState<SingleValue<BrandOption> | null>(null);
   const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
+  const [createError, setCreateError] = useState();
   const [fieldValues, setFieldValues] = useState<{ [key: string]: any }>({});
   const [isCreate, setIsCreate] = useState(false);
   const [userFields, setUserFields] = useState<UserField[]>([]);
@@ -785,7 +786,10 @@ export default function DraftUpdatePage() {
     }
   };
 
-  const updateDraftStatus = async (newStatus: number) => {
+  const updateDraftStatus = async (
+    newStatus: number,
+    shouldRedirect: boolean
+  ) => {
     setIsLoading(true);
     try {
       const response = await fetch(
@@ -804,8 +808,10 @@ export default function DraftUpdatePage() {
         setTimeout(() => {
           notifySuccess("Brouiilon validée");
           setIsLoading(false);
-          navigate("/draft");
-          window.location.reload();
+          if (shouldRedirect) {
+            navigate("/draft");
+            window.location.reload();
+          }
         }, 100);
       } else {
         notifyError("Erreur lors de la mise à jour du statut !");
@@ -1009,11 +1015,21 @@ export default function DraftUpdatePage() {
       );
 
       if (productResponse.ok) {
-        updateDraftStatus(3);
+        updateDraftStatus(3, false);
         notifySuccess("Produit créé avec succès !");
         navigate("/product");
+      } else if (productResponse.status === 400) {
+        // Afficher un message explicite si la référence existe déjà
+        const errorData = await productResponse.json();
+        const errorMessage =
+          errorData.error || "La référence du produit existe déjà.";
+        setCreateError(errorMessage);
       } else {
-        notifyError("Erreur lors de la création du produit !");
+        // Gérer d'autres erreurs génériques
+        const errorData = await productResponse.json();
+        const errorMessage =
+          errorData.error || "Erreur lors de la création du produit !";
+        notifyError(errorMessage);
       }
     } catch (error) {
       console.error("Erreur lors de la création du produit :", error);
@@ -1110,6 +1126,11 @@ export default function DraftUpdatePage() {
         </div>
       </Backdrop>
       <section className="w-full bg-slate-50 p-8 max-w-[2000px] mx-auto min-h-screen">
+        {createError && (
+          <div className="w-full bg-red-500 p-4 text-white rounded-md font-semibold shadow-md">
+            <p>{createError}</p>
+          </div>
+        )}
         <form onSubmit={handleUpdateDraft}>
           <div className="flex flex-col gap-5">
             <div className="flex items-center gap-2">
@@ -1132,7 +1153,7 @@ export default function DraftUpdatePage() {
                       type="button"
                       green
                       onClick={() => {
-                        updateDraftStatus(2); // Passe à l'étape 2 pour validation
+                        updateDraftStatus(2, true); // Passe à l'étape 2 pour validation
                       }}
                     >
                       Valider le brouillon
@@ -1980,7 +2001,6 @@ export default function DraftUpdatePage() {
                   <UVCPriceTable
                     reference={draft?.reference}
                     uvcPrices={formData.uvc}
-
                     globalPrices={{
                       peau: formData.peau,
                       tbeu_pb: formData.tbeu_pb,
@@ -1993,11 +2013,13 @@ export default function DraftUpdatePage() {
                     reference={draft?.reference}
                     uvcDimension={formData.uvc}
                     supplierLabel={
-                      supplierDetails.length > 0 ? supplierDetails[0].company_name : "-"
+                      supplierDetails.length > 0
+                        ? supplierDetails[0].company_name
+                        : "-"
                     }
                   />
                 )}
-                 {onglet === "weight" && draft && (
+                {onglet === "weight" && draft && (
                   <UVCMeasureTable
                     reference={draft?.reference}
                     uvcMeasure={formData.uvc}
@@ -2012,7 +2034,7 @@ export default function DraftUpdatePage() {
                     weight_unit={draft?.weigth_unit || "kg"}
                   />
                 )}
-                 {onglet === "ean" && draft && (
+                {onglet === "ean" && draft && (
                   <UVCEanTable
                     reference={draft?.reference}
                     uvcDimension={formData.uvc}

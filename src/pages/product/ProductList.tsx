@@ -205,6 +205,8 @@ export default function ProductList() {
     }
   };
 
+
+
   return (
     <section className="w-full">
       <Header
