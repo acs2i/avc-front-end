@@ -421,8 +421,6 @@ function ParamsMenuPageContent() {
             onUpdateSuccess={handleUpdateSuccess}
           />
         );
-      case PAGE_TYPES.GRIDS:
-        return null;
       case PAGE_TYPES.COLLECTIONS:
         return (
           <CollectionUpdatePage
@@ -463,8 +461,6 @@ function ParamsMenuPageContent() {
             onUpdateSuccess={handleUpdateSuccess}
           />
         );
-      case PAGE_TYPES.COUNTRIES:
-        return null;
       default:
         return null;
     }
