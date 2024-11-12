@@ -147,8 +147,8 @@ export default function BlockUpdatePage({
             element="input"
             id="code"
             label="Code"
-            value={formData.code.toString()}
-            placeholder={formData.code.toString()}
+            value={formData?.code?.toString()}
+            placeholder={formData?.code?.toString()}
             disabled
             validators={[]}
             gray

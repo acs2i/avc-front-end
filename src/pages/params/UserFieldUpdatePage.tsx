@@ -204,10 +204,10 @@ export default function UserFieldUpdatePage({
                     className={`w-[100px] h-[100px] cursor-pointer p-4 border rounded-lg mt-2 flex items-center justify-center bg-gray-200 text-gray-700 shadow-[0_0_10px_rgba(0,0,0,0.3)]`}
                   >
                     <h3 className="text-md font-bold text-center capitalize">
-                      {formData.additional_fields[0]?.field_type
+                      {formData?.additional_fields[0]?.field_type
                         ? fieldTypeTranslations[
-                            formData.additional_fields[0].field_type
-                          ] || formData.additional_fields[0].field_type
+                            formData?.additional_fields[0]?.field_type
+                          ] || formData?.additional_fields[0]?.field_type
                         : "Type inconnu"}
                     </h3>
                   </div>
@@ -259,10 +259,10 @@ export default function UserFieldUpdatePage({
               className={`w-[100px] h-[100px] cursor-pointer p-4 border rounded-lg mt-2 flex items-center justify-center bg-gray-200 text-gray-700 shadow-[0_0_10px_rgba(0,0,0,0.3)]`}
             >
               <h3 className="text-md font-bold text-center capitalize">
-                {formData.additional_fields[0]?.field_type
+                {formData?.additional_fields[0]?.field_type
                   ? fieldTypeTranslations[
-                      formData.additional_fields[0].field_type
-                    ] || formData.additional_fields[0].field_type
+                      formData?.additional_fields[0]?.field_type
+                    ] || formData?.additional_fields[0]?.field_type
                   : "Type inconnu"}
               </h3>
             </div>
