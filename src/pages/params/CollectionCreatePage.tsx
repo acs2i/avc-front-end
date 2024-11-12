@@ -27,13 +27,14 @@ export default function CollectionCreatePage({
 }: CollectionCreatePageProps) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState("");
   const user = useSelector((state: any) => state.auth.user);
   const { notifySuccess, notifyError } = useNotify();
   const [formData, setFormData] = useState<FormData>({
     creator_id: user._id,
     code: "",
     label: "",
-    status: "A"
+    status: "A",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,6 +44,8 @@ export default function CollectionCreatePage({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrors("");
+
     try {
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/collection`,
@@ -59,20 +62,29 @@ export default function CollectionCreatePage({
         const data = await response.json();
         const newCollectionId = data._id;
         setTimeout(() => {
-          notifySuccess("Collection crée avec succés !");
+          notifySuccess("Collection crée avec succès !");
           setIsLoading(false);
           onCreate(newCollectionId);
           onClose();
         }, 100);
       } else {
-        notifyError("Erreur lors de la création ou Code déja existant");
+        if (response.status === 409) {
+          const errorData = await response.json();
+          setErrors("Code déjà existant.");
+        } else {
+          setErrors("Erreur lors de la création de la collection.");
+        }
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Erreur lors de la requête", error);
+      setErrors("Erreur lors de la requête");
+      notifyError("Erreur lors de la requête");
+      setIsLoading(false);
     }
   };
 
-
+  console.log(formData);
 
   return (
     <section className="w-full p-4">
@@ -131,6 +143,11 @@ export default function CollectionCreatePage({
             )}
           </div>
         </div>
+        {errors && (
+          <div className="w-full bg-red-400 mt-4 p-4 rounded-md shadow-md">
+            <span className="text-white font-bold">{errors}</span>
+          </div>
+        )}
       </form>
     </section>
   );

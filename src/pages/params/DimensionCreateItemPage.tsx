@@ -27,6 +27,7 @@ export default function DimensionCreateItemPage({
 }: DimensionCreatePageProps) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState("");
   const user = useSelector((state: any) => state.auth.user);
   const { notifySuccess, notifyError } = useNotify();
   const [formData, setFormData] = useState<FormData>({
@@ -48,6 +49,8 @@ export default function DimensionCreateItemPage({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrors(""); // Réinitialise les erreurs avant chaque soumission
+  
     try {
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/dimension`,
@@ -59,23 +62,34 @@ export default function DimensionCreateItemPage({
           body: JSON.stringify(formData),
         }
       );
-
+  
       if (response.ok) {
         const data = await response.json();
-        const newDimenesionId = data._id;
+        const newDimensionId = data._id;
         setTimeout(() => {
-          notifySuccess("Marque crée avec succés !");
+          notifySuccess("Dimension créée avec succès !");
           setIsLoading(false);
-          onCreate(newDimenesionId);
+          onCreate(newDimensionId);
           onClose();
         }, 100);
       } else {
-        notifyError("Erreur lors de la création ou Code déja existant");
+        if (response.status === 409) {
+          const errorData = await response.json();
+          setErrors("Code déjà existant.");
+        } else {
+          setErrors("Erreur lors de la création de la dimension.");
+        }
+        notifyError("Erreur lors de la création ou code déjà existant");
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Erreur lors de la requête", error);
+      setErrors("Erreur lors de la requête");
+      notifyError("Erreur lors de la requête");
+      setIsLoading(false);
     }
   };
+  
 
 
   return (
@@ -147,6 +161,11 @@ export default function DimensionCreateItemPage({
             )}
           </div>
         </div>
+        {errors && (
+          <div className="w-full bg-red-400 mt-4 p-4 rounded-md shadow-md">
+            <span className="text-white font-bold">{errors}</span>
+          </div>
+        )}
       </form>
     </section>
   );

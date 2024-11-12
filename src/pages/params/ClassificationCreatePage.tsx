@@ -48,6 +48,7 @@ function ClassificationCreatePage({
 }: ClassificationCreatePageProps) {
   const user = useSelector((state: any) => state.auth.user);
   const [classificationValue, setClassificationValue] = useState("");
+  const [errors, setErrors] = useState("");
   const [levelOptions, setLevelOptions] = useState<Option[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
@@ -103,6 +104,8 @@ function ClassificationCreatePage({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrors("");
+  
     try {
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/tag`,
@@ -114,26 +117,33 @@ function ClassificationCreatePage({
           body: JSON.stringify(formData),
         }
       );
-
+  
       if (response.ok) {
         const data = await response.json();
-        const newFamilyId = data._id;
+        const newTagId = data._id;
         setTimeout(() => {
           notifySuccess("Classification créée avec succès !");
           setIsLoading(false);
-          onCreate(newFamilyId);
+          onCreate(newTagId);
           onClose();
         }, 100);
-      } else if (response.status === 409) { // Status Conflict
-        notifyError("Le code existe déjà"); // Utiliser le message du backend
-        setIsLoading(false);
       } else {
-        notifyError("Erreur lors de la création ou Code déja existant");
+        if (response.status === 409) {
+          const errorData = await response.json();
+          setErrors(errorData.msg || "Code déjà existant pour ce niveau.");
+        } else {
+          setErrors("Erreur lors de la création de la classification.");
+        }
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Erreur lors de la requête", error);
+      setErrors("Erreur lors de la requête");
+      notifyError("Erreur lors de la requête");
+      setIsLoading(false);
     }
   };
+  
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -263,6 +273,11 @@ function ClassificationCreatePage({
             )}
           </div>
         </div>
+        {errors && (
+          <div className="w-full bg-red-400 mt-4 p-4 rounded-md shadow-md">
+            <span className="text-white font-bold">{errors}</span>
+          </div>
+        )}
       </form>
     </section>
   );
