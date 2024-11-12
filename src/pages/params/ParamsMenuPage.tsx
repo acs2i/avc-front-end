@@ -145,7 +145,7 @@ function ParamsMenuPageContent() {
   const [searchFields, setSearchFields] = useState<SearchFields>({
     code: "",
     label: "",
-    status: "all",
+    status: "A",
     level: "",
     type: "",
     countryName: "",
@@ -192,7 +192,14 @@ function ParamsMenuPageContent() {
     setIsLoading(true);
     try {
       const endpoint = getApiEndpoint();
-      const url = `${process.env.REACT_APP_URL_DEV}/api/v1/${endpoint}?page=${currentPage}&limit=${limit}`;
+      let url = `${process.env.REACT_APP_URL_DEV}/api/v1/${endpoint}/search/?page=${currentPage}&limit=${limit}`;
+      
+      if (searchFields.status && searchFields.status !== "all" && endpoint !== "iso-code") {
+        console.log(searchFields.status)
+        url += `&status=${searchFields.status}`;
+      } else {
+        url = `${process.env.REACT_APP_URL_DEV}/api/v1/${endpoint}/?page=${currentPage}&limit=${limit}`;
+      }
       const response = await fetch(url, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -217,16 +224,30 @@ function ParamsMenuPageContent() {
         const queryParams = new URLSearchParams(
           params as Record<string, string>
         );
-        const url = `${
-          process.env.REACT_APP_URL_DEV
-        }/api/v1/${endpoint}/search?page=${currentPage}&limit=${limit}&${queryParams?.toString()}`;
-        const response = await fetch(url, {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        });
-        const result = await response.json();
-        setItems(result.data || []);
-        setTotalItem(result.total);
+        if (queryParams?.toString().includes("all")) {
+          let url = `${
+            process.env.REACT_APP_URL_DEV
+          }/api/v1/${endpoint}/?page=${currentPage}&limit=${limit}`;
+          const response = await fetch(url, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+          });
+          const result = await response.json();
+          setItems(result.data || []);
+          setTotalItem(result.total);
+        } else {
+          let url = `${
+            process.env.REACT_APP_URL_DEV
+          }/api/v1/${endpoint}/search?page=${currentPage}&limit=${limit}&${queryParams?.toString()}`;
+          const response = await fetch(url, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+          });
+          const result = await response.json();
+          setItems(result.data || []);
+          setTotalItem(result.total);
+        }
+        
       } catch (error) {
         console.error("Erreur lors de la requête", error);
       } finally {
@@ -258,7 +279,7 @@ function ParamsMenuPageContent() {
     debounce(() => {
       const params = Object.entries(searchFields).reduce(
         (acc, [key, value]) => {
-          if (value && value !== "all") {
+          if (value) {
             acc[key as keyof SearchFields] = value;
           }
           return acc;
@@ -479,7 +500,7 @@ function ParamsMenuPageContent() {
     setSearchFields({
       code: "",
       label: "",
-      status: "all",
+      status: "A",
       level: "",
       type: "",
       countryName: "",

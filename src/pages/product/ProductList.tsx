@@ -366,9 +366,9 @@ export default function ProductList() {
           <Button type="button" size="small" blue onClick={handleSearch}>
             Lancer la Recherche
           </Button>
-          <Button type="button" size="small" blue onClick={handleCSV}>
+          {/* <Button type="button" size="small" blue onClick={handleCSV}>
             Exporter le CSV
-          </Button>
+          </Button> */}
         </div>
       </Header>
       {products && products.length === 0 && (
