@@ -264,6 +264,7 @@ export default function DraftPage() {
           <CircularProgress color="inherit" size={100} />
         </div>
       </Backdrop>
+      
     <section>
       {/* Partie Header */}
       <div className="w-full h-[320px] bg-slate-100 p-8 relative overflow-hidden">
