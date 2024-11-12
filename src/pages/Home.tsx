@@ -384,7 +384,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="flex border-b-[1px]">
+      {/* <section className="flex border-b-[1px]">
         <div className="w-1/2 h-[600px] p-8 bg-gray-100 dark:bg-gray-800 ">
           <div className="flx flex-col">
             <h4 className="text-[25px] font-bold text-gray-800 dark:text-white">
@@ -433,7 +433,7 @@ export default function Home() {
         <div className="w-1/2">
           <Map />
         </div>
-      </section>
+      </section> */}
     </>
   );
 }
