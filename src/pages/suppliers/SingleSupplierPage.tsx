@@ -326,6 +326,8 @@ export default function SingleSupplierPage() {
     }
   );
 
+  console.log(supplier?._id)
+
   const {
     inputValueUser,
     optionsUser,
@@ -505,6 +507,22 @@ export default function SingleSupplierPage() {
       }));
     }
   }, [selectedCollection]);
+
+  const updateFormDataCondition = () => {
+    setFormDataCondition((prev) => ({
+      ...prev,
+      supplier_id: supplier?._id || "",
+      season: formDataCondition.season,
+      ...formData, 
+    }));
+  };
+  
+  useEffect(() => {
+    if (formData) {
+      updateFormDataCondition();
+    }
+  }, [formData]);
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -693,11 +711,11 @@ export default function SingleSupplierPage() {
         }
       );
       if (response.ok) {
-        notifySuccess("Fournisseur modifié avec succès !");
+        notifySuccess("Condition commerciale crée avec succès !");
         window.location.reload();
         setIsLoading(false);
       } else {
-        notifyError("Erreur lors de la modification !");
+        notifyError("Erreur lors de la création !");
       }
     } catch (error) {
       console.error(error);
@@ -806,7 +824,7 @@ export default function SingleSupplierPage() {
     }
   }, [supplier]);
 
- console.log(formData);
+ console.log(formDataCondition);
   return (
     <>
       <Modal

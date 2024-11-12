@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Spinner from "../../components/Shared/Spinner";
 import { ChevronsUpDown, CircleSlash2, Plus } from "lucide-react";
 import Header from "../../components/Navigation/Header";
+import truncateText from "../../utils/func/Formattext";
 
 interface Supplier {
   _id: string;
@@ -108,18 +109,18 @@ export default function SuppliersList() {
 
   const handleSearch = () => {
     const params: any = {};
-  
+
     if (codeValue) params.code = codeValue;
     if (labelValue) params.company_name = labelValue;
     if (addressValue) params.address = addressValue;
     if (postalValue) params.postal = postalValue;
     if (cityValue) params.city = cityValue;
     if (countryValue) params.country = countryValue;
-  
+
     if (statusValue !== "all") {
       params.status = statusValue;
     }
-  
+
     if (
       !codeValue &&
       !labelValue &&
@@ -138,13 +139,12 @@ export default function SuppliersList() {
       searchSuppliers(params);
     }
   };
-  
+
   const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       handleSearch();
     }
   };
-  
 
   console.log(statusValue);
 
@@ -366,8 +366,12 @@ export default function SuppliersList() {
                     navigate(`/suppliers/${supplier._id}`);
                   }}
                 >
-                  <td className="px-6 py-2">{supplier.code}</td>
-                  <td className="px-6 py-2">{supplier.company_name}</td>
+                  <td className="px-6 py-2 font-bold">
+                    {truncateText(supplier?.code || "", 10)}
+                  </td>
+                  <td className="px-6 py-2 text-blue-400 font-[700]">
+                    <span>{truncateText(supplier?.company_name || "", 25)}</span>
+                  </td>
                   <td className="px-6 py-2">
                     {supplier.address_1 ? (
                       supplier.address_1

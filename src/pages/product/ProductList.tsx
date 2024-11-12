@@ -426,7 +426,7 @@ export default function ProductList() {
                   className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-[11px] text-gray-500 whitespace-nowrap border-y-[1px] border-gray-200"
                   onClick={() => navigate(`/product/${product._id}`)}
                 >
-                  <td className="px-6 py-2">{product.reference}</td>
+                  <td className="px-6 py-2 font-bold">{truncateText(product?.reference || "", 10)}</td>
                   <td className="px-6 py-2">
                     {!product.imgPath ? (
                       <div className="relative w-[60px] h-[60px] flex items-center border p-1 rounded-md">
@@ -449,7 +449,7 @@ export default function ProductList() {
                       </div>
                     )}
                   </td>
-                  <td className="px-6 py-2 text-blue-500">
+                  <td className="px-6 py-2 text-blue-400 font-[700]">
                     <span>{truncateText(product?.long_label || "", 25)}</span>
                   </td>
                   <td className="px-6 py-2">
