@@ -410,7 +410,7 @@ export default function DraftPage() {
               <div className="mt-5 flex gap-3">
                 <div
                   onClick={toggleCheckboxVisibility}
-                  className="flex items-center gap-1 cursor-pointer text-gray-700 hover:text-orange-400 font-bold"
+                  className="flex items-center gap-1 cursor-pointer text-gray-700 hover:text-orange-400"
                 >
                   <SquareMousePointer size={18} />
                   <span className="text-[12px]">Selection multiple</span>

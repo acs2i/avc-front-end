@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronUp,
   CircleSlash2,
+  File,
   Plus,
   Trash,
   X,
@@ -217,7 +218,7 @@ const customStyles = {
 
 export default function SingleSupplierPage() {
   const navigate = useNavigate();
-  const { id} = useParams();
+  const { id } = useParams();
   const [supplier, setSupplier] = useState<Supplier>();
   const [conditions, setConditions] = useState<Commerciale[]>([]);
   const [supplierId, setSupplierId] = useState(supplier?._id);
@@ -326,7 +327,7 @@ export default function SingleSupplierPage() {
     }
   );
 
-  console.log(supplier?._id)
+  console.log(supplier?._id);
 
   const {
     inputValueUser,
@@ -497,7 +498,6 @@ export default function SingleSupplierPage() {
       }));
     }
   }, [supplier, creatorId]);
-  
 
   useEffect(() => {
     if (selectedCollection) {
@@ -513,16 +513,15 @@ export default function SingleSupplierPage() {
       ...prev,
       supplier_id: supplier?._id || "",
       season: formDataCondition.season,
-      ...formData, 
+      ...formData,
     }));
   };
-  
+
   useEffect(() => {
     if (formData) {
       updateFormDataCondition();
     }
   }, [formData]);
-  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -562,31 +561,27 @@ export default function SingleSupplierPage() {
 
   const handleFieldChange = (
     label: string,
-    field_type: string, // Ajout du type de champ
+    field_type: string,
     id: string,
     newValue: string
   ) => {
-    // Mettre à jour fieldValues pour le contrôle local
+    // Mettre à jour `fieldValues`
     setFieldValues((prevValues) => ({
       ...prevValues,
-      [id]: newValue, // Met à jour l'état local du champ
+      [id]: newValue,
     }));
 
-    // Mettre à jour formData.additional_fields pour avoir un tableau d'objets
+    // Mettre à jour `formData.additional_fields`
     setFormData((prevFormData) => {
       const updatedAdditionalFields = [...prevFormData.additional_fields];
-
-      // Vérifier si un champ avec ce label existe déjà
       const fieldIndex = updatedAdditionalFields.findIndex(
         (field) => field.label === label
       );
 
       if (fieldIndex !== -1) {
-        // Mettre à jour la valeur et le type si le champ existe
         updatedAdditionalFields[fieldIndex].value = newValue;
         updatedAdditionalFields[fieldIndex].field_type = field_type;
       } else {
-        // Ajouter un nouveau champ s'il n'existe pas encore
         updatedAdditionalFields.push({ label, value: newValue, field_type });
       }
 
@@ -596,6 +591,7 @@ export default function SingleSupplierPage() {
       };
     });
   };
+
   // Fonction qui ajoute un contact
   const addContact = (newContact: Contact) => {
     console.log("Adding contact:", newContact);
@@ -824,7 +820,7 @@ export default function SingleSupplierPage() {
     }
   }, [supplier]);
 
- console.log(formDataCondition);
+  console.log(formDataCondition);
   return (
     <>
       <Modal
@@ -1509,7 +1505,7 @@ export default function SingleSupplierPage() {
             </div>
             <div className="mt-[30px]">
               {!isModify && (
-                <FormSection title="Champs additionnels">
+                <FormSection title="Champs utilisateur">
                   <div>
                     {userFields
                       .filter((field) => field.apply_to === "Fournisseur")
@@ -1537,7 +1533,7 @@ export default function SingleSupplierPage() {
                 </FormSection>
               )}
               {isModify && (
-                <FormSection title="Champs additionnels">
+                <FormSection title="Champs utilisateur">
                   <div>
                     {userFields && userFields.length > 0 && (
                       <div className="mt-3">
@@ -1559,13 +1555,8 @@ export default function SingleSupplierPage() {
                                       name={customField.field_name}
                                       fieldType={customField.field_type}
                                       value={
-                                        customField.field_type === "boolean" ||
-                                        customField.field_type ===
-                                          "multiple_choice"
-                                          ? supplier?.additional_fields?.find(
-                                              (f) => f.label === field.label
-                                            )?.value
-                                          : fieldValues[`${field._id}-${index}`]
+                                        fieldValues[`${field._id}-${index}`] ||
+                                        ""
                                       }
                                       onChange={(e) =>
                                         handleFieldChange(
@@ -1574,15 +1565,6 @@ export default function SingleSupplierPage() {
                                           `${field._id}-${index}`,
                                           e.target.value
                                         )
-                                      }
-                                      placeholder={
-                                        customField.field_type === "text" ||
-                                        customField.field_type === "number" ||
-                                        customField.field_type === "textarea"
-                                          ? supplier?.additional_fields?.find(
-                                              (f) => f.label === field.label
-                                            )?.value
-                                          : "Saisir un texte"
                                       }
                                       options={customField.options}
                                     />
@@ -1626,37 +1608,10 @@ export default function SingleSupplierPage() {
                                   </span>
                                 </p>
                               </div>
-                              {open ? (
-                                <ChevronUp size={20} />
-                              ) : (
-                                <ChevronDown size={20} />
-                              )}
-                            </div>
-                            <Collapse in={open}>
-                              <div className="p-1">
-                                {condition?.brand_id.map((brand, index) => (
-                                  <div
-                                    key={index}
-                                    className="flex flex-col gap-2 px-4"
-                                  >
-                                    <p className="font-[600] text-black capitalize">
-                                      Marque : {brand?.label}
-                                    </p>
-                                  </div>
-                                ))}
-                                {condition?.contacts.map((contact, index) => (
-                                  <div
-                                    key={index}
-                                    className="flex flex-col gap-2 px-4"
-                                  >
-                                    <p className="font-[600] text-black capitalize">
-                                      Contact : {contact.firstname}{" "}
-                                      {contact.lastname}
-                                    </p>
-                                  </div>
-                                ))}
+                              <div className="text-gray-500">
+                                <File size={18} />
                               </div>
-                            </Collapse>
+                            </div>
                           </div>
                         );
                       })
