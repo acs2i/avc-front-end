@@ -27,6 +27,7 @@ export default function BrandCreatePage({
 }: BrandCreatePageProps) {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState("");
   const user = useSelector((state: any) => state.auth.user);
   const { notifySuccess, notifyError } = useNotify();
   const [formData, setFormData] = useState<FormData>({
@@ -43,6 +44,8 @@ export default function BrandCreatePage({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+    setErrors("");
+
     try {
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/brand`,
@@ -60,16 +63,24 @@ export default function BrandCreatePage({
       if (response.ok) {
         const newBrandId = data._id;
         setTimeout(() => {
-          notifySuccess("Marque crée avec succés !");
+          notifySuccess("Marque créée avec succès !");
           setIsLoading(false);
           onCreate(newBrandId);
           onClose();
         }, 100);
       } else {
-        notifyError("Erreur lors de la création ou Code déja existant");
+        if (response.status === 409) {
+          setErrors("Code déjà existant.");
+        } else {
+          setErrors("Erreur lors de la création de la marque.");
+        }
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Erreur lors de la requête", error);
+      setErrors("Erreur lors de la requête");
+      notifyError("Erreur lors de la requête");
+      setIsLoading(false);
     }
   };
 
@@ -130,6 +141,11 @@ export default function BrandCreatePage({
             )}
           </div>
         </div>
+        {errors && (
+          <div className="w-full bg-red-400 mt-4 p-4 rounded-md shadow-md">
+            <span className="text-white font-bold">{errors}</span>
+          </div>
+        )}
       </form>
     </section>
   );
