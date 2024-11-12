@@ -205,7 +205,24 @@ export default function ProductList() {
     }
   };
 
+  const handleCSV = async () => {
+    setIsLoading(true);
+    try {
+      let url = `${process.env.REACT_APP_URL_DEV}/api/v1/product/search?exportToCsv=true`;
 
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const result = await response.json();
+    } catch (error) {
+      console.error("Erreur lors de la requête", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <section className="w-full">
@@ -348,6 +365,9 @@ export default function ProductList() {
         <div className="flex items-center justify-between w-full mt-3">
           <Button type="button" size="small" blue onClick={handleSearch}>
             Lancer la Recherche
+          </Button>
+          <Button type="button" size="small" blue onClick={handleCSV}>
+            Exporter le CSV
           </Button>
         </div>
       </Header>
