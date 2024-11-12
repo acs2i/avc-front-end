@@ -7,6 +7,7 @@ import Input from "../../components/FormElements/Input";
 import { ChevronRight, ChevronsUpDown } from "lucide-react";
 import truncateText from "../../utils/func/Formattext";
 import Button from "../../components/FormElements/Button";
+import { Backdrop, CircularProgress } from "@mui/material";
 
 interface PriceItem {
   peau: number;
@@ -80,6 +81,7 @@ export default function DraftPage() {
   const user = useSelector((state: any) => state.auth.user._id);
   const token = useSelector((state: any) => state.auth.token);
   const [isMultipleValidate, setIsMultipleValidate] = useState(false);
+  const [isLoading, setIsLoading] = useState(false)
   const [selectAll, setSelectAll] = useState(false);
   const [selectedDrafts, setSelectedDrafts] = useState<string[]>([]);
   const [lastSelectedDraft, setLastSelectedDraft] =
@@ -217,6 +219,7 @@ export default function DraftPage() {
   };
 
   const fetchDraft = async () => {
+    setIsLoading(true)
     try {
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/draft/user/${userId}/enrichie`,
@@ -235,6 +238,7 @@ export default function DraftPage() {
 
       const data: EnrichedDraft[] = await response.json();
       setDrafts(data);
+      setIsLoading(false)
     } catch (error) {
       console.error(
         "Erreur lors de la requête pour récupérer les brouillons enrichis",
@@ -250,6 +254,16 @@ export default function DraftPage() {
   console.log(drafts)
 
   return (
+    <>
+    <Backdrop
+        sx={(theme) => ({ color: "#fff", zIndex: theme.zIndex.drawer + 1 })}
+        open={isLoading}
+      >
+        <div className="flex flex-col items-center gap-4">
+          <p className="text-[30px] animate-pulse">Brouillons en cours de récupération</p>
+          <CircularProgress color="inherit" size={100} />
+        </div>
+      </Backdrop>
     <section>
       {/* Partie Header */}
       <div className="w-full h-[320px] bg-slate-100 p-8 relative overflow-hidden">
@@ -577,5 +591,6 @@ export default function DraftPage() {
         </table>
       </div>
     </section>
+    </>
   );
 }
