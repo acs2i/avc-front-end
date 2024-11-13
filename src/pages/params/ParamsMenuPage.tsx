@@ -499,7 +499,7 @@ function ParamsMenuPageContent() {
   const handlePageTypeChange = useCallback((newPage: PageTypeValue) => {
     setIsCreateModalOpen(false);
     setIsUpdateModalOpen(false);
-    
+
     setFormData({});
     setSelectedItem(null);
     setPage(newPage);
@@ -617,33 +617,33 @@ function ParamsMenuPageContent() {
       [PAGE_TYPES.DIMENSIONS]: (
         <div className="flex flex-col">
           <label className="text-sm font-bold mb-1">Type :</label>
-          <input
-            type="text"
+          <select
             className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:ring-blue-500 transition-all focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
-            placeholder="Rechercher par type"
             value={searchFields.type}
             onChange={(e) =>
               setSearchFields({ ...searchFields, type: e.target.value })
             }
-            onKeyPress={handleKeyPress}
-            autoComplete="off"
-          />
+          >
+            <option value="">Tous les types</option>
+            <option value="Taille">Taille</option>
+            <option value="Couleur">Couleur</option>
+          </select>
         </div>
       ),
       [PAGE_TYPES.GRIDS]: (
         <div className="flex flex-col">
           <label className="text-sm font-bold mb-1">Type :</label>
-          <input
-            type="text"
+          <select
             className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:ring-blue-500 transition-all focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
-            placeholder="Rechercher par type"
             value={searchFields.type}
             onChange={(e) =>
               setSearchFields({ ...searchFields, type: e.target.value })
             }
-            onKeyPress={handleKeyPress}
-            autoComplete="off"
-          />
+          >
+            <option value="">Tous les types</option>
+            <option value="Taille">Taille</option>
+            <option value="Couleur">Couleur</option>
+          </select>
         </div>
       ),
       [PAGE_TYPES.COLLECTIONS]: <></>,
@@ -895,73 +895,81 @@ function ParamsMenuPageContent() {
                   <td className="px-6 py-2">{renderStatus(item.status)}</td>
                 </>
               );
-              case PAGE_TYPES.GRIDS:
-                const gridItem = item as GridItem;
-                return (
-                  <>
-                    <td className="px-6 py-2">{gridItem.type}</td>
-                    <td className="px-6 py-2">{gridItem.code}</td>
-                    <td className="px-6 py-2">PAS DE DONNÉES</td>
-                    <td className="px-6 py-2">
-                      <table className="border-collapse border-2 border-grey w-fit">
-                        <thead>
-                          <tr>
-                            <th className="border-r-2 border-b-2 border-grey p-0.5 w-12 text-center text-[10px] font-bold">
-                              LIB
-                            </th>
-                            {gridItem.frn_labels &&
-                              gridItem.frn_labels
-                                .slice(0, expandedGrid === gridItem ? N : undefined)
-                                .map((_, index) => (
-                                  <th
-                                    key={index}
-                                    className="border-r-2 border-b-2 border-grey p-0.5 w-8 text-center text-[10px]"
-                                  >
-                                    {32 + index * 2}
-                                  </th>
-                                ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td className="border-r-2 border-grey p-0.5 text-center text-[10px] font-bold">
-                              CODE
-                            </td>
-                            {gridItem.dimensions &&
-                              gridItem.dimensions
-                                .slice(0, expandedGrid === gridItem ? N : undefined)
-                                .map((dim, index) => (
-                                  <td
-                                    key={index}
-                                    className="border-r-2 border-grey p-0.5 text-center text-[10px]"
-                                  >
-                                    {extractNumbers(dim)}
-                                  </td>
-                                ))}
-                          </tr>
-                        </tbody>
-                      </table>
-              
-                      {((gridItem.frn_labels && gridItem.frn_labels?.length > N) ||
-                        (gridItem.dimensions && gridItem.dimensions?.length > N)) && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (expandedGrid === gridItem) {
-                              setExpandedGrid(null); // Si déjà expandé, on rétracte
-                            } else {
-                              setExpandedGrid(gridItem); // Sinon, on expand
-                            }
-                          }}
-                          className="text-blue-600 text-[8px] mt-1"
-                        >
-                          {expandedGrid === gridItem ? "Voir plus" : "Voir moins"}
-                        </button>
-                      )}
-                    </td>
-                    <td className="px-6 py-2">{renderStatus(gridItem.status)}</td>
-                  </>
-                );
+            case PAGE_TYPES.GRIDS:
+              const gridItem = item as GridItem;
+              return (
+                <>
+                  <td className="px-6 py-2">{gridItem.type}</td>
+                  <td className="px-6 py-2">{gridItem.code}</td>
+                  <td className="px-6 py-2">PAS DE DONNÉES</td>
+                  <td className="px-6 py-2">
+                    <table className="border-collapse border-2 border-grey w-fit">
+                      <thead>
+                        <tr>
+                          <th className="border-r-2 border-b-2 border-grey p-0.5 w-12 text-center text-[10px] font-bold">
+                            LIB
+                          </th>
+                          {gridItem.frn_labels &&
+                            gridItem.frn_labels
+                              .slice(
+                                0,
+                                expandedGrid === gridItem ? N : undefined
+                              )
+                              .map((_, index) => (
+                                <th
+                                  key={index}
+                                  className="border-r-2 border-b-2 border-grey p-0.5 w-8 text-center text-[10px]"
+                                >
+                                  {32 + index * 2}
+                                </th>
+                              ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="border-r-2 border-grey p-0.5 text-center text-[10px] font-bold">
+                            CODE
+                          </td>
+                          {gridItem.dimensions &&
+                            gridItem.dimensions
+                              .slice(
+                                0,
+                                expandedGrid === gridItem ? N : undefined
+                              )
+                              .map((dim, index) => (
+                                <td
+                                  key={index}
+                                  className="border-r-2 border-grey p-0.5 text-center text-[10px]"
+                                >
+                                  {extractNumbers(dim)}
+                                </td>
+                              ))}
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    {((gridItem.frn_labels &&
+                      gridItem.frn_labels?.length > N) ||
+                      (gridItem.dimensions &&
+                        gridItem.dimensions?.length > N)) && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (expandedGrid === gridItem) {
+                            setExpandedGrid(null); // Si déjà expandé, on rétracte
+                          } else {
+                            setExpandedGrid(gridItem); // Sinon, on expand
+                          }
+                        }}
+                        className="text-blue-600 text-[8px] mt-1"
+                      >
+                        {expandedGrid === gridItem ? "Voir plus" : "Voir moins"}
+                      </button>
+                    )}
+                  </td>
+                  <td className="px-6 py-2">{renderStatus(gridItem.status)}</td>
+                </>
+              );
             case PAGE_TYPES.COLLECTIONS:
             case PAGE_TYPES.BRANDS:
             case PAGE_TYPES.BLOCKS:
