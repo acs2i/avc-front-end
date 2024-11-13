@@ -69,7 +69,7 @@ interface FormData {
   dimension_types: string;
   brand_ids: any[];
   collection_ids: any[];
-  paeu: number;
+  peau: number;
   tbeu_pb: number;
   tbeu_pmeu: number;
   imgPath: string;
@@ -258,7 +258,7 @@ export default function DraftImportPage() {
             dimension_types: "Couleur/Taille",
             brand_ids: [data.Marque],
             collection_ids: [data.Collection],
-            paeu: Number(data["PA Net"]),
+            peau: Number(data["PA Net"]),
             tbeu_pb: Number(data["PV Conseillé"]),
             tbeu_pmeu: 0,
             imgPath: "",

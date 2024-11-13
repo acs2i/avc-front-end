@@ -202,7 +202,7 @@ export default function ClassificationUpdatePage({
           <h6 className="text-xs font-[700] text-gray-700">
             Historique des modifications :
           </h6>
-          <div className="border-l-2 border-blue-500 pl-4 relative">
+          <div className="pl-6 relative h-[700px] overflow-y-scroll relative">
             {selectedFamily.updates
               .slice()
               .sort((a: { updated_at: string }, b: { updated_at: string }) => {

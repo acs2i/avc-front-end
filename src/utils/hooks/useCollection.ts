@@ -26,7 +26,7 @@ export const useCollections = (initialInputValue: string = "", limit = 10) => {
         data.data?.map((collection: CollectionOption) => ({
           value: collection.label,
           label: collection.label,
-          _id: collection._id,
+          _id: collection.label,
         })) || []
       );
     } catch (error) {
@@ -52,7 +52,7 @@ export const useCollections = (initialInputValue: string = "", limit = 10) => {
         data.data?.map((collection: CollectionOption) => ({
           value: collection.label,
           label: collection.label,
-          _id: collection._id,
+          _id: collection.label,
         })) || []
       );
     } catch (error) {

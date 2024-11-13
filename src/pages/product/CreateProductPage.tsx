@@ -395,7 +395,7 @@ export default function CreateProductPage() {
         const data = await response.json();
 
         const optionsSupplier = data.data?.map((supplier: SuppliersOption) => ({
-          value: supplier._id,
+          value: supplier.company_name,
           label: supplier.company_name,
         }));
 
@@ -419,7 +419,7 @@ export default function CreateProductPage() {
       const data = await response.json();
 
       const optionsSupplier = data.data?.map((supplier: SuppliersOption) => ({
-        value: supplier._id,
+        value: supplier.company_name,
         label: supplier.company_name,
       }));
 

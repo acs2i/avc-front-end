@@ -545,7 +545,9 @@ export default function DraftPage() {
                       <td className="px-6 py-2">
                         {product.brand_ids ? product.brand_ids[0] : "N/A"}
                       </td>
-                      <td className="px-6 py-2">{product.suppliers[0].supplier_id}</td>
+                      <td className="px-6 py-2">
+                        {product.suppliers[0].supplier_id}
+                      </td>
                       <td className="px-6 py-2">
                         {product.tag_ids && product.tag_ids.length > 0
                           ? product.tag_ids[0]
@@ -592,10 +594,25 @@ export default function DraftPage() {
                         {" "}
                         {truncateText(product.long_label, 20)}
                       </td>
-                      <td className="px-6 py-2">{product.brandName}</td>
-                      <td className="px-6 py-2">{product.supplierName}</td>
-                      <td className="px-6 py-2">{product.familyName}</td>
-                      <td className="px-6 py-2">{product.subFamilyName}</td>
+                      <td className="px-6 py-2">
+                        {" "}
+                        {product.brand_ids ? product.brand_ids[0] : "N/A"}
+                      </td>
+                      <td className="px-6 py-2">
+                        {" "}
+                        {product.suppliers[0].supplier_id}
+                      </td>
+                      <td className="px-6 py-2">
+                        {product.tag_ids && product.tag_ids.length > 0
+                          ? product.tag_ids[0]
+                          : "N/A"}{" "}
+                      </td>
+                      <td className="px-6 py-2">
+                        {" "}
+                        {product.tag_ids && product.tag_ids.length > 1
+                          ? product.tag_ids[1]
+                          : "N/A"}{" "}
+                      </td>
                       <td className="px-6 py-2 text-blue-600">
                         {formatDate(product.createdAt)}
                       </td>
@@ -632,10 +649,26 @@ export default function DraftPage() {
                         {" "}
                         {truncateText(product.long_label, 20)}
                       </td>
-                      <td className="px-6 py-2">{product.brandName}</td>
-                      <td className="px-6 py-2">{product.supplierName}</td>
-                      <td className="px-6 py-2">{product.familyName}</td>
-                      <td className="px-6 py-2">{product.subFamilyName}</td>
+                      <td className="px-6 py-2">
+                        {" "}
+                        {product.brand_ids ? product.brand_ids[0] : "N/A"}
+                      </td>
+                      <td className="px-6 py-2">
+                        {" "}
+                        {product.suppliers[0].supplier_id}
+                      </td>
+                      <td className="px-6 py-2">
+                        {" "}
+                        {product.tag_ids && product.tag_ids.length > 0
+                          ? product.tag_ids[0]
+                          : "N/A"}{" "}
+                      </td>
+                      <td className="px-6 py-2">
+                        {" "}
+                        {product.tag_ids && product.tag_ids.length > 1
+                          ? product.tag_ids[1]
+                          : "N/A"}{" "}
+                      </td>
                       <td className="px-6 py-2 text-blue-600">
                         {formatDate(product.createdAt)}
                       </td>

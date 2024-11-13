@@ -48,7 +48,7 @@ export const useBrands = (initialInputValue: string = "", limit = 10) => {
       return data.data?.map((brand: BrandOption) => ({
         value: brand.label,
         label: brand.label,
-        _id: brand._id,
+        _id: brand.label,
       })) || [];
     } catch (error) {
       console.error("Erreur lors de la requête", error);

@@ -306,7 +306,7 @@ export default function DraftUpdatePage() {
         ) {
           const [color, size] = dimension.split(",");
           updatedUVCs.push({
-            code: `${color}/${size}`,
+            code: `${draft?.reference}_${color}_${size}`,
             dimensions: [`${color}/${size}`],
             prices: [
               {
@@ -478,7 +478,7 @@ export default function DraftUpdatePage() {
         const data = await response.json();
 
         const optionsBrand = data.data?.map((brand: BrandOption) => ({
-          value: brand._id, // Assurez-vous que cette valeur est l'ID de la marque
+          value: brand.label,
           label: brand.label,
         }));
 
@@ -502,7 +502,7 @@ export default function DraftUpdatePage() {
       const data = await response.json();
 
       const optionsBrand = data.data?.map((brand: BrandOption) => ({
-        value: brand._id, // Assurez-vous que cette valeur est l'ID de la marque
+        value: brand.label, // Assurez-vous que cette valeur est l'ID de la marque
         label: brand.label,
       }));
 
@@ -546,7 +546,7 @@ export default function DraftUpdatePage() {
         const data = await response.json();
 
         const optionsFamily = data.data?.map((tag: Tag) => ({
-          value: tag._id,
+          value: tag.code,
           label: tag.name,
         }));
 
@@ -570,7 +570,7 @@ export default function DraftUpdatePage() {
       const data = await response.json();
 
       const optionsFamily = data.data?.map((tag: Tag) => ({
-        value: tag._id,
+        value: tag.code,
         label: tag.name,
       }));
 
@@ -614,7 +614,7 @@ export default function DraftUpdatePage() {
         const data = await response.json();
 
         const optionsSubFamily = data.data?.map((tag: Tag) => ({
-          value: tag._id,
+          value: tag.code,
           label: tag.name,
         }));
 
@@ -638,7 +638,7 @@ export default function DraftUpdatePage() {
       const data = await response.json();
 
       const optionsSubFamily = data.data?.map((tag: Tag) => ({
-        value: tag._id,
+        value: tag.code,
         label: tag.name,
       }));
 
@@ -686,7 +686,7 @@ export default function DraftUpdatePage() {
         const data = await response.json();
 
         const optionsSubSubFamily = data.data?.map((tag: Tag) => ({
-          value: tag._id,
+          value: tag.code,
           label: tag.name,
         }));
 
@@ -710,7 +710,7 @@ export default function DraftUpdatePage() {
       const data = await response.json();
 
       const optionsSubSubFamily = data.data?.map((tag: Tag) => ({
-        value: tag._id,
+        value: tag.code,
         label: tag.name,
       }));
 
@@ -749,7 +749,7 @@ export default function DraftUpdatePage() {
 
         const optionsCollection = data.data?.map(
           (collection: CollectionOption) => ({
-            value: collection._id,
+            value: collection.code,
             label: collection.label,
           })
         );
@@ -775,7 +775,7 @@ export default function DraftUpdatePage() {
 
       const optionsCollection = data.data?.map(
         (collection: CollectionOption) => ({
-          value: collection._id,
+          value: collection.code,
           label: collection.label,
         })
       );
@@ -1040,6 +1040,7 @@ export default function DraftUpdatePage() {
     }
   };
 
+  console.log(formData)
   return (
     <>
       <Modal
@@ -1230,7 +1231,7 @@ export default function DraftUpdatePage() {
                   <div className="w-[60%]">
                     <FormSection
                       title="Identification"
-                      size={`${!isModify ? "h-[400px]" : "h-[450px]"}`}
+                      size={`${!isModify ? "h-[400px]" : "h-[470px]"}`}
                     >
                       <div className="mt-3">
                         <div className="relative flex-1">
@@ -1362,6 +1363,7 @@ export default function DraftUpdatePage() {
                                 options={optionsBrand}
                                 inputValue={inputValueBrand}
                                 isClearable
+                                placeholder={draft?.brand_ids[0] || "Selectionnez une marque"}
                               />
                             )}
                           </div>
@@ -1395,6 +1397,7 @@ export default function DraftUpdatePage() {
                                 options={optionsFamily}
                                 inputValue={inputValueFamily}
                                 isClearable
+                                placeholder={draft?.tag_ids[0] || "Selectionnez une Famille"}
                               />
                             )}
                           </div>
@@ -1428,6 +1431,7 @@ export default function DraftUpdatePage() {
                                 options={optionsSubFamily}
                                 inputValue={inputSubValueFamily}
                                 isClearable
+                                placeholder={draft?.tag_ids[1] || "Selectionnez une Sous-fFamille"}
                               />
                             )}
                           </div>
@@ -1461,6 +1465,7 @@ export default function DraftUpdatePage() {
                                 options={optionsSubSubFamily}
                                 inputValue={inputValueSubSubFamily}
                                 isClearable
+                                placeholder={draft?.tag_ids[2] || "Selectionnez une Sous-sous-Famille"}
                               />
                             )}
                           </div>
@@ -1470,7 +1475,7 @@ export default function DraftUpdatePage() {
                   </div>
                   <div className="w-[480px] bg-white">
                     <FormSection
-                      size={`${!isModify ? "h-[400px]" : "h-[450px]"}`}
+                      size={`${!isModify ? "h-[400px]" : "h-[470px]"}`}
                     >
                       {draft.imgPath ? (
                         <div className="relative w-full h-0 pb-[75%]">
@@ -1564,7 +1569,7 @@ export default function DraftUpdatePage() {
                     <FormSection title="Caractéristiques Produit">
                       <div className="mt-3">
                         <div className="grid grid-cols-12 gap-2 py-2">
-                          <span className="col-span-4 font-[700] text-slate-500 text-[13px]">
+                          <span className="col-span-4 font-[700] text-slate-500 text-[12px]">
                             Type :
                           </span>
                           {!isModify ? (
@@ -1586,7 +1591,7 @@ export default function DraftUpdatePage() {
                           )}
                         </div>
                         <div className="grid grid-cols-12 gap-2 py-2">
-                          <span className="col-span-4 font-[700] text-slate-500 text-[13px]">
+                          <span className="col-span-4 font-[700] text-slate-500 text-[12px]">
                             Dimensions :
                           </span>
                           <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px] capitalize">
@@ -1599,19 +1604,12 @@ export default function DraftUpdatePage() {
                           </span>
                         </div>
                         <div className="grid grid-cols-12 gap-2 py-2">
-                          <span className="col-span-4 font-[700] text-slate-500 text-[13px]">
+                          <span className="col-span-4 font-[700] text-slate-500 text-[12px]">
                             Collection :
                           </span>
                           {!isModify ? (
                             <span className="col-span-6 text-gray-600 text-[14px]">
-                              {collectionDetails &&
-                              collectionDetails.length > 0 ? (
-                                collectionDetails.map((collection, index) => (
-                                  <p key={index}>{collection.label}</p>
-                                ))
-                              ) : (
-                                <CircleSlash2 size={15} />
-                              )}
+                             {draft?.collection_ids[0]}
                             </span>
                           ) : (
                             <CreatableSelect
@@ -1622,6 +1620,7 @@ export default function DraftUpdatePage() {
                               options={optionsCollection}
                               inputValue={inputValueCollection}
                               isClearable
+                              placeholder={draft?.collection_ids[0]}
                             />
                           )}
                         </div>
@@ -1632,8 +1631,8 @@ export default function DraftUpdatePage() {
                   <div className="w-1/4">
                     <FormSection title="Prix">
                       <div className="mt-3">
-                        <div className="grid grid-cols-12 gap-2 py-2">
-                          <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                        <div className="flex items-center gap-2 py-2">
+                          <span className="font-[700] text-slate-500 text-[12px]">
                             Prix Achat (PAEU) :
                           </span>
                           {!isModify ? (
@@ -1650,8 +1649,8 @@ export default function DraftUpdatePage() {
                             />
                           )}
                         </div>
-                        <div className="grid grid-cols-12 gap-2 py-2">
-                          <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                        <div className="flex items-center gap-2 py-2">
+                          <span className="font-[700] text-slate-500 text-[12px]">
                             Prix Vente (TBEU/PB) :
                           </span>
                           {!isModify ? (
@@ -1668,8 +1667,8 @@ export default function DraftUpdatePage() {
                             />
                           )}
                         </div>
-                        <div className="grid grid-cols-12 gap-2 py-2">
-                          <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                        <div className="flex items-center gap-2 py-2">
+                          <span className="font-[700] text-slate-500 text-[12px] whitespace-nowrap">
                             Prix Modulé (TBEU/PMEU) :
                           </span>
                           {!isModify ? (
@@ -1694,8 +1693,8 @@ export default function DraftUpdatePage() {
                     <FormSection title="Cotes et poids">
                       <div className="flex gap-3">
                         <div>
-                          <div className="grid grid-cols-12 gap-2 py-2">
-                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                          <div className="flex items-center gap-2 py-2">
+                            <span className="font-[700] text-slate-500 text-[12px]">
                               Hauteur
                             </span>
                             {!isModify ? (
@@ -1713,8 +1712,8 @@ export default function DraftUpdatePage() {
                               />
                             )}
                           </div>
-                          <div className="grid grid-cols-12 gap-2 py-2">
-                            <span className="col-span-6 font-[700] text-slate-500 text-[13px] whitespace-nowrap">
+                          <div className="flex items-center gap-2 gap-2 py-2">
+                            <span className="font-[700] text-slate-500 text-[12px]">
                               Longueur
                             </span>
                             {!isModify ? (
@@ -1732,12 +1731,12 @@ export default function DraftUpdatePage() {
                               />
                             )}
                           </div>
-                          <div className="grid grid-cols-12 gap-2 py-2">
-                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                          <div className="flex items-center gap-2 py-2">
+                            <span className="col-span-6 font-[700] text-slate-500 text-[12px]">
                               Largeur
                             </span>
                             {!isModify ? (
-                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                              <span className="col-span-6 text-gray-600 overflow-ellipsis overflow-hidden text-[14px]">
                                 {draft.width || "0"}
                                 {draft.size_unit || "m"}
                               </span>
@@ -1753,12 +1752,12 @@ export default function DraftUpdatePage() {
                           </div>
                         </div>
                         <div>
-                          <div className="grid grid-cols-12 gap-2 py-2">
-                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                          <div className="flex items-center gap-2 gap-2 py-2">
+                            <span className="font-[700] text-slate-500 text-[12px]">
                               Poids Brut
                             </span>
                             {!isModify ? (
-                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                              <span className="col-span-6 text-gray-600 text-[14px]">
                                 {draft.gross_weight || "0"}
                                 {draft.weigth_unit || "kg"}
                               </span>
@@ -1772,12 +1771,12 @@ export default function DraftUpdatePage() {
                               />
                             )}
                           </div>
-                          <div className="grid grid-cols-12 gap-2 py-2">
-                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                          <div className="flex items-center gap-2 gap-2 py-2">
+                            <span className="font-[700] text-slate-500 text-[1px]">
                               Poids Net
                             </span>
                             {!isModify ? (
-                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                              <span className="col-span-6 text-gray-600 text-[14px]">
                                 {draft.net_weight || "0"}
                                 {draft.weigth_unit || "kg"}
                               </span>
@@ -1998,7 +1997,7 @@ export default function DraftUpdatePage() {
                   <UVCInfosTable
                     reference={draft?.reference}
                     uvcDimension={formData.uvc}
-                    brandLabel={brandDetails[0].label}
+                    brandLabel={draft?.brand_ids[0]}
                   />
                 )}
                 {onglet === "price" && draft && (
@@ -2016,11 +2015,7 @@ export default function DraftUpdatePage() {
                   <UVCSupplierTable
                     reference={draft?.reference}
                     uvcDimension={formData.uvc}
-                    supplierLabel={
-                      supplierDetails.length > 0
-                        ? supplierDetails[0].company_name
-                        : "-"
-                    }
+                    supplierLabel={draft?.suppliers[0].supplier_id}
                   />
                 )}
                 {onglet === "weight" && draft && (

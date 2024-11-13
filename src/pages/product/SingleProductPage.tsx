@@ -261,6 +261,7 @@ export default function SingleProductPage() {
         label: supplier?.supplier_id?.company_name || "Nom inconnu",
         company_name: supplier?.supplier_id?.company_name || "Nom inconnu",
         supplier_ref: supplier?.supplier_ref || "Référence inconnue",
+        supplier_id: supplier?.supplier_id || "Référence inconnue",
         pcb: supplier?.pcb || "PCB inconnue",
         custom_cat: supplier?.custom_cat || "Catégorie inconnue",
         made_in: supplier?.made_in || "Pays d'origine inconnu",
@@ -651,6 +652,7 @@ export default function SingleProductPage() {
           value: selectedSupplier.value,
           label: selectedSupplier.label,
           company_name: selectedSupplier.label,
+          supplier_id: "",
           supplier_ref: "",
           pcb: "",
           custom_cat: "",
@@ -750,7 +752,7 @@ export default function SingleProductPage() {
 
     const newUVCs = newDimensions.map((dim, index) => ({
       product_id: id,
-      code: `${dim.color}${dim.size}${formData.reference}`,
+      code: `${formData.reference}_${dim.color}_${dim.size}`,
       dimensions: [`${dim.color}/${dim.size}`],
       prices: [
         {
@@ -858,65 +860,75 @@ export default function SingleProductPage() {
   const handleUpdateReference = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-
+  
     try {
-      // Récupérez les UVC à créer et mappez-les
+      // Créer les UVC et récupérer leurs IDs
       const uvcPromises = formDataUvc.uvc.map(async (uvc) => {
-        const response = await fetch(
-          `${process.env.REACT_APP_URL_DEV}/api/v1/uvc`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(uvc),
-          }
-        );
-
+        const response = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/uvc`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(uvc),
+        });
+  
         if (!response.ok) {
           throw new Error("Erreur lors de la création des UVC !");
         }
-
+  
         const createdUvc = await response.json();
         return createdUvc._id;
       });
-
+  
       const uvcIds = await Promise.all(uvcPromises);
-
-      // Mettez à jour l'ordre des fournisseurs
-      const formattedSuppliers: Supplier[] = selectedSuppliers.map(
-        (supplierOption) => ({
-          supplier_id: supplierOption.value,
-          supplier_ref: supplierOption.supplier_ref || "",
-          pcb: supplierOption.pcb || "",
-          custom_cat: supplierOption.custom_cat || "",
-          made_in: supplierOption.made_in || "",
-          company_name: supplierOption.company_name || "",
-        })
-      );
-
-      // Données à mettre à jour dans le produit
+  
+      // Formater les fournisseurs sélectionnés
+      const formattedSuppliers: Supplier[] = selectedSuppliers.map((supplierOption) => ({
+        supplier_id: supplierOption.value,
+        supplier_ref: supplierOption.supplier_ref || "",
+        pcb: supplierOption.pcb || "",
+        custom_cat: supplierOption.custom_cat || "",
+        made_in: supplierOption.made_in || "",
+        company_name: supplierOption.company_name || "",
+      }));
+  
+      // Créer l'objet de mise à jour
       const updatedFormData = {
         ...formData,
         uvc_ids: uvcIds,
         suppliers: formattedSuppliers,
       };
-
-      const productResponse = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(updatedFormData),
+  
+      // Enregistrer les modifications
+      const changes = Object.keys(updatedFormData).reduce((acc, key) => {
+        const typedKey = key as keyof typeof updatedFormData; // Assurez-vous que `key` est bien une clé de `updatedFormData`
+        
+        if (updatedFormData[typedKey] !== formData[typedKey]) {
+          acc[typedKey] = updatedFormData[typedKey];
         }
-      );
-
+        return acc;
+      }, {} as Partial<typeof updatedFormData>);
+  
+      // Préparer `updateEntry`
+      const updateEntry = {
+        updated_at: new Date(),
+        updated_by: creatorId.username,
+        changes,
+      };
+  
+      // Envoyer la requête de mise à jour avec `updateEntry`
+      const productResponse = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ ...updatedFormData, updateEntry }),
+      });
+  
       if (productResponse.ok) {
-        notifySuccess("Le produit à bien été mise à jour !");
+        notifySuccess("Le produit a bien été mis à jour !");
         window.location.reload();
       } else {
         notifyError("Erreur lors de la mise à jour de la référence !");
@@ -929,6 +941,7 @@ export default function SingleProductPage() {
       setIsModify(false);
     }
   };
+  
 
   // Fonction pour mettre à jour l'ordre des fournisseurs dans le produit
   const updateProductSuppliersOrder = async (
@@ -1060,8 +1073,7 @@ export default function SingleProductPage() {
     });
   };
 
-  console.log(product);
-  console.log(selectedSupplier);
+
   return (
     <>
       <Modal
@@ -1559,8 +1571,8 @@ export default function SingleProductPage() {
                   <div className="w-1/4">
                     <FormSection title="Caractéristiques Produit">
                       <div className="mt-3">
-                        <div className="grid grid-cols-12 gap-2 py-2">
-                          <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                        <div className="flex items-center gap-2 py-2">
+                          <span className="font-[700] text-slate-500 text-[12px]">
                             Type :
                           </span>
                           {!isModify ? (
@@ -1581,8 +1593,8 @@ export default function SingleProductPage() {
                             </select>
                           )}
                         </div>
-                        <div className="grid grid-cols-12 gap-2 py-2">
-                          <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                        <div className="flex items-center gap-2 py-2">
+                          <span className="font-[700] text-slate-500 text-[12px]">
                             Dimensions :
                           </span>
                           <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px] capitalize">
@@ -1594,8 +1606,8 @@ export default function SingleProductPage() {
                             )}
                           </span>
                         </div>
-                        <div className="grid grid-cols-12 gap-2 py-2">
-                          <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                        <div className="flex items-center gap-2 py-2">
+                          <span className="font-[700] text-slate-500 text-[12px]">
                             Collection :
                           </span>
                           {!isModify ? (
@@ -1634,8 +1646,8 @@ export default function SingleProductPage() {
                   <div className="w-1/4">
                     <FormSection title="Prix">
                       <div className="mt-3">
-                        <div className="grid grid-cols-12 gap-2 py-2">
-                          <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                        <div className="flex items-center gap-2 py-2">
+                          <span className="font-[700] text-slate-500 text-[12px]">
                             Prix Achat (PAEU) :
                           </span>
                           {!isModify ? (
@@ -1652,8 +1664,8 @@ export default function SingleProductPage() {
                             />
                           )}
                         </div>
-                        <div className="grid grid-cols-12 gap-2 py-2">
-                          <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                        <div className="flex items-center gap-2 py-2">
+                          <span className="font-[700] text-slate-500 text-[12px]">
                             Prix Vente (TBEU/PB) :
                           </span>
                           {!isModify ? (
@@ -1670,8 +1682,8 @@ export default function SingleProductPage() {
                             />
                           )}
                         </div>
-                        <div className="grid grid-cols-12 gap-2 py-2">
-                          <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                        <div className="flex items-center gap-2 py-2">
+                          <span className="font-[700] text-slate-500 text-[12px]">
                             Prix Modulé (TBEU/PMEU) :
                           </span>
                           {!isModify ? (
@@ -1696,8 +1708,8 @@ export default function SingleProductPage() {
                     <FormSection title="Cotes et poids">
                       <div className="flex gap-3">
                         <div>
-                          <div className="grid grid-cols-12 gap-2 py-2">
-                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                          <div className="flex items-center gap-2 py-2">
+                            <span className="font-[700] text-slate-500 text-[12px]">
                               Hauteur
                             </span>
                             {!isModify ? (
@@ -1715,8 +1727,8 @@ export default function SingleProductPage() {
                               />
                             )}
                           </div>
-                          <div className="grid grid-cols-12 gap-2 py-2">
-                            <span className="col-span-6 font-[700] text-slate-500 text-[13px] whitespace-nowrap">
+                          <div className="flex items-center gap-2 py-2">
+                            <span className="font-[700] text-slate-500 text-[12px]">
                               Longueur
                             </span>
                             {!isModify ? (
@@ -1734,8 +1746,8 @@ export default function SingleProductPage() {
                               />
                             )}
                           </div>
-                          <div className="grid grid-cols-12 gap-2 py-2">
-                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                          <div className="flex items-center gap-2 py-2">
+                            <span className="font-[700] text-slate-500 text-[12px]">
                               Largeur
                             </span>
                             {!isModify ? (
@@ -1755,8 +1767,8 @@ export default function SingleProductPage() {
                           </div>
                         </div>
                         <div>
-                          <div className="grid grid-cols-12 gap-2 py-2">
-                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                          <div className="flex items-center gap-2 py-2">
+                            <span className="font-[700] text-slate-500 text-[12px]">
                               Poids Brut
                             </span>
                             {!isModify ? (
@@ -1774,12 +1786,12 @@ export default function SingleProductPage() {
                               />
                             )}
                           </div>
-                          <div className="grid grid-cols-12 gap-2 py-2">
-                            <span className="col-span-6 font-[700] text-slate-500 text-[13px]">
+                          <div className="flex items-center gap-2 py-2">
+                            <span className="font-[700] text-slate-500 text-[12px]">
                               Poids Net
                             </span>
                             {!isModify ? (
-                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                              <span className="col-span-6 text-gray-600 text-[14px]">
                                 {product?.net_weight || "0"}
                                 {product?.weigth_unit || "kg"}
                               </span>

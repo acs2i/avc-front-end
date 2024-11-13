@@ -247,6 +247,7 @@ export type CollectionOption = {
   _id: string;
   value: string;
   label: string;
+  code: string;
 };
 
 export type SuppliersOption = {

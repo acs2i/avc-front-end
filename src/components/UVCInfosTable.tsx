@@ -25,7 +25,7 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
         {uvcDimension.map((uvc, index) => {
           // Extraire la couleur et la taille à partir de dimensions
           const [couleur, taille] = uvc.dimensions[0].split("/");
-          const uvcReference = `${reference}${couleur}${taille}`;
+          const uvcReference = `${reference}_${couleur}_${taille}`;
 
           return (
             <tr key={index} className="text-[11px]">

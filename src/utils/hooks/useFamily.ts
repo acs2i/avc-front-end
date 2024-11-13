@@ -34,7 +34,7 @@ export const useFamily = (initialInputValue: string = "", limit = 10) => {
       }
       const data = await response.json();
       const optionsFamily = data.data?.map((tag: Tag) => ({
-        value: tag._id,
+        value: tag.code,
         label: tag.name,
         name: tag.name,
         code: tag.code,
@@ -68,8 +68,8 @@ export const useFamily = (initialInputValue: string = "", limit = 10) => {
 
         const data = await response.json();
         const optionsFamily = data.data?.map((tag: Tag) => ({
-            value: tag._id,
-            label: tag.name, // ou utilisez `code` comme label si vous préférez
+            value: tag.code,
+            label: tag.name,
             name: tag.name,
             code: tag.code,
         }));
