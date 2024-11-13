@@ -193,9 +193,13 @@ function ParamsMenuPageContent() {
     try {
       const endpoint = getApiEndpoint();
       let url = `${process.env.REACT_APP_URL_DEV}/api/v1/${endpoint}/search/?page=${currentPage}&limit=${limit}`;
-      
-      if (searchFields.status && searchFields.status !== "all" && endpoint !== "iso-code") {
-        console.log(searchFields.status)
+
+      if (
+        searchFields.status &&
+        searchFields.status !== "all" &&
+        endpoint !== "iso-code"
+      ) {
+        console.log(searchFields.status);
         url += `&status=${searchFields.status}`;
       } else {
         url = `${process.env.REACT_APP_URL_DEV}/api/v1/${endpoint}/?page=${currentPage}&limit=${limit}`;
@@ -224,10 +228,8 @@ function ParamsMenuPageContent() {
         const queryParams = new URLSearchParams(
           params as Record<string, string>
         );
-        if (queryParams?.toString().includes("all")) {
-          let url = `${
-            process.env.REACT_APP_URL_DEV
-          }/api/v1/${endpoint}/?page=${currentPage}&limit=${limit}`;
+        if (queryParams?.toString().includes("status=all")) {
+          let url = `${process.env.REACT_APP_URL_DEV}/api/v1/${endpoint}/?page=${currentPage}&limit=${limit}`;
           const response = await fetch(url, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
@@ -247,7 +249,6 @@ function ParamsMenuPageContent() {
           setItems(result.data || []);
           setTotalItem(result.total);
         }
-        
       } catch (error) {
         console.error("Erreur lors de la requête", error);
       } finally {
@@ -371,6 +372,7 @@ function ParamsMenuPageContent() {
     setHighlightedItemId(updatedItemId);
     setIsUpdateModalOpen(false);
     fetchItems();
+    // handleUpdateClose();
   };
 
   useEffect(() => {
@@ -495,6 +497,11 @@ function ParamsMenuPageContent() {
   };
 
   const handlePageTypeChange = useCallback((newPage: PageTypeValue) => {
+    setIsCreateModalOpen(false);
+    setIsUpdateModalOpen(false);
+    
+    setFormData({});
+    setSelectedItem(null);
     setPage(newPage);
     localStorage.setItem(LAST_PAGE_KEY, newPage);
     setSearchFields({
@@ -779,7 +786,7 @@ function ParamsMenuPageContent() {
         { id: "type", label: "Type" },
         { id: "code", label: "Code" },
         { id: "label", label: "Libellé" },
-        { id: "dimensions", label: "Dimensions" },
+        { id: "dimensions", label: "Correspondance" },
         { id: "status", label: "Statut" },
       ],
       [PAGE_TYPES.COLLECTIONS]: [
@@ -888,123 +895,73 @@ function ParamsMenuPageContent() {
                   <td className="px-6 py-2">{renderStatus(item.status)}</td>
                 </>
               );
-            case PAGE_TYPES.GRIDS:
-              const gridItem = item as GridItem;
-              return (
-                <>
-                  <td className="px-6 py-2">{gridItem.type}</td>
-                  <td className="px-6 py-2">{gridItem.code}</td>
-                  <td className="px-6 py-2">
-                    {gridItem.frn_labels &&
-                      gridItem.frn_labels
-                        .slice(0, N)
-                        .map((dim: string, index: number) => (
-                          <span
-                            key={index}
-                            className="text-[10px] rounded-[5px] mr-1"
-                          >
-                            {dim}
-                          </span>
-                        ))}
-                    {gridItem.frn_labels && gridItem.frn_labels.length > N && (
-                      <>
-                        {expandedGrid !== gridItem && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleViewMore(gridItem);
-                            }}
-                            className="text-blue-600 text-[8px]"
-                          >
-                            Voir plus
-                          </button>
-                        )}
-                        <Collapse in={expandedGrid === gridItem}>
-                          <div className="mt-1">
-                            <div className="grid grid-cols-5 gap-1">
-                              {gridItem.frn_labels &&
-                                gridItem.frn_labels
-                                  .slice(N)
-                                  .map((dim: string, index: number) => (
-                                    <span
-                                      key={index}
-                                      className="text-[10px] rounded-[5px]"
-                                    >
-                                      {dim}
-                                    </span>
-                                  ))}
-                            </div>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setExpandedGrid(null);
-                              }}
-                              className="text-blue-600 text-[8px]"
-                            >
-                              Voir moins
-                            </button>
-                          </div>
-                        </Collapse>
-                      </>
-                    )}
-                  </td>
-                  <td className="px-6 py-2">
-                    {gridItem.dimensions &&
-                      gridItem.dimensions
-                        .slice(0, N)
-                        .map((dim: string, index: number) => (
-                          <span
-                            key={index}
-                            className="text-[10px] rounded-[5px] mr-1"
-                          >
-                            {extractNumbers(dim)}
-                          </span>
-                        ))}
-                    {gridItem.dimensions && gridItem.dimensions.length > N && (
-                      <>
-                        {expandedGrid !== gridItem && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleViewMore(gridItem);
-                            }}
-                            className="text-blue-600 text-[8px]"
-                          >
-                            Voir plus
-                          </button>
-                        )}
-                        <Collapse in={expandedGrid === gridItem}>
-                          <div className="mt-1">
-                            <div className="grid grid-cols-5 gap-1">
-                              {gridItem.dimensions &&
-                                gridItem.dimensions
-                                  .slice(N)
-                                  .map((dim: string, index: number) => (
-                                    <span
-                                      key={index}
-                                      className="text-[10px] rounded-[5px]"
-                                    >
-                                      {extractNumbers(dim)}
-                                    </span>
-                                  ))}
-                            </div>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setExpandedGrid(null);
-                              }}
-                              className="text-blue-600 text-[8px]"
-                            >
-                              Voir moins
-                            </button>
-                          </div>
-                        </Collapse>
-                      </>
-                    )}
-                  </td>
-                  <td className="px-6 py-2">{renderStatus(gridItem.status)}</td>
-                </>
-              );
+              case PAGE_TYPES.GRIDS:
+                const gridItem = item as GridItem;
+                return (
+                  <>
+                    <td className="px-6 py-2">{gridItem.type}</td>
+                    <td className="px-6 py-2">{gridItem.code}</td>
+                    <td className="px-6 py-2">PAS DE DONNÉES</td>
+                    <td className="px-6 py-2">
+                      <table className="border-collapse border-2 border-grey w-fit">
+                        <thead>
+                          <tr>
+                            <th className="border-r-2 border-b-2 border-grey p-0.5 w-12 text-center text-[10px] font-bold">
+                              LIB
+                            </th>
+                            {gridItem.frn_labels &&
+                              gridItem.frn_labels
+                                .slice(0, expandedGrid === gridItem ? N : undefined)
+                                .map((_, index) => (
+                                  <th
+                                    key={index}
+                                    className="border-r-2 border-b-2 border-grey p-0.5 w-8 text-center text-[10px]"
+                                  >
+                                    {32 + index * 2}
+                                  </th>
+                                ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td className="border-r-2 border-grey p-0.5 text-center text-[10px] font-bold">
+                              CODE
+                            </td>
+                            {gridItem.dimensions &&
+                              gridItem.dimensions
+                                .slice(0, expandedGrid === gridItem ? N : undefined)
+                                .map((dim, index) => (
+                                  <td
+                                    key={index}
+                                    className="border-r-2 border-grey p-0.5 text-center text-[10px]"
+                                  >
+                                    {extractNumbers(dim)}
+                                  </td>
+                                ))}
+                          </tr>
+                        </tbody>
+                      </table>
+              
+                      {((gridItem.frn_labels && gridItem.frn_labels?.length > N) ||
+                        (gridItem.dimensions && gridItem.dimensions?.length > N)) && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (expandedGrid === gridItem) {
+                              setExpandedGrid(null); // Si déjà expandé, on rétracte
+                            } else {
+                              setExpandedGrid(gridItem); // Sinon, on expand
+                            }
+                          }}
+                          className="text-blue-600 text-[8px] mt-1"
+                        >
+                          {expandedGrid === gridItem ? "Voir plus" : "Voir moins"}
+                        </button>
+                      )}
+                    </td>
+                    <td className="px-6 py-2">{renderStatus(gridItem.status)}</td>
+                  </>
+                );
             case PAGE_TYPES.COLLECTIONS:
             case PAGE_TYPES.BRANDS:
             case PAGE_TYPES.BLOCKS:
