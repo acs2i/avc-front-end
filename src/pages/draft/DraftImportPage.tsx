@@ -22,6 +22,9 @@ interface ImportData {
   Collection: string;
   "PA Net": string | number;
   "PV Conseillé": string | number;
+  "Grille de taille": string | number;
+  Couleur: string | number;
+  Tailles: string[];
 }
 
 interface PriceItemSchema {
@@ -66,7 +69,7 @@ interface FormData {
   dimension_types: string;
   brand_ids: any[];
   collection_ids: any[];
-  peau: number;
+  paeu: number;
   tbeu_pb: number;
   tbeu_pmeu: number;
   imgPath: string;
@@ -94,6 +97,10 @@ export default function DraftImportPage() {
     "Marque",
     "Réf fournisseur",
     "Collection",
+    "PA Net",
+    "PV Conseillé",
+    "Couleur",
+    "Tailles",
   ];
   const [formData, setFormData] = useState<FormData[]>([]);
 
@@ -108,7 +115,9 @@ export default function DraftImportPage() {
     }));
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (file) {
       setFileName(file.name);
@@ -116,7 +125,7 @@ export default function DraftImportPage() {
 
       if (fileExtension === "xlsx" || fileExtension === "xls") {
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
           const data = new Uint8Array(e.target?.result as ArrayBuffer);
           const workbook = XLSX.read(data, { type: "array" });
           const sheetName = workbook.SheetNames[0];
@@ -160,10 +169,13 @@ export default function DraftImportPage() {
             "Nouvelle Collection",
             "PA Net",
             "PV Conseillé",
+            "Grille de taille",
+            "Code Couleur",
           ];
 
+          const sizeColumns = Array.from({ length: 24 }, (_, i) => `T${i + 1}`);
           const columnMap: { [key: string]: number } = {};
-          columnsToKeep.forEach((col) => {
+          columnsToKeep.concat(sizeColumns).forEach((col) => {
             const index = headers.findIndex(
               (header: string) => header.trim() === col
             );
@@ -172,10 +184,30 @@ export default function DraftImportPage() {
             }
           });
 
-          const formattedData: ImportData[] = rows
-            .map((row: any) => {
+          const formattedData: ImportData[] = await Promise.all(
+            rows.map(async (row: any) => {
               if (row[columnMap["Référence"]]) {
-                const formattedRow: ImportData = {
+                const dimensionsIndices = sizeColumns
+                  .filter((sizeCol) => row[columnMap[sizeCol]])
+                  .map((sizeCol) => parseInt(sizeCol.slice(1), 10));
+
+                // Appel à la route pour obtenir les tailles réelles
+                const sizeGridCode = row[columnMap["Grille de taille"]];
+                const response = await fetch(
+                  `${process.env.REACT_APP_URL_DEV}/api/v1/draft/fetch-dimensions`,
+                  {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      sizeGridCode,
+                      sizeIndices: dimensionsIndices,
+                    }),
+                  }
+                );
+
+                const { dimensions } = await response.json();
+
+                return {
                   Référence: row[columnMap["Référence"]].toString() || "",
                   Famille: row[columnMap["Famille"]] || "",
                   "Sous Famille": row[columnMap["Sous Famille"]] || "",
@@ -191,19 +223,23 @@ export default function DraftImportPage() {
                   Collection: row[columnMap["Nouvelle Collection"]] || "",
                   "PA Net": row[columnMap["PA Net"]] || 0,
                   "PV Conseillé": row[columnMap["PV Conseillé"]] || 0,
+                  "Grille de taille": row[columnMap["Grille de taille"]] || 0,
+                  Couleur: row[columnMap["Code Couleur"]] || 0,
+                  Tailles: dimensions,
                 };
-                return formattedRow;
               }
               return null;
             })
-            .filter((row): row is ImportData => row !== null);
+          ).then((rows) =>
+            rows.filter((row): row is ImportData => row !== null)
+          );
 
           const updatedFormData = formattedData.map((data) => ({
             creator_id: creatorId._id,
             reference: data.Référence,
             name: "",
             short_label: "",
-            long_label: data["Libellé"],
+            long_label: data.Libellé,
             type: "Marchandise",
             tag_ids: [
               data.Famille,
@@ -222,33 +258,31 @@ export default function DraftImportPage() {
             dimension_types: "Couleur/Taille",
             brand_ids: [data.Marque],
             collection_ids: [data.Collection],
-            peau: 0,
-            tbeu_pb: 0,
+            paeu: Number(data["PA Net"]),
+            tbeu_pb: Number(data["PV Conseillé"]),
             tbeu_pmeu: 0,
             imgPath: "",
             status: "A",
             additional_fields: [],
-            uvc: [
-              {
-                code: "",
-                dimensions: [],
-                prices: [
-                  {
-                    tarif_id: "",
-                    currency: "",
-                    supplier_id: "",
-                    price: {
-                      peau: 0,
-                      tbeu_pb: 0,
-                      tbeu_pmeu: 0,
-                    },
-                    store: "",
+            uvc: data.Tailles.map((taille) => ({
+              code: `${data.Référence}-${data.Couleur}-${taille}`,
+              dimensions: [`${data.Couleur}/${taille}`], // Utilise le format "000/000"
+              prices: [
+                {
+                  tarif_id: "",
+                  currency: "",
+                  supplier_id: "",
+                  price: {
+                    peau: Number(data["PA Net"]),
+                    tbeu_pb: Number(data["PV Conseillé"]),
+                    tbeu_pmeu: 0,
                   },
-                ],
-                eans: [],
-                status: "A",
-              },
-            ],
+                  store: "",
+                },
+              ],
+              eans: [], // Ajoutez des EANs si nécessaire
+              status: "A",
+            })),
           }));
 
           setFormData(updatedFormData);

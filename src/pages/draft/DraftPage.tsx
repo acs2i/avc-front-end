@@ -227,7 +227,7 @@ export default function DraftPage() {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/draft/user/${userId}/enrichie`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/draft/user/${userId}`,
         {
           method: "GET",
           headers: {
@@ -477,7 +477,7 @@ export default function DraftPage() {
                     </div>
                   </div>
                 </th>
-                <th scope="col" className="px-6 w-1/6">
+                <th scope="col" className="px-6 w-[10%]">
                   <div className="flex items-center">
                     <span>Famille</span>
                     <div className="cursor-pointer">
@@ -485,7 +485,7 @@ export default function DraftPage() {
                     </div>
                   </div>
                 </th>
-                <th scope="col" className="px-6 w-1/6">
+                <th scope="col" className="px-6 w-[10%]">
                   <div className="flex items-center">
                     <span>Sous-famille</span>
                     <div className="cursor-pointer">
@@ -539,15 +539,23 @@ export default function DraftPage() {
                       <td className="px-6 py-2 font-bold">
                         {truncateText(product?.reference || "", 10)}
                       </td>
-                      <td className="px-6 py-2">
+                      <td className="px-6 py-2  text-blue-400 font-[700]">
                         {truncateText(product.long_label, 20)}
                       </td>
-                      <td className="px-6 py-2 text-blue-400 font-[700]">
-                        {product.brandName}
+                      <td className="px-6 py-2">
+                        {product.brand_ids ? product.brand_ids[0] : "N/A"}
                       </td>
-                      <td className="px-6 py-2">{product.supplierName}</td>
-                      <td className="px-6 py-2">{product.familyName}</td>
-                      <td className="px-6 py-2">{product.subFamilyName}</td>
+                      <td className="px-6 py-2">{product.suppliers[0].supplier_id}</td>
+                      <td className="px-6 py-2">
+                        {product.tag_ids && product.tag_ids.length > 0
+                          ? product.tag_ids[0]
+                          : "N/A"}{" "}
+                      </td>
+                      <td className="px-6 py-2">
+                        {product.tag_ids && product.tag_ids.length > 1
+                          ? product.tag_ids[1]
+                          : "N/A"}{" "}
+                      </td>
                       <td className="px-6 py-2 text-blue-600">
                         {formatDate(product.createdAt)}
                       </td>

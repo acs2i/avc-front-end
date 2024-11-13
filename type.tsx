@@ -258,6 +258,7 @@ export type SuppliersOption = {
   pcb?: string;
   custom_cat?: string;
   made_in?: string;
+  supplier_id: string;
 };
 
 

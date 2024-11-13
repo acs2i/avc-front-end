@@ -846,6 +846,7 @@ export default function DraftUpdatePage() {
           value: selectedSupplier.value,
           label: selectedSupplier.label,
           company_name: selectedSupplier.label,
+          supplier_id: selectedSupplier.value,
           supplier_ref: "",
           pcb: "",
           custom_cat: "",
@@ -1502,41 +1503,44 @@ export default function DraftUpdatePage() {
                       <div className="relative flex flex-col gap-3">
                         <div className="mt-3">
                           <div className="flex flex-col gap-2">
-                            {[...supplierDetails, ...selectedSuppliers].map(
-                              (supplierDetail, index) => {
-                                const draftSupplier = draft?.suppliers.find(
-                                  (draftSup) =>
-                                    draftSup.supplier_id === supplierDetail._id
-                                );
+                            {[
+                              ...(draft.suppliers || []),
+                              ...selectedSuppliers,
+                            ].map((supplierDetail, index) => {
+                              const draftSupplier = draft?.suppliers.find(
+                                (draftSup) =>
+                                  draftSup.supplier_id ===
+                                  supplierDetail.supplier_id
+                              );
 
-                                const combinedSupplier = {
-                                  ...supplierDetail,
-                                  ...draftSupplier,
-                                };
+                              const combinedSupplier = {
+                                ...supplierDetail,
+                                ...draftSupplier,
+                              };
 
-                                return (
-                                  <div
-                                    key={index}
-                                    className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md ${
-                                      index === 0
-                                        ? "bg-[#3B71CA]"
-                                        : "bg-slate-400"
-                                    }`}
-                                    onClick={() => {
-                                      setSelectedSupplier({
-                                        ...combinedSupplier,
-                                        index,
-                                      });
-                                      setModalSupplierisOpen(true);
-                                    }}
-                                  >
-                                    <span className="text-[20px] text-white font-bold">
-                                      {combinedSupplier.company_name}
-                                    </span>
-                                  </div>
-                                );
-                              }
-                            )}
+                              return (
+                                <div
+                                  key={index}
+                                  className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md ${
+                                    index === 0
+                                      ? "bg-[#3B71CA]"
+                                      : "bg-slate-400"
+                                  }`}
+                                  onClick={() => {
+                                    setSelectedSupplier({
+                                      ...combinedSupplier,
+                                      index,
+                                    } as SupplierDetail);
+                                    setModalSupplierisOpen(true);
+                                  }}
+                                >
+                                  <span className="text-[20px] text-white font-bold">
+                                    {combinedSupplier.company_name ||
+                                      combinedSupplier.supplier_id}
+                                  </span>
+                                </div>
+                              );
+                            })}
                           </div>
                           {isModify && (
                             <div
