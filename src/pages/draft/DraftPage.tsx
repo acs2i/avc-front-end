@@ -546,7 +546,9 @@ export default function DraftPage() {
                         {product.brand_ids ? product.brand_ids[0] : "N/A"}
                       </td>
                       <td className="px-6 py-2">
-                        {product.suppliers[0].supplier_id}
+                        {product.suppliers && product.suppliers.length > 0
+                          ? product.suppliers[0].supplier_id
+                          : "N/A"}
                       </td>
                       <td className="px-6 py-2">
                         {product.tag_ids && product.tag_ids.length > 0
