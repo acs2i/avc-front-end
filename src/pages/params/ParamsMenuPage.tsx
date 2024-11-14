@@ -200,6 +200,13 @@ function ParamsMenuPageContent() {
         endpoint !== "iso-code"
       ) {
         console.log(searchFields.status);
+
+      if (
+        searchFields.status &&
+        searchFields.status !== "all" &&
+        endpoint !== "iso-code"
+      ) {
+        console.log(searchFields.status);
         url += `&status=${searchFields.status}`;
       } else {
         url = `${process.env.REACT_APP_URL_DEV}/api/v1/${endpoint}/?page=${currentPage}&limit=${limit}`;
@@ -229,7 +236,9 @@ function ParamsMenuPageContent() {
           params as Record<string, string>
         );
         if (queryParams?.toString().includes("all")) {
-          let url = `${process.env.REACT_APP_URL_DEV}/api/v1/${endpoint}/?page=${currentPage}&limit=${limit}`;
+          let url = `${
+            process.env.REACT_APP_URL_DEV
+          }/api/v1/${endpoint}/?page=${currentPage}&limit=${limit}`;
           const response = await fetch(url, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
@@ -372,6 +381,7 @@ function ParamsMenuPageContent() {
     setHighlightedItemId(updatedItemId);
     setIsUpdateModalOpen(false);
     fetchItems();
+    // handleUpdateClose();
   };
 
   useEffect(() => {
@@ -496,6 +506,11 @@ function ParamsMenuPageContent() {
   };
 
   const handlePageTypeChange = useCallback((newPage: PageTypeValue) => {
+    setIsCreateModalOpen(false);
+    setIsUpdateModalOpen(false);
+
+    setFormData({});
+    setSelectedItem(null);
     setPage(newPage);
     localStorage.setItem(LAST_PAGE_KEY, newPage);
     setSearchFields({
@@ -611,33 +626,33 @@ function ParamsMenuPageContent() {
       [PAGE_TYPES.DIMENSIONS]: (
         <div className="flex flex-col">
           <label className="text-sm font-bold mb-1">Type :</label>
-          <input
-            type="text"
+          <select
             className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:ring-blue-500 transition-all focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
-            placeholder="Rechercher par type"
             value={searchFields.type}
             onChange={(e) =>
               setSearchFields({ ...searchFields, type: e.target.value })
             }
-            onKeyPress={handleKeyPress}
-            autoComplete="off"
-          />
+          >
+            <option value="">Tous les types</option>
+            <option value="Taille">Taille</option>
+            <option value="Couleur">Couleur</option>
+          </select>
         </div>
       ),
       [PAGE_TYPES.GRIDS]: (
         <div className="flex flex-col">
           <label className="text-sm font-bold mb-1">Type :</label>
-          <input
-            type="text"
+          <select
             className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:ring-blue-500 transition-all focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
-            placeholder="Rechercher par type"
             value={searchFields.type}
             onChange={(e) =>
               setSearchFields({ ...searchFields, type: e.target.value })
             }
-            onKeyPress={handleKeyPress}
-            autoComplete="off"
-          />
+          >
+            <option value="">Tous les types</option>
+            <option value="Taille">Taille</option>
+            <option value="Couleur">Couleur</option>
+          </select>
         </div>
       ),
       [PAGE_TYPES.COLLECTIONS]: <></>,
@@ -784,7 +799,7 @@ function ParamsMenuPageContent() {
         { id: "type", label: "Type" },
         { id: "code", label: "Code" },
         { id: "label", label: "Libellé" },
-        { id: "dimensions", label: "Dimensions" },
+        { id: "dimensions", label: "Correspondance" },
         { id: "status", label: "Statut" },
       ],
       [PAGE_TYPES.COLLECTIONS]: [
@@ -899,112 +914,70 @@ function ParamsMenuPageContent() {
                 <>
                   <td className="px-6 py-2">{gridItem.type}</td>
                   <td className="px-6 py-2">{gridItem.code}</td>
+                  <td className="px-6 py-2">PAS DE DONNÉES</td>
                   <td className="px-6 py-2">
-                    {gridItem.frn_labels &&
-                      gridItem.frn_labels
-                        .slice(0, N)
-                        .map((dim: string, index: number) => (
-                          <span
-                            key={index}
-                            className="text-[10px] rounded-[5px] mr-1"
-                          >
-                            {dim}
-                          </span>
-                        ))}
-                    {gridItem.frn_labels && gridItem.frn_labels.length > N && (
-                      <>
-                        {expandedGrid !== gridItem && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleViewMore(gridItem);
-                            }}
-                            className="text-blue-600 text-[8px]"
-                          >
-                            Voir plus
-                          </button>
-                        )}
-                        <Collapse in={expandedGrid === gridItem}>
-                          <div className="mt-1">
-                            <div className="grid grid-cols-5 gap-1">
-                              {gridItem.frn_labels &&
-                                gridItem.frn_labels
-                                  .slice(N)
-                                  .map((dim: string, index: number) => (
-                                    <span
-                                      key={index}
-                                      className="text-[10px] rounded-[5px]"
-                                    >
-                                      {dim}
-                                    </span>
-                                  ))}
-                            </div>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setExpandedGrid(null);
-                              }}
-                              className="text-blue-600 text-[8px]"
-                            >
-                              Voir moins
-                            </button>
-                          </div>
-                        </Collapse>
-                      </>
-                    )}
-                  </td>
-                  <td className="px-6 py-2">
-                    {gridItem.dimensions &&
-                      gridItem.dimensions
-                        .slice(0, N)
-                        .map((dim: string, index: number) => (
-                          <span
-                            key={index}
-                            className="text-[10px] rounded-[5px] mr-1"
-                          >
-                            {extractNumbers(dim)}
-                          </span>
-                        ))}
-                    {gridItem.dimensions && gridItem.dimensions.length > N && (
-                      <>
-                        {expandedGrid !== gridItem && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleViewMore(gridItem);
-                            }}
-                            className="text-blue-600 text-[8px]"
-                          >
-                            Voir plus
-                          </button>
-                        )}
-                        <Collapse in={expandedGrid === gridItem}>
-                          <div className="mt-1">
-                            <div className="grid grid-cols-5 gap-1">
-                              {gridItem.dimensions &&
-                                gridItem.dimensions
-                                  .slice(N)
-                                  .map((dim: string, index: number) => (
-                                    <span
-                                      key={index}
-                                      className="text-[10px] rounded-[5px]"
-                                    >
-                                      {extractNumbers(dim)}
-                                    </span>
-                                  ))}
-                            </div>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setExpandedGrid(null);
-                              }}
-                              className="text-blue-600 text-[8px]"
-                            >
-                              Voir moins
-                            </button>
-                          </div>
-                        </Collapse>
-                      </>
+                    <table className="border-collapse border-2 border-grey w-fit">
+                      <thead>
+                        <tr>
+                          <th className="border-r-2 border-b-2 border-grey p-0.5 w-12 text-center text-[10px] font-bold">
+                            LIB
+                          </th>
+                          {gridItem.frn_labels &&
+                            gridItem.frn_labels
+                              .slice(
+                                0,
+                                expandedGrid === gridItem ? N : undefined
+                              )
+                              .map((_, index) => (
+                                <th
+                                  key={index}
+                                  className="border-r-2 border-b-2 border-grey p-0.5 w-8 text-center text-[10px]"
+                                >
+                                  {32 + index * 2}
+                                </th>
+                              ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="border-r-2 border-grey p-0.5 text-center text-[10px] font-bold">
+                            CODE
+                          </td>
+                          {gridItem.dimensions &&
+                            gridItem.dimensions
+                              .slice(
+                                0,
+                                expandedGrid === gridItem ? N : undefined
+                              )
+                              .map((dim, index) => (
+                                <td
+                                  key={index}
+                                  className="border-r-2 border-grey p-0.5 text-center text-[10px]"
+                                >
+                                  {extractNumbers(dim)}
+                                </td>
+                              ))}
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    {((gridItem.frn_labels &&
+                      gridItem.frn_labels?.length > N) ||
+                      (gridItem.dimensions &&
+                        gridItem.dimensions?.length > N)) && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (expandedGrid === gridItem) {
+                            setExpandedGrid(null); // Si déjà expandé, on rétracte
+                          } else {
+                            setExpandedGrid(gridItem); // Sinon, on expand
+                          }
+                        }}
+                        className="text-blue-600 text-[8px] mt-1"
+                      >
+                        {expandedGrid === gridItem ? "Voir plus" : "Voir moins"}
+                      </button>
                     )}
                   </td>
                   <td className="px-6 py-2">{renderStatus(gridItem.status)}</td>
