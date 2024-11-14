@@ -200,13 +200,6 @@ function ParamsMenuPageContent() {
         endpoint !== "iso-code"
       ) {
         console.log(searchFields.status);
-
-      if (
-        searchFields.status &&
-        searchFields.status !== "all" &&
-        endpoint !== "iso-code"
-      ) {
-        console.log(searchFields.status);
         url += `&status=${searchFields.status}`;
       } else {
         url = `${process.env.REACT_APP_URL_DEV}/api/v1/${endpoint}/?page=${currentPage}&limit=${limit}`;
