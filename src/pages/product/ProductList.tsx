@@ -224,7 +224,7 @@ export default function ProductList() {
     }
   };
 
-  console.log(products)
+  console.log(products);
 
   return (
     <section className="w-full">
@@ -448,7 +448,9 @@ export default function ProductList() {
                   className="bg-white cursor-pointer hover:bg-slate-200 capitalize text-[11px] text-gray-500 whitespace-nowrap border-y-[1px] border-gray-200"
                   onClick={() => navigate(`/product/${product._id}`)}
                 >
-                  <td className="px-6 py-2 font-bold">{truncateText(product?.reference || "", 10)}</td>
+                  <td className="px-6 py-2 font-bold">
+                    {truncateText(product?.reference || "", 10)}
+                  </td>
                   <td className="px-6 py-2">
                     {!product.imgPath ? (
                       <div className="relative w-[60px] h-[60px] flex items-center border p-1 rounded-md">
@@ -475,7 +477,7 @@ export default function ProductList() {
                     <span>{truncateText(product?.long_label || "", 25)}</span>
                   </td>
                   <td className="px-6 py-2">
-                   {product?.brand_ids[0].label}
+                  {product?.brand_ids?.length > 0 && product.brand_ids[0]?.label ? product.brand_ids[0].label : ""}
                   </td>
                   <td className="px-6 py-2">
                     {product.suppliers && product.suppliers.length > 0 ? (
