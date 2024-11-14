@@ -6,7 +6,15 @@ import { useSelector } from "react-redux";
 import useNotify from "../../utils/hooks/useToast";
 import { VALIDATOR_REQUIRE } from "../../utils/validator";
 import { CircularProgress } from "@mui/material";
-import { Binary, CalendarRange, ChevronLeft, CircleDot, Plus, Space } from "lucide-react";
+import {
+  Binary,
+  CalendarRange,
+  ChevronLeft,
+  CircleDot,
+  Plus,
+  Space,
+  TriangleAlert,
+} from "lucide-react";
 
 interface CustomField {
   field_name: string;
@@ -41,12 +49,10 @@ export default function UserFieldCreatePage({
     label: "",
     apply_to: "",
     additional_fields: [
-      { field_name: "", field_type: "text", options: [], value: "" }
+      { field_name: "", field_type: "text", options: [], value: "" },
     ],
     status: "A",
   });
-  
-
 
   // useEffect(() => {
   //   const fetchLastCode = async () => {
@@ -59,7 +65,7 @@ export default function UserFieldCreatePage({
   //       });
 
   //       const data = await response.json();
-  //       const lastCode = data.lastCode || 0; 
+  //       const lastCode = data.lastCode || 0;
   //       setFormData(prevFormData => ({ ...prevFormData, code: lastCode + 1 }));
   //     } catch (error) {
   //       console.error("Erreur lors de la récupération du dernier code", error);
@@ -94,19 +100,17 @@ export default function UserFieldCreatePage({
   const handleFieldTypeSelection = (index: number, type: string) => {
     const updatedFields = [...formData.additional_fields];
     updatedFields[index].field_type = type;
-    
+
     // Pas besoin de définir des options pour boolean pendant la création
     if (type === "multiple_choice") {
       updatedFields[index].options = [""];
     } else {
       updatedFields[index].options = [];
     }
-    
+
     updatedFields[index].value = updatedFields[index].value || "";
     setFormData({ ...formData, additional_fields: updatedFields });
   };
-  
-  
 
   const handleOptionChange = (
     fieldIndex: number,
@@ -129,16 +133,16 @@ export default function UserFieldCreatePage({
     setIsLoading(true);
 
     try {
-        const response = await fetch(
-            `${process.env.REACT_APP_URL_DEV}/api/v1/user-field`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formData),
-            }
-        );
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/user-field`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
@@ -160,13 +164,12 @@ export default function UserFieldCreatePage({
         notifyError("Erreur lors de la création");
       }
     } catch (error) {
-        console.error("Erreur lors de la requête", error);
-        notifyError("Erreur lors de la création");
+      console.error("Erreur lors de la requête", error);
+      notifyError("Erreur lors de la création");
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
-};
-
+  };
 
   return (
     <section className="w-full p-4">
@@ -179,9 +182,20 @@ export default function UserFieldCreatePage({
             Créer <span className="font-[300]">un champ utilisateur</span>
           </h1>
         </div>
-        <div className="mt-[30px] flex flex-col justify-between">
+        <div className="w-full bg-yellow-400 mt-3 p-4 text-yellow-800 text-[15px] rounded-md shadow-md font-semibold flex gap-2 border-[1px] border-orange-400">
+          <div>
+            <TriangleAlert size={20}/>
+          </div>
+          <p>
+            Vous êtes sur le point de créer un nouveau champ utilisateur. Si
+            cette nouvelle information doit être communiquée vers d’autres
+            applications merci de contacter Acs2i pour que les interfaces soient
+            adaptées en conséquence.
+          </p>
+        </div>
+        <div className="mt-3 flex flex-col justify-between">
           <div className="flex flex-col">
-          <Input
+            <Input
               element="select"
               id="apply_to"
               label="S'applique à"
@@ -190,7 +204,11 @@ export default function UserFieldCreatePage({
               placeholder="Choisir la liaison"
               options={[
                 { value: "Produit", label: "Produit", name: "Produit" },
-                { value: "Fournisseur", label: "Fournisseur", name: "Fournisseur" }
+                {
+                  value: "Fournisseur",
+                  label: "Fournisseur",
+                  name: "Fournisseur",
+                },
               ]}
               required
               create
@@ -255,13 +273,9 @@ export default function UserFieldCreatePage({
                           ? "bg-blue-500 text-white"
                           : "bg-white text-gray-800"
                       }`}
-                      onClick={() =>
-                        handleFieldTypeSelection(index, "boolean")
-                      }
+                      onClick={() => handleFieldTypeSelection(index, "boolean")}
                     >
-                      <h3 className="text-md font-bold text-center">
-                        Boolean
-                      </h3>
+                      <h3 className="text-md font-bold text-center">Boolean</h3>
                       <div className="flex items-center justify-center">
                         <Binary />
                       </div>
@@ -273,12 +287,13 @@ export default function UserFieldCreatePage({
                           ? "bg-blue-500 text-white"
                           : "bg-white text-gray-800"
                       }`}
-                      onClick={() =>
-                        handleFieldTypeSelection(index, "date")
-                      }
+                      onClick={() => handleFieldTypeSelection(index, "date")}
                     >
                       <h3 className="text-md font-bold text-center">
-                        Date <span className="text-[12px] italic">(Jour/Mois/Année)</span>
+                        Date{" "}
+                        <span className="text-[12px] italic">
+                          (Jour/Mois/Année)
+                        </span>
                       </h3>
                       <div className="flex items-center justify-center">
                         <CalendarRange />
@@ -287,7 +302,8 @@ export default function UserFieldCreatePage({
                   </div>
                 </div>
 
-                {(field.field_type === "multiple_choice" || field.field_type === "boolean") && (
+                {(field.field_type === "multiple_choice" ||
+                  field.field_type === "boolean") && (
                   <div className="mt-4">
                     {field.options!.map((option, optionIndex) => (
                       <Input

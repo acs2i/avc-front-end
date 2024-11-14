@@ -240,6 +240,7 @@ function ClassificationCreatePage({
               validators={[]}
               create
               gray
+              maxLength={6}
             />
             <Input
               element="input"
@@ -251,6 +252,7 @@ function ClassificationCreatePage({
               validators={[]}
               create
               gray
+              maxLength={100}
             />
             {!isLoading ? (
               <div className="flex items-center gap-2 mt-5">

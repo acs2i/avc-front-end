@@ -22,6 +22,7 @@ type InputProps = {
   disabled?: boolean;
   margin?: boolean;
   rows?: number;
+  step?: string;
   options?: { value: string; label: string; name: string }[];
   maxLength?: number;
   label?: string;
@@ -129,6 +130,8 @@ const Input: React.FC<InputProps> = (props) => {
         onKeyDown={props.onKeyDown}
         className={InputClasses}
         disabled={props.disabled}
+        step={props.step}
+        maxLength={props.maxLength}
         autoComplete="off"
       />
     ) : props.element === "textarea" ? (

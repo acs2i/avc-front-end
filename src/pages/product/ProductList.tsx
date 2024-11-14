@@ -224,6 +224,8 @@ export default function ProductList() {
     }
   };
 
+  console.log(products)
+
   return (
     <section className="w-full">
       <Header
@@ -473,17 +475,7 @@ export default function ProductList() {
                     <span>{truncateText(product?.long_label || "", 25)}</span>
                   </td>
                   <td className="px-6 py-2">
-                    {product.brand_ids && product.brand_ids.length > 0 ? (
-                      product.brand_ids.map((brand) => (
-                        <div key={brand._id}>
-                          <span>{brand?.code ?? "NA"}</span>
-                          <span className="mx-1">-</span>
-                          <span>{brand?.label ?? "NA"}</span>
-                        </div>
-                      ))
-                    ) : (
-                      <span>Aucune marque</span>
-                    )}
+                   {product?.brand_ids[0].label}
                   </td>
                   <td className="px-6 py-2">
                     {product.suppliers && product.suppliers.length > 0 ? (

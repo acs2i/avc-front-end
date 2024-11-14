@@ -37,6 +37,7 @@ const BrandSection: React.FC<BrandSelectorProps> = ({
               onChange={(option) => handleChangeBrand(option, index)}
               onInputChange={handleInputChangeBrand}
               inputValue={inputValueBrand}
+              onFocus={() => handleInputChangeBrand("")}
               options={optionsBrand}
               placeholder="Selectionner une marque"
               styles={customStyles}

@@ -3,13 +3,13 @@ import React from "react";
 interface UVCInfosTableProps {
   reference: string;
   uvcDimension: { code: string; dimensions: string[] }[];
-  brandLabel: string;
+  collectionLabel: string;
 }
 
 const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
   reference,
   uvcDimension,
-  brandLabel
+  collectionLabel
 }) => {
   return (
     <table className="w-full border">
@@ -18,7 +18,7 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
           <th className="border px-4 py-2 w-[50px]">Code UVC</th>
           <th className="border px-4 py-2 w-[50px]">Couleur</th>
           <th className="border px-4 py-2 w-[50px]">Taille</th>
-          <th className="border px-4 py-2 w-[50px]">Marque</th>
+          <th className="border px-4 py-2 w-[50px]">Collection</th>
         </tr>
       </thead>
       <tbody>
@@ -32,7 +32,7 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
               <td className="border px-4 py-1 text-center">{uvcReference}</td>
               <td className="border px-4 py-1 text-center">{couleur}</td>
               <td className="border px-4 py-1 text-center">{taille}</td>
-              <td className="border px-4 py-1 text-center">{brandLabel}</td>
+              <td className="border px-4 py-1 text-center">{collectionLabel}</td>
             </tr>
           );
         })}

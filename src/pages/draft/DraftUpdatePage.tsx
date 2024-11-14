@@ -71,7 +71,7 @@ interface FormData {
   dimension_types: string;
   brand_ids: any[];
   collection_ids: any[];
-  peau: number;
+  paeu: number;
   tbeu_pb: number;
   tbeu_pmeu: number;
   height: string;
@@ -125,7 +125,7 @@ export default function DraftUpdatePage() {
     dimension_types: draft?.dimension_types?.[0] || "Couleur/Taille",
     brand_ids: [],
     collection_ids: [],
-    peau: draft?.peau || 0,
+    paeu: draft?.paeu || 0,
     tbeu_pb: draft?.tbeu_pb || 0,
     tbeu_pmeu: draft?.tbeu_pmeu || 0,
     height: draft?.height || "",
@@ -314,7 +314,7 @@ export default function DraftUpdatePage() {
                 currency: "",
                 supplier_id: "",
                 price: {
-                  peau: 0,
+                  paeu: 0,
                   tbeu_pb: 0,
                   tbeu_pmeu: 0,
                 },
@@ -373,7 +373,7 @@ export default function DraftUpdatePage() {
         dimension_types: draft.dimension_types[0] || "Couleur/Taille",
         brand_ids: draft.brand_ids || [],
         collection_ids: draft.collection_ids || [],
-        peau: draft.peau || 0,
+        paeu: draft.paeu || 0,
         tbeu_pb: draft.tbeu_pb || 0,
         tbeu_pmeu: draft.tbeu_pmeu || 0,
         height: draft?.height || "",
@@ -478,7 +478,7 @@ export default function DraftUpdatePage() {
         const data = await response.json();
 
         const optionsBrand = data.data?.map((brand: BrandOption) => ({
-          value: brand.label,
+          value: brand.code,
           label: brand.label,
         }));
 
@@ -502,7 +502,7 @@ export default function DraftUpdatePage() {
       const data = await response.json();
 
       const optionsBrand = data.data?.map((brand: BrandOption) => ({
-        value: brand.label, // Assurez-vous que cette valeur est l'ID de la marque
+        value: brand.code,
         label: brand.label,
       }));
 
@@ -1040,7 +1040,7 @@ export default function DraftUpdatePage() {
     }
   };
 
-  console.log(formData)
+  console.log(formData);
   return (
     <>
       <Modal
@@ -1363,7 +1363,10 @@ export default function DraftUpdatePage() {
                                 options={optionsBrand}
                                 inputValue={inputValueBrand}
                                 isClearable
-                                placeholder={draft?.brand_ids[0] || "Selectionnez une marque"}
+                                placeholder={
+                                  draft?.brand_ids[0] ||
+                                  "Selectionnez une marque"
+                                }
                               />
                             )}
                           </div>
@@ -1397,7 +1400,10 @@ export default function DraftUpdatePage() {
                                 options={optionsFamily}
                                 inputValue={inputValueFamily}
                                 isClearable
-                                placeholder={draft?.tag_ids[0] || "Selectionnez une Famille"}
+                                placeholder={
+                                  draft?.tag_ids[0] ||
+                                  "Selectionnez une Famille"
+                                }
                               />
                             )}
                           </div>
@@ -1431,7 +1437,10 @@ export default function DraftUpdatePage() {
                                 options={optionsSubFamily}
                                 inputValue={inputSubValueFamily}
                                 isClearable
-                                placeholder={draft?.tag_ids[1] || "Selectionnez une Sous-fFamille"}
+                                placeholder={
+                                  draft?.tag_ids[1] ||
+                                  "Selectionnez une Sous-fFamille"
+                                }
                               />
                             )}
                           </div>
@@ -1465,7 +1474,10 @@ export default function DraftUpdatePage() {
                                 options={optionsSubSubFamily}
                                 inputValue={inputValueSubSubFamily}
                                 isClearable
-                                placeholder={draft?.tag_ids[2] || "Selectionnez une Sous-sous-Famille"}
+                                placeholder={
+                                  draft?.tag_ids[2] ||
+                                  "Selectionnez une Sous-sous-Famille"
+                                }
                               />
                             )}
                           </div>
@@ -1609,7 +1621,7 @@ export default function DraftUpdatePage() {
                           </span>
                           {!isModify ? (
                             <span className="col-span-6 text-gray-600 text-[14px]">
-                             {draft?.collection_ids[0]}
+                              {draft?.collection_ids[0]}
                             </span>
                           ) : (
                             <CreatableSelect
@@ -1637,15 +1649,15 @@ export default function DraftUpdatePage() {
                           </span>
                           {!isModify ? (
                             <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                              {draft.peau} €
+                              {draft.paeu} €
                             </span>
                           ) : (
                             <input
-                              type="text"
-                              id="peau"
+                              type="number"
+                              id="paeu"
                               onChange={handlePriceChange}
-                              value={formData.peau}
-                              className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                              placeholder={formData.paeu.toString()}
+                              className="border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 w-full"
                             />
                           )}
                         </div>
@@ -1654,21 +1666,21 @@ export default function DraftUpdatePage() {
                             Prix Vente (TBEU/PB) :
                           </span>
                           {!isModify ? (
-                            <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                            <span className="text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
                               {draft.tbeu_pb} €
                             </span>
                           ) : (
                             <input
-                              type="text"
+                              type="number"
                               id="tbeu_pb"
                               onChange={handlePriceChange}
-                              value={formData.tbeu_pb}
-                              className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                              placeholder={formData.tbeu_pb.toString()}
+                              className="border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 w-full"
                             />
                           )}
                         </div>
                         <div className="flex items-center gap-2 py-2">
-                          <span className="font-[700] text-slate-500 text-[12px] whitespace-nowrap">
+                          <span className="font-[700] text-slate-500 text-[12px]">
                             Prix Modulé (TBEU/PMEU) :
                           </span>
                           {!isModify ? (
@@ -1677,11 +1689,11 @@ export default function DraftUpdatePage() {
                             </span>
                           ) : (
                             <input
-                              type="text"
+                              type="number"
                               id="tbeu_pmeu"
                               onChange={handlePriceChange}
-                              value={formData.tbeu_pmeu}
-                              className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                              placeholder={formData.tbeu_pmeu.toString()}
+                              className="border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 w-full"
                             />
                           )}
                         </div>
@@ -1691,24 +1703,24 @@ export default function DraftUpdatePage() {
                   {/* Cotes et poids */}
                   <div className="w-1/4">
                     <FormSection title="Cotes et poids">
-                      <div className="flex gap-3">
+                      <div className="grid grid-cols-2 gap-3">
                         <div>
                           <div className="flex items-center gap-2 py-2">
                             <span className="font-[700] text-slate-500 text-[12px]">
                               Hauteur
                             </span>
                             {!isModify ? (
-                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                              <span className="text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
                                 {draft.height || "0"}
                                 {draft.size_unit || "m"}
                               </span>
                             ) : (
                               <input
-                                type="text"
+                                type="number"
                                 id="height"
                                 onChange={handleChange}
                                 value={formData.height}
-                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                                className="border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 w-full"
                               />
                             )}
                           </div>
@@ -1717,36 +1729,36 @@ export default function DraftUpdatePage() {
                               Longueur
                             </span>
                             {!isModify ? (
-                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                              <span className="text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
                                 {draft.length || "0"}
                                 {draft.size_unit || "m"}
                               </span>
                             ) : (
                               <input
-                                type="text"
+                                type="number"
                                 id="length"
                                 onChange={handleChange}
                                 value={formData.length}
-                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                                className="border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 w-full"
                               />
                             )}
                           </div>
                           <div className="flex items-center gap-2 py-2">
-                            <span className="col-span-6 font-[700] text-slate-500 text-[12px]">
+                            <span className="font-[700] text-slate-500 text-[12px]">
                               Largeur
                             </span>
                             {!isModify ? (
-                              <span className="col-span-6 text-gray-600 overflow-ellipsis overflow-hidden text-[14px]">
+                              <span className="text-gray-600 overflow-ellipsis overflow-hidden text-[14px]">
                                 {draft.width || "0"}
                                 {draft.size_unit || "m"}
                               </span>
                             ) : (
                               <input
-                                type="text"
+                                type="number"
                                 id="width"
                                 onChange={handleChange}
                                 value={formData.width}
-                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                                className="border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 w-full"
                               />
                             )}
                           </div>
@@ -1763,30 +1775,30 @@ export default function DraftUpdatePage() {
                               </span>
                             ) : (
                               <input
-                                type="text"
+                                 type="number"
                                 id="gross_weight"
                                 onChange={handleChange}
                                 value={formData.gross_weight}
-                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                                className="border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 w-full"
                               />
                             )}
                           </div>
                           <div className="flex items-center gap-2 gap-2 py-2">
-                            <span className="font-[700] text-slate-500 text-[1px]">
+                            <span className="font-[700] text-slate-500 text-[12px]">
                               Poids Net
                             </span>
                             {!isModify ? (
-                              <span className="col-span-6 text-gray-600 text-[14px]">
+                              <span className="text-gray-600 text-[14px]">
                                 {draft.net_weight || "0"}
                                 {draft.weigth_unit || "kg"}
                               </span>
                             ) : (
                               <input
-                                type="text"
+                                type="number"
                                 id="net_weight"
                                 onChange={handleChange}
                                 value={formData.net_weight}
-                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                                className="border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 w-full"
                               />
                             )}
                           </div>
@@ -1997,7 +2009,7 @@ export default function DraftUpdatePage() {
                   <UVCInfosTable
                     reference={draft?.reference}
                     uvcDimension={formData.uvc}
-                    brandLabel={draft?.brand_ids[0]}
+                    collectionLabel={draft?.collection_ids[0]}
                   />
                 )}
                 {onglet === "price" && draft && (
@@ -2005,7 +2017,7 @@ export default function DraftUpdatePage() {
                     reference={draft?.reference}
                     uvcPrices={formData.uvc}
                     globalPrices={{
-                      peau: formData.peau,
+                      paeu: formData.paeu,
                       tbeu_pb: formData.tbeu_pb,
                       tbeu_pmeu: formData.tbeu_pmeu,
                     }}

@@ -193,9 +193,13 @@ function ParamsMenuPageContent() {
     try {
       const endpoint = getApiEndpoint();
       let url = `${process.env.REACT_APP_URL_DEV}/api/v1/${endpoint}/search/?page=${currentPage}&limit=${limit}`;
-      
-      if (searchFields.status && searchFields.status !== "all" && endpoint !== "iso-code") {
-        console.log(searchFields.status)
+
+      if (
+        searchFields.status &&
+        searchFields.status !== "all" &&
+        endpoint !== "iso-code"
+      ) {
+        console.log(searchFields.status);
         url += `&status=${searchFields.status}`;
       } else {
         url = `${process.env.REACT_APP_URL_DEV}/api/v1/${endpoint}/?page=${currentPage}&limit=${limit}`;
@@ -225,9 +229,7 @@ function ParamsMenuPageContent() {
           params as Record<string, string>
         );
         if (queryParams?.toString().includes("all")) {
-          let url = `${
-            process.env.REACT_APP_URL_DEV
-          }/api/v1/${endpoint}/?page=${currentPage}&limit=${limit}`;
+          let url = `${process.env.REACT_APP_URL_DEV}/api/v1/${endpoint}/?page=${currentPage}&limit=${limit}`;
           const response = await fetch(url, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
@@ -247,7 +249,6 @@ function ParamsMenuPageContent() {
           setItems(result.data || []);
           setTotalItem(result.total);
         }
-        
       } catch (error) {
         console.error("Erreur lors de la requête", error);
       } finally {
@@ -641,7 +642,26 @@ function ParamsMenuPageContent() {
       ),
       [PAGE_TYPES.COLLECTIONS]: <></>,
       [PAGE_TYPES.BRANDS]: <></>,
-      [PAGE_TYPES.USER_FIELDS]: <></>,
+      [PAGE_TYPES.USER_FIELDS]: (
+        <div className="flex flex-col">
+          <label className="text-sm font-bold mb-1">Associé à :</label>
+          <select
+            className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:ring-blue-500 transition-all focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
+            value={searchFields.applyTo}
+            onChange={(e) =>
+              setSearchFields({ ...searchFields, applyTo: e.target.value })
+            }
+            autoComplete="off"
+          >
+            <option value="" disabled hidden>
+              Choisissez une option
+            </option>
+            <option value="Fournisseur">Fournisseur</option>
+            <option value="Produit">Produit</option>
+          </select>
+        </div>
+      ),
+
       [PAGE_TYPES.TAXES]: <></>,
       [PAGE_TYPES.BLOCKS]: <></>,
       [PAGE_TYPES.COUNTRIES]: <></>,
@@ -654,22 +674,7 @@ function ParamsMenuPageContent() {
       [PAGE_TYPES.GRIDS]: <></>,
       [PAGE_TYPES.COLLECTIONS]: <></>,
       [PAGE_TYPES.BRANDS]: <></>,
-      [PAGE_TYPES.USER_FIELDS]: (
-        <div className="flex flex-col">
-          <label className="text-sm font-bold mb-1">Associé à :</label>
-          <input
-            type="text"
-            className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:ring-blue-500 transition-all focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
-            placeholder="Rechercher par association"
-            value={searchFields.applyTo}
-            onChange={(e) =>
-              setSearchFields({ ...searchFields, applyTo: e.target.value })
-            }
-            onKeyPress={handleKeyPress}
-            autoComplete="off"
-          />
-        </div>
-      ),
+      [PAGE_TYPES.USER_FIELDS]: <></>,
       [PAGE_TYPES.TAXES]: (
         <div className="flex flex-col">
           <label className="text-sm font-bold mb-1">Taux :</label>

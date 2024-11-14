@@ -41,7 +41,7 @@ const Button: React.FC<ButtonProps> = (props) => {
     ${props.warning ? "bg-yellow-500 text-white hover:bg-yellow-400" : ""}
     ${props.danger ? "bg-[#DC4C64] border border-red-500 text-white hover:brightness-125" : ""}
     ${props.gray ? "bg-[#3B3B3C] border border-black text-white hover:brightness-125" : ""}
-    ${props.disabled ? "bg-gray-500 border border-gray-500 text-gray-400 cursor-not-allowed" : ""}
+    ${props.disabled ? "bg-gray-400 border border-gray-200 text-gray-400 cursor-not-allowed" : ""}
 
   `;
 

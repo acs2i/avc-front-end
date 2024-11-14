@@ -172,6 +172,7 @@ export default function CreateSupplierPage() {
   });
   const [selectedContacts, setSelectedContacts] = useState<Contact[]>([]);
 
+  const isCreate = true;
   const {
     inputValueBrand,
     optionsBrand,
@@ -180,7 +181,7 @@ export default function CreateSupplierPage() {
     handleChangeBrand,
     addBrandField,
     removeBrandField,
-  } = useBrands("", 10);
+  } = useBrands("", 10, isCreate);
 
   const {
     inputValueUser,

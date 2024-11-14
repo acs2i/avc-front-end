@@ -147,7 +147,7 @@ export type Product = {
   gross_weight: string;
   net_weight: string;
   imgPath: string;
-  peau: number;
+  paeu: number;
   tbeu_pb: number;
   tbeu_pmeu: number;
   status: string;
@@ -165,7 +165,7 @@ export type Draft = {
   tag_ids: string[];
   brand_ids: string[];
   collection_ids: string[];
-  peau: number;
+  paeu: number;
   tbeu_pb: number;
   tbeu_pmeu: number;
   height: string;
@@ -189,7 +189,7 @@ export type Draft = {
 }
 
 export type PriceItemSchema = {
-  peau: number;
+  paeu: number;
   tbeu_pb: number;
   tbeu_pmeu: number;
 }
@@ -241,6 +241,7 @@ export type BrandOption = {
   _id: string;
   value: string;
   label: string;
+  code: string;
 };
 
 export type CollectionOption = {

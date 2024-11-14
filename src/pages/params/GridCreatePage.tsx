@@ -95,7 +95,7 @@ export default function GridCreatePage({
   const handleSearch = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/dimension/search?label=${searchValue}&code=${code}&page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/dimension/search?label=${searchValue}&code=${code}&type=${formData.type}&page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -109,6 +109,7 @@ export default function GridCreatePage({
       console.error("Erreur lors de la requête", error);
     }
   };
+  
 
   const handleSetType = (e: any) => {
     const selectedOption = e.target.options[e.target.selectedIndex];

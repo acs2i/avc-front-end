@@ -119,6 +119,7 @@ export default function BrandCreatePage({
               required
               create
               gray
+              maxLength={100}
             />
             {!isLoading ? (
               <div className="flex items-center gap-2 mt-5">

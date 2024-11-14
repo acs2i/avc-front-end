@@ -76,7 +76,7 @@ interface FormData {
   dimension_types: string;
   brand_ids: any[];
   collection_ids: any[];
-  peau: number;
+  paeu: number;
   tbeu_pb: number;
   tbeu_pmeu: number;
   height: string;
@@ -167,7 +167,7 @@ export default function SingleProductPage() {
     dimension_types: "Couleur/Taille",
     brand_ids: [],
     collection_ids: [],
-    peau: product?.peau || 0,
+    paeu: product?.paeu || 0,
     tbeu_pb: product?.tbeu_pb || 0,
     tbeu_pmeu: product?.tbeu_pmeu || 0,
     height: product?.height || "",
@@ -198,9 +198,9 @@ export default function SingleProductPage() {
             currency: "",
             supplier_id: "",
             price: {
-              peau: 0,
-              tbeu_pb: 0,
-              tbeu_pmeu: 0,
+              paeu: product?.paeu || 0,
+              tbeu_pb: product?.tbeu_pb || 0,
+              tbeu_pmeu: product?.tbeu_pmeu || 0,
             },
             store: "",
           },
@@ -234,7 +234,7 @@ export default function SingleProductPage() {
         dimension_types: product.dimension_types?.[0] || "Couleur/Taille",
         brand_ids: product.brand_ids || [],
         collection_ids: product.collection_ids || [],
-        peau: product.peau || 0,
+        paeu: product.paeu || 0,
         tbeu_pb: product.tbeu_pb || 0,
         tbeu_pmeu: product.tbeu_pmeu || 0,
         height: product?.height || "",
@@ -761,7 +761,7 @@ export default function SingleProductPage() {
           supplier_id:
             selectedSuppliers.length > 0 ? selectedSuppliers[0]._id : "",
           price: {
-            peau: formData.peau,
+            paeu: formData.paeu,
             tbeu_pb: formData.tbeu_pb,
             tbeu_pmeu: formData.tbeu_pmeu,
           },
@@ -1652,14 +1652,14 @@ export default function SingleProductPage() {
                           </span>
                           {!isModify ? (
                             <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                              {product.peau} €
+                              {product.paeu} €
                             </span>
                           ) : (
                             <input
                               type="text"
                               id="peau"
                               onChange={handlePriceChange}
-                              value={formData.peau}
+                              value={formData.paeu}
                               className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
                             />
                           )}
@@ -2020,7 +2020,7 @@ export default function SingleProductPage() {
                   <UVCInfosTable
                     reference={product?.reference}
                     uvcDimension={formData.uvc_ids}
-                    brandLabel={product.brand_ids[0]?.label || ""}
+                    collectionLabel={product.collection_ids[0]?.label || ""}
                   />
                 )}
                 {onglet === "price" && product && (
@@ -2028,7 +2028,7 @@ export default function SingleProductPage() {
                     reference={product?.reference}
                     uvcPrices={formData.uvc_ids}
                     globalPrices={{
-                      peau: formData.peau,
+                      paeu: formData.paeu,
                       tbeu_pb: formData.tbeu_pb,
                       tbeu_pmeu: formData.tbeu_pmeu,
                     }}

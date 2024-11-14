@@ -33,7 +33,7 @@ import { useSubFamily } from "../../utils/hooks/useSubFamily";
 import { useSubSubFamily } from "../../utils/hooks/useSubSubFamily";
 
 interface PriceItemSchema {
-  peau: number;
+  paeu: number;
   tbeu_pb: number;
   tbeu_pmeu: number;
 }
@@ -76,7 +76,7 @@ interface FormData {
   brand_ids: any[];
   collection_ids: any[];
   tax: string;
-  peau: number;
+  paeu: number;
   tbeu_pb: number;
   tbeu_pmeu: number;
   height: string;
@@ -218,7 +218,7 @@ export default function CreateProductPage() {
     brand_ids: [],
     collection_ids: [],
     tax: "",
-    peau: 0,
+    paeu: 0,
     tbeu_pb: 0,
     tbeu_pmeu: 0,
     height: "0",
@@ -241,7 +241,7 @@ export default function CreateProductPage() {
             currency: "",
             supplier_id: "",
             price: {
-              peau: 0,
+              paeu: 0,
               tbeu_pb: 0,
               tbeu_pmeu: 0,
             },
@@ -249,7 +249,7 @@ export default function CreateProductPage() {
           },
         ],
         eans: [],
-        ean:"",
+        ean: "",
         status: "",
       },
     ],
@@ -262,6 +262,7 @@ export default function CreateProductPage() {
   const [colors, setColors] = useState<string[]>([]);
   const [uvcGrid, setUvcGrid] = useState<boolean[][]>([]);
   // Fonction qui fetch les marques pour l'input creatable select (brand)
+  const isCreate = false
   const {
     inputValueBrand,
     optionsBrand,
@@ -270,7 +271,7 @@ export default function CreateProductPage() {
     handleChangeBrand,
     addBrandField,
     removeBrandField,
-  } = useBrands("", 10);
+  } = useBrands("", 10, isCreate);
 
   // Fonction qui fetch les collections pour l'input creatable select (collection)
   const {
@@ -358,7 +359,7 @@ export default function CreateProductPage() {
             currency: "",
             supplier_id: "",
             price: {
-              peau: formData.peau,
+              paeu: formData.paeu,
               tbeu_pb: formData.tbeu_pb,
               tbeu_pmeu: formData.tbeu_pmeu,
             },
@@ -628,7 +629,7 @@ export default function CreateProductPage() {
       );
 
       const data = await response.json();
-      console.log(data)
+      console.log(data);
       const formattedTaxs = data.data.map((tax: any) => ({
         value: tax.rate.toString(),
         name: tax.label,
@@ -651,8 +652,6 @@ export default function CreateProductPage() {
       setIsLoading(false);
     }
   };
-
-
 
   const toggleFullScreen = () => {
     setIsFullScreen((prevState) => !prevState);
@@ -1033,7 +1032,7 @@ export default function CreateProductPage() {
                         Collection
                       </label>
                       <CollectionSection
-                        collection={selectedCollection} // Passer la collection sélectionnée
+                        collection={selectedCollection}
                         optionsCollection={optionsCollection}
                         handleChangeCollection={handleChangeCollection}
                         handleInputChangeCollection={
@@ -1063,36 +1062,39 @@ export default function CreateProductPage() {
                     />
                     <Input
                       element="input"
-                      id="peau"
+                      type="number"
+                      id="paeu"
                       label="Prix achat :"
-                      value={formData.peau}
                       onChange={handlePriceChange}
                       validators={[]}
-                      placeholder=""
+                      placeholder={formData.paeu.toString()}
                       create
                       gray
+                      step="any"
                     />
                     <Input
                       element="input"
+                      type="number"
                       id="tbeu_pb"
                       label="Prix Vente :"
-                      value={formData.tbeu_pb}
                       onChange={handlePriceChange}
                       validators={[]}
-                      placeholder=""
+                      placeholder={formData.tbeu_pb.toString()}
                       create
                       gray
+                      step="any"
                     />
                     <Input
                       element="input"
                       id="tbeu_pmeu"
+                      type="number"
                       label="Prix Modulé :"
-                      value={formData.tbeu_pmeu}
                       onChange={handlePriceChange}
                       validators={[]}
-                      placeholder=""
+                      placeholder={formData.tbeu_pmeu.toString()}
                       create
                       gray
+                      step="any"
                     />
                   </div>
                 </FormSection>
@@ -1117,34 +1119,37 @@ export default function CreateProductPage() {
                         element="input"
                         id="height"
                         label="Hauteur :"
-                        value={formData.height}
+                        type="number"
                         onChange={handleChange}
                         validators={[]}
-                        placeholder=""
+                        placeholder={formData.height}
                         create
                         gray
+                        step="any"
                       />
                       <Input
                         element="input"
                         id="length"
                         label="Longueur :"
-                        value={formData.length}
+                        type="number"
                         onChange={handleChange}
                         validators={[]}
-                        placeholder=""
+                        placeholder={formData.length}
                         create
                         gray
+                        step="any"
                       />
                       <Input
                         element="input"
                         id="width"
                         label="Largeur :"
-                        value={formData.width}
+                        type="number"
                         onChange={handleChange}
                         validators={[]}
-                        placeholder=""
+                        placeholder={formData.width}
                         create
                         gray
+                        step="any"
                       />
                     </div>
                     <div>
@@ -1164,23 +1169,25 @@ export default function CreateProductPage() {
                         element="input"
                         id="gross_weight"
                         label="Poids Brut :"
-                        value={formData.gross_weight}
+                        type="number"
                         onChange={handleChange}
                         validators={[]}
-                        placeholder=""
+                        placeholder={formData.gross_weight}
                         create
                         gray
+                        step="any"
                       />
                       <Input
                         element="input"
                         id="net_weight"
                         label="Poids Net :"
-                        value={formData.net_weight}
+                        type="number"
                         onChange={handleChange}
                         validators={[]}
-                        placeholder=""
+                        placeholder={formData.net_weight}
                         create
                         gray
+                        step="any"
                       />
                     </div>
                   </div>

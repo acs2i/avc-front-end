@@ -4,6 +4,7 @@ type CollectionOption = {
   _id: string;
   value: string;
   label: string;
+  code: string;
 };
 
 export const useCollections = (initialInputValue: string = "", limit = 10) => {

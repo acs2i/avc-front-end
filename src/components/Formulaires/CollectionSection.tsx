@@ -2,9 +2,9 @@ import React from "react";
 import CreatableSelect from "react-select/creatable";
 
 interface CollectionSelectorProps {
-  collection: any; // Une seule collection
+  collection: any;
   optionsCollection: any[];
-  handleChangeCollection: (selectedOption: any) => void; // Plus besoin d'index ici
+  handleChangeCollection: (selectedOption: any) => void;
   handleInputChangeCollection: (inputValueCollection: string) => void;
   inputValueCollection: string;
   customStyles: any;
@@ -25,6 +25,7 @@ const CollectionSection: React.FC<CollectionSelectorProps> = ({
           value={collection} // Gérer une seule collection
           onChange={handleChangeCollection} // Pas d'index ici
           onInputChange={handleInputChangeCollection}
+          onFocus={() => handleInputChangeCollection("")}
           inputValue={inputValueCollection}
           options={optionsCollection}
           placeholder="Sélectionner une collection"

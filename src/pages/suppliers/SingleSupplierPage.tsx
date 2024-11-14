@@ -30,6 +30,8 @@ import GestionFormComponent from "../../components/GestionFormComponent";
 import { useBrands } from "../../utils/hooks/useBrands";
 import { useUsers } from "../../utils/hooks/useUsers";
 import { useFamily } from "../../utils/hooks/useFamily";
+import { useIsoCode } from "../../utils/hooks/useIsoCode";
+import IsoCodeSection from "../../components/Formulaires/IsoCodeSection";
 
 interface BrandId {
   _id: string;
@@ -153,6 +155,7 @@ interface FormData {
   admin: string;
   buyers: Buyer[];
   conditions: Condition[];
+  status: string;
 }
 
 interface FormDataCondition {
@@ -186,6 +189,7 @@ type BrandOption = {
   code: string;
   label: string;
 };
+
 const customStyles = {
   control: (provided: any) => ({
     ...provided,
@@ -273,7 +277,7 @@ export default function SingleSupplierPage() {
     country: supplier?.country || "",
     currency: supplier?.currency || "",
     additional_fields: [],
-    brand_id: [],
+    brand_id: supplier?.brand_id || [],
     admin: "",
     buyers: supplier?.buyers || [],
     contacts: [
@@ -299,6 +303,7 @@ export default function SingleSupplierPage() {
         budget: "",
       },
     ],
+    status: "",
   });
   const [formDataCondition, setFormDataCondition] = useState<FormDataCondition>(
     {
@@ -327,7 +332,7 @@ export default function SingleSupplierPage() {
     }
   );
 
-  console.log(supplier?._id);
+  console.log(formData);
 
   const {
     inputValueUser,
@@ -340,6 +345,15 @@ export default function SingleSupplierPage() {
   } = useUsers("", 10);
 
   const {
+    inputValueIsoCode,
+    optionsIsoCode,
+    isoCodes,
+    handleInputChangeIsoCode,
+    handleChangeIsoCode,
+  } = useIsoCode("", 10);
+
+  const isCreate = true;
+  const {
     inputValueBrand,
     optionsBrand,
     brands,
@@ -347,7 +361,7 @@ export default function SingleSupplierPage() {
     handleChangeBrand,
     addBrandField,
     removeBrandField,
-  } = useBrands("", 10);
+  } = useBrands("", 10, isCreate);
 
   const {
     inputValueFamily,
@@ -400,56 +414,8 @@ export default function SingleSupplierPage() {
 
   useEffect(() => {
     if (supplier) {
-      setFormData({
-        creator_id: creatorId._id,
-        code: supplier.code || "",
-        company_name: supplier.company_name || "",
-        phone: supplier.phone || "",
-        email: supplier.email || "",
-        web_url: supplier.web_url || "",
-        siret: supplier.siret || "",
-        tva: supplier.tva || "",
-        address_1: supplier.address_1 || "",
-        address_2: supplier.address_2 || "",
-        address_3: supplier.address_3 || "",
-        city: supplier.city || "",
-        postal: supplier.postal || "",
-        country: supplier.country || "",
-        currency: supplier.currency || "",
-        brand_id: supplier.brand_id.map((brand) => brand._id),
-        additional_fields: [],
-        admin: "",
-        buyers: [],
-        contacts: supplier.contacts || [
-          {
-            firstname: "",
-            lastname: "",
-            function: "",
-            phone: "",
-            mobile: "",
-            email: "",
-          },
-        ],
-        conditions: supplier.conditions || [
-          {
-            tarif: "",
-            currency: "",
-            rfa: "",
-            net_price: "",
-            labeling: "",
-            paiement_condition: "",
-            franco: "",
-            validate_tarif: "",
-            budget: "",
-          },
-        ],
-      });
-    }
-  }, [supplier, creatorId]);
-
-  useEffect(() => {
-    if (supplier) {
       setFormData((prevFormData) => ({
+        ...prevFormData,
         creator_id: creatorId._id,
         code: supplier.code || "",
         company_name: supplier.company_name || "",
@@ -466,35 +432,12 @@ export default function SingleSupplierPage() {
         country: supplier.country || "",
         currency: supplier.currency || "",
         admin: supplier.admin || "",
-        buyers: supplier.buyers || [], // Copier correctement buyers ici
-        brand_id: supplier.brand_id.map((brand) => brand._id),
-        additional_fields:
-          supplier.additional_fields?.length > 0
-            ? supplier.additional_fields
-            : prevFormData.additional_fields,
-        contacts: supplier.contacts || [
-          {
-            firstname: "",
-            lastname: "",
-            function: "",
-            phone: "",
-            mobile: "",
-            email: "",
-          },
-        ],
-        conditions: supplier.conditions || [
-          {
-            tarif: "",
-            currency: "",
-            rfa: "",
-            net_price: "",
-            labeling: "",
-            paiement_condition: "",
-            franco: "",
-            validate_tarif: "",
-            budget: "",
-          },
-        ],
+        buyers: supplier.buyers || [],
+        brand_id: supplier.brand_id.map((brand) => brand._id) || [],
+        additional_fields: supplier.additional_fields || [],
+        contacts: supplier.contacts || [],
+        conditions: supplier.conditions || [],
+        status: supplier.status || "",
       }));
     }
   }, [supplier, creatorId]);
@@ -530,12 +473,84 @@ export default function SingleSupplierPage() {
     });
   };
 
+  const handleCountryChange = (
+    selectedOption: { value: string; label: string } | null
+  ) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      country: selectedOption ? selectedOption.value : "",
+    }));
+  };
+
   const handleContactChange = (field: keyof Contact, value: string) => {
     setNewContact((prevContact) => {
       const updatedContact = { ...prevContact, [field]: value };
       console.log("Updated Contact:", updatedContact);
       return updatedContact;
     });
+  };
+
+  useEffect(() => {
+    const selectedBrandIds = brands.map((brand) => brand?._id || "");
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      brand_id: selectedBrandIds,
+    }));
+  }, [brands]);
+
+  const updateStatus = async (newStatus: string) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/supplier/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status: newStatus }),
+        }
+      );
+
+      if (response.ok) {
+        notifySuccess("Statut du fournisseur mis à jour avec succès !");
+
+        // Mettez à jour à la fois formData et supplier pour refléter le nouveau statut
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          status: newStatus,
+        }));
+
+        setSupplier((prevSupplier) =>
+          prevSupplier ? { ...prevSupplier, status: newStatus } : undefined
+        );
+      } else {
+        notifyError("Erreur lors de la mise à jour du statut !");
+      }
+    } catch (error) {
+      console.error("Erreur de requête :", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Assurez-vous que le bouton est contrôlé par supplier.status, pas seulement par formData
+  <Button
+    blue
+    size="small"
+    type="button"
+    onClick={(e) => {
+      e.preventDefault();
+      setIsModify(true);
+    }}
+    disabled={supplier?.status === "I"}
+  >
+    {isModify ? "Annuler la modification" : "Modifier"}
+  </Button>;
+
+  const handleStatusChange = () => {
+    const newStatus = formData.status === "A" ? "I" : "A";
+    updateStatus(newStatus);
   };
 
   const fetchField = async () => {
@@ -764,63 +779,11 @@ export default function SingleSupplierPage() {
 
   useEffect(() => {
     if (supplier) {
-      setFormData((prevFormData) => ({
-        creator_id: creatorId._id,
-        code: supplier.code || "",
-        company_name: supplier.company_name || "",
-        phone: supplier.phone || "",
-        email: supplier.email || "",
-        web_url: supplier.web_url || "",
-        siret: supplier.siret || "",
-        tva: supplier.tva || "",
-        address_1: supplier.address_1 || "",
-        address_2: supplier.address_2 || "",
-        address_3: supplier.address_3 || "",
-        city: supplier.city || "",
-        postal: supplier.postal || "",
-        country: supplier.country || "",
-        currency: supplier.currency || "",
-        admin: supplier.admin || "",
-        buyers: [],
-        brand_id: supplier.brand_id.map((brand) => brand._id),
-        additional_fields:
-          supplier.additional_fields?.length > 0
-            ? supplier.additional_fields
-            : prevFormData.additional_fields,
-        contacts: supplier.contacts || [
-          {
-            firstname: "",
-            lastname: "",
-            function: "",
-            phone: "",
-            mobile: "",
-            email: "",
-          },
-        ],
-        conditions: supplier.conditions || [
-          {
-            tarif: "",
-            currency: "",
-            rfa: "",
-            net_price: "",
-            labeling: "",
-            paiement_condition: "",
-            franco: "",
-            validate_tarif: "",
-            budget: "",
-          },
-        ],
-      }));
-    }
-  }, [supplier, creatorId]);
-
-  useEffect(() => {
-    if (supplier) {
       fetchCondition();
     }
   }, [supplier]);
 
-  console.log(formDataCondition);
+  console.log(formData);
   return (
     <>
       <Modal
@@ -934,19 +897,23 @@ export default function SingleSupplierPage() {
                 <div className="flex items-center justify-between gap-3 mt-[50px]">
                   {!isModify ? (
                     <div className="flex items-center gap-2">
-                      <Button
-                        size="small"
-                        type="button"
-                        cancel
+                      <div
                         onClick={(e) => {
                           e.preventDefault();
-                          // setIsModalOpenConfirm(true);
+                          handleStatusChange();
                         }}
+                        className={`cursor-pointer text-[13px] ${
+                          formData.status === "A"
+                            ? "text-red-800"
+                            : "text-green-600"
+                        } font-semibold`}
                       >
-                        {supplier?.status === "A"
-                          ? "Désactiver le fournisseur"
-                          : "Réactiver le fournisseur"}
-                      </Button>
+                        <span>
+                          {formData.status === "A"
+                            ? "Désactiver le fournisseur"
+                            : "Réactiver le fournisseur"}
+                        </span>
+                      </div>
                       <Button
                         blue
                         size="small"
@@ -955,7 +922,7 @@ export default function SingleSupplierPage() {
                           e.preventDefault();
                           setIsModify(true);
                         }}
-                        disabled={supplier?.status === "D"}
+                        disabled={supplier?.status === "I"}
                       >
                         {isModify ? "Annuler la modification" : "Modifier"}
                       </Button>
@@ -1196,16 +1163,16 @@ export default function SingleSupplierPage() {
                         create
                         gray
                       />
-                      <Input
-                        element="input"
-                        id="country"
-                        label="Pays :"
-                        value=""
-                        onChange={handleChange}
-                        validators={[]}
-                        placeholder={supplier?.country}
-                        create
-                        gray
+                      <IsoCodeSection
+                        isoCode={isoCodes}
+                        optionsIsoCode={optionsIsoCode}
+                        handleChangeIsoCode={(selectedOption) => {
+                          handleChangeIsoCode(selectedOption, 0);
+                          handleCountryChange(selectedOption);
+                        }}
+                        handleInputChangeIsoCode={handleInputChangeIsoCode}
+                        inputValueIsoCode={inputValueIsoCode}
+                        customStyles={customStyles}
                       />
                     </>
                   ) : (
@@ -1451,43 +1418,6 @@ export default function SingleSupplierPage() {
                     </div>
                   )}
 
-                  {/* Affichage des acheteurs modifiés pour `formData` */}
-                  {formData?.buyers && formData.buyers.length > 0 && (
-                    <div className="mt-4 overflow-x-auto">
-                      <p className="text-gray-600 font-semibold mb-2">
-                        Acheteurs modifiés :
-                      </p>
-                      <table className="min-w-full bg-white border border-gray-300">
-                        <thead>
-                          <tr className="bg-gray-200 text-gray-700">
-                            <th className="py-2 px-4 border-b text-left font-semibold">
-                              Acheteur
-                            </th>
-                            <th className="py-2 px-4 border-b text-left font-semibold">
-                              Famille
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {formData.buyers.map((buyer, index) => (
-                            <tr key={index} className="hover:bg-gray-100">
-                              <td className="py-2 px-4 border-b">
-                                <span className="capitalize font-bold">
-                                  {buyer.user || "N/A"}
-                                </span>
-                              </td>
-                              <td className="py-2 px-4 border-b">
-                                <span className="capitalize font-bold">
-                                  {buyer.family?.join(" | ") || "N/A"}
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-
                   {/* Bouton pour ajouter un(e) gestionnaire en mode modification */}
                   {isModify && (
                     <div
@@ -1539,40 +1469,52 @@ export default function SingleSupplierPage() {
                       <div className="mt-3">
                         {userFields
                           .filter((field) => field.apply_to === "Fournisseur")
-                          .map((field) => (
-                            <div key={field._id} className="mb-6">
-                              <h3 className="text-md font-semibold text-gray-800 mb-1">
-                                {field.label}
-                              </h3>
-                              {field.additional_fields.map(
-                                (customField, index) => (
-                                  <div
-                                    key={`${field._id}-${index}`}
-                                    className="mb-4"
-                                  >
-                                    <DynamicField
-                                      id={`${field._id}-${index}`}
-                                      name={customField.field_name}
-                                      fieldType={customField.field_type}
-                                      value={
-                                        fieldValues[`${field._id}-${index}`] ||
-                                        ""
-                                      }
-                                      onChange={(e) =>
-                                        handleFieldChange(
-                                          field.label,
-                                          customField.field_type,
-                                          `${field._id}-${index}`,
-                                          e.target.value
-                                        )
-                                      }
-                                      options={customField.options}
-                                    />
-                                  </div>
-                                )
-                              )}
-                            </div>
-                          ))}
+                          .map((field) => {
+                            // Récupérer la valeur de `supplier` pour chaque champ utilisateur
+                            const supplierField =
+                              supplier?.additional_fields.find(
+                                (supField: any) =>
+                                  supField.label === field.label
+                              );
+
+                            return (
+                              <div key={field._id} className="mb-6">
+                                <h3 className="text-md font-semibold text-gray-800 mb-1">
+                                  {field.label}
+                                </h3>
+                                {field.additional_fields.map(
+                                  (customField, index) => (
+                                    <div
+                                      key={`${field._id}-${index}`}
+                                      className="mb-4"
+                                    >
+                                      <DynamicField
+                                        id={`${field._id}-${index}`}
+                                        name={customField.field_name}
+                                        fieldType={customField.field_type}
+                                        value={
+                                          fieldValues[
+                                            `${field._id}-${index}`
+                                          ] ||
+                                          supplierField?.value ||
+                                          ""
+                                        }
+                                        onChange={(e) =>
+                                          handleFieldChange(
+                                            field.label,
+                                            customField.field_type,
+                                            `${field._id}-${index}`,
+                                            e.target.value
+                                          )
+                                        }
+                                        options={customField.options}
+                                      />
+                                    </div>
+                                  )
+                                )}
+                              </div>
+                            );
+                          })}
                       </div>
                     )}
                   </div>

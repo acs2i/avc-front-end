@@ -7,7 +7,7 @@ interface UVCPriceTableProps {
     dimensions: string[];
   }[];
   globalPrices: {
-    peau: number;
+    paeu: number;
     tbeu_pb: number;
     tbeu_pmeu: number;
   };
@@ -38,7 +38,7 @@ const UVCPriceTable: React.FC<UVCPriceTableProps> = ({ uvcPrices, globalPrices, 
               <td className="border px-4 py-1 text-center">{couleur}</td>
               <td className="border px-4 py-1 text-center">{taille}</td>
               {/* Utiliser les prix globaux */}
-              <td className="border px-4 py-1 text-center">{globalPrices.peau} €</td>
+              <td className="border px-4 py-1 text-center">{globalPrices.paeu} €</td>
               <td className="border px-4 py-1 text-center">{globalPrices.tbeu_pb} €</td>
               <td className="border px-4 py-1 text-center">{globalPrices.tbeu_pmeu} €</td>
             </tr>

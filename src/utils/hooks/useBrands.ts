@@ -7,7 +7,7 @@ type BrandOption = {
   label: string;
 };
 
-export const useBrands = (initialInputValue: string = "", limit = 10) => {
+export const useBrands = (initialInputValue: string = "", limit = 10, isCreate: boolean = false) => {
   const [inputValueBrand, setInputValueBrand] = useState(initialInputValue);
   const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
   const [brands, setBrands] = useState<(BrandOption | null)[]>([null]);
@@ -23,9 +23,9 @@ export const useBrands = (initialInputValue: string = "", limit = 10) => {
       });
       const data = await response.json();
       return data.data?.map((brand: BrandOption) => ({
-        value: brand.label,
-        label: brand.label,
-        _id: brand._id,
+        value: isCreate ? brand._id : brand.label,
+        label: isCreate ? brand._id : brand.label,
+        _id: isCreate ? brand._id : brand.label,
       })) || [];
     } catch (error) {
       console.error("Erreur lors de la requête", error);
@@ -46,9 +46,9 @@ export const useBrands = (initialInputValue: string = "", limit = 10) => {
       );
       const data = await response.json();
       return data.data?.map((brand: BrandOption) => ({
-        value: brand.label,
-        label: brand.label,
-        _id: brand.label,
+        value: isCreate ? brand._id : brand.label,
+        label: isCreate ? brand._id : brand.label,
+        _id: isCreate ? brand._id : brand.label,
       })) || [];
     } catch (error) {
       console.error("Erreur lors de la requête", error);
