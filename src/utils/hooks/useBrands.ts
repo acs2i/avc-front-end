@@ -23,8 +23,8 @@ export const useBrands = (initialInputValue: string = "", limit = 10, isCreate: 
       });
       const data = await response.json();
       return data.data?.map((brand: BrandOption) => ({
-        value: isCreate ? brand._id : brand.label,
-        label: isCreate ? brand._id : brand.label,
+        value: isCreate ? brand.label : brand.label,
+        label: isCreate ? brand.label : brand.label,
         _id: isCreate ? brand._id : brand.label,
       })) || [];
     } catch (error) {
@@ -46,8 +46,8 @@ export const useBrands = (initialInputValue: string = "", limit = 10, isCreate: 
       );
       const data = await response.json();
       return data.data?.map((brand: BrandOption) => ({
-        value: isCreate ? brand._id : brand.label,
-        label: isCreate ? brand._id : brand.label,
+        value: isCreate ? brand.label : brand.label,
+        label: isCreate ? brand.label : brand.label,
         _id: isCreate ? brand._id : brand.label,
       })) || [];
     } catch (error) {

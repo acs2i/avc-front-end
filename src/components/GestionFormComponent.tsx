@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import CreatableSelect from "react-select/creatable";
 import Input from "./FormElements/Input";
 
@@ -22,6 +22,7 @@ interface GestionFormComponentProps {
   onCloseModal: () => void;
   userOptions: { label: string; value: string }[];
   handleUserSearchInput: (inputValue: string, index: number) => void;
+  handleInputChangeUser: (inputValue: string) => void; // Ajouter ici
   familyOptions: { label: string; value: string; code: string }[];
   handleFamilySearchInput: (inputValue: string) => void;
 }
@@ -49,6 +50,7 @@ const GestionFormComponent: React.FC<GestionFormComponentProps> = ({
   onCloseModal,
   userOptions,
   handleUserSearchInput,
+  handleInputChangeUser, // Ajouter ici
   familyOptions,
   handleFamilySearchInput,
 }) => {
@@ -59,12 +61,13 @@ const GestionFormComponent: React.FC<GestionFormComponentProps> = ({
         value={admin ? { label: admin, value: admin } : null}
         onChange={(option) => handleAdminChange(option ? option.value : "")}
         onInputChange={(inputValue) => setAdminSearchInput(inputValue)}
+        onFocus={() => handleInputChangeUser("")}
         options={adminOptions}
         placeholder="Sélectionnez un utilisateur"
         styles={customStyles}
         isClearable
+        isValidNewOption={() => false}
       />
-
       <h6>Acheteur(s)</h6>
       {buyers.map((buyer, index) => (
         <div key={index} className="grid grid-cols-2 gap-2">

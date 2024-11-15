@@ -450,9 +450,9 @@ export default function CreateSupplierPage() {
           handleUserSearchInput={(input, index) =>
             handleSearchInputChange(input, `buyer-${index}`)
           }
-          // Ajoutez ces props pour la recherche de familles
           familyOptions={optionsFamily}
           handleFamilySearchInput={handleInputChangeFamily}
+          handleInputChangeUser={handleInputChangeUser} // Ajout ici
         />
       </Modal>
       <section className="w-full bg-slate-50 p-7">
@@ -511,6 +511,7 @@ export default function CreateSupplierPage() {
                     placeholder="Ajouter le code fournisseur"
                     create
                     gray
+                    maxLength={9}
                   />
                   <Input
                     element="input"

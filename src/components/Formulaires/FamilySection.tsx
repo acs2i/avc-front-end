@@ -45,6 +45,7 @@ const FamilySection: React.FC<FamilySelectorProps> = ({
           value={family}
           onChange={handleChangeFamily}
           onInputChange={handleInputChangeFamily}
+          onFocus={() => handleInputChangeFamily("")}
           inputValue={inputValueFamily}
           options={optionsFamily}
           filterOption={(option, input) => 

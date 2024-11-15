@@ -171,6 +171,7 @@ export default function ClassificationUpdatePage({
             onChange={handleInputChange}
             gray
             disabled={!isModify || formData.status === 'I'}
+            maxLength={100}
           />
         </div>
       </div>

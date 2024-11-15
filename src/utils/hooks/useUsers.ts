@@ -14,6 +14,32 @@ export const useUsers = (initialInputValue: string = "", limit = 10) => {
   const token = useSelector((state: any) => state.auth.token);
   const [currentPage, setCurrentPage] = useState(1);
 
+
+  const fetchAllUsers = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/auth/search?page=${currentPage}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      setOptionsUser(
+        data.map((user: any) => ({
+          value: user.username,
+          label: user.username,
+        }))
+      );
+    } catch (error) {
+      console.error("Erreur lors de la récupération des utilisateurs :", error);
+    }
+  };
+  
+
   const searchUsers = async (inputValue: string) => {
     try {
       const response = await fetch(
@@ -39,12 +65,16 @@ export const useUsers = (initialInputValue: string = "", limit = 10) => {
     }
   };
   
-
   const handleInputChangeUser = async (inputValue: string) => {
     setInputValueUser(inputValue);
-    const searchedUsers = await searchUsers(inputValue);
-    setOptionsUser(searchedUsers);
+    if (inputValue === "") {
+      await fetchAllUsers(); // Fetch général si vide
+    } else {
+      const searchedUsers = await searchUsers(inputValue);
+      setOptionsUser(searchedUsers);
+    }
   };
+  
 
   const handleChangeUser = (selectedOption: UserOption | null, index: number) => {
     const updatedUsers = [...users];

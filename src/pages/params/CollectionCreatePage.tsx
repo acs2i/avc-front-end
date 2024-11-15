@@ -109,6 +109,7 @@ export default function CollectionCreatePage({
               required
               create
               gray
+              maxLength={3}
             />
             <Input
               element="input"
@@ -121,6 +122,7 @@ export default function CollectionCreatePage({
               required
               create
               gray
+              maxLength={50}
             />
             {!isLoading ? (
               <div className="flex items-center gap-2 mt-5">

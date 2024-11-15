@@ -825,6 +825,7 @@ export default function CreateProductPage() {
                       placeholder="Ajouter la référence du produit"
                       create
                       gray
+                      maxLength={70}
                     />
                     <Input
                       element="input"
@@ -847,6 +848,7 @@ export default function CreateProductPage() {
                       placeholder="Ajouter la designation du produit"
                       create
                       gray
+                      maxLength={70}
                     />
                     <Input
                       element="input"
@@ -858,8 +860,9 @@ export default function CreateProductPage() {
                       placeholder=""
                       create
                       gray
+                      maxLength={35}
                     />
-                    <div>
+                    <div className="mt-4">
                       <label className="text-sm font-medium text-gray-600">
                         Marque
                       </label>
@@ -872,8 +875,6 @@ export default function CreateProductPage() {
                         handleInputChangeBrand={handleInputChangeBrand}
                         inputValueBrand={inputValueBrand}
                         customStyles={customStyles}
-                        addBrand
-                        displayTrash
                       />
                     </div>
                     <div className="mt-[30px] grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -127,18 +127,20 @@ export default function DimensionCreateItemPage({
               create
               required
               gray
+              maxLength={50}
             />
             <Input
               element="input"
               id="label"
               type="text"
-              placeholder="Nom de la collection"
+              placeholder="Nom de la dimension"
               label="Libellé"
               onChange={handleChange}
               validators={[VALIDATOR_REQUIRE()]}
               create
               required
               gray
+              maxLength={50}
             />
             {!isLoading ? (
               <div className="flex items-center gap-2 mt-5">
