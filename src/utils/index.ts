@@ -82,12 +82,12 @@ export const LINKS: Link[] = [
             linksGroup: [],
             icon: Settings2,
           },
-          {
-            name: "Chat",
-            link: "/chat",
-            linksGroup: [],
-            icon: MessageSquare,
-          },
+          // {
+          //   name: "Chat",
+          //   link: "/chat",
+          //   linksGroup: [],
+          //   icon: MessageSquare,
+          // },
           {
             name: "Utilisateurs",
             linksGroup: [

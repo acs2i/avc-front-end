@@ -27,6 +27,24 @@ const BrandSection: React.FC<BrandSelectorProps> = ({
   addBrand,
   displayTrash,
 }) => {
+  // Fonction de filtrage améliorée
+  const filterOptions = (inputValue: string, options: any[]) => {
+    const input = inputValue.toLowerCase();
+    return options.filter(
+      option =>
+        option.label.toLowerCase().includes(input) ||
+        (option.code && option.code.toLowerCase().includes(input))
+    );
+  };
+
+  // Formatage personnalisé des options
+  const formatOptionLabel = ({ label, code }: { label: string; code?: string }) => (
+    <div className="flex items-center justify-between">
+      <span>{label}</span>
+      {code && <span className="text-gray-400 text-sm">({code})</span>}
+    </div>
+  );
+
   return (
     <div className="w-full flex flex-col gap-3">
       <div>
@@ -37,13 +55,24 @@ const BrandSection: React.FC<BrandSelectorProps> = ({
               onChange={(option) => handleChangeBrand(option, index)}
               onInputChange={handleInputChangeBrand}
               inputValue={inputValueBrand}
-              onFocus={() => handleInputChangeBrand("")}
               options={optionsBrand}
-              placeholder="Selectionner une marque"
-              styles={customStyles}
+              filterOption={(option, input) => 
+                filterOptions(input, [option.data])[0] !== undefined
+              }
+              formatOptionLabel={formatOptionLabel}
+              placeholder="Rechercher ou créer une marque"
+              styles={{
+                ...customStyles,
+                menu: (base) => ({
+                  ...base,
+                  zIndex: 9999
+                })
+              }}
               menuPortalTarget={document.body}
               className="block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
               isClearable
+              openMenuOnFocus
+              onMenuOpen={() => handleInputChangeBrand("")}
             />
             {displayTrash && (
               <button
