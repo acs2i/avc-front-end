@@ -743,36 +743,44 @@ export default function SingleProductPage() {
   };
 
   const handleDimensionsChange = (dimensions: string[][]) => {
-    const newDimensions = dimensions.flatMap((dim) => {
+    const newUVCs = dimensions.flatMap((dim) => {
       return dim.map((combination) => {
         const [color, size] = combination.split(",");
-        return { color, size };
+        
+        // Rechercher si une UVC avec ces dimensions existe déjà
+        const existingUvc = formData.uvc_ids.find(uvc => {
+          const [existingColor, existingSize] = uvc.dimensions[0].split("/");
+          return existingColor === color && existingSize === size;
+        });
+  
+        return {
+          product_id: id,
+          code: `${formData.reference}_${color}_${size}`,
+          dimensions: [`${color}/${size}`],
+          prices: [
+            {
+              tarif_id: "",
+              currency: "EUR",
+              supplier_id: selectedSuppliers.length > 0 ? selectedSuppliers[0]._id : "",
+              price: {
+                paeu: formData.paeu,
+                tbeu_pb: formData.tbeu_pb,
+                tbeu_pmeu: formData.tbeu_pmeu,
+              },
+              store: "",
+            },
+          ],
+          // Conserver les EANs existants si l'UVC existe déjà
+          eans: existingUvc?.eans || [],
+          // Conserver l'EAN principal s'il existe déjà
+          ean: existingUvc?.ean || "",
+          // Conserver le chemin du code-barres s'il existe
+          barcodePath: existingUvc?.barcodePath || "",
+          status: "A",
+        };
       });
     });
-
-    const newUVCs = newDimensions.map((dim, index) => ({
-      product_id: id,
-      code: `${formData.reference}_${dim.color}_${dim.size}`,
-      dimensions: [`${dim.color}/${dim.size}`],
-      prices: [
-        {
-          tarif_id: "",
-          currency: "EUR",
-          supplier_id:
-            selectedSuppliers.length > 0 ? selectedSuppliers[0]._id : "",
-          price: {
-            paeu: formData.paeu,
-            tbeu_pb: formData.tbeu_pb,
-            tbeu_pmeu: formData.tbeu_pmeu,
-          },
-          store: "",
-        },
-      ],
-      eans: [],
-      ean: "",
-      status: "A",
-    }));
-
+  
     setFormDataUvc((prevFormData) => ({
       ...prevFormData,
       uvc: newUVCs,
@@ -1683,7 +1691,7 @@ export default function SingleProductPage() {
                               type="number"
                               id="tbeu_pb"
                               onChange={handlePriceChange}
-                              value={formData.tbeu_pb}
+                              placeholder={formData.tbeu_pb.toString()}
                               className="border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 w-full"
                             />
                           )}
@@ -1701,7 +1709,7 @@ export default function SingleProductPage() {
                               type="number"
                               id="tbeu_pmeu"
                               onChange={handlePriceChange}
-                              value={formData.tbeu_pmeu}
+                              placeholder={formData.tbeu_pmeu.toString()}
                               className="rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 w-full"
                             />
                           )}
