@@ -18,6 +18,23 @@ const CollectionSection: React.FC<CollectionSelectorProps> = ({
   inputValueCollection,
   customStyles,
 }) => {
+
+  const filterOptions = (inputValue: string, options: any[]) => {
+    const input = inputValue ? inputValue.toLowerCase() : "";
+    return options.filter((option) => {
+      const name = option.label ? option.label.toLowerCase() : "";
+      const code = option.code ? option.code.toLowerCase() : "";
+      return name.includes(input) || code.includes(input);
+    });
+  };
+
+  const formatOptionLabel = ({ label, code }: { label: string; code: string }) => (
+    <div className="flex items-center justify-between">
+      <span>{label}</span>
+      <span className="text-gray-400 text-sm">({code})</span>
+    </div>
+  );
+
   return (
     <div className="relative w-full flex flex-col gap-3">
       <div>
@@ -26,6 +43,10 @@ const CollectionSection: React.FC<CollectionSelectorProps> = ({
           onChange={handleChangeCollection} // Pas d'index ici
           onInputChange={handleInputChangeCollection}
           onFocus={() => handleInputChangeCollection("")}
+          filterOption={(option, input) => 
+            filterOptions(input, [option.data])[0] !== undefined
+          }
+          formatOptionLabel={formatOptionLabel}
           inputValue={inputValueCollection}
           options={optionsCollection}
           placeholder="Sélectionner une collection"
