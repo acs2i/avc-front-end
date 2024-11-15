@@ -42,7 +42,6 @@ import useNotify from "../../utils/hooks/useToast";
 import { CircularProgress } from "@mui/material";
 import DynamicField from "../../components/FormElements/DynamicField";
 import Input from "../../components/FormElements/Input";
-import EnhancedSelect from "../../components/Formulaires/EnhancedSelect";
 
 interface formDataUVC {
   uvc: DatalakeUvc[];
@@ -744,44 +743,35 @@ export default function SingleProductPage() {
   };
 
   const handleDimensionsChange = (dimensions: string[][]) => {
-    const newUVCs = dimensions.flatMap((dim) => {
+    const newDimensions = dimensions.flatMap((dim) => {
       return dim.map((combination) => {
         const [color, size] = combination.split(",");
-
-        // Rechercher si une UVC avec ces dimensions existe déjà
-        const existingUvc = formData.uvc_ids.find((uvc) => {
-          const [existingColor, existingSize] = uvc.dimensions[0].split("/");
-          return existingColor === color && existingSize === size;
-        });
-
-        return {
-          product_id: id,
-          code: `${formData.reference}_${color}_${size}`,
-          dimensions: [`${color}/${size}`],
-          prices: [
-            {
-              tarif_id: "",
-              currency: "EUR",
-              supplier_id:
-                selectedSuppliers.length > 0 ? selectedSuppliers[0]._id : "",
-              price: {
-                paeu: formData.paeu,
-                tbeu_pb: formData.tbeu_pb,
-                tbeu_pmeu: formData.tbeu_pmeu,
-              },
-              store: "",
-            },
-          ],
-          // Conserver les EANs existants si l'UVC existe déjà
-          eans: existingUvc?.eans || [],
-          // Conserver l'EAN principal s'il existe déjà
-          ean: existingUvc?.ean || "",
-          // Conserver le chemin du code-barres s'il existe
-          barcodePath: existingUvc?.barcodePath || "",
-          status: "A",
-        };
+        return { color, size };
       });
     });
+
+    const newUVCs = newDimensions.map((dim, index) => ({
+      product_id: id,
+      code: `${formData.reference}_${dim.color}_${dim.size}`,
+      dimensions: [`${dim.color}/${dim.size}`],
+      prices: [
+        {
+          tarif_id: "",
+          currency: "EUR",
+          supplier_id:
+            selectedSuppliers.length > 0 ? selectedSuppliers[0]._id : "",
+          price: {
+            paeu: formData.paeu,
+            tbeu_pb: formData.tbeu_pb,
+            tbeu_pmeu: formData.tbeu_pmeu,
+          },
+          store: "",
+        },
+      ],
+      eans: [],
+      ean: "",
+      status: "A",
+    }));
 
     setFormDataUvc((prevFormData) => ({
       ...prevFormData,
@@ -1407,19 +1397,15 @@ export default function SingleProductPage() {
                               )}
                             </span>
                           ) : (
-                            <EnhancedSelect
+                            <CreatableSelect
                               className="col-span-3"
                               value={selectedOptionBrand}
                               onChange={handleChangeBrand}
                               onInputChange={handleInputChangeBrand}
                               options={optionsBrand}
                               inputValue={inputValueBrand}
-                              placeholder={
-                                product?.brand_ids?.[0]?.label ||
-                                "Sélectionnez une marque"
-                              }
-                              type="brand"
-                              isDisabled={!isModify}
+                              placeholder={product?.brand_ids[0].label || ""}
+                              isClearable
                             />
                           )}
                         </div>
@@ -1437,7 +1423,7 @@ export default function SingleProductPage() {
                               )}
                             </span>
                           ) : (
-                            <EnhancedSelect
+                            <CreatableSelect
                               className="col-span-3"
                               value={selectedOptionFamily}
                               onChange={handleChangeFamily}
@@ -1449,8 +1435,7 @@ export default function SingleProductPage() {
                                   ? `${product.tag_ids[0].code} - ${product.tag_ids[0].name}`
                                   : "Sélectionnez une famille"
                               }
-                              type="family"
-                              isDisabled={!isModify}
+                              isClearable
                             />
                           )}
                         </div>
@@ -1469,7 +1454,7 @@ export default function SingleProductPage() {
                               )}
                             </span>
                           ) : (
-                            <EnhancedSelect
+                            <CreatableSelect
                               className="col-span-3"
                               value={selectedOptionSubFamily}
                               onChange={handleChangeSubFamily}
@@ -1479,10 +1464,9 @@ export default function SingleProductPage() {
                               placeholder={
                                 product?.tag_ids?.[1]
                                   ? `${product.tag_ids[1].code} - ${product.tag_ids[1].name}`
-                                  : "Sélectionnez une sous-famille"
+                                  : "Sélectionnez une sous famille"
                               }
-                              type="subfamily"
-                              isDisabled={!isModify}
+                              isClearable
                             />
                           )}
                         </div>
@@ -1501,7 +1485,7 @@ export default function SingleProductPage() {
                               )}
                             </span>
                           ) : (
-                            <EnhancedSelect
+                            <CreatableSelect
                               className="col-span-3"
                               value={selectedOptionSubSubFamily}
                               onChange={handleChangeSubSubFamily}
@@ -1511,10 +1495,9 @@ export default function SingleProductPage() {
                               placeholder={
                                 product?.tag_ids?.[2]
                                   ? `${product.tag_ids[2].code} - ${product.tag_ids[2].name}`
-                                  : "Sélectionnez une sous-sous-famille"
+                                  : "Sélectionnez une sous sous famille"
                               }
-                              type="subsubfamily"
-                              isDisabled={!isModify}
+                              isClearable
                             />
                           )}
                         </div>
@@ -1647,7 +1630,7 @@ export default function SingleProductPage() {
                               )}
                             </span>
                           ) : (
-                            <EnhancedSelect
+                            <CreatableSelect
                               className="col-span-6"
                               value={selectedOptionCollection}
                               onChange={handleChangeCollection}
@@ -1656,10 +1639,9 @@ export default function SingleProductPage() {
                               inputValue={inputValueCollection}
                               placeholder={
                                 product?.collection_ids?.[0]?.label ||
-                                "Sélectionnez une collection"
+                                "Selectionnez une collection"
                               }
-                              type="collection"
-                              isDisabled={!isModify}
+                              isClearable
                             />
                           )}
                         </div>
@@ -1701,7 +1683,7 @@ export default function SingleProductPage() {
                               type="number"
                               id="tbeu_pb"
                               onChange={handlePriceChange}
-                              placeholder={formData.tbeu_pb.toString()}
+                              value={formData.tbeu_pb}
                               className="border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 w-full"
                             />
                           )}
@@ -1719,7 +1701,7 @@ export default function SingleProductPage() {
                               type="number"
                               id="tbeu_pmeu"
                               onChange={handlePriceChange}
-                              placeholder={formData.tbeu_pmeu.toString()}
+                              value={formData.tbeu_pmeu}
                               className="rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 w-full"
                             />
                           )}
