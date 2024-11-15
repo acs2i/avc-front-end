@@ -27,6 +27,7 @@ export const useCollections = (initialInputValue: string = "", limit = 10) => {
         data.data?.map((collection: CollectionOption) => ({
           value: collection.label,
           label: collection.label,
+          code: collection.code,
           _id: collection.label,
         })) || []
       );
@@ -53,6 +54,7 @@ export const useCollections = (initialInputValue: string = "", limit = 10) => {
         data.data?.map((collection: CollectionOption) => ({
           value: collection.label,
           label: collection.label,
+          code: collection.code,
           _id: collection.label,
         })) || []
       );

@@ -33,9 +33,10 @@ export const useSubFamily = (initialInputValue: string = "", limit = 10) => {
       );
       const data = await response.json();
       const optionsSubFamily = data.data?.map((tag: Tag) => ({
-        value: tag._id,
+        value: tag.code,
         label: tag.name,
         name: tag.name,
+        code: tag.code,
       }));
       setOptionsSubFamily(optionsSubFamily);
     } catch (error) {
@@ -60,6 +61,7 @@ export const useSubFamily = (initialInputValue: string = "", limit = 10) => {
         value: tag.code,
         label: tag.name,
         name: tag.name,
+        code: tag.code,
       }));
       setOptionsSubFamily(optionsSubFamily);
     } catch (error) {

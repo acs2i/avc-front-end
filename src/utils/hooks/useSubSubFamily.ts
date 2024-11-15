@@ -34,6 +34,8 @@ export const useSubSubFamily = (initialInputValue: string = "", limit = 10) => {
       const optionsSubSubFamily = data.data?.map((tag: Tag) => ({
         value: tag.code,
         label: tag.name,
+        name: tag.name,
+        code: tag.code,
       }));
       setOptionsSubSubFamily(optionsSubSubFamily);
     } catch (error) {
@@ -57,6 +59,8 @@ export const useSubSubFamily = (initialInputValue: string = "", limit = 10) => {
       const optionsSubSubFamily = data.data?.map((tag: Tag) => ({
         value: tag.code,
         label: tag.name,
+        name: tag.name,
+        code: tag.code,
       }));
       setOptionsSubSubFamily(optionsSubSubFamily);
     } catch (error) {

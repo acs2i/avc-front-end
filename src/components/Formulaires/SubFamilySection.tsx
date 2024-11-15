@@ -23,12 +23,13 @@ const SubFamilySection: React.FC<SubFamilySelectorProps> = ({
   // Fonction de filtrage améliorée
   const filterOptions = (inputValue: string, options: any[]) => {
     const input = inputValue.toLowerCase();
-    return options.filter(
-      option =>
-        option.name.toLowerCase().includes(input) ||
-        option.code.toLowerCase().includes(input)
-    );
+    return options.filter((option) => {
+      const name = option.name ? option.name.toLowerCase() : "";
+      const code = option.code ? option.code.toLowerCase() : "";
+      return name.includes(input) || code.includes(input);
+    });
   };
+  
 
   // Formatage personnalisé des options
   const formatOptionLabel = ({ name, code }: { name: string; code: string }) => (

@@ -25,6 +25,7 @@ export const useBrands = (initialInputValue: string = "", limit = 10, isCreate: 
       return data.data?.map((brand: BrandOption) => ({
         value: isCreate ? brand.label : brand.label,
         label: isCreate ? brand.label : brand.label,
+        code: isCreate ? brand.code : brand.code,
         _id: isCreate ? brand._id : brand.label,
       })) || [];
     } catch (error) {
@@ -48,6 +49,7 @@ export const useBrands = (initialInputValue: string = "", limit = 10, isCreate: 
       return data.data?.map((brand: BrandOption) => ({
         value: isCreate ? brand.label : brand.label,
         label: isCreate ? brand.label : brand.label,
+        code: isCreate ? brand.code : brand.code,
         _id: isCreate ? brand._id : brand.label,
       })) || [];
     } catch (error) {
