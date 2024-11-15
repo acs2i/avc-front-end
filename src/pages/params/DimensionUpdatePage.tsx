@@ -168,6 +168,7 @@ export default function DimensionUpdatePage({
             onChange={handleInputChange}
             gray
             disabled={!isModify || formData.status === 'I'}
+            maxLength={50}
           />
         </div>
       </div>

@@ -769,7 +769,7 @@ export default function SingleProductPage() {
         },
       ],
       eans: [],
-      ean:"",
+      ean: "",
       status: "A",
     }));
 
@@ -860,73 +860,81 @@ export default function SingleProductPage() {
   const handleUpdateReference = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-  
+
     try {
       // Créer les UVC et récupérer leurs IDs
       const uvcPromises = formDataUvc.uvc.map(async (uvc) => {
-        const response = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/uvc`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(uvc),
-        });
-  
+        const response = await fetch(
+          `${process.env.REACT_APP_URL_DEV}/api/v1/uvc`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(uvc),
+          }
+        );
+
         if (!response.ok) {
           throw new Error("Erreur lors de la création des UVC !");
         }
-  
+
         const createdUvc = await response.json();
         return createdUvc._id;
       });
-  
+
       const uvcIds = await Promise.all(uvcPromises);
-  
+
       // Formater les fournisseurs sélectionnés
-      const formattedSuppliers: Supplier[] = selectedSuppliers.map((supplierOption) => ({
-        supplier_id: supplierOption.value,
-        supplier_ref: supplierOption.supplier_ref || "",
-        pcb: supplierOption.pcb || "",
-        custom_cat: supplierOption.custom_cat || "",
-        made_in: supplierOption.made_in || "",
-        company_name: supplierOption.company_name || "",
-      }));
-  
+      const formattedSuppliers: Supplier[] = selectedSuppliers.map(
+        (supplierOption) => ({
+          supplier_id: supplierOption.value,
+          supplier_ref: supplierOption.supplier_ref || "",
+          pcb: supplierOption.pcb || "",
+          custom_cat: supplierOption.custom_cat || "",
+          made_in: supplierOption.made_in || "",
+          company_name: supplierOption.company_name || "",
+        })
+      );
+
       // Créer l'objet de mise à jour
       const updatedFormData = {
         ...formData,
         uvc_ids: uvcIds,
         suppliers: formattedSuppliers,
       };
-  
+
       // Enregistrer les modifications
       const changes = Object.keys(updatedFormData).reduce((acc, key) => {
         const typedKey = key as keyof typeof updatedFormData; // Assurez-vous que `key` est bien une clé de `updatedFormData`
-        
+
         if (updatedFormData[typedKey] !== formData[typedKey]) {
           acc[typedKey] = updatedFormData[typedKey];
         }
         return acc;
       }, {} as Partial<typeof updatedFormData>);
-  
+
       // Préparer `updateEntry`
       const updateEntry = {
         updated_at: new Date(),
         updated_by: creatorId.username,
         changes,
       };
-  
+
       // Envoyer la requête de mise à jour avec `updateEntry`
-      const productResponse = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ ...updatedFormData, updateEntry }),
-      });
-  
+      const productResponse = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ ...updatedFormData, updateEntry }),
+        }
+      );
+
       if (productResponse.ok) {
         notifySuccess("Le produit a bien été mis à jour !");
         window.location.reload();
@@ -941,7 +949,6 @@ export default function SingleProductPage() {
       setIsModify(false);
     }
   };
-  
 
   // Fonction pour mettre à jour l'ordre des fournisseurs dans le produit
   const updateProductSuppliersOrder = async (
@@ -1072,7 +1079,6 @@ export default function SingleProductPage() {
       };
     });
   };
-
 
   return (
     <>
@@ -1656,11 +1662,11 @@ export default function SingleProductPage() {
                             </span>
                           ) : (
                             <input
-                              type="text"
-                              id="peau"
+                              type="number"
+                              id="paeu"
                               onChange={handlePriceChange}
-                              value={formData.paeu}
-                              className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                              placeholder={formData.paeu.toString()}
+                              className="border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 w-full"
                             />
                           )}
                         </div>
@@ -1669,16 +1675,16 @@ export default function SingleProductPage() {
                             Prix Vente (TBEU/PB) :
                           </span>
                           {!isModify ? (
-                            <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                            <span className="text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
                               {product.tbeu_pb} €
                             </span>
                           ) : (
                             <input
-                              type="text"
+                              type="number"
                               id="tbeu_pb"
                               onChange={handlePriceChange}
-                              value={formData.tbeu_pb}
-                              className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                              placeholder={formData.tbeu_pb.toString()}
+                              className="border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 w-full"
                             />
                           )}
                         </div>
@@ -1687,16 +1693,16 @@ export default function SingleProductPage() {
                             Prix Modulé (TBEU/PMEU) :
                           </span>
                           {!isModify ? (
-                            <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                            <span className="text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
                               {product.tbeu_pmeu} €
                             </span>
                           ) : (
                             <input
-                              type="text"
+                              type="number"
                               id="tbeu_pmeu"
                               onChange={handlePriceChange}
-                              value={formData.tbeu_pmeu}
-                              className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                              placeholder={formData.tbeu_pmeu.toString()}
+                              className="rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 w-full"
                             />
                           )}
                         </div>
@@ -1706,7 +1712,7 @@ export default function SingleProductPage() {
                   {/* Prix produit */}
                   <div className="w-1/4">
                     <FormSection title="Cotes et poids">
-                      <div className="flex gap-3">
+                      <div className="grid grid-cols-2 gap-3">
                         <div>
                           <div className="flex items-center gap-2 py-2">
                             <span className="font-[700] text-slate-500 text-[12px]">
@@ -1723,7 +1729,7 @@ export default function SingleProductPage() {
                                 id="height"
                                 onChange={handleChange}
                                 value={formData.height}
-                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                                className="border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 w-full"
                               />
                             )}
                           </div>
@@ -1732,7 +1738,7 @@ export default function SingleProductPage() {
                               Longueur
                             </span>
                             {!isModify ? (
-                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
+                              <span className="ext-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
                                 {product?.length || "0"}
                                 {product?.size_unit || "m"}
                               </span>
@@ -1742,7 +1748,7 @@ export default function SingleProductPage() {
                                 id="length"
                                 onChange={handleChange}
                                 value={formData.length}
-                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                                className="border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 w-full"
                               />
                             )}
                           </div>
@@ -1761,7 +1767,7 @@ export default function SingleProductPage() {
                                 id="width"
                                 onChange={handleChange}
                                 value={formData.width}
-                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 w-full"
                               />
                             )}
                           </div>
@@ -1778,11 +1784,11 @@ export default function SingleProductPage() {
                               </span>
                             ) : (
                               <input
-                                type="text"
+                                type="number"
                                 id="gross_weight"
                                 onChange={handleChange}
                                 value={formData.gross_weight}
-                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 w-full"
                               />
                             )}
                           </div>
@@ -1797,11 +1803,11 @@ export default function SingleProductPage() {
                               </span>
                             ) : (
                               <input
-                                type="text"
+                                type="number"
                                 id="net_weight"
                                 onChange={handleChange}
                                 value={formData.net_weight}
-                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500"
+                                className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 w-full"
                               />
                             )}
                           </div>

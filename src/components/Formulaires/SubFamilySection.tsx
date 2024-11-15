@@ -29,6 +29,7 @@ const SubFamilySection: React.FC<SubFamilySelectorProps> = ({
           value={subFamily}
           onChange={handleChangeSubFamily}
           onInputChange={handleInputChangeSubFamily}
+          onFocus={() => handleInputChangeSubFamily("")}
           inputValue={inputValueSubFamily}
           options={optionsSubFamily}
           placeholder="Sélectionner une sous-famille"

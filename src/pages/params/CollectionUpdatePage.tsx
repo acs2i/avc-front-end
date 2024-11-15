@@ -166,6 +166,7 @@ export default function CollectionUpdatePage({
             onChange={handleInputChange}
             gray
             disabled={!isModify || formData.status === 'I'}
+            maxLength={50}
           />
         </div>
       </div>

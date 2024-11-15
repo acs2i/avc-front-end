@@ -29,6 +29,7 @@ const FamilySection: React.FC<FamilySelectorProps> = ({
           value={family} // Gérer une seule famille
           onChange={handleChangeFamily} // Pas d'index ici
           onInputChange={handleInputChangeFamily}
+          onFocus={() => handleInputChangeFamily("")}
           inputValue={inputValueFamily}
           options={optionsFamily}
           placeholder="Sélectionner une famille"
