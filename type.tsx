@@ -203,11 +203,13 @@ export type Price = {
 }
 
 export type Uvc = {
+  _id: any;
   code: string;
   dimensions: string[];
   prices: Price[];
   eans: string[];
   ean: string;
+  barcodePath: string;
   status: string;
 }
 
