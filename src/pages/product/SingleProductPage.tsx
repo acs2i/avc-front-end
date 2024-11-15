@@ -42,6 +42,7 @@ import useNotify from "../../utils/hooks/useToast";
 import { CircularProgress } from "@mui/material";
 import DynamicField from "../../components/FormElements/DynamicField";
 import Input from "../../components/FormElements/Input";
+import EnhancedSelect from "../../components/Formulaires/EnhancedSelect";
 
 interface formDataUVC {
   uvc: DatalakeUvc[];
@@ -746,13 +747,13 @@ export default function SingleProductPage() {
     const newUVCs = dimensions.flatMap((dim) => {
       return dim.map((combination) => {
         const [color, size] = combination.split(",");
-        
+
         // Rechercher si une UVC avec ces dimensions existe déjà
-        const existingUvc = formData.uvc_ids.find(uvc => {
+        const existingUvc = formData.uvc_ids.find((uvc) => {
           const [existingColor, existingSize] = uvc.dimensions[0].split("/");
           return existingColor === color && existingSize === size;
         });
-  
+
         return {
           product_id: id,
           code: `${formData.reference}_${color}_${size}`,
@@ -761,7 +762,8 @@ export default function SingleProductPage() {
             {
               tarif_id: "",
               currency: "EUR",
-              supplier_id: selectedSuppliers.length > 0 ? selectedSuppliers[0]._id : "",
+              supplier_id:
+                selectedSuppliers.length > 0 ? selectedSuppliers[0]._id : "",
               price: {
                 paeu: formData.paeu,
                 tbeu_pb: formData.tbeu_pb,
@@ -780,7 +782,7 @@ export default function SingleProductPage() {
         };
       });
     });
-  
+
     setFormDataUvc((prevFormData) => ({
       ...prevFormData,
       uvc: newUVCs,
@@ -1405,15 +1407,19 @@ export default function SingleProductPage() {
                               )}
                             </span>
                           ) : (
-                            <CreatableSelect
+                            <EnhancedSelect
                               className="col-span-3"
                               value={selectedOptionBrand}
                               onChange={handleChangeBrand}
                               onInputChange={handleInputChangeBrand}
                               options={optionsBrand}
                               inputValue={inputValueBrand}
-                              placeholder={product?.brand_ids[0].label || ""}
-                              isClearable
+                              placeholder={
+                                product?.brand_ids?.[0]?.label ||
+                                "Sélectionnez une marque"
+                              }
+                              type="brand"
+                              isDisabled={!isModify}
                             />
                           )}
                         </div>
@@ -1431,7 +1437,7 @@ export default function SingleProductPage() {
                               )}
                             </span>
                           ) : (
-                            <CreatableSelect
+                            <EnhancedSelect
                               className="col-span-3"
                               value={selectedOptionFamily}
                               onChange={handleChangeFamily}
@@ -1443,7 +1449,8 @@ export default function SingleProductPage() {
                                   ? `${product.tag_ids[0].code} - ${product.tag_ids[0].name}`
                                   : "Sélectionnez une famille"
                               }
-                              isClearable
+                              type="family"
+                              isDisabled={!isModify}
                             />
                           )}
                         </div>
@@ -1462,7 +1469,7 @@ export default function SingleProductPage() {
                               )}
                             </span>
                           ) : (
-                            <CreatableSelect
+                            <EnhancedSelect
                               className="col-span-3"
                               value={selectedOptionSubFamily}
                               onChange={handleChangeSubFamily}
@@ -1472,9 +1479,10 @@ export default function SingleProductPage() {
                               placeholder={
                                 product?.tag_ids?.[1]
                                   ? `${product.tag_ids[1].code} - ${product.tag_ids[1].name}`
-                                  : "Sélectionnez une sous famille"
+                                  : "Sélectionnez une sous-famille"
                               }
-                              isClearable
+                              type="subfamily"
+                              isDisabled={!isModify}
                             />
                           )}
                         </div>
@@ -1493,7 +1501,7 @@ export default function SingleProductPage() {
                               )}
                             </span>
                           ) : (
-                            <CreatableSelect
+                            <EnhancedSelect
                               className="col-span-3"
                               value={selectedOptionSubSubFamily}
                               onChange={handleChangeSubSubFamily}
@@ -1503,9 +1511,10 @@ export default function SingleProductPage() {
                               placeholder={
                                 product?.tag_ids?.[2]
                                   ? `${product.tag_ids[2].code} - ${product.tag_ids[2].name}`
-                                  : "Sélectionnez une sous sous famille"
+                                  : "Sélectionnez une sous-sous-famille"
                               }
-                              isClearable
+                              type="subsubfamily"
+                              isDisabled={!isModify}
                             />
                           )}
                         </div>
@@ -1638,7 +1647,7 @@ export default function SingleProductPage() {
                               )}
                             </span>
                           ) : (
-                            <CreatableSelect
+                            <EnhancedSelect
                               className="col-span-6"
                               value={selectedOptionCollection}
                               onChange={handleChangeCollection}
@@ -1647,9 +1656,10 @@ export default function SingleProductPage() {
                               inputValue={inputValueCollection}
                               placeholder={
                                 product?.collection_ids?.[0]?.label ||
-                                "Selectionnez une collection"
+                                "Sélectionnez une collection"
                               }
-                              isClearable
+                              type="collection"
+                              isDisabled={!isModify}
                             />
                           )}
                         </div>
