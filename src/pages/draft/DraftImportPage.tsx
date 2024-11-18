@@ -34,17 +34,14 @@ interface PriceItemSchema {
 }
 
 interface Price {
-  tarif_id: any;
-  currency: string;
   supplier_id: any;
   price: PriceItemSchema;
-  store: string;
 }
 
 interface Uvc {
   code: string;
   dimensions: string[];
-  prices: Price[];
+  prices: Price;
   eans: string[];
   status: string;
 }
@@ -267,19 +264,15 @@ export default function DraftImportPage() {
             uvc: data.Tailles.map((taille) => ({
               code: `${data.Référence}-${data.Couleur}-${taille}`,
               dimensions: [`${data.Couleur}/${taille}`], // Utilise le format "000/000"
-              prices: [
+              prices: 
                 {
-                  tarif_id: "",
-                  currency: "",
                   supplier_id: "",
                   price: {
                     peau: Number(data["PA Net"]),
                     tbeu_pb: Number(data["PV Conseillé"]),
                     tbeu_pmeu: 0,
                   },
-                  store: "",
                 },
-              ],
               eans: [], // Ajoutez des EANs si nécessaire
               status: "A",
             })),
