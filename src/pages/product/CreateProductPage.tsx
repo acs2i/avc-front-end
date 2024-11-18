@@ -53,6 +53,7 @@ interface Uvc {
   eans: string[];
   ean: string;
   status: string;
+  collectionUvc: string;
 }
 interface Supplier {
   supplier_id: string;
@@ -172,6 +173,7 @@ export default function CreateProductPage() {
   const [supplierModalIsOpen, setsupplierModalIsOpen] = useState(false);
   const [userFields, setUserFields] = useState<UserField[]>([]);
   const [fieldValues, setFieldValues] = useState<{ [key: string]: any }>({});
+  const [isModifyUvc, setIsModifyUvc] = useState(false);
   const [sizeUnits, setSizeUnits] = useState([]);
   const [weightUnits, setWeightUnits] = useState([]);
   const [page, setPage] = useState("dimension");
@@ -179,6 +181,7 @@ export default function CreateProductPage() {
   const [brandLabel, setBrandLabel] = useState("");
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
   const [classificationValue, setClassificationValue] =
     useState("Au vieux campeur");
   const [currentPage, setCurrentPage] = useState(1);
@@ -248,6 +251,7 @@ export default function CreateProductPage() {
             store: "",
           },
         ],
+        collectionUvc: "",
         eans: [],
         ean: "",
         status: "",
@@ -262,7 +266,7 @@ export default function CreateProductPage() {
   const [colors, setColors] = useState<string[]>([]);
   const [uvcGrid, setUvcGrid] = useState<boolean[][]>([]);
   // Fonction qui fetch les marques pour l'input creatable select (brand)
-  const isCreate = false
+  const isCreate = false;
   const {
     inputValueBrand,
     optionsBrand,
@@ -343,10 +347,18 @@ export default function CreateProductPage() {
     });
   };
 
+  const handleUpdateCollection = (index: number, updatedCollection: any) => {
+    setFormData((prevFormData) => {
+      const updatedUVCs = [...prevFormData.uvc];
+      updatedUVCs[index].collectionUvc = updatedCollection;
+      return { ...prevFormData, uvc: updatedUVCs };
+    });
+  };
+
   const handleDimensionsChange = (
     newDimensions: { color: string; size: string }[]
   ) => {
-    const newUVCs = newDimensions.map((dim, index) => {
+    const newUVCs = newDimensions.map((dim, i) => {
       // Génération d'un code unique pour chaque UVC basé sur la référence du produit, couleur et taille
       const generatedCode = `${formData.reference}${dim.color}${dim.size}`;
 
@@ -366,6 +378,7 @@ export default function CreateProductPage() {
             store: "",
           },
         ],
+        collectionUvc: formData.collection_ids[0]?.label || "",
         eans: [],
         ean: "",
         status: "",
@@ -440,6 +453,21 @@ export default function CreateProductPage() {
   const handleInputChangeClassification = (inputValue: string) => {
     setInputValueClassification(inputValue);
   };
+
+  useEffect(() => {
+    if (selectedCollection) {
+      setFormData((prevFormData) => {
+        const updatedUVCs = prevFormData.uvc.map((uvc) => ({
+          ...uvc,
+          collectionUvc: selectedCollection.label,
+        }));
+        return {
+          ...prevFormData,
+          uvc: updatedUVCs,
+        };
+      });
+    }
+  }, [selectedCollection]);
 
   const handleSupplierSelectChange = (
     index: number,
@@ -1033,6 +1061,7 @@ export default function CreateProductPage() {
                         Collection
                       </label>
                       <CollectionSection
+                        placeholder="Choississez une collection"
                         collection={selectedCollection}
                         optionsCollection={optionsCollection}
                         handleChangeCollection={handleChangeCollection}
@@ -1290,6 +1319,18 @@ export default function CreateProductPage() {
                     )}
                   </div>
                 ))}
+                {
+                  <div className="mt-3">
+                    <Button
+                      size="100"
+                      blue
+                      type="button"
+                      onClick={() => setIsModifyUvc((prev) => !prev)}
+                    >
+                      {isModifyUvc ? "Générer les UVC" : "Modifier les UVC"}
+                    </Button>
+                  </div>
+                }
               </div>
               {page === "dimension" && (
                 <div
@@ -1350,13 +1391,24 @@ export default function CreateProductPage() {
                     </div>
                   </div>
 
-                  {/* {onglet === "infos" && (
+                  {onglet === "infos" && (
                     <UVCInfosTable
-                      uvcDimension={formData.uvc}
-                      brandLabel={formData.brand_ids[0]?.label || ""}
+                      isModify={isModifyUvc}
+                      reference={formData?.reference}
+                      placeholder={(index) =>
+                        formData.uvc[index].collectionUvc ||
+                        "Sélectionnez une collection"
+                      }
+                      uvcDimension={formData.uvc.map((uvc) => ({
+                        code: uvc.code,
+                        dimensions: uvc.dimensions,
+                        collectionUvc: uvc.collectionUvc,
+                      }))}
+                      customStyles={customStyles}
+                      handleUpdateCollection={handleUpdateCollection}
                     />
                   )}
-                  {onglet === "price" && (
+                  {/* {onglet === "price" && (
                     <UVCPriceTable
                       uvcPrices={formData.uvc}
                       brandLabel={formData.brand_ids[0]?.label || ""}
@@ -1379,35 +1431,6 @@ export default function CreateProductPage() {
                 </div>
               )}
             </div>
-            {/* Partie boutton */}
-            {!isLoading ? (
-              <div className="mt-[50px] flex gap-2">
-                <button
-                  className="w-full bg-[#9FA6B2] text-white py-2 rounded-md font-[600] hover:bg-[#bac3d4] hover:text-white shadow-md"
-                  type="button"
-                  onClick={() => navigate("/product")}
-                >
-                  Annuler
-                </button>
-                <button
-                  className="w-full bg-[#3B71CA] text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
-                  type="submit"
-                >
-                  Créer la référence
-                </button>
-              </div>
-            ) : (
-              <div className="relative flex justify-center mt-7 px-7 gap-2">
-                <CircularProgress size={100} />
-                <div className="absolute h-[60px] w-[80px] top-[50%] translate-y-[-50%]">
-                  <img
-                    src="/img/logo.png"
-                    alt="logo"
-                    className="w-full h-full animate-pulse"
-                  />
-                </div>
-              </div>
-            )}
           </form>
         </div>
       </section>

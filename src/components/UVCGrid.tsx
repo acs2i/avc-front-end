@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Maximize2, Palette, Plus, Ruler, Check, X } from "lucide-react";
+import { Maximize2, Palette, Plus, Ruler, Check, X, Trash2 } from "lucide-react";
 import Modal from "./Shared/Modal";
 
 interface UVCGridProps {
@@ -90,6 +90,15 @@ const UVCGrid: React.FC<UVCGridProps> = ({
     );
     setUvcGrid(newGrid);
     updateDimensions(newGrid);
+  };
+
+  const handleDeleteRow = (colorIndex: number): void => {
+    const updatedColors = colors.filter((_, index) => index !== colorIndex);
+    const updatedGrid = uvcGrid.filter((_, index) => index !== colorIndex);
+
+    setColors(updatedColors);
+    setUvcGrid(updatedGrid);
+    updateDimensions(updatedGrid);
   };
 
   const importColors = (newColors: string[]) => {
@@ -362,6 +371,14 @@ const UVCGrid: React.FC<UVCGridProps> = ({
                   )}
                 </th>
               ))}
+               {isModify && (
+                <th
+                  scope="col"
+                  className="px-1 py-2 text-center border border-solid border-gray-300 border-b"
+                >
+                  <Trash2 size={18}/>
+                </th>
+              )}
             </tr>
           </thead>
           <tbody className="relative text-center text-[12px]">
@@ -406,6 +423,16 @@ const UVCGrid: React.FC<UVCGridProps> = ({
                     )}
                   </td>
                 ))}
+                {isModify && (
+                  <td className="py-2 px-2 border text-center">
+                    <button
+                      onClick={() => handleDeleteRow(colorIndex)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

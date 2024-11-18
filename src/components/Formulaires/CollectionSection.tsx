@@ -7,6 +7,7 @@ interface CollectionSelectorProps {
   handleChangeCollection: (selectedOption: any) => void;
   handleInputChangeCollection: (inputValueCollection: string) => void;
   inputValueCollection: string;
+  placeholder: string;
   customStyles: any;
 }
 
@@ -16,6 +17,7 @@ const CollectionSection: React.FC<CollectionSelectorProps> = ({
   handleChangeCollection,
   handleInputChangeCollection,
   inputValueCollection,
+  placeholder,
   customStyles,
 }) => {
 
@@ -49,7 +51,7 @@ const CollectionSection: React.FC<CollectionSelectorProps> = ({
           formatOptionLabel={formatOptionLabel}
           inputValue={inputValueCollection}
           options={optionsCollection}
-          placeholder="Sélectionner une collection"
+          placeholder={placeholder}
           styles={customStyles}
           menuPortalTarget={document.body}
           isClearable

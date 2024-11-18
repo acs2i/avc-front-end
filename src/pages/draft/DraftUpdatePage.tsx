@@ -91,6 +91,32 @@ interface FormData {
   initialGrid: any[];
 }
 
+const customStyles = {
+  control: (provided: any) => ({
+    ...provided,
+    border: "none", // Supprimer la bordure
+    boxShadow: "none",
+    borderRadius: "10px", // Ajouter une bordure arrondie
+    "&:hover": {
+      border: "none", // Assurez-vous que la bordure n'apparaît pas au survol
+    },
+  }),
+  option: (provided: any, state: any) => ({
+    ...provided,
+    borderBottom: "1px solid #e5e5e5",
+    backgroundColor: state.isSelected ? "#e5e5e5" : "white",
+    color: state.isSelected ? "black" : "gray",
+    "&:hover": {
+      backgroundColor: "#e5e5e5",
+      color: "black",
+    },
+  }),
+  singleValue: (provided: any) => ({
+    ...provided,
+    color: "gray",
+  }),
+};
+
 export default function DraftUpdatePage() {
   const { id } = useParams();
   const token = useSelector((state: any) => state.auth.token);
@@ -107,6 +133,7 @@ export default function DraftUpdatePage() {
   const [draft, setDraft] = useState<Draft>();
   const [isDetailsFetched, setIsDetailsFetched] = useState(false);
   const [isModify, setIsModify] = useState(false);
+  const [isModifyUvc, setIsModifyUvc] = useState(false);
   const [product, setProduct] = useState<Draft>();
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [desactivationInput, setDesactivationInput] = useState("");
@@ -298,35 +325,38 @@ export default function DraftUpdatePage() {
 
     grid.forEach((row, colorIndex) => {
       row.forEach((dimension, sizeIndex) => {
-        // Vérification que dimension existe et est une chaîne avant d'appeler split()
         if (
           dimension &&
           typeof dimension === "string" &&
           dimension.includes(",")
         ) {
           const [color, size] = dimension.split(",");
+          const uvcIndex = colorIndex * row.length + sizeIndex; // Calcul de l'index global de l'UVC
+          const collectionUvc =
+            formData.uvc[uvcIndex]?.collectionUvc ||
+            formData.collection_ids[0] ||
+            "";
+
           updatedUVCs.push({
+            _id: "",
             code: `${draft?.reference}_${color}_${size}`,
             dimensions: [`${color}/${size}`],
-            prices: [
+            prices: 
               {
-                tarif_id: "",
-                currency: "",
                 supplier_id: "",
                 price: {
-                  paeu: 0,
-                  tbeu_pb: 0,
-                  tbeu_pmeu: 0,
+                  paeu: draft?.paeu || 0,
+                  tbeu_pb: draft?.tbeu_pb || 0,
+                  tbeu_pmeu: draft?.tbeu_pmeu || 0,
                 },
-                store: "",
               },
-            ],
+            collectionUvc,
+            barcodePath: "",
             eans: [],
             ean: "",
             status: "",
           });
         } else {
-          // Si dimension n'est pas correcte ou ne peut pas être splittée, tu peux ajouter un traitement ici
           console.warn(`La dimension est incorrecte ou vide : ${dimension}`);
         }
       });
@@ -360,6 +390,16 @@ export default function DraftUpdatePage() {
   };
 
   useEffect(() => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      uvc: prevFormData.uvc.map((uvc) => ({
+        ...uvc,
+        collectionUvc: uvc.collectionUvc || "", // Ajoutez une valeur par défaut si absente
+      })),
+    }));
+  }, []);
+
+  useEffect(() => {
     if (draft) {
       setFormData({
         creator_id: draft?.creator_id,
@@ -373,8 +413,8 @@ export default function DraftUpdatePage() {
         dimension_types: draft.dimension_types[0] || "Couleur/Taille",
         brand_ids: draft.brand_ids || [],
         collection_ids: draft.collection_ids || [],
-        paeu: draft.paeu || 0,
-        tbeu_pb: draft.tbeu_pb || 0,
+        paeu: draft.paeu || 0, // Correction ici
+        tbeu_pb: draft.tbeu_pb || 0, // Utilisation de ?? pour éviter le problème
         tbeu_pmeu: draft.tbeu_pmeu || 0,
         height: draft?.height || "",
         width: draft?.width || "",
@@ -394,6 +434,9 @@ export default function DraftUpdatePage() {
       });
     }
   }, [draft]);
+
+  
+  
 
   useEffect(() => {
     fetchField();
@@ -731,6 +774,27 @@ export default function DraftUpdatePage() {
     }));
   };
 
+  const handleUpdateCollection = (index: number, updatedCollection: any) => {
+    console.log(
+      "Updating collection for UVC at index:",
+      index,
+      updatedCollection
+    );
+    setFormData((prevFormData) => {
+      const updatedUVCs = [...prevFormData.uvc];
+
+      // Vérifiez si `updatedCollection` est un objet et extrayez `value`, sinon utilisez directement `updatedCollection`.
+      updatedUVCs[index].collectionUvc =
+        typeof updatedCollection === "object" && updatedCollection !== null
+          ? updatedCollection.value // Utilisez `value` pour normaliser
+          : updatedCollection;
+
+      console.log("Updated UVCs:", updatedUVCs);
+
+      return { ...prevFormData, uvc: updatedUVCs };
+    });
+  };
+
   const handleInputChangeCollection = async (inputValueCollection: string) => {
     setInputValueCollection(inputValueCollection);
 
@@ -749,7 +813,7 @@ export default function DraftUpdatePage() {
 
         const optionsCollection = data.data?.map(
           (collection: CollectionOption) => ({
-            value: collection.code,
+            value: collection.label,
             label: collection.label,
           })
         );
@@ -775,7 +839,7 @@ export default function DraftUpdatePage() {
 
       const optionsCollection = data.data?.map(
         (collection: CollectionOption) => ({
-          value: collection.code,
+          value: collection.label,
           label: collection.label,
         })
       );
@@ -953,8 +1017,10 @@ export default function DraftUpdatePage() {
       );
 
       if (response.ok) {
+        const result = await response.json();
+        console.log("Réponse du backend :", result);
         notifySuccess("Brouillon modifié avec succès !");
-        window.location.reload();
+        // window.location.reload();
         setTimeout(() => {
           setIsLoading(false);
           setIsModify(false);
@@ -1775,7 +1841,7 @@ export default function DraftUpdatePage() {
                               </span>
                             ) : (
                               <input
-                                 type="number"
+                                type="number"
                                 id="gross_weight"
                                 onChange={handleChange}
                                 value={formData.gross_weight}
@@ -1944,6 +2010,18 @@ export default function DraftUpdatePage() {
                   )}
                 </div>
               ))}
+              <div className="mt-3">
+                {isModify && (
+                  <Button
+                    size="100"
+                    blue
+                    onClick={() => setIsModifyUvc((prev) => !prev)}
+                    type="button"
+                  >
+                    {isModifyUvc ? "Générer les UVC" : "Modifier les UVC"}
+                  </Button>
+                )}
+              </div>
             </div>
             {page === "dimension" && (
               <div
@@ -1965,7 +2043,7 @@ export default function DraftUpdatePage() {
                   colors={colors}
                   uvcGrid={uvcGrid}
                   isFullScreen={toggleFullScreen}
-                  isModify={isModify}
+                  isModify={isModifyUvc}
                   isEditable
                 />
               </div>
@@ -2007,21 +2085,67 @@ export default function DraftUpdatePage() {
                 </div>
                 {onglet === "infos" && draft && (
                   <UVCInfosTable
+                    isModify={isModifyUvc}
                     reference={draft?.reference}
-                    uvcDimension={formData.uvc}
-                    collectionLabel={draft?.collection_ids[0]}
+                    placeholder={(index) =>
+                      formData.uvc[index].collectionUvc ||
+                      formData.collection_ids[0]?.label
+                    }
+                    uvcDimension={formData.uvc.map((uvc) => ({
+                      code: uvc.code,
+                      dimensions: uvc.dimensions,
+                      collectionUvc: uvc.collectionUvc,
+                    }))}
+                    customStyles={customStyles}
+                    handleUpdateCollection={handleUpdateCollection}
                   />
                 )}
                 {onglet === "price" && draft && (
                   <UVCPriceTable
-                    reference={draft?.reference}
-                    uvcPrices={formData.uvc}
-                    globalPrices={{
-                      paeu: formData.paeu,
-                      tbeu_pb: formData.tbeu_pb,
-                      tbeu_pmeu: formData.tbeu_pmeu,
-                    }}
-                  />
+                  reference={draft?.reference}
+                  uvcPrices={formData.uvc.map((uvc) => ({
+                    code: uvc.code,
+                    dimensions: uvc.dimensions,
+                    prices: {
+                      paeu: uvc.prices?.price.paeu || 0,
+                      tbeu_pb: uvc.prices?.price.tbeu_pb || 0,
+                      tbeu_pmeu: uvc.prices?.price.tbeu_pmeu || 0,
+                    },
+                  }))}
+                  globalPrices={{
+                    paeu: formData.paeu,
+                    tbeu_pb: formData.tbeu_pb,
+                    tbeu_pmeu: formData.tbeu_pmeu,
+                  }}
+                  isModify={isModifyUvc}
+                  onPriceChange={(index, field, value) => {
+                    setFormData((prevFormData) => {
+                      const updatedUVCs = [...prevFormData.uvc];
+                
+                      // Vérifier si `prices[0]` existe, sinon l'initialiser
+                      if (!updatedUVCs[index].prices) {
+                        updatedUVCs[index].prices = {
+                          supplier_id: "",
+                          price: {
+                            paeu: 0,
+                            tbeu_pb: 0,
+                            tbeu_pmeu: 0,
+                          },
+                        };
+                      }
+                
+                      // Mettre à jour uniquement le champ dans `prices[0].price`
+                      updatedUVCs[index].prices.price = {
+                        ...updatedUVCs[index].prices.price,
+                        [field]: value,
+                      };
+                
+                      return { ...prevFormData, uvc: updatedUVCs };
+                    });
+                  }}
+                />
+                
+                
                 )}
                 {onglet === "supplier" && draft && (
                   <UVCSupplierTable
@@ -2054,38 +2178,6 @@ export default function DraftUpdatePage() {
               </div>
             )}
           </div>
-          {isModify && (
-            <div>
-              {!isLoading ? (
-                <div className="mt-[50px] flex gap-2">
-                  <button
-                    className="w-full bg-[#9FA6B2] text-white py-2 rounded-md font-[600] hover:bg-[#bac3d4] hover:text-white shadow-md"
-                    type="button"
-                    onClick={() => setIsModify(false)}
-                  >
-                    Annuler la modification
-                  </button>
-                  <button
-                    className="w-full bg-[#3B71CA] text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
-                    type="submit"
-                  >
-                    Valider les modifications
-                  </button>
-                </div>
-              ) : (
-                <div className="relative flex justify-center mt-7 px-7 gap-2">
-                  <CircularProgress size={100} />
-                  <div className="absolute h-[60px] w-[80px] top-[50%] translate-y-[-50%]">
-                    <img
-                      src="/img/logo.png"
-                      alt="logo"
-                      className="w-full h-full animate-pulse"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
         </form>
       </section>
     </>

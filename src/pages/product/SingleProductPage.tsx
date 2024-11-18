@@ -96,6 +96,32 @@ interface FormData {
   initialGrid: any[];
 }
 
+const customStyles = {
+  control: (provided: any) => ({
+    ...provided,
+    border: "none", // Supprimer la bordure
+    boxShadow: "none",
+    borderRadius: "10px", // Ajouter une bordure arrondie
+    "&:hover": {
+      border: "none", // Assurez-vous que la bordure n'apparaît pas au survol
+    },
+  }),
+  option: (provided: any, state: any) => ({
+    ...provided,
+    borderBottom: "1px solid #e5e5e5",
+    backgroundColor: state.isSelected ? "#e5e5e5" : "white",
+    color: state.isSelected ? "black" : "gray",
+    "&:hover": {
+      backgroundColor: "#e5e5e5",
+      color: "black",
+    },
+  }),
+  singleValue: (provided: any) => ({
+    ...provided,
+    color: "gray",
+  }),
+};
+
 export default function SingleProductPage() {
   const { id } = useParams();
   const token = useSelector((state: any) => state.auth.token);
@@ -153,6 +179,7 @@ export default function SingleProductPage() {
   const [isCheckboxChecked, setIsCheckboxChecked] = useState(false);
   const [userFields, setUserFields] = useState<UserField[]>([]);
   const [isModify, setIsModify] = useState(false);
+  const [isModifyUvc, setIsModifyUvc] = useState(false);
   const [page, setPage] = useState("dimension");
   const [onglet, setOnglet] = useState("infos");
   const [formData, setFormData] = useState<FormData>({
@@ -192,19 +219,16 @@ export default function SingleProductPage() {
         product_id: "",
         code: "",
         dimensions: [],
-        prices: [
+        prices: 
           {
-            tarif_id: "",
-            currency: "",
             supplier_id: "",
             price: {
               paeu: product?.paeu || 0,
               tbeu_pb: product?.tbeu_pb || 0,
               tbeu_pmeu: product?.tbeu_pmeu || 0,
             },
-            store: "",
           },
-        ],
+        collectionUvc: product?.collection_ids[0].label || "",
         eans: [],
         ean: "",
         status: "",
@@ -219,6 +243,18 @@ export default function SingleProductPage() {
     made_in: "",
     company_name: "",
   });
+
+  useEffect(() => {
+    if (product) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        uvc_ids: product.uvc_ids.map((uvc) => ({
+          ...uvc,
+          collectionUvc: product.collection_ids[0]?.label || "",
+        })),
+      }));
+    }
+  }, [product]);
 
   useEffect(() => {
     if (product) {
@@ -518,6 +554,14 @@ export default function SingleProductPage() {
     });
   };
 
+  const handleUpdateCollection = (index: number, updatedCollection: any) => {
+    setFormDataUvc((prevFormDataUvc) => {
+      const updatedUVCs = [...prevFormDataUvc.uvc];
+      updatedUVCs[index].collectionUvc = updatedCollection;
+      return { ...prevFormDataUvc, uvc: updatedUVCs };
+    });
+  };
+
   const handleInputChangeSubSubFamily = async (
     inputValueSubSubFamily: string
   ) => {
@@ -744,24 +788,22 @@ export default function SingleProductPage() {
 
   const handleDimensionsChange = (dimensions: string[][]) => {
     const newUVCs = dimensions.flatMap((dim) => {
-      return dim.map((combination) => {
+      return dim.map((combination, i) => {
         const [color, size] = combination.split(",");
-        
-        // Rechercher si une UVC avec ces dimensions existe déjà
-        const existingUvc = formData.uvc_ids.find(uvc => {
+
+        const existingUvc = formData.uvc_ids.find((uvc) => {
           const [existingColor, existingSize] = uvc.dimensions[0].split("/");
           return existingColor === color && existingSize === size;
         });
-  
+
         return {
           product_id: id,
           code: `${formData.reference}_${color}_${size}`,
           dimensions: [`${color}/${size}`],
-          prices: [
+          prices: 
             {
-              tarif_id: "",
-              currency: "EUR",
-              supplier_id: selectedSuppliers.length > 0 ? selectedSuppliers[0]._id : "",
+              supplier_id:
+                selectedSuppliers.length > 0 ? selectedSuppliers[0]._id : "",
               price: {
                 paeu: formData.paeu,
                 tbeu_pb: formData.tbeu_pb,
@@ -769,18 +811,17 @@ export default function SingleProductPage() {
               },
               store: "",
             },
-          ],
-          // Conserver les EANs existants si l'UVC existe déjà
+          collectionUvc:
+            formData.uvc_ids[i]?.collectionUvc ||
+            formData.collection_ids[0]?.label,
           eans: existingUvc?.eans || [],
-          // Conserver l'EAN principal s'il existe déjà
           ean: existingUvc?.ean || "",
-          // Conserver le chemin du code-barres s'il existe
           barcodePath: existingUvc?.barcodePath || "",
           status: "A",
         };
       });
     });
-  
+
     setFormDataUvc((prevFormData) => ({
       ...prevFormData,
       uvc: newUVCs,
@@ -1087,7 +1128,7 @@ export default function SingleProductPage() {
       };
     });
   };
-
+  console.log(formDataUvc);
   return (
     <>
       <Modal
@@ -1969,6 +2010,16 @@ export default function SingleProductPage() {
                   )}
                 </div>
               ))}
+              {isModify && <div className="mt-3">
+                <Button
+                  size="100"
+                  blue
+                  type="button"
+                  onClick={() => setIsModifyUvc((prev) => !prev)}
+                >
+                  {isModifyUvc ? "Générer les UVC" : "Modifier les UVC"}
+                </Button>
+              </div>}
             </div>
             {page === "dimension" && (
               <div
@@ -1990,7 +2041,7 @@ export default function SingleProductPage() {
                   colors={colors}
                   uvcGrid={uvcGrid}
                   isFullScreen={toggleFullScreen}
-                  isModify={isModify}
+                  isModify={isModifyUvc}
                   isEditable={true}
                 />
               </div>
@@ -2032,21 +2083,65 @@ export default function SingleProductPage() {
                 </div>
                 {onglet === "infos" && product && (
                   <UVCInfosTable
+                    isModify={isModifyUvc}
                     reference={product?.reference}
-                    uvcDimension={formData.uvc_ids}
-                    collectionLabel={product.collection_ids[0]?.label || ""}
+                    placeholder={(index) =>
+                      formData.uvc_ids[index].collectionUvc ||
+                      formData.collection_ids[0]?.label
+                    }
+                    uvcDimension={formDataUvc.uvc.map((uvc) => ({
+                      code: uvc.code,
+                      dimensions: uvc.dimensions,
+                      collectionUvc: uvc.collectionUvc,
+                    }))}
+                    customStyles={customStyles}
+                    handleUpdateCollection={handleUpdateCollection}
                   />
                 )}
                 {onglet === "price" && product && (
-                  <UVCPriceTable
-                    reference={product?.reference}
-                    uvcPrices={formData.uvc_ids}
-                    globalPrices={{
-                      paeu: formData.paeu,
-                      tbeu_pb: formData.tbeu_pb,
-                      tbeu_pmeu: formData.tbeu_pmeu,
-                    }}
-                  />
+                 <UVCPriceTable
+                 reference={product?.reference}
+                 uvcPrices={formDataUvc.uvc.map((uvc) => ({
+                   code: uvc.code,
+                   dimensions: uvc.dimensions,
+                   prices: {
+                     paeu: uvc.prices?.price.paeu || 0,
+                     tbeu_pb: uvc.prices?.price.tbeu_pb || 0,
+                     tbeu_pmeu: uvc.prices?.price.tbeu_pmeu || 0,
+                   },
+                 }))}
+                 globalPrices={{
+                   paeu: formData.paeu,
+                   tbeu_pb: formData.tbeu_pb,
+                   tbeu_pmeu: formData.tbeu_pmeu,
+                 }}
+                 isModify={isModifyUvc}
+                 onPriceChange={(index, field, value) => {
+                   setFormDataUvc((prevFormData) => {
+                     const updatedUVCs = [...prevFormData.uvc];
+
+                     // Vérifier si `prices[0]` existe, sinon l'initialiser
+                     if (!updatedUVCs[index].prices) {
+                       updatedUVCs[index].prices = {
+                         supplier_id: "",
+                         price: {
+                           paeu: 0,
+                           tbeu_pb: 0,
+                           tbeu_pmeu: 0,
+                         },
+                       };
+                     }
+
+                     // Mettre à jour uniquement le champ dans `prices[0].price`
+                     updatedUVCs[index].prices.price = {
+                       ...updatedUVCs[index].prices.price,
+                       [field]: value,
+                     };
+
+                     return { ...prevFormData, uvc: updatedUVCs };
+                   });
+                 }}
+               />
                 )}
                 {onglet === "supplier" && product && (
                   <UVCSupplierTable
@@ -2081,38 +2176,6 @@ export default function SingleProductPage() {
               </div>
             )}
           </div>
-          {isModify && (
-            <div>
-              {!isLoading ? (
-                <div className="mt-[50px] flex gap-2">
-                  <button
-                    className="w-full bg-[#9FA6B2] text-white py-2 rounded-md font-[600] hover:bg-[#bac3d4] hover:text-white shadow-md"
-                    type="button"
-                    onClick={() => setIsModify(false)}
-                  >
-                    Annuler la modification
-                  </button>
-                  <button
-                    className="w-full bg-[#3B71CA] text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
-                    type="submit"
-                  >
-                    Valider les modifications
-                  </button>
-                </div>
-              ) : (
-                <div className="relative flex justify-center mt-7 px-7 gap-2">
-                  <CircularProgress size={100} />
-                  <div className="absolute h-[60px] w-[80px] top-[50%] translate-y-[-50%]">
-                    <img
-                      src="/img/logo.png"
-                      alt="logo"
-                      className="w-full h-full animate-pulse"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
         </form>
       </section>
     </>

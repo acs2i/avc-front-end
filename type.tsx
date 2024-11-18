@@ -195,20 +195,18 @@ export type PriceItemSchema = {
 }
 
 export type Price = {
-  tarif_id: any;
-  currency: string;
   supplier_id: any;
   price: PriceItemSchema;
-  store: string;
 }
 
 export type Uvc = {
   _id: any;
   code: string;
   dimensions: string[];
-  prices: Price[];
+  prices: Price;
   eans: string[];
   ean: string;
+  collectionUvc: string;
   barcodePath: string;
   status: string;
 }
@@ -217,9 +215,10 @@ export type DatalakeUvc = {
   product_id: any;
   code: string;
   dimensions: string[];
-  prices: Price[];
+  prices: Price;
   ean: string;
   eans: string[];
+  collectionUvc: string;
   status: string;
 }
 
