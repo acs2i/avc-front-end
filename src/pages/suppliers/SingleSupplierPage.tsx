@@ -32,6 +32,7 @@ import { useUsers } from "../../utils/hooks/useUsers";
 import { useFamily } from "../../utils/hooks/useFamily";
 import { useIsoCode } from "../../utils/hooks/useIsoCode";
 import IsoCodeSection from "../../components/Formulaires/IsoCodeSection";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 interface BrandId {
   _id: string;
@@ -107,7 +108,52 @@ interface Condition {
   budget: string;
 }
 
+interface Conditions {
+  _id: string;
+  supplier_id: string;
+  season: string;
+  code: string;
+  company_name: string;
+  createdAt: string;
+  // Ajout des champs manquants
+  siret?: string;
+  tva?: string;
+  address_1?: string;
+  address_2?: string;
+  address_3?: string;
+  city?: string;
+  postal?: string;
+  country?: string;
+  // Champs existants
+  brand_id: Array<{
+    _id: string;
+    code: string;
+    label: string;
+    status: string;
+    creator_id: string;
+    creation_date: string;
+    modification_date: string;
+    updates: any[];
+  }>;
+  additional_fields: Array<{
+    label: string;
+    value: string;
+    field_type: string;
+    _id: string;
+  }>;
+  contacts: Contact[];
+  admin: string;
+  buyers: Buyer[];
+}
+
+interface PdfData {
+  condition: Conditions;
+  supplier: FormData;
+  conditionIndex: number;
+}
+
 interface Commerciale {
+  _id: string;
   supplier_id: any;
   season: string;
   code: string;
@@ -333,6 +379,8 @@ export default function SingleSupplierPage() {
   );
 
   console.log(formData);
+  console.log(formDataCondition);
+  console.log(conditions);
 
   const {
     inputValueUser,
@@ -471,6 +519,119 @@ export default function SingleSupplierPage() {
       ...formData,
       [e.target.id]: e.target.value,
     });
+  };
+
+  const handlePdf = async (
+    condition: Conditions,
+    index: number
+  ): Promise<void> => {
+    setIsLoading(true);
+    try {
+      // Gestion des marques
+      const brandLabels = condition.brand_id.map((brand, idx, arr) => ({
+        label: brand.label,
+        last: idx === arr.length - 1,
+      }));
+
+      // Gestion des champs additionnels
+      const getFieldValue = (fieldLabel: string) => {
+        const field = condition.additional_fields.find(
+          (field) => field.label === fieldLabel
+        );
+        return field ? field.value : "";
+      };
+
+      const today = new Date();
+      const formattedDate = today.toLocaleDateString("fr-FR", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+
+      // Construction de l'objet pour le PDF
+      const pdfData = {
+        // En-tête
+        season: condition.season,
+
+        // Informations de base du fournisseur
+        code: condition.code,
+        company_name: condition.company_name,
+
+        // Marques
+        brand_id: brandLabels,
+
+        // Adresses
+        address_1: condition.address_1,
+        address_2: condition.address_2,
+        address_3: condition.address_3,
+        postal: condition.postal,
+        country: condition.country,
+
+        // Informations fiscales
+        siret: condition.siret,
+        tva: condition.tva,
+
+        // Contacts
+        contacts: condition.contacts.map((contact) => ({
+          firstname: contact.firstname,
+          lastname: contact.lastname,
+          phone: contact.phone,
+          mobile: contact.mobile,
+          email: contact.email,
+        })),
+
+        // Champs additionnels organisés par section
+        additional_fields: {
+          // Section Facturation
+          paiement_condition: getFieldValue("Conditions de paiement"),
+
+          // Section Service Commercial
+          etiquetage: getFieldValue("Etiquetage"),
+          validate_tarif: getFieldValue("Validité des tarifs"),
+
+          // Section Remise
+          remise_facture: getFieldValue("Remise sur facture"),
+          remise_fin_annee: getFieldValue("Remise de fin d'année"),
+          prix_nets: getFieldValue("Prix nets"),
+          franco: getFieldValue("Franco"),
+          budget_marketing: getFieldValue("Budget marketing"),
+        },
+        signatureDate: formattedDate,
+
+        // Options supplémentaires
+        join_rib: 1, // Active la case RIB si pas de SIRET
+      };
+
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1//generate-pdf`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(pdfData),
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+
+        if (result.filePath) {
+          // Ouvrir le PDF dans un nouvel onglet
+          window.open(result.filePath, "_blank");
+          notifySuccess("PDF généré avec succès !");
+        } else {
+          notifyError("Erreur: Chemin du fichier PDF non trouvé");
+        }
+      } else {
+        notifyError("Erreur lors de la génération du PDF");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la génération du PDF:", error);
+      notifyError("Erreur lors de la génération du PDF");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCountryChange = (
@@ -753,9 +914,22 @@ export default function SingleSupplierPage() {
 
       if (response.ok) {
         const result = await response.json();
-        console.log(result);
-        setConditions(result || []);
-        console.log("Conditions après setConditions:", conditions);
+
+        // Modifier les contacts dans les conditions pour mettre le contact principal en premier
+        const updatedConditions = result.map((condition: Commerciale) => {
+          if (supplier.contacts && supplier.contacts.length > 0) {
+            return {
+              ...condition,
+              contacts: [
+                supplier.contacts[0], // Contact principal du supplier
+                ...supplier.contacts.slice(1), // Reste des contacts
+              ],
+            };
+          }
+          return condition;
+        });
+
+        setConditions(updatedConditions);
       } else {
         console.error("Erreur lors de la requête");
       }
@@ -783,7 +957,64 @@ export default function SingleSupplierPage() {
     }
   }, [supplier]);
 
-  console.log(formData);
+  const reorderContacts = (
+    list: Contact[],
+    startIndex: number,
+    endIndex: number
+  ) => {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+    return result;
+  };
+
+  const handleDragEnd = (result: any) => {
+    if (!result.destination) {
+      return;
+    }
+
+    if (result.destination.index === result.source.index) {
+      return;
+    }
+
+    // Réorganiser les contacts
+    const updatedContacts = reorderContacts(
+      supplier?.contacts || [],
+      result.source.index,
+      result.destination.index
+    );
+
+    // Mettre à jour le supplier
+    setSupplier((prev) =>
+      prev
+        ? {
+            ...prev,
+            contacts: updatedContacts,
+          }
+        : undefined
+    );
+
+    // Mettre à jour formData
+    setFormData((prev) => ({
+      ...prev,
+      contacts: updatedContacts,
+    }));
+
+    // Mettre à jour le tableau conditions avec les contacts réorganisés
+    setConditions((prev) =>
+      prev.map((condition) => ({
+        ...condition,
+        contacts: updatedContacts, // Ceci assure que tous les contacts dans chaque condition sont alignés
+      }))
+    );
+
+    // Mettre à jour formDataCondition
+    setFormDataCondition((prev) => ({
+      ...prev,
+      contacts: updatedContacts,
+    }));
+  };
+
   return (
     <>
       <Modal
@@ -848,6 +1079,9 @@ export default function SingleSupplierPage() {
           // Ajoutez ces props pour la recherche de familles
           familyOptions={optionsFamily}
           handleFamilySearchInput={handleInputChangeFamily}
+          handleInputChangeUser={function (inputValue: string): void {
+            throw new Error("Function not implemented.");
+          }}
         />
       </Modal>
       <section className="w-full bg-slate-50 p-7 min-h-screen">
@@ -1307,47 +1541,90 @@ export default function SingleSupplierPage() {
                 </div>
               </FormSection>
               <FormSection title="Contacts">
-                <div className="flex flex-col gap-2 mt-3">
-                  {/* Combinez les contacts enregistrés et les contacts sélectionnés */}
-                  {(supplier?.contacts && supplier.contacts.length > 0) ||
-                  (selectedContacts && selectedContacts.length > 0) ? (
-                    <>
-                      {/* Affichez les contacts enregistrés */}
-                      {supplier?.contacts &&
-                        supplier.contacts.length > 0 &&
-                        supplier.contacts.map((contact, index) => (
-                          <div
-                            key={`stored-${index}`}
-                            className="text-center rounded-md cursor-pointer hover:brightness-125 shadow-md bg-slate-400"
-                          >
+                {isModify ? (
+                  <DragDropContext onDragEnd={handleDragEnd}>
+                    <Droppable droppableId="contacts">
+                      {(provided) => (
+                        <div
+                          className="flex flex-col gap-2 mt-3"
+                          {...provided.droppableProps}
+                          ref={provided.innerRef}
+                        >
+                          {(supplier?.contacts &&
+                            supplier.contacts.length > 0) ||
+                          (selectedContacts && selectedContacts.length > 0) ? (
+                            <>
+                              {supplier?.contacts &&
+                                supplier.contacts.map((contact, index) => (
+                                  <Draggable
+                                    key={`contact-${index}`}
+                                    draggableId={`contact-${index}`}
+                                    index={index}
+                                  >
+                                    {(provided) => (
+                                      <div
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        {...provided.dragHandleProps}
+                                        className={`text-center rounded-md cursor-move hover:brightness-125 shadow-md p-3
+                          ${index === 0 ? "bg-blue-500" : "bg-slate-400"}`}
+                                      >
+                                        <div className="flex items-center justify-between">
+                                          <span className="text-[20px] text-white font-bold">
+                                            {contact.firstname}{" "}
+                                            {contact.lastname}
+                                          </span>
+                                          {index === 0 && (
+                                            <span className="text-xs text-white bg-blue-600 px-2 py-1 rounded">
+                                              Contact Principal
+                                            </span>
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </Draggable>
+                                ))}
+                              {provided.placeholder}
+                            </>
+                          ) : (
+                            <p className="text-gray-400 font-bold text-xs">
+                              Aucun contact enregistré pour ce fournisseur
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </Droppable>
+                  </DragDropContext>
+                ) : (
+                  // Affichage en mode lecture seule
+                  <div className="flex flex-col gap-2 mt-3">
+                    {supplier?.contacts && supplier.contacts.length > 0 ? (
+                      supplier.contacts.map((contact, index) => (
+                        <div
+                          key={`contact-${index}`}
+                          className={`text-center rounded-md shadow-md p-3
+              ${index === 0 ? "bg-blue-500" : "bg-slate-400"}`}
+                        >
+                          <div className="flex items-center justify-between">
                             <span className="text-[20px] text-white font-bold">
                               {contact.firstname} {contact.lastname}
                             </span>
+                            {index === 0 && (
+                              <span className="text-xs text-white bg-blue-600 px-2 py-1 rounded">
+                                Contact Principal
+                              </span>
+                            )}
                           </div>
-                        ))}
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-gray-400 font-bold text-xs">
+                        Aucun contact enregistré pour ce fournisseur
+                      </p>
+                    )}
+                  </div>
+                )}
 
-                      {/* Affichez les contacts sélectionnés */}
-                      {selectedContacts &&
-                        selectedContacts.length > 0 &&
-                        selectedContacts.map((contact, index) => (
-                          <div
-                            key={`selected-${index}`}
-                            className="text-center rounded-md cursor-pointer hover:brightness-125 shadow-md bg-slate-400"
-                          >
-                            <span className="text-[20px] text-white font-bold">
-                              {contact.firstname} {contact.lastname}
-                            </span>
-                          </div>
-                        ))}
-                    </>
-                  ) : !isModify ? (
-                    <p className="text-gray-400 font-bold text-xs">
-                      Aucun contact enregistré pour ce fournisseur
-                    </p>
-                  ) : null}
-                </div>
-
-                {/* Afficher le bouton "Ajouter un contact" seulement en mode modification */}
                 {isModify && (
                   <div
                     className="flex flex-col items-center justify-center p-[20px] text-orange-400 hover:text-orange-300 cursor-pointer"
@@ -1551,7 +1828,15 @@ export default function SingleSupplierPage() {
                                 </p>
                               </div>
                               <div className="text-gray-500">
-                                <File size={18} />
+                                <div
+                                  onClick={(e: React.MouseEvent) => {
+                                    e.stopPropagation();
+                                    handlePdf(condition, index);
+                                  }}
+                                  className="cursor-pointer"
+                                >
+                                  <File size={18} />
+                                </div>
                               </div>
                             </div>
                           </div>

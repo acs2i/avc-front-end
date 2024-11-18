@@ -42,6 +42,7 @@ import useNotify from "../../utils/hooks/useToast";
 import { CircularProgress } from "@mui/material";
 import DynamicField from "../../components/FormElements/DynamicField";
 import Input from "../../components/FormElements/Input";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 interface formDataUVC {
   uvc: DatalakeUvc[];
@@ -746,13 +747,13 @@ export default function SingleProductPage() {
     const newUVCs = dimensions.flatMap((dim) => {
       return dim.map((combination) => {
         const [color, size] = combination.split(",");
-        
+
         // Rechercher si une UVC avec ces dimensions existe déjà
-        const existingUvc = formData.uvc_ids.find(uvc => {
+        const existingUvc = formData.uvc_ids.find((uvc) => {
           const [existingColor, existingSize] = uvc.dimensions[0].split("/");
           return existingColor === color && existingSize === size;
         });
-  
+
         return {
           product_id: id,
           code: `${formData.reference}_${color}_${size}`,
@@ -761,7 +762,8 @@ export default function SingleProductPage() {
             {
               tarif_id: "",
               currency: "EUR",
-              supplier_id: selectedSuppliers.length > 0 ? selectedSuppliers[0]._id : "",
+              supplier_id:
+                selectedSuppliers.length > 0 ? selectedSuppliers[0]._id : "",
               price: {
                 paeu: formData.paeu,
                 tbeu_pb: formData.tbeu_pb,
@@ -780,7 +782,7 @@ export default function SingleProductPage() {
         };
       });
     });
-  
+
     setFormDataUvc((prevFormData) => ({
       ...prevFormData,
       uvc: newUVCs,
@@ -1086,6 +1088,54 @@ export default function SingleProductPage() {
         additional_fields: updatedAdditionalFields,
       };
     });
+  };
+
+  const handleSupplierDragEnd = (result: any) => {
+    if (!result.destination || !isModify) {
+      return;
+    }
+
+    if (result.destination.index === result.source.index) {
+      return;
+    }
+
+    const reorderedSuppliers = Array.from(selectedSuppliers);
+    const [reorderedItem] = reorderedSuppliers.splice(result.source.index, 1);
+    reorderedSuppliers.splice(result.destination.index, 0, reorderedItem);
+
+    setSelectedSuppliers(reorderedSuppliers);
+
+    // Mise à jour de formData
+    setFormData((prev) => ({
+      ...prev,
+      suppliers: reorderedSuppliers.map((supplier) => ({
+        supplier_id: supplier.value,
+        supplier_ref: supplier.supplier_ref || "",
+        pcb: supplier.pcb || "",
+        custom_cat: supplier.custom_cat || "",
+        made_in: supplier.made_in || "",
+        company_name: supplier.company_name || "",
+      })),
+    }));
+
+    // Si le fournisseur principal a changé (index 0), mettre à jour les prix des UVC
+    if (result.source.index === 0 || result.destination.index === 0) {
+      const newMainSupplierId = reorderedSuppliers[0].value;
+
+      setFormDataUvc((prev) => ({
+        ...prev,
+        uvc: prev.uvc.map((uvc) => ({
+          ...uvc,
+          prices: uvc.prices.map((price) => ({
+            ...price,
+            supplier_id: newMainSupplierId,
+          })),
+        })),
+      }));
+    }
+
+    // Persister les changements si nécessaire
+    updateProductSuppliersOrder(reorderedSuppliers);
   };
 
   return (
@@ -1545,40 +1595,77 @@ export default function SingleProductPage() {
                   {/* Fournisseur */}
                   <div className="w-1/4">
                     <FormSection title="Fournisseurs">
-                      <div className="relative flex flex-col gap-3">
-                        <div className="mt-3 flex flex-col gap-2">
-                          {selectedSuppliers && selectedSuppliers.length > 0 ? (
-                            selectedSuppliers.map((supplier, index) => (
-                              <div
-                                key={index}
-                                className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md ${
-                                  index === 0 ? "bg-[#3B71CA]" : "bg-slate-400"
-                                }`}
-                                onClick={() =>
-                                  handleSupplierClick(supplier, index)
-                                }
-                              >
-                                <span className="text-[20px] text-white font-bold capitalize">
-                                  {supplier.label}
-                                </span>
-                              </div>
-                            ))
-                          ) : (
-                            <p>Aucun fournisseur pour cette référence</p>
-                          )}
-                        </div>
-                        {isModify && (
-                          <div
-                            className="flex flex-col items-center justify-center p-[20px] text-orange-400 hover:text-orange-300 cursor-pointer"
-                            onClick={() => setModalSupplierisOpen(true)}
-                          >
-                            <div className="flex items-center gap-2 text-[12px] mt-3">
-                              <Plus size={30} />
+                      <DragDropContext onDragEnd={handleSupplierDragEnd}>
+                        <Droppable droppableId="suppliers">
+                          {(provided) => (
+                            <div
+                              className="relative flex flex-col gap-2 mt-3"
+                              {...provided.droppableProps}
+                              ref={provided.innerRef}
+                            >
+                              {selectedSuppliers &&
+                              selectedSuppliers.length > 0 ? (
+                                selectedSuppliers.map((supplier, index) => (
+                                  <Draggable
+                                    key={`supplier-${index}`}
+                                    draggableId={`supplier-${index}`}
+                                    index={index}
+                                    isDragDisabled={!isModify}
+                                  >
+                                    {(provided) => (
+                                      <div
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        {...provided.dragHandleProps}
+                                        className={`text-center rounded-md ${
+                                          isModify
+                                            ? "cursor-move"
+                                            : "cursor-pointer"
+                                        } hover:brightness-125 shadow-md p-3 ${
+                                          index === 0
+                                            ? "bg-[#3B71CA]"
+                                            : "bg-slate-400"
+                                        }`}
+                                        onClick={() =>
+                                          handleSupplierClick(supplier, index)
+                                        }
+                                      >
+                                        <div className="flex items-center justify-between">
+                                          <span className="text-[20px] text-white font-bold capitalize">
+                                            {supplier.label}
+                                          </span>
+                                          {index === 0 && (
+                                            <span className="text-xs text-white bg-blue-600 px-2 py-1 rounded">
+                                              Principal
+                                            </span>
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </Draggable>
+                                ))
+                              ) : (
+                                <p className="text-gray-400 font-bold text-xs">
+                                  Aucun fournisseur pour cette référence
+                                </p>
+                              )}
+                              {provided.placeholder}
                             </div>
-                            <p className="font-[700]">Ajouter un fournisseur</p>
+                          )}
+                        </Droppable>
+                      </DragDropContext>
+
+                      {isModify && (
+                        <div
+                          className="flex flex-col items-center justify-center p-[20px] text-orange-400 hover:text-orange-300 cursor-pointer"
+                          onClick={() => setModalSupplierisOpen(true)}
+                        >
+                          <div className="flex items-center gap-2 text-[12px] mt-3">
+                            <Plus size={30} />
                           </div>
-                        )}
-                      </div>
+                          <p className="font-[700]">Ajouter un fournisseur</p>
+                        </div>
+                      )}
                     </FormSection>
                   </div>
                   {/* Caractéristiques produit */}
