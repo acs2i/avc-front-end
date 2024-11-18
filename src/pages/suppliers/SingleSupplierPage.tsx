@@ -1015,6 +1015,27 @@ export default function SingleSupplierPage() {
     }));
   };
 
+  const [fileName, setFileName] = useState<string>("");
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // Ajoutez cette fonction de gestion du fichier
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setFileName(file.name);
+      // Ici vous pouvez ajouter la logique de traitement du fichier PDF
+    }
+  };
+
+  const handleButtonClick = () => {
+    setIsExpanded(true);
+    setTimeout(() => {
+      setIsExpanded(false);
+    }, 3000);
+  };
+
   return (
     <>
       <Modal
@@ -1800,55 +1821,125 @@ export default function SingleSupplierPage() {
             </div>
             <div className="mt-[30px]">
               {!isModify && (
-                <FormSection title="Conditions commerciales">
-                  <div>
-                    {conditions && conditions.length > 0 ? (
-                      conditions.map((condition, index) => {
-                        return (
-                          <div
-                            key={index}
-                            className="mb-2 border rounded-md bg-gray-50"
-                          >
+                <>
+                  <FormSection title="Conditions commerciales">
+                    <div>
+                      {conditions && conditions.length > 0 ? (
+                        conditions.map((condition, index) => {
+                          return (
                             <div
-                              className="p-2 flex justify-between items-center cursor-pointer"
-                              onClick={() => setOpen(!open)}
+                              key={index}
+                              className="mb-2 border rounded-md bg-gray-50"
                             >
-                              <div className="flex items-center gap-2">
-                                <p className="font-bold text-lg">
-                                  Saison :{" "}
-                                  <span className="font-light">
-                                    {condition.season}
-                                  </span>
-                                </p>
-                                <p className="text-[12px] font-[600]">
-                                  Crée le :{" "}
-                                  <span className="text-blue-500">
-                                    {formatDate(condition.createdAt)}
-                                  </span>
-                                </p>
-                              </div>
-                              <div className="text-gray-500">
-                                <div
-                                  onClick={(e: React.MouseEvent) => {
-                                    e.stopPropagation();
-                                    handlePdf(condition, index);
-                                  }}
-                                  className="cursor-pointer"
-                                >
-                                  <File size={18} />
+                              <div
+                                className="p-2 flex justify-between items-center cursor-pointer"
+                                onClick={() => setOpen(!open)}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <p className="font-bold text-lg">
+                                    Saison :{" "}
+                                    <span className="font-light">
+                                      {condition.season}
+                                    </span>
+                                  </p>
+                                  <p className="text-[12px] font-[600]">
+                                    Crée le :{" "}
+                                    <span className="text-blue-500">
+                                      {formatDate(condition.createdAt)}
+                                    </span>
+                                  </p>
+                                </div>
+                                <div className="text-gray-500">
+                                  <div
+                                    onClick={(e: React.MouseEvent) => {
+                                      e.stopPropagation();
+                                      handlePdf(condition, index);
+                                    }}
+                                    className="cursor-pointer"
+                                  >
+                                    <File size={18} />
+                                  </div>
                                 </div>
                               </div>
                             </div>
+                          );
+                        })
+                      ) : (
+                        <p className="text-gray-500">
+                          Aucune condition commerciale n'a été enregistrée
+                        </p>
+                      )}
+                    </div>
+                  </FormSection>
+                  <div className="mt-5">
+                    <FormSection title="Importer des conditions commerciales">
+                      {fileName ? (
+                        <div className="flex items-center mt-3">
+                          <div className="relative">
+                            {!isExpanded ? (
+                              <button
+                                onClick={handleButtonClick}
+                                className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center transition-all duration-300"
+                              >
+                                <Plus />
+                              </button>
+                            ) : (
+                              <div className="flex items-center gap-3 transition-all duration-300">
+                                <input
+                                  type="file"
+                                  accept=".pdf"
+                                  onChange={handleFileUpload}
+                                  className="hidden"
+                                  id="fileUpload"
+                                />
+                                <label
+                                  htmlFor="fileUpload"
+                                  className="border-[3px] border-blue-400 rounded-full py-1 px-4 hover:font-bold hover:bg-gradient-to-r from-cyan-500 to-blue-500 hover:text-white transition-all cursor-pointer"
+                                >
+                                  Changer de fichier
+                                </label>
+                              </div>
+                            )}
                           </div>
-                        );
-                      })
-                    ) : (
-                      <p className="text-gray-500">
-                        Aucune condition commerciale n'a été enregistrée
-                      </p>
-                    )}
+                          <span className="ml-4 text-gray-600 font-semibold">
+                            Fichier sélectionné : {fileName}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="w-full h-[200px] flex flex-col gap-5 border-[5px] border-dashed border-slate-300 rounded-lg hover:bg-white hover:bg-opacity-75 transition ease-in-out delay-150 duration-300 cursor-pointer mt-3">
+                          <div className="w-full h-full flex justify-center items-center rounded-md">
+                            <div className="flex flex-col items-center text-center gap-5">
+                              <div className="w-[80px]">
+                                <img src="/img/upload.png" alt="icone" />
+                              </div>
+                              <div className="flex flex-col gap-2">
+                                <p className="text-gray-600 text-[20px]">
+                                  Glissez déposez votre fichier PDF ici
+                                </p>
+                                <span className="text-gray-600 text-[15px]">
+                                  ou
+                                </span>
+                                <input
+                                  type="file"
+                                  accept=".pdf"
+                                  onChange={handleFileUpload}
+                                  className="hidden"
+                                  id="fileUpload"
+                                />
+                                <label
+                                  htmlFor="fileUpload"
+                                  className="border-[3px] border-blue-400 rounded-full hover:font-bold py-1 hover:bg-gradient-to-r from-cyan-500 to-blue-500 hover:text-white transition-all cursor-pointer"
+                                >
+                                  Téléchargez le depuis votre ordinateur
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </FormSection>
                   </div>
-                </FormSection>
+                </>
               )}
               {isModify && (
                 <div

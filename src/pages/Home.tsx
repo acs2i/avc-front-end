@@ -6,15 +6,14 @@ import SparkLineChart from "../components/Charts/LineCharts";
 import PointChart from "../components/Charts/PointChart";
 import Map from "../components/Shared/Map";
 import { Pause, Star, X } from "lucide-react";
-import CardHome from "../components/Shared/CardHome";
+import CardHome, { ChartTypes } from "../components/Shared/CardHome";
 import { useProducts } from "../utils/hooks/useProducts";
 import { useNavigate } from "react-router-dom";
 import { CARD, GRAPH } from "../utils";
 import { useActiveInactiveProductGraph } from "../utils/hooks/dashboard/useActiveInactiveProductGraphs";
 import useCardsHook from "../utils/hooks/dashboard/useCards";
 import { Card } from "@/type";
-import {Mosaic, OrbitProgress} from "react-loading-indicators"
-
+import { Mosaic, OrbitProgress } from "react-loading-indicators";
 
 interface Supplier {
   _id: string;
@@ -76,8 +75,60 @@ interface CardType {
   chartType: string;
 }
 
+interface InitialCard {
+  id: number;
+  title: string;
+  subtitle: string;
+  data1: number[];
+  data2?: number[];
+  labels: string[];
+  chartType: ChartTypes;
+}
+
+const INITIAL_CARDS: InitialCard[] = [
+  {
+    id: 0,
+    title: "Produits",
+    subtitle: "Actif vs. Inactif",
+    data1: [50, 50],
+    labels: ["Actif", "Inactif"],
+    chartType: "pie",
+  },
+  {
+    id: 1,
+    title: "UVC",
+    subtitle: "Actif vs. Inactif",
+    data1: [50, 50],
+    labels: ["Actif", "Inactif"],
+    chartType: "pie",
+  },
+  {
+    id: 2,
+    title: "UVC",
+    subtitle: "Actifs avec/sans EAN",
+    data1: [50, 50],
+    labels: ["Avec EAN", "Sans EAN"],
+    chartType: "pie",
+  },
+  {
+    id: 3,
+    title: "Marques",
+    subtitle: "Actif vs. Inactif",
+    data1: [50, 50],
+    labels: ["Actif", "Inactif"],
+    chartType: "pie",
+  },
+  {
+    id: 4,
+    title: "Fournisseurs",
+    subtitle: "Actif vs. Inactif",
+    data1: [50, 50],
+    labels: ["Actif", "Inactif"],
+    chartType: "pie",
+  },
+];
+
 export default function Home() {
-  
   const limit = 10;
 
   const navigate = useNavigate();
@@ -86,17 +137,34 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalItem, setTotalItem] = useState<number | null>(null);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
-  const [submittedSearchParams, setSubmittedSearchParams] = useState<SearchParams>({});
+  const [submittedSearchParams, setSubmittedSearchParams] =
+    useState<SearchParams>({});
   const { data: products, refetch: refetchProducts } = useProducts(
     limit,
     currentPage,
     submittedSearchParams
   );
 
-  const [numberValidatedOfProducts, setNumberValidatedOfProducts] = useState<number>(0)
-  const [numberDraftsWaiting, setNumberDraftsWaiting] = useState<number>(0)
+  const [numberValidatedOfProducts, setNumberValidatedOfProducts] =
+    useState<number>(0);
+  const [numberDraftsWaiting, setNumberDraftsWaiting] = useState<number>(0);
 
-  const {cards, isLoadingCards}: {cards: Card[], isLoadingCards: boolean} = useCardsHook()
+  const { cards, isLoadingCards }: { cards: Card[]; isLoadingCards: boolean } =
+    useCardsHook();
+
+  const [displayCards, setDisplayCards] =
+    useState<InitialCard[]>(INITIAL_CARDS);
+
+  useEffect(() => {
+    if (!isLoadingCards && cards?.length > 0) {
+      setDisplayCards(
+        cards.map((card) => ({
+          ...card,
+          chartType: card.chartType as ChartTypes,
+        }))
+      );
+    }
+  }, [cards, isLoadingCards]);
 
   const totalPages = Math.ceil((totalItem ?? 0) / limit);
   const data1 = [12, 19, 14, 5, 16, 19];
@@ -110,46 +178,36 @@ export default function Home() {
 
   useEffect(() => {
     (async () => {
-    
-     const response = await fetch(
-       `${
-         process.env.REACT_APP_URL_DEV
-       }/api/v1/product/search?creation_date=2020-02-01T00:00:00Z`,
-       {
-         method: "GET",
-         headers: {
-           "Content-Type": "application/json",
-         },
-       }
-     ) 
-     const {data, total} = await response.json();
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/product/search?creation_date=2020-02-01T00:00:00Z`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const { data, total } = await response.json();
 
-     setNumberValidatedOfProducts(total);
-     })();
- },[])
+      setNumberValidatedOfProducts(total);
+    })();
+  }, []);
 
- 
- useEffect(() => {
-  (async () => {
-  
-   const response = await fetch(
-     `${
-       process.env.REACT_APP_URL_DEV
-     }/api/v1/draft/status`,
-     {
-       method: "GET",
-       headers: {
-         "Content-Type": "application/json",
-       },
-     }
-   ) 
-   const data = await response.json();
-   setNumberDraftsWaiting(data.length);
-   })();
-},[])
-
-
-
+  useEffect(() => {
+    (async () => {
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/draft/status`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+      setNumberDraftsWaiting(data.length);
+    })();
+  }, []);
 
   const fetchSuppliers = async () => {
     try {
@@ -172,8 +230,6 @@ export default function Home() {
       setIsLoading(false);
     }
   };
-
-
 
   // Fictitious data for the new indicators
   const indicatorsData = {
@@ -221,7 +277,9 @@ export default function Home() {
                   <Pause size={20} />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-lg font-bold">{numberDraftsWaiting} Brouillons attendent la validation </span>
+                  <span className="text-lg font-bold">
+                    {numberDraftsWaiting} Brouillons attendent la validation{" "}
+                  </span>
                   <span className="text-xs">Awaiting processing</span>
                 </div>
               </div>
@@ -264,26 +322,17 @@ export default function Home() {
           </div> */}
         </div>
         <div className="w-[70%] flex flex-wrap justify-end gap-6">
-          {isLoadingCards 
-          ?
-             <div className="m-auto">
-              <OrbitProgress color="#fff" size="large" text="" textColor="" />
-              </div> 
-            : <React.Fragment>
-              {cards?.map((card: Card) => {
-                return <CardHome 
-                  key={card.id}
-                  title={card.title}
-                  subtitle={card.subtitle}
-                  data1={card.data1}
-                  data2={card.data2}
-                  labels={card.labels}
-                  chartType={card.chartType}
-                  />
-              })}
-            </React.Fragment>
-          }
-    
+          {displayCards.map((card) => (
+            <CardHome
+              key={card.id}
+              title={card.title}
+              subtitle={card.subtitle}
+              data1={card.data1}
+              data2={card.data2}
+              labels={card.labels}
+              chartType={card.chartType}
+            />
+          ))}
         </div>
       </section>
 
