@@ -221,12 +221,6 @@ export const LINKS_UVC: Params[] = [
     page: "bloc",
   },
   {
-    name: "Pays",
-    link: "",
-    icon: "",
-    page: "country",
-  },
-  {
     name: "Champs utilisateur",
     link: "",
     icon: "",

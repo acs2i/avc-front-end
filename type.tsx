@@ -138,6 +138,7 @@ export type Product = {
   uvc_ids: any[];
   brand_ids: any[];
   collection_ids: any[];
+  blocked?: string;
   height: string;
   width: string;
   length: string;
@@ -200,7 +201,6 @@ export type Price = {
 }
 
 export type Uvc = {
-  _id: any;
   code: string;
   dimensions: string[];
   prices: Price;
@@ -209,6 +209,12 @@ export type Uvc = {
   collectionUvc: string;
   barcodePath: string;
   status: string;
+  blocked?: string;
+  height?: string;
+  width?: string;
+  length?: string;
+  gross_weight?: string;
+  net_weight?: string; 
 }
 
 export type DatalakeUvc = {
@@ -220,6 +226,13 @@ export type DatalakeUvc = {
   eans: string[];
   collectionUvc: string;
   status: string;
+  blocked?: string;
+  barcodePath: string;
+  height?: string;
+  width?: string;
+  length?: string;
+  gross_weight?: string;
+  net_weight?: string; 
 }
 
 export type Supplier = {

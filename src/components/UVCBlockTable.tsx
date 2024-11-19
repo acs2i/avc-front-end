@@ -5,17 +5,17 @@ import CollectionSection from "./Formulaires/CollectionSection";
 interface UVCInfosTableProps {
   reference: string;
   isModify?: boolean;
-  collection?: any;
+  block?: any;
   uvcDimension: { code: string; dimensions: string[]; collectionUvc: any }[];
   customStyles: any;
   placeholder: (index: number) => string;
   handleUpdateCollection: (index: number, updatedCollection: any) => void;
 }
 
-const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
+const UVCBlockTable: React.FC<UVCInfosTableProps> = ({
   reference,
   isModify,
-  collection,
+  block,
   uvcDimension,
   customStyles,
   placeholder,
@@ -43,19 +43,7 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
 
   return (
     <div className="w-full">
-      {/* Section descriptive */}
-      <div className="mb-4 p-4 bg-gray-100 rounded-md">
-        <h3 className="font-semibold mb-2">Collection principale</h3>
-        <div className="grid grid-cols-1 gap-4 text-sm">
-          <div>
-            <span className="text-gray-600">Collection: </span>
-            <span className="font-medium">
-              {collection}
-            </span>
-          </div>
-        </div>
-      </div>
-
+   
       {/* Table des collections */}
       <table className="w-full border-collapse">
         <thead>
@@ -70,7 +58,7 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
               Taille
             </th>
             <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
-              Collection
+              Blocage
             </th>
           </tr>
         </thead>
@@ -90,29 +78,8 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
                 <td className="border px-4 py-2 text-center text-sm">
                   {taille}
                 </td>
-                <td className="border px-4 py-2 text-center text-sm bg-blue-50">
-                  {isModify ? (
-                    <CollectionSection
-                      collection={uvc.collectionUvc}
-                      placeholder={placeholder(index)}
-                      optionsCollection={optionsCollection}
-                      handleChangeCollection={(selectedOption) =>
-                        handleUpdateCollection(index, selectedOption)
-                      }
-                      handleInputChangeCollection={(newInputValue) =>
-                        handleLocalInputChange(index, newInputValue)
-                      }
-                      inputValueCollection={localInputValues[index]}
-                      customStyles={customStyles}
-                    />
-                  ) : (
-                    <span>
-                      {typeof uvc.collectionUvc === "object" &&
-                      uvc.collectionUvc?.label
-                        ? uvc.collectionUvc.label
-                        : uvc.collectionUvc || "Non spécifiée"}
-                    </span>
-                  )}
+                <td className="border px-4 py-2 text-center text-sm">
+                 {block}
                 </td>
               </tr>
             );
@@ -123,4 +90,4 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
   );
 };
 
-export default UVCInfosTable;
+export default UVCBlockTable;

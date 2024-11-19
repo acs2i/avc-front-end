@@ -42,6 +42,7 @@ import useNotify from "../../utils/hooks/useToast";
 import { CircularProgress } from "@mui/material";
 import DynamicField from "../../components/FormElements/DynamicField";
 import Input from "../../components/FormElements/Input";
+import UVCBlockTable from "../../components/UVCBlockTable";
 
 interface formDataUVC {
   uvc: DatalakeUvc[];
@@ -83,6 +84,7 @@ interface FormData {
   width: string;
   length: string;
   comment: string;
+  blocked: string;
   size_unit: string;
   weigth_unit: string;
   gross_weight: string;
@@ -205,6 +207,7 @@ export default function SingleProductPage() {
     weigth_unit: product?.weigth_unit || "",
     gross_weight: product?.gross_weight || "",
     net_weight: product?.net_weight || "",
+    blocked: product?.blocked || "",
     imgPath: "",
     status: "A",
     uvc_ids: [],
@@ -219,22 +222,29 @@ export default function SingleProductPage() {
         product_id: "",
         code: "",
         dimensions: [],
-        prices: 
-          {
-            supplier_id: "",
-            price: {
-              paeu: product?.paeu || 0,
-              tbeu_pb: product?.tbeu_pb || 0,
-              tbeu_pmeu: product?.tbeu_pmeu || 0,
-            },
+        prices: {
+          supplier_id: "",
+          price: {
+            paeu: product?.paeu || 0,
+            tbeu_pb: product?.tbeu_pb || 0,
+            tbeu_pmeu: product?.tbeu_pmeu || 0,
           },
-        collectionUvc: product?.collection_ids[0].label || "",
+        },
+        collectionUvc: product?.collection_ids[0]?.label || "",
         eans: [],
         ean: "",
         status: "",
+        blocked: "",
+        barcodePath: "",
+        height: product?.height || "",
+        width: product?.width || "",
+        length: product?.length || "",
+        net_weight: product?.net_weight || "",
+        gross_weight: product?.gross_weight || "",
       },
     ],
   });
+
   const [newSupplier, setNewSupplier] = useState<Supplier>({
     supplier_id: "",
     supplier_ref: "",
@@ -280,6 +290,7 @@ export default function SingleProductPage() {
         size_unit: product?.size_unit || "",
         weigth_unit: product?.weigth_unit || "",
         gross_weight: product?.gross_weight || "",
+        blocked: product?.blocked || "",
         net_weight: product?.net_weight || "",
         imgPath: product.imgPath || "",
         status: product.status || "A",
@@ -306,6 +317,53 @@ export default function SingleProductPage() {
       setSelectedSuppliers(suppliersMapped);
     }
   }, [product, creatorId._id]);
+
+  useEffect(() => {
+    if (product && product.uvc_ids) {
+      setFormDataUvc({
+        uvc: product.uvc_ids.map((uvc) => ({
+          ...uvc,
+          product_id: uvc.product_id || "",
+          code: uvc.code || "",
+          dimensions: uvc.dimensions || [],
+          prices: {
+            supplier_id: uvc.prices?.supplier_id || "",
+            price: {
+              // Utiliser d'abord les prix spécifiques de l'UVC s'ils existent
+              paeu: uvc.prices?.price?.paeu || product.paeu || 0,
+              tbeu_pb: uvc.prices?.price?.tbeu_pb ?? product.tbeu_pb ?? 0,
+              tbeu_pmeu: uvc.prices?.price?.tbeu_pmeu ?? product.tbeu_pmeu ?? 0,
+            },
+          },
+          collectionUvc:
+            uvc.collectionUvc || product.collection_ids[0]?.label || "",
+          eans: uvc.eans || [],
+          ean: uvc.ean || "",
+          status: uvc.status || "A",
+          made_in: uvc.made_in,
+          custom_cat: uvc.custom_cat,
+          measurements: uvc.measurements,
+          net_weight: uvc.net_weight,
+          gross_weight: uvc.gross_weight,
+          height: uvc.height,
+          length: uvc.length,
+          width: uvc.width,
+          blocked: uvc.blocked,
+          blocked_reason_code: uvc.blocked_reason_code,
+          coulfour: uvc.coulfour,
+          visible_on_internet: uvc.visible_on_internet,
+          sold_on_internet: uvc.sold_on_internet,
+          seuil_internet: uvc.seuil_internet,
+          en_reassort: uvc.en_reassort,
+          remisegenerale: uvc.remisegenerale,
+          fixation: uvc.fixation,
+          ventemetre: uvc.ventemetre,
+          comment: uvc.comment,
+          barcodePath: uvc.barcodePath,
+        })),
+      });
+    }
+  }, [product]);
 
   const [sizes, setSizes] = useState<string[]>(formData.initialSizes);
   const [colors, setColors] = useState<string[]>(formData.initialColors);
@@ -792,31 +850,42 @@ export default function SingleProductPage() {
         const [color, size] = combination.split(",");
 
         const existingUvc = formData.uvc_ids.find((uvc) => {
-          const [existingColor, existingSize] = uvc.dimensions[0].split("/");
+          const [existingColor, existingSize] =
+            uvc.dimensions[0]?.split("/") || [];
           return existingColor === color && existingSize === size;
         });
+
+        // Vérifiez que `prices` et `price` existent, sinon appliquez une valeur par défaut
+        const defaultPrice = { paeu: 0, tbeu_pb: 0, tbeu_pmeu: 0 };
+        const prices = existingUvc?.prices || {
+          supplier_id: "",
+          price: defaultPrice,
+        };
 
         return {
           product_id: id,
           code: `${formData.reference}_${color}_${size}`,
           dimensions: [`${color}/${size}`],
-          prices: 
-            {
-              supplier_id:
-                selectedSuppliers.length > 0 ? selectedSuppliers[0]._id : "",
-              price: {
-                paeu: formData.paeu,
-                tbeu_pb: formData.tbeu_pb,
-                tbeu_pmeu: formData.tbeu_pmeu,
-              },
-              store: "",
+          prices: {
+            supplier_id: prices.supplier_id,
+            price: {
+              paeu: prices.price.paeu || formData.paeu || 0,
+              tbeu_pb: prices.price.tbeu_pb || formData.tbeu_pb || 0,
+              tbeu_pmeu: prices.price.tbeu_pmeu || formData.tbeu_pmeu || 0,
             },
+          },
           collectionUvc:
             formData.uvc_ids[i]?.collectionUvc ||
-            formData.collection_ids[0]?.label,
+            formData.collection_ids[0]?.label ||
+            "Aucune collection enregistré",
           eans: existingUvc?.eans || [],
           ean: existingUvc?.ean || "",
           barcodePath: existingUvc?.barcodePath || "",
+          height: existingUvc?.height || "",
+          width: existingUvc?.height || "",
+          length: existingUvc?.length || "",
+          gross_weight: existingUvc?.gross_weight || "",
+          net_weight: existingUvc?.gross_weight || "",
           status: "A",
         };
       });
@@ -1128,7 +1197,7 @@ export default function SingleProductPage() {
       };
     });
   };
-  console.log(formDataUvc);
+  console.log(product);
   return (
     <>
       <Modal
@@ -2010,16 +2079,18 @@ export default function SingleProductPage() {
                   )}
                 </div>
               ))}
-              {isModify && <div className="mt-3">
-                <Button
-                  size="100"
-                  blue
-                  type="button"
-                  onClick={() => setIsModifyUvc((prev) => !prev)}
-                >
-                  {isModifyUvc ? "Générer les UVC" : "Modifier les UVC"}
-                </Button>
-              </div>}
+              {isModify && (
+                <div className="mt-3">
+                  <Button
+                    size="100"
+                    blue
+                    type="button"
+                    onClick={() => setIsModifyUvc((prev) => !prev)}
+                  >
+                    {isModifyUvc ? "Générer les UVC" : "Modifier les UVC"}
+                  </Button>
+                </div>
+              )}
             </div>
             {page === "dimension" && (
               <div
@@ -2085,92 +2156,119 @@ export default function SingleProductPage() {
                   <UVCInfosTable
                     isModify={isModifyUvc}
                     reference={product?.reference}
+                    collection={
+                      product?.collection_ids?.[0]?.label || "Non spécifiée"
+                    }
                     placeholder={(index) =>
-                      formData.uvc_ids[index].collectionUvc ||
-                      formData.collection_ids[0]?.label
+                      formData.uvc_ids[index]?.collectionUvc ||
+                      formData.collection_ids[0]?.label ||
+                      ""
                     }
                     uvcDimension={formDataUvc.uvc.map((uvc) => ({
                       code: uvc.code,
                       dimensions: uvc.dimensions,
-                      collectionUvc: uvc.collectionUvc,
+                      collectionUvc:
+                        uvc.collectionUvc ||
+                        product?.collection_ids[0]?.label ||
+                        "",
                     }))}
                     customStyles={customStyles}
                     handleUpdateCollection={handleUpdateCollection}
                   />
                 )}
                 {onglet === "price" && product && (
-                 <UVCPriceTable
-                 reference={product?.reference}
-                 uvcPrices={formDataUvc.uvc.map((uvc) => ({
-                   code: uvc.code,
-                   dimensions: uvc.dimensions,
-                   prices: {
-                     paeu: uvc.prices?.price.paeu || 0,
-                     tbeu_pb: uvc.prices?.price.tbeu_pb || 0,
-                     tbeu_pmeu: uvc.prices?.price.tbeu_pmeu || 0,
-                   },
-                 }))}
-                 globalPrices={{
-                   paeu: formData.paeu,
-                   tbeu_pb: formData.tbeu_pb,
-                   tbeu_pmeu: formData.tbeu_pmeu,
-                 }}
-                 isModify={isModifyUvc}
-                 onPriceChange={(index, field, value) => {
-                   setFormDataUvc((prevFormData) => {
-                     const updatedUVCs = [...prevFormData.uvc];
+                  <UVCPriceTable
+                    reference={product?.reference}
+                    uvcPrices={formDataUvc.uvc}
+                    globalPrices={{
+                      paeu: formData.paeu,
+                      tbeu_pb: formData.tbeu_pb,
+                      tbeu_pmeu: formData.tbeu_pmeu,
+                    }}
+                    isModify={isModifyUvc}
+                    onPriceChange={(index, field, value) => {
+                      setFormDataUvc((prevFormData) => {
+                        const updatedUVCs = [...prevFormData.uvc];
 
-                     // Vérifier si `prices[0]` existe, sinon l'initialiser
-                     if (!updatedUVCs[index].prices) {
-                       updatedUVCs[index].prices = {
-                         supplier_id: "",
-                         price: {
-                           paeu: 0,
-                           tbeu_pb: 0,
-                           tbeu_pmeu: 0,
-                         },
-                       };
-                     }
+                        if (!updatedUVCs[index].prices) {
+                          updatedUVCs[index].prices = {
+                            supplier_id: "",
+                            price: {
+                              paeu: 0,
+                              tbeu_pb: 0,
+                              tbeu_pmeu: 0,
+                            },
+                          };
+                        }
+                        updatedUVCs[index].prices.price = {
+                          ...updatedUVCs[index].prices.price,
+                          [field]: value,
+                        };
 
-                     // Mettre à jour uniquement le champ dans `prices[0].price`
-                     updatedUVCs[index].prices.price = {
-                       ...updatedUVCs[index].prices.price,
-                       [field]: value,
-                     };
-
-                     return { ...prevFormData, uvc: updatedUVCs };
-                   });
-                 }}
-               />
+                        return { ...prevFormData, uvc: updatedUVCs };
+                      });
+                    }}
+                  />
                 )}
                 {onglet === "supplier" && product && (
                   <UVCSupplierTable
                     reference={product?.reference}
                     uvcDimension={formData.uvc_ids}
                     supplierLabel={
-                      product.suppliers[0].supplier_id.company_name || ""
+                      product?.suppliers[0].supplier_id?.company_name ||
+                      "Nom inconnu"
                     }
                   />
                 )}
                 {onglet === "weight" && product && (
                   <UVCMeasureTable
                     reference={product?.reference}
-                    uvcMeasure={formData.uvc_ids}
+                    uvcMeasure={formDataUvc.uvc}
                     Measure={{
-                      height: product.height || "0",
-                      long: product.length || "0",
-                      width: product.width || "0",
-                      weight_brut: product.gross_weight || "0",
-                      weight_net: product.net_weight || "0",
+                      height: product?.height || "0",
+                      long: product?.length || "0",
+                      width: product?.width || "0",
+                      weight_brut: product?.gross_weight || "0",
+                      weight_net: product?.net_weight || "0",
                     }}
-                    size_unit={product.size_unit || "m"}
-                    weight_unit={product.weigth_unit || "kg"}
+                    size_unit={product?.size_unit || "m"}
+                    weight_unit={product?.weigth_unit || "kg"}
+                    isModify={isModifyUvc}
+                    onUpdateMeasures={(index, field, value) => {
+                      setFormDataUvc((prev) => {
+                        const updatedUvc = [...prev.uvc];
+                        updatedUvc[index] = {
+                          ...updatedUvc[index],
+                          [field]: value,
+                        };
+                        return { ...prev, uvc: updatedUvc };
+                      });
+                    }}
                   />
                 )}
                 {onglet === "ean" && product && (
                   <UVCEanTable
                     reference={product?.reference}
                     uvcDimension={formData.uvc_ids}
+                  />
+                )}
+                {onglet === "bloc" && product && (
+                  <UVCBlockTable
+                    isModify={isModifyUvc}
+                    reference={product?.reference}
+                    placeholder={(index) =>
+                      formData.uvc_ids[index]?.collectionUvc ||
+                      formData.collection_ids[0]?.label ||
+                      ""
+                    }
+                    block="Non"
+                    uvcDimension={formData.uvc_ids.map((uvc) => ({
+                      code: uvc.code,
+                      dimensions: uvc.dimensions,
+                      collectionUvc: uvc.collectionUvc,
+                    }))}
+                    customStyles={customStyles}
+                    handleUpdateCollection={handleUpdateCollection}
                   />
                 )}
               </div>

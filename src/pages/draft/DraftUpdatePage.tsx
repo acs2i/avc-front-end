@@ -41,6 +41,7 @@ import SupplierFormComponent from "../../components/SupplierFormComponent";
 import Input from "../../components/FormElements/Input";
 import Loader from "../../components/Shared/Loader";
 import Backdrop from "@mui/material/Backdrop";
+import UVCBlockTable from "../../components/UVCBlockTable";
 
 interface CustomField {
   field_name: string;
@@ -331,33 +332,34 @@ export default function DraftUpdatePage() {
           dimension.includes(",")
         ) {
           const [color, size] = dimension.split(",");
-          const uvcIndex = colorIndex * row.length + sizeIndex; // Calcul de l'index global de l'UVC
+          const uvcIndex = colorIndex * row.length + sizeIndex;
+          const existingUvc = formData.uvc[uvcIndex];
           const collectionUvc =
-            formData.uvc[uvcIndex]?.collectionUvc ||
-            formData.collection_ids[0] ||
-            "";
+            existingUvc?.collectionUvc || formData.collection_ids[0] || "";
 
           updatedUVCs.push({
-            _id: "",
             code: `${draft?.reference}_${color}_${size}`,
             dimensions: [`${color}/${size}`],
-            prices: 
-              {
-                supplier_id: "",
-                price: {
-                  paeu: draft?.paeu || 0,
-                  tbeu_pb: draft?.tbeu_pb || 0,
-                  tbeu_pmeu: draft?.tbeu_pmeu || 0,
-                },
+            prices: existingUvc?.prices || {
+              supplier_id: "",
+              price: {
+                paeu: formData.paeu || 0,
+                tbeu_pb: formData.tbeu_pb || 0,
+                tbeu_pmeu: formData.tbeu_pmeu || 0,
               },
+            },
             collectionUvc,
             barcodePath: "",
             eans: [],
             ean: "",
             status: "",
+            height: existingUvc?.height || formData.height || "0",
+            width: existingUvc?.width || formData.width || "0",
+            length: existingUvc?.length || formData.length || "0",
+            gross_weight:
+              existingUvc?.gross_weight || formData.gross_weight || "0",
+            net_weight: existingUvc?.net_weight || formData.net_weight || "0",
           });
-        } else {
-          console.warn(`La dimension est incorrecte ou vide : ${dimension}`);
         }
       });
     });
@@ -400,9 +402,10 @@ export default function DraftUpdatePage() {
   }, []);
 
   useEffect(() => {
-    if (draft) {
+    if (draft && draft.uvc) {
+      // Vérification de l'existence de draft.uvc
       setFormData({
-        creator_id: draft?.creator_id,
+        creator_id: draft.creator_id,
         reference: draft.reference || "",
         alias: draft.alias || "",
         short_label: draft.short_label || "",
@@ -410,33 +413,45 @@ export default function DraftUpdatePage() {
         type: draft.type || "Marchandise",
         tag_ids: draft.tag_ids || [],
         suppliers: draft.suppliers || [],
-        dimension_types: draft.dimension_types[0] || "Couleur/Taille",
+        dimension_types: draft.dimension_types?.[0] || "Couleur/Taille",
         brand_ids: draft.brand_ids || [],
         collection_ids: draft.collection_ids || [],
-        paeu: draft.paeu || 0, // Correction ici
-        tbeu_pb: draft.tbeu_pb || 0, // Utilisation de ?? pour éviter le problème
+        paeu: draft.paeu || 0,
+        tbeu_pb: draft.tbeu_pb || 0,
         tbeu_pmeu: draft.tbeu_pmeu || 0,
-        height: draft?.height || "",
-        width: draft?.width || "",
-        length: draft?.length || "",
-        comment: draft?.comment || "",
-        size_unit: draft?.size_unit || "",
-        weigth_unit: draft?.weigth_unit || "",
-        gross_weight: draft?.gross_weight || "",
-        net_weight: draft?.net_weight || "",
+        height: draft.height || "",
+        width: draft.width || "",
+        length: draft.length || "",
+        comment: draft.comment || "",
+        size_unit: draft.size_unit || "",
+        weigth_unit: draft.weigth_unit || "",
+        gross_weight: draft.gross_weight || "",
+        net_weight: draft.net_weight || "",
         imgPath: draft.imgPath || "",
         status: draft.status === "A" ? "A" : "I",
         additional_fields: draft.additional_fields || {},
-        uvc: draft.uvc || [],
+        uvc: draft.uvc.map((uvc) => ({
+          ...uvc,
+          height: uvc.height || draft.height || "",
+          width: uvc.width || draft.width || "",
+          length: uvc.length || draft.length || "",
+          gross_weight: uvc.gross_weight || draft.gross_weight || "",
+          net_weight: uvc.net_weight || draft.net_weight || "",
+          prices: {
+            supplier_id: uvc.prices?.supplier_id || "",
+            price: {
+              paeu: uvc.prices?.price?.paeu || draft.paeu || 0,
+              tbeu_pb: uvc.prices?.price?.tbeu_pb || draft.tbeu_pb || 0,
+              tbeu_pmeu: uvc.prices?.price?.tbeu_pmeu || draft.tbeu_pmeu || 0,
+            },
+          },
+        })),
         initialSizes: formData.initialSizes,
         initialColors: formData.initialColors,
         initialGrid: formData.initialGrid,
       });
     }
   }, [draft]);
-
-  
-  
 
   useEffect(() => {
     fetchField();
@@ -1020,7 +1035,7 @@ export default function DraftUpdatePage() {
         const result = await response.json();
         console.log("Réponse du backend :", result);
         notifySuccess("Brouillon modifié avec succès !");
-        // window.location.reload();
+        window.location.reload();
         setTimeout(() => {
           setIsLoading(false);
           setIsModify(false);
@@ -1106,7 +1121,7 @@ export default function DraftUpdatePage() {
     }
   };
 
-  console.log(formData);
+  console.log(product);
   return (
     <>
       <Modal
@@ -2088,8 +2103,9 @@ export default function DraftUpdatePage() {
                     isModify={isModifyUvc}
                     reference={draft?.reference}
                     placeholder={(index) =>
-                      formData.uvc[index].collectionUvc ||
-                      formData.collection_ids[0]?.label
+                      formData.uvc[index]?.collectionUvc ||
+                      formData.collection_ids[0]?.label ||
+                      ""
                     }
                     uvcDimension={formData.uvc.map((uvc) => ({
                       code: uvc.code,
@@ -2102,50 +2118,40 @@ export default function DraftUpdatePage() {
                 )}
                 {onglet === "price" && draft && (
                   <UVCPriceTable
-                  reference={draft?.reference}
-                  uvcPrices={formData.uvc.map((uvc) => ({
-                    code: uvc.code,
-                    dimensions: uvc.dimensions,
-                    prices: {
-                      paeu: uvc.prices?.price.paeu || 0,
-                      tbeu_pb: uvc.prices?.price.tbeu_pb || 0,
-                      tbeu_pmeu: uvc.prices?.price.tbeu_pmeu || 0,
-                    },
-                  }))}
-                  globalPrices={{
-                    paeu: formData.paeu,
-                    tbeu_pb: formData.tbeu_pb,
-                    tbeu_pmeu: formData.tbeu_pmeu,
-                  }}
-                  isModify={isModifyUvc}
-                  onPriceChange={(index, field, value) => {
-                    setFormData((prevFormData) => {
-                      const updatedUVCs = [...prevFormData.uvc];
-                
-                      // Vérifier si `prices[0]` existe, sinon l'initialiser
-                      if (!updatedUVCs[index].prices) {
-                        updatedUVCs[index].prices = {
-                          supplier_id: "",
-                          price: {
-                            paeu: 0,
-                            tbeu_pb: 0,
-                            tbeu_pmeu: 0,
-                          },
+                    reference={draft?.reference}
+                    uvcPrices={formData.uvc} // Passez directement formData.uvc sans le mapping
+                    globalPrices={{
+                      paeu: formData.paeu,
+                      tbeu_pb: formData.tbeu_pb,
+                      tbeu_pmeu: formData.tbeu_pmeu,
+                    }}
+                    isModify={isModifyUvc}
+                    onPriceChange={(index, field, value) => {
+                      setFormData((prevFormData) => {
+                        const updatedUVCs = [...prevFormData.uvc];
+
+                        // Vérifier si prices existe, sinon l'initialiser
+                        if (!updatedUVCs[index].prices) {
+                          updatedUVCs[index].prices = {
+                            supplier_id: "",
+                            price: {
+                              paeu: 0,
+                              tbeu_pb: 0,
+                              tbeu_pmeu: 0,
+                            },
+                          };
+                        }
+
+                        // Mettre à jour uniquement le champ dans prices.price
+                        updatedUVCs[index].prices.price = {
+                          ...updatedUVCs[index].prices.price,
+                          [field]: value,
                         };
-                      }
-                
-                      // Mettre à jour uniquement le champ dans `prices[0].price`
-                      updatedUVCs[index].prices.price = {
-                        ...updatedUVCs[index].prices.price,
-                        [field]: value,
-                      };
-                
-                      return { ...prevFormData, uvc: updatedUVCs };
-                    });
-                  }}
-                />
-                
-                
+
+                        return { ...prevFormData, uvc: updatedUVCs };
+                      });
+                    }}
+                  />
                 )}
                 {onglet === "supplier" && draft && (
                   <UVCSupplierTable
@@ -2167,12 +2173,42 @@ export default function DraftUpdatePage() {
                     }}
                     size_unit={draft?.size_unit || "m"}
                     weight_unit={draft?.weigth_unit || "kg"}
+                    isModify={isModifyUvc}
+                    onUpdateMeasures={(index, field, value) => {
+                      setFormData((prev) => {
+                        const updatedUvc = [...prev.uvc];
+                        updatedUvc[index] = {
+                          ...updatedUvc[index],
+                          [field]: value,
+                        };
+                        return { ...prev, uvc: updatedUvc };
+                      });
+                    }}
                   />
                 )}
                 {onglet === "ean" && draft && (
                   <UVCEanTable
                     reference={draft?.reference}
                     uvcDimension={formData.uvc}
+                  />
+                )}
+                {onglet === "bloc" && draft && (
+                  <UVCBlockTable
+                    isModify={isModifyUvc}
+                    reference={draft?.reference}
+                    placeholder={(index) =>
+                      formData.uvc[index]?.collectionUvc ||
+                      formData.collection_ids[0]?.label ||
+                      ""
+                    }
+                    block="Non"
+                    uvcDimension={formData.uvc.map((uvc) => ({
+                      code: uvc.code,
+                      dimensions: uvc.dimensions,
+                      collectionUvc: uvc.collectionUvc,
+                    }))}
+                    customStyles={customStyles}
+                    handleUpdateCollection={handleUpdateCollection}
                   />
                 )}
               </div>

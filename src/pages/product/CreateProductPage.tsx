@@ -31,38 +31,20 @@ import { useCollections } from "../../utils/hooks/useCollection";
 import { useFamily } from "../../utils/hooks/useFamily";
 import { useSubFamily } from "../../utils/hooks/useSubFamily";
 import { useSubSubFamily } from "../../utils/hooks/useSubSubFamily";
-
-interface PriceItemSchema {
-  paeu: number;
-  tbeu_pb: number;
-  tbeu_pmeu: number;
-}
-
-interface Price {
-  tarif_id: any;
-  currency: string;
-  supplier_id: any;
-  price: PriceItemSchema;
-  store: string;
-}
-
-interface Uvc {
-  code: string;
-  dimensions: string[];
-  prices: Price[];
-  eans: string[];
-  ean: string;
-  status: string;
-  collectionUvc: string;
-}
-interface Supplier {
-  supplier_id: string;
-  supplier_ref: string;
-  pcb: string;
-  custom_cat: string;
-  made_in: string;
-  company_name: string;
-}
+import {
+  Uvc,
+  Supplier,
+  Draft,
+  SupplierDetail,
+  TagOption,
+  BrandOption,
+  CollectionOption,
+  Price,
+  PriceItemSchema,
+  SuppliersOption,
+  Tag,
+} from "@/type";
+import UVCMeasureTable from "../../components/UVCMeasureTable";
 
 interface FormData {
   creator_id: any;
@@ -120,22 +102,6 @@ interface Unit {
   unit: string;
   apply_to: string;
 }
-
-type TagOption = {
-  value: string;
-  label: string;
-};
-
-type SuppliersOption = {
-  _id: string;
-  value: string;
-  label: string;
-  company_name: string;
-  supplier_ref?: string;
-  pcb?: string;
-  custom_cat?: string;
-  made_in?: string;
-};
 
 const customStyles = {
   control: (provided: any) => ({
@@ -201,6 +167,7 @@ export default function CreateProductPage() {
   const [optionsSupplier, setOptionsSupplier] = useState<SuppliersOption[]>([]);
   const classificationOptions = [
     {
+      _id: "Au vieux",
       value: "Au vieux campeur",
       label: "Au vieux campeur",
       name: "Au vieux campeur",
@@ -238,20 +205,16 @@ export default function CreateProductPage() {
       {
         code: "",
         dimensions: [],
-        prices: [
-          {
-            tarif_id: "",
-            currency: "",
-            supplier_id: "",
-            price: {
-              paeu: 0,
-              tbeu_pb: 0,
-              tbeu_pmeu: 0,
-            },
-            store: "",
+        prices: {
+          supplier_id: "",
+          price: {
+            paeu: 0,
+            tbeu_pb: 0,
+            tbeu_pmeu: 0,
           },
-        ],
+        },
         collectionUvc: "",
+        barcodePath: "",
         eans: [],
         ean: "",
         status: "",
@@ -262,6 +225,7 @@ export default function CreateProductPage() {
     initialColors: ["000"],
     initialGrid: [[true]],
   });
+
   const [sizes, setSizes] = useState<string[]>([]);
   const [colors, setColors] = useState<string[]>([]);
   const [uvcGrid, setUvcGrid] = useState<boolean[][]>([]);
@@ -363,26 +327,22 @@ export default function CreateProductPage() {
       const generatedCode = `${formData.reference}${dim.color}${dim.size}`;
 
       return {
+        _id: "",
         code: generatedCode, // Utilisation du code généré
         dimensions: [`${dim.color}/${dim.size}`],
-        prices: [
-          {
-            tarif_id: "",
-            currency: "",
-            supplier_id: "",
-            price: {
-              paeu: formData.paeu,
-              tbeu_pb: formData.tbeu_pb,
-              tbeu_pmeu: formData.tbeu_pmeu,
-            },
-            store: "",
+        prices: {
+          supplier_id: "",
+          price: {
+            paeu: formData.paeu || 0,
+            tbeu_pb: formData.tbeu_pb || 0,
+            tbeu_pmeu: formData.tbeu_pmeu || 0,
           },
-        ],
+        },
         collectionUvc: formData.collection_ids[0]?.label || "",
         eans: [],
         ean: "",
+        barcodePath: "",
         status: "",
-        additional_fields: {},
       };
     });
 
@@ -479,15 +439,16 @@ export default function CreateProductPage() {
 
     if (selectedSupplier) {
       setSelectedSuppliers((prevSuppliers) => {
-        const newSupplier = {
-          _id: selectedSupplier.value,
+        const newSupplier: SuppliersOption = {
+          _id: selectedSupplier.value, // Copie l'ID sélectionné
           value: selectedSupplier.value,
           label: selectedSupplier.label,
           company_name: selectedSupplier.label,
-          supplier_ref: "",
-          pcb: "",
-          custom_cat: "",
-          made_in: "0",
+          supplier_id: selectedSupplier.value, // Ajoutez la propriété supplier_id
+          supplier_ref: "", // Valeur par défaut
+          pcb: "", // Valeur par défaut
+          custom_cat: "", // Valeur par défaut
+          made_in: "0", // Valeur par défaut
         };
 
         // Ajoute le nouveau fournisseur à la fin du tableau
@@ -496,7 +457,7 @@ export default function CreateProductPage() {
 
       // Mettez à jour `newSupplier` pour le fournisseur actuellement sélectionné
       setNewSupplier({
-        supplier_id: selectedSupplier.value,
+        supplier_id: selectedSupplier.value, // Assurez-vous que supplier_id est défini
         company_name: selectedSupplier.label,
         supplier_ref: "",
         pcb: "",
@@ -1396,8 +1357,9 @@ export default function CreateProductPage() {
                       isModify={isModifyUvc}
                       reference={formData?.reference}
                       placeholder={(index) =>
-                        formData.uvc[index].collectionUvc ||
-                        "Sélectionnez une collection"
+                        formData.uvc[index]?.collectionUvc ||
+                        formData.collection_ids[0]?.label ||
+                        ""
                       }
                       uvcDimension={formData.uvc.map((uvc) => ({
                         code: uvc.code,
@@ -1408,26 +1370,79 @@ export default function CreateProductPage() {
                       handleUpdateCollection={handleUpdateCollection}
                     />
                   )}
-                  {/* {onglet === "price" && (
+                  {onglet === "price" && (
                     <UVCPriceTable
-                      uvcPrices={formData.uvc}
-                      brandLabel={formData.brand_ids[0]?.label || ""}
+                      reference={formData?.reference}
+                      uvcPrices={formData.uvc} // Passez directement formData.uvc sans le mapping
                       globalPrices={{
-                        peau: formData.peau,
+                        paeu: formData.paeu,
                         tbeu_pb: formData.tbeu_pb,
                         tbeu_pmeu: formData.tbeu_pmeu,
                       }}
+                      isModify={isModifyUvc}
+                      onPriceChange={(index, field, value) => {
+                        setFormData((prevFormData) => {
+                          const updatedUVCs = [...prevFormData.uvc];
+
+                          // Vérifier si prices existe, sinon l'initialiser
+                          if (!updatedUVCs[index].prices) {
+                            updatedUVCs[index].prices = {
+                              supplier_id: "",
+                              price: {
+                                paeu: 0,
+                                tbeu_pb: 0,
+                                tbeu_pmeu: 0,
+                              },
+                            };
+                          }
+
+                          // Mettre à jour uniquement le champ dans prices.price
+                          updatedUVCs[index].prices.price = {
+                            ...updatedUVCs[index].prices.price,
+                            [field]: value,
+                          };
+
+                          return { ...prevFormData, uvc: updatedUVCs };
+                        });
+                      }}
                     />
-                  )} */}
-                  {/* {onglet === "supplier" && (
-                          <UVCSupplierTable
-                            uvcDimensions={uvc.dimensions || []}
-                            productReference={formData.reference || ""}
-                            productSupplier={
-                              formData.suppliers[0]?.supplier_id || ""
-                            }
-                          />
-                        )} */}
+                  )}
+                  {onglet === "supplier" && (
+                    <UVCSupplierTable
+                      reference={formData?.reference}
+                      uvcDimension={formData.uvc}
+                      supplierLabel={
+                        formData?.suppliers[0]?.supplier_id ||
+                        "Aucun Fournisseur"
+                      }
+                    />
+                  )}
+                  {onglet === "weight" && (
+                    <UVCMeasureTable
+                      reference={formData?.reference}
+                      uvcMeasure={formData.uvc}
+                      Measure={{
+                        height: formData?.height || "0",
+                        long: formData?.length || "0",
+                        width: formData?.width || "0",
+                        weight_brut: formData?.gross_weight || "0",
+                        weight_net: formData?.net_weight || "0",
+                      }}
+                      size_unit={formData?.size_unit || "m"}
+                      weight_unit={formData?.weigth_unit || "kg"}
+                      isModify={isModifyUvc}
+                      onUpdateMeasures={(index, field, value) => {
+                        setFormData((prev) => {
+                          const updatedUvc = [...prev.uvc];
+                          updatedUvc[index] = {
+                            ...updatedUvc[index],
+                            [field]: value,
+                          };
+                          return { ...prev, uvc: updatedUvc };
+                        });
+                      }}
+                    />
+                  )}
                 </div>
               )}
             </div>

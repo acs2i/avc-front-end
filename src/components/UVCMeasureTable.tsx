@@ -1,11 +1,33 @@
 import React from "react";
 
+interface Price {
+  supplier_id: string;
+  price: {
+    paeu: number;
+    tbeu_pb: number;
+    tbeu_pmeu: number;
+  };
+}
+
+interface Uvc {
+  code: string;
+  dimensions: string[];
+  prices: Price;
+  eans: string[];
+  status: string;
+  collectionUvc: string;
+  barcodePath: string;
+  ean: string;
+  height?: string;
+  width?: string;
+  length?: string;
+  gross_weight?: string;
+  net_weight?: string;
+}
+
 interface UVCMeasureTableProps {
   reference: string;
-  uvcMeasure: {
-    code: string;
-    dimensions: string[];
-  }[];
+  uvcMeasure: Uvc[];
   Measure: {
     height: string;
     long: string;
@@ -13,46 +35,170 @@ interface UVCMeasureTableProps {
     weight_brut: string;
     weight_net: string;
   };
-  size_unit: string
-  weight_unit: string
+  size_unit: string;
+  weight_unit: string;
+  isModify?: boolean;
+  onUpdateMeasures?: (index: number, field: string, value: string) => void;
 }
 
-const UVCMeasureTable: React.FC<UVCMeasureTableProps> = ({ uvcMeasure, Measure, reference, size_unit, weight_unit }) => {
+const UVCMeasureTable: React.FC<UVCMeasureTableProps> = ({
+  uvcMeasure,
+  Measure,
+  reference,
+  size_unit,
+  weight_unit,
+  isModify = false,
+  onUpdateMeasures
+}) => {
   return (
-    <table className="w-full border">
-      <thead>
-        <tr className="text-[13px] text-gray-400">
-          <th className="border px-4 py-2 w-[50px]">Code UVC</th>
-          <th className="border px-4 py-2 w-[50px]">Couleur</th>
-          <th className="border px-4 py-2 w-[50px]">Taille</th>
-          <th className="border px-4 py-2 w-[50px]">Hauteur</th>
-          <th className="border px-4 py-2 w-[50px]">Longueur</th>
-          <th className="border px-4 py-2 w-[50px]">Largeur</th>
-          <th className="border px-4 py-2 w-[50px]">Poids brut</th>
-          <th className="border px-4 py-2 w-[50px]">Poids net</th>
-        </tr>
-      </thead>
-      <tbody>
-        {uvcMeasure.map((uvc, index) => {
-          // Extraire la couleur et la taille à partir des dimensions
-          const [couleur, taille] = uvc.dimensions[0].split("/");
-          const uvcReference = `${reference}_${couleur}_${taille}`;
+    <div className="w-full">
+      <div className="mb-4 p-4 bg-gray-100 rounded-md">
+        <h3 className="font-semibold mb-2">Dimensions globales</h3>
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <span className="text-gray-600">Hauteur: </span>
+            <span className="font-medium">
+              {Measure.height} {size_unit}
+            </span>
+          </div>
+          <div>
+            <span className="text-gray-600">Longueur: </span>
+            <span className="font-medium">
+              {Measure.long} {size_unit}
+            </span>
+          </div>
+          <div>
+            <span className="text-gray-600">Largeur: </span>
+            <span className="font-medium">
+              {Measure.width} {size_unit}
+            </span>
+          </div>
+          <div>
+            <span className="text-gray-600">Poids brut: </span>
+            <span className="font-medium">
+              {Measure.weight_brut} {weight_unit}
+            </span>
+          </div>
+          <div>
+            <span className="text-gray-600">Poids net: </span>
+            <span className="font-medium">
+              {Measure.weight_net} {weight_unit}
+            </span>
+          </div>
+        </div>
+      </div>
 
-          return (
-            <tr key={index} className="text-[11px]">
-              <td className="border px-4 py-1 text-center">{uvcReference}</td>
-              <td className="border px-4 py-1 text-center">{couleur}</td>
-              <td className="border px-4 py-1 text-center">{taille}</td>
-              <td className="border px-4 py-1 text-center">{Measure.height} {size_unit}</td>
-              <td className="border px-4 py-1 text-center">{Measure.long} {size_unit}</td>
-              <td className="border px-4 py-1 text-center">{Measure.width} {size_unit}</td>
-              <td className="border px-4 py-1 text-center">{Measure.weight_brut} {weight_unit}</td>
-              <td className="border px-4 py-1 text-center">{Measure.weight_net} {weight_unit}</td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="bg-gray-50">
+            <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
+              Code UVC
+            </th>
+            <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
+              Couleur
+            </th>
+            <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
+              Taille
+            </th>
+            <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
+              Hauteur
+            </th>
+            <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
+              Longueur
+            </th>
+            <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
+              Largeur
+            </th>
+            <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
+              Poids brut
+            </th>
+            <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
+              Poids net
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {uvcMeasure.map((uvc, index) => {
+            const [couleur, taille] = uvc.dimensions[0]?.split("/") || ["", ""];
+            const uvcReference = `${reference}_${couleur}_${taille}`;
+
+            return (
+              <tr key={index} className="hover:bg-gray-50">
+                <td className="border px-4 py-2 text-center text-sm">
+                  {uvcReference}
+                </td>
+                <td className="border px-4 py-2 text-center text-sm">
+                  {couleur}
+                </td>
+                <td className="border px-4 py-2 text-center text-sm">
+                  {taille}
+                </td>
+                <td className="border px-4 py-2 text-center text-sm bg-blue-50">
+                  {isModify ? (
+                    <input
+                      type="number"
+                      className="w-20 p-1 border rounded"
+                      placeholder={uvc.height || Measure.height}
+                      onChange={(e) => onUpdateMeasures?.(index, 'height', e.target.value)}
+                    />
+                  ) : (
+                    `${uvc.height || Measure.height} ${size_unit}`
+                  )}
+                </td>
+                <td className="border px-4 py-2 text-center text-sm  bg-blue-50">
+                  {isModify ? (
+                    <input
+                      type="number"
+                      className="w-20 p-1 border rounded"
+                      placeholder={uvc.length || Measure.long}
+                      onChange={(e) => onUpdateMeasures?.(index, 'length', e.target.value)}
+                    />
+                  ) : (
+                    `${uvc.length || Measure.long} ${size_unit}`
+                  )}
+                </td>
+                <td className="border px-4 py-2 text-center text-sm bg-blue-50">
+                  {isModify ? (
+                    <input
+                      type="number"
+                      className="w-20 p-1 border rounded"
+                      placeholder={uvc.width || Measure.width}
+                      onChange={(e) => onUpdateMeasures?.(index, 'width', e.target.value)}
+                    />
+                  ) : (
+                    `${uvc.width || Measure.width} ${size_unit}`
+                  )}
+                </td>
+                <td className="border px-4 py-2 text-center text-sm  bg-blue-50">
+                  {isModify ? (
+                    <input
+                      type="number"
+                      className="w-20 p-1 border rounded"
+                      placeholder={uvc.gross_weight || Measure.weight_brut}
+                      onChange={(e) => onUpdateMeasures?.(index, 'gross_weight', e.target.value)}
+                    />
+                  ) : (
+                    `${uvc.gross_weight || Measure.weight_brut} ${weight_unit}`
+                  )}
+                </td>
+                <td className="border px-4 py-2 text-center text-sm bg-blue-50">
+                  {isModify ? (
+                    <input
+                      type="number"
+                      className="w-20 p-1 border rounded"
+                      placeholder={uvc.net_weight || Measure.weight_net}
+                      onChange={(e) => onUpdateMeasures?.(index, 'net_weight', e.target.value)}
+                    />
+                  ) : (
+                    `${uvc.net_weight || Measure.weight_net} ${weight_unit}`
+                  )}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 };
 
