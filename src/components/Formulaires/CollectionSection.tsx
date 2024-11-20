@@ -7,7 +7,7 @@ interface CollectionSelectorProps {
   handleChangeCollection: (selectedOption: any) => void;
   handleInputChangeCollection: (inputValueCollection: string) => void;
   inputValueCollection: string;
-  placeholder: string;
+  placeholder?: string;
   customStyles: any;
 }
 
