@@ -32,7 +32,7 @@ const UVCPriceTable: React.FC<UVCPriceTableProps> = ({
 }) => {
   return (
     <div className="w-full">
-      <div className="mb-4 p-4 bg-gray-100 rounded-md">
+      <div className="mb-4 p-4 bg-gray-200 rounded-md shadow-md">
         <h3 className="font-semibold mb-2">Prix globaux</h3>
         <div className="grid grid-cols-3 gap-4">
           <div>

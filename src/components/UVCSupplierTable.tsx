@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { SuppliersOption } from "@/type";
+import { Info } from "lucide-react";
 
 interface Supplier {
   supplier_id: string;
@@ -41,7 +42,7 @@ const UVCSupplierTable: React.FC<UVCSupplierTableProps> = ({
   reference,
   uvcDimension,
   type,
-  data
+  data,
 }) => {
   const [selectedSupplierIndex, setSelectedSupplierIndex] = useState(0);
 
@@ -49,13 +50,20 @@ const UVCSupplierTable: React.FC<UVCSupplierTableProps> = ({
   const currentSupplier = suppliers[selectedSupplierIndex];
 
   if (!suppliers.length) {
-    return <div>Aucun fournisseur disponible</div>;
+    return (
+      <div className="bg-gray-200 p-4 rounded-md shadow-md font-semibold text-gray-700 flex items-center gap-2">
+        <Info />
+        <span>Aucun fournisseur n'a été ajouté au brouillon</span>
+      </div>
+    );
   }
 
   const getSupplierName = (supplier: Supplier | SuppliersOption) => {
     if (type === "create") {
       const createSupplier = supplier as SuppliersOption;
-      return createSupplier.company_name || createSupplier.label || "Non défini";
+      return (
+        createSupplier.company_name || createSupplier.label || "Non défini"
+      );
     } else {
       const productSupplier = supplier as Supplier;
       return productSupplier.supplier_id || "Non défini";
@@ -102,13 +110,15 @@ const UVCSupplierTable: React.FC<UVCSupplierTableProps> = ({
     }
   };
 
-  const handleSupplierChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleSupplierChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     setSelectedSupplierIndex(Number(event.target.value));
   };
 
   return (
     <div className="w-full">
-      <div className="mb-4 p-4 bg-gray-100 rounded-md">
+      <div className="mb-4 p-4 bg-gray-200 rounded-md shadow-md">
         <h3 className="font-semibold mb-2">Sélection du fournisseur</h3>
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-600">Fournisseur: </span>

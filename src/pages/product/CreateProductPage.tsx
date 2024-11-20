@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import "react-toastify/dist/ReactToastify.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import Card from "../../components/Shared/Card";
-import { ChevronLeft, Maximize2, Minimize2, Plus } from "lucide-react";
+import { ChevronLeft, Info, Maximize2, Minimize2, Plus } from "lucide-react";
 import Button from "../../components/FormElements/Button";
 import useNotify from "../../utils/hooks/useToast";
 import { CircularProgress, Divider } from "@mui/material";
@@ -1359,7 +1359,7 @@ export default function CreateProductPage() {
                       placeholder={(index) =>
                         formData.uvc[index]?.collectionUvc ||
                         formData.collection_ids[0]?.label ||
-                        ""
+                        "Aucune collection n'a été ajouté"
                       }
                       uvcDimension={formData.uvc.map((uvc) => ({
                         code: uvc.code,
@@ -1442,6 +1442,14 @@ export default function CreateProductPage() {
                         });
                       }}
                     />
+                  )}
+                  {onglet === "ean" && (
+                    <div className="bg-gray-200 p-4 rounded-md shadow-md font-semibold text-gray-700 flex items-center gap-2">
+                      <Info />
+                      <span>
+                        Les EAN seront créés lors de la validation définitive
+                      </span>
+                    </div>
                   )}
                 </div>
               )}

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useCollections } from "../utils/hooks/useCollection";
 import CollectionSection from "./Formulaires/CollectionSection";
+import { Info } from "lucide-react";
 
 interface UVCInfosTableProps {
   reference: string;
@@ -41,16 +42,25 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
     handleInputChangeCollection(newInputValue);
   };
 
+  if (!collection) {
+    return (
+      <div className="bg-gray-200 p-4 rounded-md shadow-md font-semibold text-gray-700 flex items-center gap-2">
+        <Info/>
+        <span>Aucune collection n'a été ajoutée au brouillon</span>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full">
       {/* Section descriptive */}
-      <div className="mb-4 p-4 bg-gray-100 rounded-md">
+      <div className="mb-4 p-4 bg-gray-200 rounded-md shadow-md">
         <h3 className="font-semibold mb-2">Collection principale</h3>
         <div className="grid grid-cols-1 gap-4 text-sm">
           <div>
             <span className="text-gray-600">Collection : </span>
             <span className="font-medium">
-              {collection}
+              {collection ? collection : "Aucune collection n'a été ajouté"}
             </span>
           </div>
         </div>
@@ -110,7 +120,8 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
                       {typeof uvc.collectionUvc === "object" &&
                       uvc.collectionUvc?.label
                         ? uvc.collectionUvc.label
-                        : uvc.collectionUvc || "Non spécifiée"}
+                        : uvc.collectionUvc ||
+                          "Aucune collection n'a été ajoutée"}
                     </span>
                   )}
                 </td>

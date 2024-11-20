@@ -6,6 +6,7 @@ import Modal from "../../components/Shared/Modal";
 import {
   ChevronLeft,
   CircleSlash2,
+  Info,
   Maximize2,
   Minimize2,
   Pen,
@@ -1143,7 +1144,6 @@ export default function DraftUpdatePage() {
           removeSupplier={() => {}}
           onCloseModal={() => setsupplierModalIsOpen(false)}
           addSupplier={addSupplier}
-          
         />
       </Modal>
       <Modal
@@ -2125,7 +2125,9 @@ export default function DraftUpdatePage() {
                 {onglet === "infos" && draft && (
                   <UVCInfosTable
                     isModify={isModifyUvc}
-                    collection={formData.collection_ids[0] || "Aucune collection"}
+                    collection={
+                      formData.collection_ids[0] || "Aucune collection"
+                    }
                     reference={draft?.reference}
                     placeholder={(index) =>
                       formData.uvc[index]?.collectionUvc ||
@@ -2215,10 +2217,12 @@ export default function DraftUpdatePage() {
                   />
                 )}
                 {onglet === "ean" && draft && (
-                  <UVCEanTable
-                    reference={draft?.reference}
-                    uvcDimension={formData.uvc}
-                  />
+                  <div className="bg-gray-200 p-4 rounded-md shadow-md font-semibold text-gray-700 flex items-center gap-2">
+                    <Info />
+                    <span>
+                      Les EAN seront créés lors de la validation définitive
+                    </span>
+                  </div>
                 )}
                 {onglet === "bloc" && draft && (
                   <UVCBlockTable
