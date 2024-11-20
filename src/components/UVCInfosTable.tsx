@@ -48,7 +48,7 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
         <h3 className="font-semibold mb-2">Collection principale</h3>
         <div className="grid grid-cols-1 gap-4 text-sm">
           <div>
-            <span className="text-gray-600">Collection: </span>
+            <span className="text-gray-600">Collection : </span>
             <span className="font-medium">
               {collection}
             </span>

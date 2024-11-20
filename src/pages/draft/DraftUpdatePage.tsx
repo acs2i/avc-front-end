@@ -925,11 +925,11 @@ export default function DraftUpdatePage() {
           value: selectedSupplier.value,
           label: selectedSupplier.label,
           company_name: selectedSupplier.label,
-          supplier_id: selectedSupplier.value,
+          supplier_id: selectedSupplier.label,
           supplier_ref: "",
           pcb: "",
           custom_cat: "",
-          made_in: "0",
+          made_in: "",
         };
 
         // Ajoute le nouveau fournisseur à la fin du tableau
@@ -938,7 +938,7 @@ export default function DraftUpdatePage() {
 
       // Mettez à jour `newSupplier` pour le fournisseur actuellement sélectionné
       setNewSupplier({
-        supplier_id: selectedSupplier.value,
+        supplier_id: selectedSupplier.label,
         company_name: selectedSupplier.label,
         supplier_ref: "",
         pcb: "",
@@ -1121,7 +1121,7 @@ export default function DraftUpdatePage() {
     }
   };
 
-  console.log(product);
+  console.log(selectedSupplier);
   return (
     <>
       <Modal
@@ -1143,6 +1143,7 @@ export default function DraftUpdatePage() {
           removeSupplier={() => {}}
           onCloseModal={() => setsupplierModalIsOpen(false)}
           addSupplier={addSupplier}
+          
         />
       </Modal>
       <Modal
@@ -1154,6 +1155,29 @@ export default function DraftUpdatePage() {
         <SupplierComponent
           supplier={selectedSupplier}
           index={selectedSupplier?.index ?? 0}
+          isModify={isModify}
+          isDraft
+          onUpdate={(updatedSupplier) => {
+            // Vérifier que selectedSupplier et son index existent
+            if (
+              selectedSupplier &&
+              typeof selectedSupplier.index === "number"
+            ) {
+              setFormData((prevFormData) => {
+                const updatedSuppliers = [...prevFormData.suppliers];
+                updatedSuppliers[selectedSupplier.index] = {
+                  ...updatedSuppliers[selectedSupplier.index],
+                  ...updatedSupplier,
+                };
+                return {
+                  ...prevFormData,
+                  suppliers: updatedSuppliers,
+                };
+              });
+              setModalSupplierisOpen(false);
+            }
+          }}
+          onClose={() => setModalSupplierisOpen(false)}
         />
       </Modal>
       <Modal
@@ -2101,6 +2125,7 @@ export default function DraftUpdatePage() {
                 {onglet === "infos" && draft && (
                   <UVCInfosTable
                     isModify={isModifyUvc}
+                    collection={formData.collection_ids[0] || "Aucune collection"}
                     reference={draft?.reference}
                     placeholder={(index) =>
                       formData.uvc[index]?.collectionUvc ||
@@ -2155,9 +2180,12 @@ export default function DraftUpdatePage() {
                 )}
                 {onglet === "supplier" && draft && (
                   <UVCSupplierTable
-                    reference={draft?.reference}
+                    reference={draft.reference}
                     uvcDimension={formData.uvc}
-                    supplierLabel={draft?.suppliers[0].supplier_id}
+                    type="draft"
+                    data={{
+                      suppliers: draft.suppliers,
+                    }}
                   />
                 )}
                 {onglet === "weight" && draft && (

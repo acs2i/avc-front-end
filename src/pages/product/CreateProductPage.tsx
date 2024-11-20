@@ -1411,10 +1411,10 @@ export default function CreateProductPage() {
                     <UVCSupplierTable
                       reference={formData?.reference}
                       uvcDimension={formData.uvc}
-                      supplierLabel={
-                        formData?.suppliers[0]?.supplier_id ||
-                        "Aucun Fournisseur"
-                      }
+                      type="create"
+                      data={{
+                        suppliers: selectedSuppliers,
+                      }}
                     />
                   )}
                   {onglet === "weight" && (

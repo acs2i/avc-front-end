@@ -245,6 +245,16 @@ export default function SingleProductPage() {
     ],
   });
 
+  const transformedSuppliers =
+  product?.suppliers?.map((supplier) => ({
+    supplier_id: supplier.supplier_id?.company_name || "ID inconnu",
+    supplier_ref: supplier.supplier_ref || "Référence inconnue",
+    pcb: supplier.pcb || "PCB inconnu",
+    custom_cat: supplier.custom_cat || "Catégorie inconnue",
+    made_in: supplier.made_in || "Pays d'origine inconnu",
+  })) || [];
+
+
   const [newSupplier, setNewSupplier] = useState<Supplier>({
     supplier_id: "",
     supplier_ref: "",
@@ -758,7 +768,7 @@ export default function SingleProductPage() {
           supplier_ref: "",
           pcb: "",
           custom_cat: "",
-          made_in: "0",
+          made_in: "",
         };
 
         // Ajoute le nouveau fournisseur à la fin du tableau
@@ -775,6 +785,24 @@ export default function SingleProductPage() {
         made_in: "",
       });
     }
+  };
+
+  const updateSupplierDetails = (
+    supplierId: string,
+    field: string,
+    value: string
+  ) => {
+    setSelectedSuppliers((prevSuppliers) => {
+      return prevSuppliers.map((supplier) => {
+        if (supplier.value === supplierId) {
+          return {
+            ...supplier,
+            [field]: value,
+          };
+        }
+        return supplier;
+      });
+    });
   };
 
   const handleInputChangeSupplier = async (inputValueSupplier: string) => {
@@ -1215,6 +1243,9 @@ export default function SingleProductPage() {
           handleInputChangeSupplier={handleInputChangeSupplier}
           handleSupplierChange={(index, field, value) => {
             setNewSupplier({ ...newSupplier, [field]: value });
+            if (newSupplier.supplier_id) {
+              updateSupplierDetails(newSupplier.supplier_id, field, value);
+            }
           }}
           removeSupplier={() => {}}
           onCloseModal={() => setModalSupplierisOpen(false)}
@@ -2212,14 +2243,15 @@ export default function SingleProductPage() {
                 )}
                 {onglet === "supplier" && product && (
                   <UVCSupplierTable
-                    reference={product?.reference}
-                    uvcDimension={formData.uvc_ids}
-                    supplierLabel={
-                      product?.suppliers[0].supplier_id?.company_name ||
-                      "Nom inconnu"
-                    }
+                    reference={product.reference || ""}
+                    uvcDimension={formData.uvc_ids || []}
+                    type="product"
+                    data={{
+                      suppliers: transformedSuppliers,
+                    }}
                   />
                 )}
+
                 {onglet === "weight" && product && (
                   <UVCMeasureTable
                     reference={product?.reference}
