@@ -43,6 +43,12 @@ import { CircularProgress } from "@mui/material";
 import DynamicField from "../../components/FormElements/DynamicField";
 import Input from "../../components/FormElements/Input";
 import UVCBlockTable from "../../components/UVCBlockTable";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "react-beautiful-dnd";
 
 interface formDataUVC {
   uvc: DatalakeUvc[];
@@ -98,6 +104,13 @@ interface FormData {
   initialGrid: any[];
 }
 
+interface SupplierListProps {
+  suppliers: SuppliersOption[];
+  onSupplierClick: (supplier: SuppliersOption, index: number) => void;
+  onDragEnd: (result: DropResult) => void;
+  isModify: boolean;
+}
+
 const customStyles = {
   control: (provided: any) => ({
     ...provided,
@@ -122,6 +135,64 @@ const customStyles = {
     ...provided,
     color: "gray",
   }),
+};
+
+const SupplierList: React.FC<SupplierListProps> = ({
+  suppliers,
+  onSupplierClick,
+  onDragEnd,
+  isModify,
+}) => {
+  return (
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Droppable droppableId="suppliers">
+        {(provided) => (
+          <div
+            className="mt-3 flex flex-col gap-2"
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+          >
+            {suppliers && suppliers.length > 0 ? (
+              suppliers.map((supplier, index) => (
+                <Draggable
+                  key={supplier.value}
+                  draggableId={supplier.value}
+                  index={index}
+                  isDragDisabled={!isModify}
+                >
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      onClick={() => onSupplierClick(supplier, index)}
+                      className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md p-3 ${
+                        index === 0 ? "bg-[#3B71CA]" : "bg-slate-400"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[20px] text-white font-bold capitalize">
+                          {supplier.label}
+                        </span>
+                        {index === 0 && (
+                          <span className="text-xs text-white bg-blue-600 px-2 py-1 rounded">
+                            Fournisseur Principal
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </Draggable>
+              ))
+            ) : (
+              <p>Aucun fournisseur pour cette référence</p>
+            )}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
+  );
 };
 
 export default function SingleProductPage() {
@@ -246,14 +317,13 @@ export default function SingleProductPage() {
   });
 
   const transformedSuppliers =
-  product?.suppliers?.map((supplier) => ({
-    supplier_id: supplier.supplier_id?.company_name || "ID inconnu",
-    supplier_ref: supplier.supplier_ref || "Référence inconnue",
-    pcb: supplier.pcb || "PCB inconnu",
-    custom_cat: supplier.custom_cat || "Catégorie inconnue",
-    made_in: supplier.made_in || "Pays d'origine inconnu",
-  })) || [];
-
+    product?.suppliers?.map((supplier) => ({
+      supplier_id: supplier.supplier_id?.company_name || "ID inconnu",
+      supplier_ref: supplier.supplier_ref || "Référence inconnue",
+      pcb: supplier.pcb || "PCB inconnu",
+      custom_cat: supplier.custom_cat || "Catégorie inconnue",
+      made_in: supplier.made_in || "Pays d'origine inconnu",
+    })) || [];
 
   const [newSupplier, setNewSupplier] = useState<Supplier>({
     supplier_id: "",
@@ -263,6 +333,30 @@ export default function SingleProductPage() {
     made_in: "",
     company_name: "",
   });
+
+  const reorderSuppliers = (
+    list: SuppliersOption[],
+    startIndex: number,
+    endIndex: number
+  ): SuppliersOption[] => {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+    return result;
+  };
+
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+
+    const updatedSuppliers = reorderSuppliers(
+      selectedSuppliers,
+      result.source.index,
+      result.destination.index
+    );
+
+    setSelectedSuppliers(updatedSuppliers);
+    updateProductSuppliersOrder(updatedSuppliers);
+  };
 
   useEffect(() => {
     if (product) {
@@ -1686,40 +1780,12 @@ export default function SingleProductPage() {
                   {/* Fournisseur */}
                   <div className="w-1/4">
                     <FormSection title="Fournisseurs">
-                      <div className="relative flex flex-col gap-3">
-                        <div className="mt-3 flex flex-col gap-2">
-                          {selectedSuppliers && selectedSuppliers.length > 0 ? (
-                            selectedSuppliers.map((supplier, index) => (
-                              <div
-                                key={index}
-                                className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md ${
-                                  index === 0 ? "bg-[#3B71CA]" : "bg-slate-400"
-                                }`}
-                                onClick={() =>
-                                  handleSupplierClick(supplier, index)
-                                }
-                              >
-                                <span className="text-[20px] text-white font-bold capitalize">
-                                  {supplier.label}
-                                </span>
-                              </div>
-                            ))
-                          ) : (
-                            <p>Aucun fournisseur pour cette référence</p>
-                          )}
-                        </div>
-                        {isModify && (
-                          <div
-                            className="flex flex-col items-center justify-center p-[20px] text-orange-400 hover:text-orange-300 cursor-pointer"
-                            onClick={() => setModalSupplierisOpen(true)}
-                          >
-                            <div className="flex items-center gap-2 text-[12px] mt-3">
-                              <Plus size={30} />
-                            </div>
-                            <p className="font-[700]">Ajouter un fournisseur</p>
-                          </div>
-                        )}
-                      </div>
+                      <SupplierList
+                        suppliers={selectedSuppliers}
+                        onSupplierClick={handleSupplierClick}
+                        onDragEnd={handleDragEnd}
+                        isModify={isModify}
+                      />
                     </FormSection>
                   </div>
                   {/* Caractéristiques produit */}
