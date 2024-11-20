@@ -1150,9 +1150,9 @@ export default function SingleSupplierPage() {
                       <span className="font-[300]">
                         : {supplier?.company_name}
                       </span>
-                      {formData.status === "I" && <div className="absolute top-[-12px] right-[-120px] bg-red-600 flex py-1 px-2 rounded-full shadow-md">
+                      {formData.status === "I" && <div className="absolute top-[50%] translate-y-[-50%] right-[-150px] bg-red-600 flex py-1 px-2 rounded-full shadow-md">
                         <span className="text-[10px] text-white">
-                          Référence Inactive
+                          Fiche fournisseur Inactive
                         </span>
                       </div>}
                     </h1>
@@ -1193,7 +1193,7 @@ export default function SingleSupplierPage() {
                           formData.status === "A"
                             ? "text-red-500"
                             : "text-green-600"
-                        } font-semibold hover:brightness-75`}
+                        } font-bold hover:brightness-75`}
                       >
                         {formData.status === "A" ? (
                           <TriangleAlert size={15} />

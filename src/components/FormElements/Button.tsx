@@ -34,14 +34,14 @@ const Button: React.FC<ButtonProps> = (props) => {
     ${props.size === "100" ? "text-md py-[10px] px-[25px] w-full" : ""}
     ${props.orange ? "bg-gradient-to-r from-orange-600 to-orange-400 border border-orange-500 text-white hover:brightness-125" : ""}
     ${props.green ? "bg-green-700 border border-green-600 text-white hover:brightness-125 font-bold" : ""}
-    ${props.blue ? "bg-[#3B71CA] border border-sky-600 text-white hover:brightness-125 font-bold" : ""}
+    ${props.blue ? "bg-[#3B71CA] text-white hover:brightness-125 font-bold" : ""}
     ${props.inverseBlue ? "bg-transparent border border-sky-600 text-gray-700 font-bold hover:bg-sky-700 hover:text-white" : ""}
     ${props.inverse ? "bg-transparent border border-emerald-500 text-gray-700 hover:brightness-125" : ""}
     ${props.cancel ? "border border-gray-300 text-white bg-[#9FA6B2] hover:bg-[#bac3d4] hover:text-white font-bold" : ""}
     ${props.warning ? "bg-yellow-500 text-white hover:bg-yellow-400" : ""}
     ${props.danger ? "bg-[#DC4C64] border border-red-500 text-white hover:brightness-125" : ""}
     ${props.gray ? "bg-[#3B3B3C] border border-black text-white hover:brightness-125" : ""}
-    ${props.disabled ? "bg-gray-400 border border-gray-200 text-gray-400 cursor-not-allowed" : ""}
+    ${props.disabled ? "bg-gray-300 text-gray-500 cursor-not-allowed" : ""}
 
   `;
 
