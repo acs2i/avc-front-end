@@ -143,7 +143,7 @@ export default function BrandUpdatePage({
       </div>
       <div className="mt-5 flex flex-col justify-between">
         <div className="flex flex-col">
-          <Input
+          {/* <Input
             element="input"
             id="code"
             label="Code"
@@ -153,7 +153,7 @@ export default function BrandUpdatePage({
             validators={[]}
             gray
             create
-          />
+          /> */}
           <Input
             element="input"
             id="label"

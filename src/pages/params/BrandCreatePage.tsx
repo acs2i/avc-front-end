@@ -97,7 +97,7 @@ export default function BrandCreatePage({
         </div>
         <div className="mt-[30px] flex flex-col justify-between">
           <div className="flex flex-col">
-            <Input
+            {/* <Input
               element="input"
               id="code"
               label="Code"
@@ -107,7 +107,7 @@ export default function BrandCreatePage({
               required
               create
               gray
-            />
+            /> */}
             <Input
               element="input"
               id="label"
