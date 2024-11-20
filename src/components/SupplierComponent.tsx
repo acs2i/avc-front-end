@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Button from "../components/FormElements/Button";
 import { Pen } from "lucide-react";
-import { isDraft } from "@reduxjs/toolkit";
 
 interface SupplierProps {
   supplier: any;
@@ -21,7 +20,6 @@ export default function SupplierComponent({
   isDraft
 }: SupplierProps) {
   const [editedSupplier, setEditedSupplier] = useState(supplier);
-  const [isEditing, setIsEditing] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEditedSupplier({
@@ -32,10 +30,14 @@ export default function SupplierComponent({
 
   const handleSubmit = () => {
     onUpdate?.(editedSupplier);
-    setIsEditing(false);
   };
 
-  if (!isModify || !isEditing) {
+  const handleSave = () => {
+    onUpdate?.(editedSupplier);
+    onClose?.();
+  };
+
+  if (!isModify) {
     return (
       <div className="px-4">
         <div className="flex items-center justify-between gap-3 mb-4">
@@ -43,18 +45,6 @@ export default function SupplierComponent({
             <h2 className="text-[30px] font-bold">{isDraft ? supplier.supplier_id : supplier.company_name}</h2>
             {index === 0 && <span className="italic">(Fournisseur principal)</span>}
           </div>
-          {isModify && (
-            <Button 
-              blue 
-              size="small"
-              onClick={() => setIsEditing(true)}
-            >
-              <div className="flex items-center gap-2">
-                <Pen size={15} />
-                <span>Modifier</span>
-              </div>
-            </Button>
-          )}
         </div>
         <div className="flex flex-col gap-2">
           {!isDraft && <div>
@@ -153,15 +143,9 @@ export default function SupplierComponent({
         <div className="flex justify-end gap-2 mt-4">
           <Button 
             size="small" 
-            cancel 
-            onClick={() => setIsEditing(false)}
-          >
-            Annuler
-          </Button>
-          <Button 
-            size="small" 
             blue 
-            onClick={handleSubmit}
+            onClick={handleSave}
+            type="button"
           >
             Enregistrer
           </Button>

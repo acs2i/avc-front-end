@@ -9,8 +9,11 @@ import {
   ChevronUp,
   CircleSlash2,
   File,
+  IterationCcw,
+  Pen,
   Plus,
   Trash,
+  TriangleAlert,
   X,
 } from "lucide-react";
 import CreatableSelect from "react-select/creatable";
@@ -695,7 +698,6 @@ export default function SingleSupplierPage() {
     }
   };
 
-  // Assurez-vous que le bouton est contrôlé par supplier.status, pas seulement par formData
   <Button
     blue
     size="small"
@@ -770,17 +772,13 @@ export default function SingleSupplierPage() {
 
   // Fonction qui ajoute un contact
   const addContact = (newContact: Contact) => {
-    console.log("Adding contact:", newContact);
-    setFormData((prevFormData) => {
-      const updatedFormData = {
-        ...prevFormData,
-        contacts: [...prevFormData.contacts, newContact],
-      };
-      console.log("Updated FormData:", updatedFormData);
-      return updatedFormData;
-    });
-
     setSelectedContacts((prevContacts) => [...prevContacts, newContact]);
+
+    // Ajouter la mise à jour de formData.contacts
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      contacts: [...prevFormData.contacts, newContact],
+    }));
 
     setNewContact({
       firstname: "",
@@ -845,27 +843,42 @@ export default function SingleSupplierPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+
     try {
+      // Mise à jour complète de formData avant l'envoi
+      const updatedFormData = {
+        ...formData,
+        contacts: formData.contacts.filter(
+          (contact) =>
+            contact.firstname !== "" ||
+            contact.lastname !== "" ||
+            contact.email !== ""
+        ), // Filtrer les contacts vides
+      };
+
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/supplier/${id}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(updatedFormData),
         }
       );
+
       if (response.ok) {
         notifySuccess("Fournisseur modifié avec succès !");
         window.location.reload();
-        setIsLoading(false);
       } else {
         notifyError("Erreur lors de la modification !");
       }
     } catch (error) {
       console.error(error);
+      notifyError("Erreur lors de la modification !");
     } finally {
+      setIsLoading(false);
     }
   };
 
@@ -969,7 +982,10 @@ export default function SingleSupplierPage() {
   };
 
   const handleDragEnd = (result: any) => {
-    if (!result.destination) {
+    if (
+      !result.destination ||
+      result.destination.index === result.source.index
+    ) {
       return;
     }
 
@@ -999,6 +1015,17 @@ export default function SingleSupplierPage() {
       ...prev,
       contacts: updatedContacts,
     }));
+
+    if (supplier) {
+      setSupplier((prev) =>
+        prev
+          ? {
+              ...prev,
+              contacts: updatedContacts,
+            }
+          : prev
+      );
+    }
 
     // Mettre à jour le tableau conditions avec les contacts réorganisés
     setConditions((prev) =>
@@ -1118,11 +1145,16 @@ export default function SingleSupplierPage() {
                     >
                       <ChevronLeft />
                     </div>
-                    <h1 className="text-[32px] font-[800]">
+                    <h1 className="text-[32px] font-[800] relative">
                       Fournisseur{" "}
                       <span className="font-[300]">
                         : {supplier?.company_name}
                       </span>
+                      {formData.status === "I" && <div className="absolute top-[-12px] right-[-120px] bg-red-600 flex py-1 px-2 rounded-full shadow-md">
+                        <span className="text-[10px] text-white">
+                          Référence Inactive
+                        </span>
+                      </div>}
                     </h1>
                   </div>
                 ) : (
@@ -1157,12 +1189,17 @@ export default function SingleSupplierPage() {
                           e.preventDefault();
                           handleStatusChange();
                         }}
-                        className={`cursor-pointer text-[13px] ${
+                        className={`cursor-pointer text-[13px] flex items-center gap-2 ${
                           formData.status === "A"
-                            ? "text-red-800"
+                            ? "text-red-500"
                             : "text-green-600"
-                        } font-semibold`}
+                        } font-semibold hover:brightness-75`}
                       >
+                        {formData.status === "A" ? (
+                          <TriangleAlert size={15} />
+                        ) : (
+                          <IterationCcw size={15} />
+                        )}
                         <span>
                           {formData.status === "A"
                             ? "Désactiver le fournisseur"
@@ -1179,6 +1216,7 @@ export default function SingleSupplierPage() {
                         }}
                         disabled={supplier?.status === "I"}
                       >
+                        <Pen size={15} />
                         {isModify ? "Annuler la modification" : "Modifier"}
                       </Button>
                     </div>
@@ -1571,12 +1609,14 @@ export default function SingleSupplierPage() {
                           {...provided.droppableProps}
                           ref={provided.innerRef}
                         >
-                          {(supplier?.contacts &&
-                            supplier.contacts.length > 0) ||
-                          (selectedContacts && selectedContacts.length > 0) ? (
+                          {formData.contacts &&
+                          formData.contacts.filter(
+                            (contact) => contact?.firstname
+                          ).length > 0 ? (
                             <>
-                              {supplier?.contacts &&
-                                supplier.contacts.map((contact, index) => (
+                              {formData.contacts
+                                .filter((contact) => contact?.firstname)
+                                .map((contact, index) => (
                                   <Draggable
                                     key={`contact-${index}`}
                                     draggableId={`contact-${index}`}
@@ -1587,8 +1627,11 @@ export default function SingleSupplierPage() {
                                         ref={provided.innerRef}
                                         {...provided.draggableProps}
                                         {...provided.dragHandleProps}
-                                        className={`text-center rounded-md cursor-move hover:brightness-125 shadow-md p-3
-                          ${index === 0 ? "bg-blue-500" : "bg-slate-400"}`}
+                                        className={`text-center rounded-md cursor-move hover:brightness-125 shadow-md p-3 ${
+                                          index === 0
+                                            ? "bg-blue-500"
+                                            : "bg-slate-400"
+                                        }`}
                                       >
                                         <div className="flex items-center justify-between">
                                           <span className="text-[20px] text-white font-bold">
@@ -1617,14 +1660,14 @@ export default function SingleSupplierPage() {
                     </Droppable>
                   </DragDropContext>
                 ) : (
-                  // Affichage en mode lecture seule
                   <div className="flex flex-col gap-2 mt-3">
                     {supplier?.contacts && supplier.contacts.length > 0 ? (
                       supplier.contacts.map((contact, index) => (
                         <div
                           key={`contact-${index}`}
-                          className={`text-center rounded-md shadow-md p-3
-              ${index === 0 ? "bg-blue-500" : "bg-slate-400"}`}
+                          className={`text-center rounded-md shadow-md p-3 ${
+                            index === 0 ? "bg-blue-500" : "bg-slate-400"
+                          }`}
                         >
                           <div className="flex items-center justify-between">
                             <span className="text-[20px] text-white font-bold">
@@ -1645,7 +1688,6 @@ export default function SingleSupplierPage() {
                     )}
                   </div>
                 )}
-
                 {isModify && (
                   <div
                     className="flex flex-col items-center justify-center p-[20px] text-orange-400 hover:text-orange-300 cursor-pointer"

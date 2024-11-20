@@ -5,10 +5,12 @@ import useFetch from "../../utils/hooks/usefetch";
 import {
   ChevronLeft,
   CircleSlash2,
+  IterationCcw,
   Maximize2,
   Minimize2,
   Pen,
   Plus,
+  TriangleAlert,
 } from "lucide-react";
 import Modal from "../../components/Shared/Modal";
 import { useNavigate } from "react-router-dom";
@@ -1411,61 +1413,45 @@ export default function SingleProductPage() {
         header="Détails du fournisseur"
       >
         {selectedSupplier && (
-          <div className="mt-1 px-6">
-            {selectedSupplierIndex === 0 && (
-              <h6 className="text-[#3B71CA] font-[600] text-[13px] italic">
-                Fournisseur Principal
-              </h6>
-            )}
-            <div className="flex flex-col gap-4 mt-3">
-              <p>
-                <span className="font-[700] text-gray-700">
-                  Raison Sociale :{" "}
-                </span>
-                {selectedSupplier.company_name}
-              </p>
-              <p>
-                <span className="font-[700] text-gray-700">
-                  Référence Produit :{" "}
-                </span>
-                {selectedSupplier.supplier_ref}
-              </p>
-              <p>
-                <span className="font-[700] text-gray-700">PCB : </span>
-                {selectedSupplier.pcb}
-              </p>
-              <p>
-                <span className="font-[700] text-gray-700">
-                  Catégorie Dounière :{" "}
-                </span>
-                {selectedSupplier.custom_cat ? selectedSupplier.custom_cat : ""}
-              </p>
-              <p>
-                <span className="font-[700] text-gray-700">Origine : </span>
-                {selectedSupplier.made_in}
-              </p>
-              {selectedSupplierIndex !== 0 && isModify && (
-                <div className="mt-4 flex items-center gap-2">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      onChange={handleCheckboxChange}
-                      className="form-checkbox"
-                      checked={isCheckboxChecked}
-                    />
-                    <span className="text-sm text-gray-600">
-                      Passer en fournisseur principal
-                    </span>
-                  </label>
-                  {isCheckboxChecked && (
-                    <Button size="small" blue onClick={handleSetAsMainSupplier}>
-                      Valider
-                    </Button>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
+          <>
+            <SupplierComponent
+              supplier={selectedSupplier}
+              isModify={isModify}
+              isDraft={false}
+              index={selectedSupplierIndex ?? 0}
+              onUpdate={(updatedSupplier) => {
+                if (
+                  selectedSupplier &&
+                  typeof selectedSupplierIndex === "number"
+                ) {
+                  // Update both formData.suppliers and selectedSuppliers
+                  setFormData((prevFormData) => {
+                    const updatedSuppliers = [...prevFormData.suppliers];
+                    updatedSuppliers[selectedSupplierIndex] = {
+                      ...updatedSuppliers[selectedSupplierIndex],
+                      ...updatedSupplier,
+                    };
+                    return {
+                      ...prevFormData,
+                      suppliers: updatedSuppliers,
+                    };
+                  });
+
+                  setSelectedSuppliers((prevSuppliers) => {
+                    const updatedSuppliers = [...prevSuppliers];
+                    updatedSuppliers[selectedSupplierIndex] = {
+                      ...updatedSuppliers[selectedSupplierIndex],
+                      ...updatedSupplier,
+                    };
+                    return updatedSuppliers;
+                  });
+
+                  setIsSupplierModalOpen(false);
+                }
+              }}
+              onClose={() => setIsSupplierModalOpen(false)}
+            />
+          </>
         )}
       </Modal>
       <section className="w-full bg-slate-50 p-8 max-w-[2000px] mx-auto min-h-screen">
@@ -1490,19 +1476,23 @@ export default function SingleProductPage() {
                 </div>
               ) : !isModify ? (
                 <div className="flex items-center gap-2">
-                  <Button
-                    size="small"
-                    type="button"
-                    cancel
+                  <div
                     onClick={(e) => {
                       e.preventDefault();
-                      setIsModalOpenConfirm(true);
                     }}
+                    className={`cursor-pointer text-[13px] flex items-center gap-2 ${
+                      formData.status === "A"
+                        ? "text-red-500"
+                        : "text-green-600"
+                    } font-semibold hover:brightness-75`}
                   >
-                    {product?.status === "A"
-                      ? "Désactiver la référence"
-                      : "Réactiver la référence"}
-                  </Button>
+                    {formData.status === "A" ? <TriangleAlert size={15} /> : <IterationCcw size={15} />}
+                    <span>
+                      {formData.status === "A"
+                        ? "Désactiver la référence"
+                        : "Réactiver la référence"}
+                    </span>
+                  </div>
                   <Button
                     blue
                     size="small"
@@ -1513,6 +1503,7 @@ export default function SingleProductPage() {
                     }}
                     disabled={product?.status === "D"}
                   >
+                    <Pen size={15} />
                     {isModify ? "Annuler modification" : "Modifier"}
                   </Button>
                 </div>
