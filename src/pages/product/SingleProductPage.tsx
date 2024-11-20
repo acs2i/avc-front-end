@@ -109,6 +109,7 @@ interface SupplierListProps {
   onSupplierClick: (supplier: SuppliersOption, index: number) => void;
   onDragEnd: (result: DropResult) => void;
   isModify: boolean;
+  setModalSupplierisOpen: (open: boolean) => void;
 }
 
 const customStyles = {
@@ -142,56 +143,70 @@ const SupplierList: React.FC<SupplierListProps> = ({
   onSupplierClick,
   onDragEnd,
   isModify,
+  setModalSupplierisOpen,
 }) => {
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="suppliers">
-        {(provided) => (
-          <div
-            className="mt-3 flex flex-col gap-2"
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-          >
-            {suppliers && suppliers.length > 0 ? (
-              suppliers.map((supplier, index) => (
-                <Draggable
-                  key={supplier.value}
-                  draggableId={supplier.value}
-                  index={index}
-                  isDragDisabled={!isModify}
-                >
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      onClick={() => onSupplierClick(supplier, index)}
-                      className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md p-3 ${
-                        index === 0 ? "bg-[#3B71CA]" : "bg-slate-400"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-[20px] text-white font-bold capitalize">
-                          {supplier.label}
-                        </span>
-                        {index === 0 && (
-                          <span className="text-xs text-white bg-blue-600 px-2 py-1 rounded">
-                            Fournisseur Principal
+    <div className="relative flex flex-col gap-3">
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="suppliers">
+          {(provided) => (
+            <div
+              className="mt-3 flex flex-col gap-2"
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
+              {suppliers && suppliers.length > 0 ? (
+                suppliers.map((supplier, index) => (
+                  <Draggable
+                    key={supplier.value}
+                    draggableId={supplier.value}
+                    index={index}
+                    isDragDisabled={!isModify}
+                  >
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        onClick={() => onSupplierClick(supplier, index)}
+                        className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md p-3 ${
+                          index === 0 ? "bg-[#3B71CA]" : "bg-slate-400"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-[20px] text-white font-bold capitalize">
+                            {supplier.label}
                           </span>
-                        )}
+                          {index === 0 && (
+                            <span className="text-xs text-white bg-blue-600 px-2 py-1 rounded">
+                              Fournisseur Principal
+                            </span>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </Draggable>
-              ))
-            ) : (
-              <p>Aucun fournisseur pour cette référence</p>
-            )}
-            {provided.placeholder}
+                    )}
+                  </Draggable>
+                ))
+              ) : (
+                <p>Aucun fournisseur pour cette référence</p>
+              )}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+      {isModify && (
+        <div
+          className="flex flex-col items-center justify-center p-[20px] text-orange-400 hover:text-orange-300 cursor-pointer"
+          onClick={() => setModalSupplierisOpen(true)}
+        >
+          <div className="flex items-center gap-2 text-[12px] mt-3">
+            <Plus size={30} />
           </div>
-        )}
-      </Droppable>
-    </DragDropContext>
+          <p className="font-[700]">Ajouter un fournisseur</p>
+        </div>
+      )}
+    </div>
   );
 };
 
@@ -1785,6 +1800,7 @@ export default function SingleProductPage() {
                         onSupplierClick={handleSupplierClick}
                         onDragEnd={handleDragEnd}
                         isModify={isModify}
+                        setModalSupplierisOpen={setModalSupplierisOpen}
                       />
                     </FormSection>
                   </div>

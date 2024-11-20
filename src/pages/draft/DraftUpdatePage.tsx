@@ -43,6 +43,12 @@ import Input from "../../components/FormElements/Input";
 import Loader from "../../components/Shared/Loader";
 import Backdrop from "@mui/material/Backdrop";
 import UVCBlockTable from "../../components/UVCBlockTable";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "react-beautiful-dnd";
 
 interface CustomField {
   field_name: string;
@@ -246,6 +252,43 @@ export default function DraftUpdatePage() {
           ? e.target.value.substring(0, 15)
           : formData.short_label,
     });
+  };
+
+  const reorderSuppliers = (
+    list: SuppliersOption[],
+    startIndex: number,
+    endIndex: number
+  ): SuppliersOption[] => {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+    return result;
+  };
+
+  // Add handleDragEnd function
+  const handleDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+
+    const updatedSuppliers = reorderSuppliers(
+      selectedSuppliers,
+      result.source.index,
+      result.destination.index
+    );
+
+    setSelectedSuppliers(updatedSuppliers);
+
+    // Update formData with reordered suppliers
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      suppliers: updatedSuppliers.map((supplier) => ({
+        supplier_id: supplier.value,
+        supplier_ref: supplier.supplier_ref || "",
+        pcb: supplier.pcb || "",
+        custom_cat: supplier.custom_cat || "",
+        made_in: supplier.made_in || "",
+        company_name: supplier.company_name || "",
+      })),
+    }));
   };
 
   const handleFieldChange = (
@@ -1623,61 +1666,91 @@ export default function DraftUpdatePage() {
                   <div className="w-1/4">
                     <FormSection title="Fournisseur">
                       <div className="relative flex flex-col gap-3">
-                        <div className="mt-3">
-                          <div className="flex flex-col gap-2">
-                            {[
-                              ...(draft.suppliers || []),
-                              ...selectedSuppliers,
-                            ].map((supplierDetail, index) => {
-                              const draftSupplier = draft?.suppliers.find(
-                                (draftSup) =>
-                                  draftSup.supplier_id ===
-                                  supplierDetail.supplier_id
-                              );
+                        <DragDropContext onDragEnd={handleDragEnd}>
+                          <Droppable droppableId="suppliers">
+                            {(provided) => (
+                              <div
+                                className="mt-3 flex flex-col gap-2"
+                                {...provided.droppableProps}
+                                ref={provided.innerRef}
+                              >
+                                {[
+                                  ...(draft?.suppliers || []),
+                                  ...selectedSuppliers,
+                                ].map((supplierDetail, index) => {
+                                  const draftSupplier = draft?.suppliers.find(
+                                    (draftSup) =>
+                                      draftSup.supplier_id ===
+                                      supplierDetail.supplier_id
+                                  );
 
-                              const combinedSupplier = {
-                                ...supplierDetail,
-                                ...draftSupplier,
-                              };
+                                  const combinedSupplier = {
+                                    ...supplierDetail,
+                                    ...draftSupplier,
+                                  };
 
-                              return (
-                                <div
-                                  key={index}
-                                  className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md ${
-                                    index === 0
-                                      ? "bg-[#3B71CA]"
-                                      : "bg-slate-400"
-                                  }`}
-                                  onClick={() => {
-                                    setSelectedSupplier({
-                                      ...combinedSupplier,
-                                      index,
-                                    } as SupplierDetail);
-                                    setModalSupplierisOpen(true);
-                                  }}
-                                >
-                                  <span className="text-[20px] text-white font-bold">
-                                    {combinedSupplier.company_name ||
-                                      combinedSupplier.supplier_id}
-                                  </span>
-                                </div>
-                              );
-                            })}
-                          </div>
-                          {isModify && (
-                            <div
-                              className="flex flex-col items-center justify-center p-[20px] text-orange-400 hover:text-orange-300 cursor-pointer"
-                              onClick={() => setsupplierModalIsOpen(true)}
-                            >
-                              <div className="flex items-center gap-2 text-[12px] mt-3">
-                                <Plus size={30} />
+                                  return (
+                                    <Draggable
+                                      key={
+                                        combinedSupplier.supplier_id || index
+                                      }
+                                      draggableId={
+                                        combinedSupplier.supplier_id ||
+                                        `supplier-${index}`
+                                      }
+                                      index={index}
+                                      isDragDisabled={!isModify}
+                                    >
+                                      {(provided) => (
+                                        <div
+                                          ref={provided.innerRef}
+                                          {...provided.draggableProps}
+                                          {...provided.dragHandleProps}
+                                          onClick={() => {
+                                            setSelectedSupplier({
+                                              ...combinedSupplier,
+                                              index,
+                                            } as SupplierDetail);
+                                            setModalSupplierisOpen(true);
+                                          }}
+                                          className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md p-3 ${
+                                            index === 0
+                                              ? "bg-[#3B71CA]"
+                                              : "bg-slate-400"
+                                          }`}
+                                        >
+                                          <div className="flex items-center justify-between">
+                                            <span className="text-[20px] text-white font-bold">
+                                              {combinedSupplier.company_name ||
+                                                combinedSupplier.supplier_id}
+                                            </span>
+                                            {index === 0 && (
+                                              <span className="text-xs text-white bg-blue-600 px-2 py-1 rounded">
+                                                Fournisseur Principal
+                                              </span>
+                                            )}
+                                          </div>
+                                        </div>
+                                      )}
+                                    </Draggable>
+                                  );
+                                })}
+                                {provided.placeholder}
                               </div>
-                              <p className="font-[700]">
-                                Ajouter un fournisseur
-                              </p>
+                            )}
+                          </Droppable>
+                        </DragDropContext>
+                        {isModify && (
+                          <div
+                            className="flex flex-col items-center justify-center p-[20px] text-orange-400 hover:text-orange-300 cursor-pointer"
+                            onClick={() => setsupplierModalIsOpen(true)}
+                          >
+                            <div className="flex items-center gap-2 text-[12px] mt-3">
+                              <Plus size={30} />
                             </div>
-                          )}
-                        </div>
+                            <p className="font-[700]">Ajouter un fournisseur</p>
+                          </div>
+                        )}
                       </div>
                     </FormSection>
                   </div>
