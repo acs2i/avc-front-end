@@ -280,7 +280,7 @@ export default function ProductList() {
             <input
               type="text"
               className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:ring-blue-500 transition-all focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
-              placeholder="Rechercher par fournisseur"
+              placeholder="Tapez Votre Recherche..."
               value={supplierValue}
               onChange={(e) => setSupplierValue(e.target.value)}
               autoComplete="off"
@@ -474,7 +474,7 @@ export default function ProductList() {
                     )}
                   </td>
                   <td className="px-6 py-2 text-blue-400 font-[700]">
-                    <span>{truncateText(product?.long_label || "", 25)}</span>
+                    <span>{truncateText(product?.long_label || "", 20)}</span>
                   </td>
                   <td className="px-6 py-2">
                   {product?.brand_ids?.length > 0 && product.brand_ids[0]?.label ? product.brand_ids[0].label : ""}

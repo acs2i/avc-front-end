@@ -603,17 +603,18 @@ function ParamsMenuPageContent() {
       [PAGE_TYPES.CLASSIFICATIONS]: (
         <div className="flex flex-col">
           <label className="text-sm font-bold mb-1">Niveau :</label>
-          <input
-            type="text"
+          <select
             className="p-2 text-sm text-gray-900 border-2 border-gray-200 bg-gray-50 rounded-md focus:outline-none focus:ring-blue-500 transition-all focus:border-[2px] focus:border-blue-500 focus:shadow-[0_0px_0px_5px_rgba(44,130,201,0.2)]"
-            placeholder="Rechercher par niveau"
             value={searchFields.level}
             onChange={(e) =>
               setSearchFields({ ...searchFields, level: e.target.value })
             }
-            onKeyPress={handleKeyPress}
-            autoComplete="off"
-          />
+          >
+            <option value="">Sélectionner un niveau</option>
+            <option value="famille">Famille</option>
+            <option value="sous-famille">Sous-famille</option>
+            <option value="sous-sous-famille">Sous-sous-famille</option>
+          </select>
         </div>
       ),
       [PAGE_TYPES.DIMENSIONS]: (

@@ -53,7 +53,7 @@ const SubFamilySection: React.FC<SubFamilySelectorProps> = ({
             filterOptions(input, [option.data])[0] !== undefined
           }
           formatOptionLabel={formatOptionLabel}
-          placeholder="Rechercher ou créer une sous-famille"
+          placeholder="Tapez Votre Recherche..."
           styles={{
             ...customStyles,
             menu: (base) => ({

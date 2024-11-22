@@ -48,7 +48,7 @@ const UVCMeasureTable: React.FC<UVCMeasureTableProps> = ({
   size_unit,
   weight_unit,
   isModify = false,
-  onUpdateMeasures
+  onUpdateMeasures,
 }) => {
   return (
     <div className="w-full">
@@ -92,7 +92,10 @@ const UVCMeasureTable: React.FC<UVCMeasureTableProps> = ({
         <thead>
           <tr className="bg-gray-50">
             <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
-              Code UVC
+              UVC Preref
+            </th>
+            <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
+              UVC Colombus
             </th>
             <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
               Couleur
@@ -128,6 +131,9 @@ const UVCMeasureTable: React.FC<UVCMeasureTableProps> = ({
                   {uvcReference}
                 </td>
                 <td className="border px-4 py-2 text-center text-sm">
+                  -
+                </td>
+                <td className="border px-4 py-2 text-center text-sm">
                   {couleur}
                 </td>
                 <td className="border px-4 py-2 text-center text-sm">
@@ -139,7 +145,9 @@ const UVCMeasureTable: React.FC<UVCMeasureTableProps> = ({
                       type="number"
                       className="w-20 p-1 border rounded"
                       placeholder={uvc.height || Measure.height}
-                      onChange={(e) => onUpdateMeasures?.(index, 'height', e.target.value)}
+                      onChange={(e) =>
+                        onUpdateMeasures?.(index, "height", e.target.value)
+                      }
                     />
                   ) : (
                     `${uvc.height || Measure.height} ${size_unit}`
@@ -151,7 +159,9 @@ const UVCMeasureTable: React.FC<UVCMeasureTableProps> = ({
                       type="number"
                       className="w-20 p-1 border rounded"
                       placeholder={uvc.length || Measure.long}
-                      onChange={(e) => onUpdateMeasures?.(index, 'length', e.target.value)}
+                      onChange={(e) =>
+                        onUpdateMeasures?.(index, "length", e.target.value)
+                      }
                     />
                   ) : (
                     `${uvc.length || Measure.long} ${size_unit}`
@@ -163,7 +173,9 @@ const UVCMeasureTable: React.FC<UVCMeasureTableProps> = ({
                       type="number"
                       className="w-20 p-1 border rounded"
                       placeholder={uvc.width || Measure.width}
-                      onChange={(e) => onUpdateMeasures?.(index, 'width', e.target.value)}
+                      onChange={(e) =>
+                        onUpdateMeasures?.(index, "width", e.target.value)
+                      }
                     />
                   ) : (
                     `${uvc.width || Measure.width} ${size_unit}`
@@ -175,7 +187,13 @@ const UVCMeasureTable: React.FC<UVCMeasureTableProps> = ({
                       type="number"
                       className="w-20 p-1 border rounded"
                       placeholder={uvc.gross_weight || Measure.weight_brut}
-                      onChange={(e) => onUpdateMeasures?.(index, 'gross_weight', e.target.value)}
+                      onChange={(e) =>
+                        onUpdateMeasures?.(
+                          index,
+                          "gross_weight",
+                          e.target.value
+                        )
+                      }
                     />
                   ) : (
                     `${uvc.gross_weight || Measure.weight_brut} ${weight_unit}`
@@ -187,7 +205,9 @@ const UVCMeasureTable: React.FC<UVCMeasureTableProps> = ({
                       type="number"
                       className="w-20 p-1 border rounded"
                       placeholder={uvc.net_weight || Measure.weight_net}
-                      onChange={(e) => onUpdateMeasures?.(index, 'net_weight', e.target.value)}
+                      onChange={(e) =>
+                        onUpdateMeasures?.(index, "net_weight", e.target.value)
+                      }
                     />
                   ) : (
                     `${uvc.net_weight || Measure.weight_net} ${weight_unit}`

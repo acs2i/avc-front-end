@@ -259,34 +259,40 @@ export default function DraftUpdatePage() {
     startIndex: number,
     endIndex: number
   ): SuppliersOption[] => {
-    const result = Array.from(list);
+    // Filtrer les éléments undefined et invalides
+    const validList = list.filter((supplier) => 
+      supplier && (supplier.value || supplier.supplier_id)
+    );
+    
+    const result = Array.from(validList);
     const [removed] = result.splice(startIndex, 1);
     result.splice(endIndex, 0, removed);
     return result;
   };
+  
 
   // Add handleDragEnd function
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
-
+  
     const updatedSuppliers = reorderSuppliers(
       selectedSuppliers,
       result.source.index,
       result.destination.index
     );
-
+  
     setSelectedSuppliers(updatedSuppliers);
-
-    // Update formData with reordered suppliers
+  
+    // Update formData avec vérification des valeurs
     setFormData((prevFormData) => ({
       ...prevFormData,
       suppliers: updatedSuppliers.map((supplier) => ({
-        supplier_id: supplier.value,
-        supplier_ref: supplier.supplier_ref || "",
-        pcb: supplier.pcb || "",
-        custom_cat: supplier.custom_cat || "",
-        made_in: supplier.made_in || "",
-        company_name: supplier.company_name || "",
+        supplier_id: supplier.value || supplier.supplier_id || '',
+        supplier_ref: supplier.supplier_ref || '',
+        pcb: supplier.pcb || '',
+        custom_cat: supplier.custom_cat || '',
+        made_in: supplier.made_in || '',
+        company_name: supplier.company_name || '',
       })),
     }));
   };
@@ -1408,7 +1414,7 @@ export default function DraftUpdatePage() {
                           </div>
                           <div className="grid grid-cols-4 gap-2 py-2">
                             <span className="col-span-1 font-[700] text-slate-500 text-[13px]">
-                              Nom d'appel :
+                              Alias :
                             </span>
                             {!isModify ? (
                               <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
@@ -1677,64 +1683,71 @@ export default function DraftUpdatePage() {
                                 {[
                                   ...(draft?.suppliers || []),
                                   ...selectedSuppliers,
-                                ].map((supplierDetail, index) => {
-                                  const draftSupplier = draft?.suppliers.find(
-                                    (draftSup) =>
-                                      draftSup.supplier_id ===
-                                      supplierDetail.supplier_id
-                                  );
+                                ]
+                                  .filter((supplier) => supplier) // Filtrer les suppliers undefined
+                                  .map((supplierDetail, index) => {
+                                    const draftSupplier =
+                                      draft?.suppliers?.find(
+                                        (draftSup) =>
+                                          draftSup?.supplier_id ===
+                                          supplierDetail?.supplier_id
+                                      );
 
-                                  const combinedSupplier = {
-                                    ...supplierDetail,
-                                    ...draftSupplier,
-                                  };
+                                    const combinedSupplier = {
+                                      ...supplierDetail,
+                                      ...draftSupplier,
+                                    };
 
-                                  return (
-                                    <Draggable
-                                      key={
-                                        combinedSupplier.supplier_id || index
-                                      }
-                                      draggableId={
-                                        combinedSupplier.supplier_id ||
-                                        `supplier-${index}`
-                                      }
-                                      index={index}
-                                      isDragDisabled={!isModify}
-                                    >
-                                      {(provided) => (
-                                        <div
-                                          ref={provided.innerRef}
-                                          {...provided.draggableProps}
-                                          {...provided.dragHandleProps}
-                                          onClick={() => {
-                                            setSelectedSupplier({
-                                              ...combinedSupplier,
-                                              index,
-                                            } as SupplierDetail);
-                                            setModalSupplierisOpen(true);
-                                          }}
-                                          className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md p-3 ${
-                                            index === 0
-                                              ? "bg-[#3B71CA]"
-                                              : "bg-slate-400"
-                                          }`}
-                                        >
-                                          <div className="flex items-center justify-between">
-                                            <span className="text-[20px] text-white font-bold">
-                                              {combinedSupplier.company_name ||
-                                                combinedSupplier.supplier_id}
-                                            </span>
-                                            {index === 0 && (
-                                              <span className="text-xs text-white bg-blue-600 px-2 py-1 rounded">
-                                                Fournisseur Principal
+                                    // Générer un ID unique pour le drag & drop
+                                    const draggableId =
+                                      combinedSupplier?.supplier_id
+                                        ? String(combinedSupplier.supplier_id)
+                                        : `supplier-${index}`;
+
+                                    return (
+                                      <Draggable
+                                        key={draggableId}
+                                        draggableId={draggableId}
+                                        index={index}
+                                        isDragDisabled={!isModify}
+                                      >
+                                        {(provided) => (
+                                          <div
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                            {...provided.dragHandleProps}
+                                            onClick={() => {
+                                              if (combinedSupplier) {
+                                                setSelectedSupplier({
+                                                  ...combinedSupplier,
+                                                  index,
+                                                } as SupplierDetail);
+                                                setModalSupplierisOpen(true);
+                                              }
+                                            }}
+                                            className={`text-center rounded-md cursor-pointer hover:brightness-110 shadow-md p-3 ${
+                                              index === 0
+                                                ? "bg-gradient-to-r from-cyan-600 to-cyan-800 text-white"
+                                                : "bg-slate-300 text-gray-500"
+                                            }`}
+                                          >
+                                            <div className="flex items-center justify-between">
+                                              <span className="text-[20px] text-white font-bold">
+                                                {combinedSupplier?.company_name ||
+                                                  combinedSupplier?.supplier_id ||
+                                                  "Sans nom"}
                                               </span>
-                                            )}
+                                              {index === 0 && (
+                                                <span className="text-xs text-white bg-cyan-800 px-2 py-1 rounded border border-white">
+                                                  Fournisseur Principal
+                                                </span>
+                                              )}
+                                            </div>
                                           </div>
-                                        </div>
-                                      )}
-                                    </Draggable>
-                                  );
-                                })}
+                                        )}
+                                      </Draggable>
+                                    );
+                                  })}
                                 {provided.placeholder}
                               </div>
                             )}

@@ -1150,11 +1150,13 @@ export default function SingleSupplierPage() {
                       <span className="font-[300]">
                         : {supplier?.company_name}
                       </span>
-                      {formData.status === "I" && <div className="absolute top-[50%] translate-y-[-50%] right-[-150px] bg-red-600 flex py-1 px-2 rounded-full shadow-md">
-                        <span className="text-[10px] text-white">
-                          Fiche fournisseur Inactive
-                        </span>
-                      </div>}
+                      {formData.status === "I" && (
+                        <div className="absolute top-[50%] translate-y-[-50%] right-[-150px] bg-red-600 flex py-1 px-2 rounded-full shadow-md">
+                          <span className="text-[10px] text-white">
+                            Fiche fournisseur Inactive
+                          </span>
+                        </div>
+                      )}
                     </h1>
                   </div>
                 ) : (
@@ -1576,14 +1578,14 @@ export default function SingleSupplierPage() {
                       {supplier?.brand_id.map((brand, index) => (
                         <div
                           key={index}
-                          className="flex items-center gap-2 mt-2 bg-gray-600 justify-center py-3 relative rounded-md"
+                          className="flex items-center gap-2 mt-2 bg-slate-300 justify-center py-3 relative rounded-md shadow-md"
                         >
-                          <span className="font-[600] text-white capitalize">
+                          <span className="font-[600] text-gray-500 capitalize">
                             {brand?.label}
                           </span>
                           <button
                             type="button"
-                            className="text-white hover:text-gray-300 absolute right-[13px]"
+                            className="text-gray-500 hover:text-gray-300 absolute right-[13px]"
                           >
                             <X size={18} />
                           </button>
@@ -1629,17 +1631,17 @@ export default function SingleSupplierPage() {
                                         {...provided.dragHandleProps}
                                         className={`text-center rounded-md cursor-move hover:brightness-125 shadow-md p-3 ${
                                           index === 0
-                                            ? "bg-blue-500"
-                                            : "bg-slate-400"
+                                            ? "bg-gradient-to-r from-cyan-600 to-cyan-800 text-white"
+                                            : "bg-slate-300 text-gray-500"
                                         }`}
                                       >
                                         <div className="flex items-center justify-between">
-                                          <span className="text-[20px] text-white font-bold">
+                                          <span className="text-[20px] font-bold">
                                             {contact.firstname}{" "}
                                             {contact.lastname}
                                           </span>
                                           {index === 0 && (
-                                            <span className="text-xs text-white bg-blue-600 px-2 py-1 rounded">
+                                            <span className="text-xs text-white bg-cyan-800 px-2 py-1 rounded border border-white">
                                               Contact Principal
                                             </span>
                                           )}
@@ -1666,15 +1668,15 @@ export default function SingleSupplierPage() {
                         <div
                           key={`contact-${index}`}
                           className={`text-center rounded-md shadow-md p-3 ${
-                            index === 0 ? "bg-blue-500" : "bg-slate-400"
+                            index === 0 ? "bg-gradient-to-r from-cyan-600 to-cyan-800 text-white" : "bg-slate-300 text-gray-500"
                           }`}
                         >
                           <div className="flex items-center justify-between">
-                            <span className="text-[20px] text-white font-bold">
+                            <span className="text-[20px] font-bold">
                               {contact.firstname} {contact.lastname}
                             </span>
                             {index === 0 && (
-                              <span className="text-xs text-white bg-blue-600 px-2 py-1 rounded">
+                              <span className="text-xs text-white bg-cyan-800 px-2 py-1 rounded border border-white">
                                 Contact Principal
                               </span>
                             )}
@@ -1891,15 +1893,33 @@ export default function SingleSupplierPage() {
                                     </span>
                                   </p>
                                 </div>
-                                <div className="text-gray-500">
+                                <div className="text-gray-500 flex items-center gap-2">
                                   <div
                                     onClick={(e: React.MouseEvent) => {
                                       e.stopPropagation();
                                       handlePdf(condition, index);
                                     }}
-                                    className="cursor-pointer"
+                                    className="cursor-pointer w-[40px] h-[40px] flex justify-center rounded-md bg-gradient-to-b from-red-400 to-red-600 p-[5px] hover:scale-110 transition shadow-md"
                                   >
-                                    <File size={18} />
+                                    <img src="/img/pdf_down.png" />
+                                  </div>
+                                  <div className="cursor-pointer w-[40px] h-[40px] flex justify-center rounded-md bg-gradient-to-b from-red-400 to-red-600 p-[5px] hover:scale-110 transition shadow-md">
+                                    {/* Input caché */}
+                                    <input
+                                      type="file"
+                                      accept=".csv, .xlsx, .xls"
+                                      onChange={handleFileUpload}
+                                      className="hidden"
+                                      id="fileUpload"
+                                    />
+
+                                    {/* Label lié à l'input */}
+                                    <label htmlFor="fileUpload" className="cursor-pointer">
+                                      <img
+                                        src="/img/pdf_up.png"
+                                        alt="Upload PDF"
+                                      />
+                                    </label>
                                   </div>
                                 </div>
                               </div>
@@ -1913,74 +1933,6 @@ export default function SingleSupplierPage() {
                       )}
                     </div>
                   </FormSection>
-                  <div className="mt-5">
-                    <FormSection title="Importer des conditions commerciales">
-                      {fileName ? (
-                        <div className="flex items-center mt-3">
-                          <div className="relative">
-                            {!isExpanded ? (
-                              <button
-                                onClick={handleButtonClick}
-                                className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center transition-all duration-300"
-                              >
-                                <Plus />
-                              </button>
-                            ) : (
-                              <div className="flex items-center gap-3 transition-all duration-300">
-                                <input
-                                  type="file"
-                                  accept=".pdf"
-                                  onChange={handleFileUpload}
-                                  className="hidden"
-                                  id="fileUpload"
-                                />
-                                <label
-                                  htmlFor="fileUpload"
-                                  className="border-[3px] border-blue-400 rounded-full py-1 px-4 hover:font-bold hover:bg-gradient-to-r from-cyan-500 to-blue-500 hover:text-white transition-all cursor-pointer"
-                                >
-                                  Changer de fichier
-                                </label>
-                              </div>
-                            )}
-                          </div>
-                          <span className="ml-4 text-gray-600 font-semibold">
-                            Fichier sélectionné : {fileName}
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="w-full h-[200px] flex flex-col gap-5 border-[5px] border-dashed border-slate-300 rounded-lg hover:bg-white hover:bg-opacity-75 transition ease-in-out delay-150 duration-300 cursor-pointer mt-3">
-                          <div className="w-full h-full flex justify-center items-center rounded-md">
-                            <div className="flex flex-col items-center text-center gap-5">
-                              <div className="w-[80px]">
-                                <img src="/img/upload.png" alt="icone" />
-                              </div>
-                              <div className="flex flex-col gap-2">
-                                <p className="text-gray-600 text-[20px]">
-                                  Glissez déposez votre fichier PDF ici
-                                </p>
-                                <span className="text-gray-600 text-[15px]">
-                                  ou
-                                </span>
-                                <input
-                                  type="file"
-                                  accept=".pdf"
-                                  onChange={handleFileUpload}
-                                  className="hidden"
-                                  id="fileUpload"
-                                />
-                                <label
-                                  htmlFor="fileUpload"
-                                  className="border-[3px] border-blue-400 rounded-full hover:font-bold py-1 hover:bg-gradient-to-r from-cyan-500 to-blue-500 hover:text-white transition-all cursor-pointer"
-                                >
-                                  Téléchargez le depuis votre ordinateur
-                                </label>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </FormSection>
-                  </div>
                 </>
               )}
               {isModify && (
@@ -1994,37 +1946,6 @@ export default function SingleSupplierPage() {
                 </div>
               )}
             </div>
-            {!isLoading ? (
-              <div className="mt-[50px] flex gap-2">
-                {isModify && (
-                  <>
-                    <button
-                      className="w-full bg-[#9FA6B2] text-white py-2 rounded-md font-[600] hover:bg-[#bac3d4] hover:text-white shadow-md"
-                      type="button"
-                    >
-                      Annuler
-                    </button>
-                    <button
-                      className="w-full bg-[#3B71CA] text-white py-2 rounded-md font-[600] hover:bg-sky-500 shadow-md"
-                      type="submit"
-                    >
-                      Modifier le fournisseur
-                    </button>
-                  </>
-                )}
-              </div>
-            ) : (
-              <div className="relative flex justify-center mt-7 px-7 gap-2">
-                <CircularProgress size={100} />
-                <div className="absolute h-[60px] w-[80px] top-[50%] translate-y-[-50%]">
-                  <img
-                    src="/img/logo.png"
-                    alt="logo"
-                    className="w-full h-full animate-pulse"
-                  />
-                </div>
-              </div>
-            )}
           </form>
         </div>
       </section>

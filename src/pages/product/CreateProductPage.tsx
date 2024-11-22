@@ -147,6 +147,7 @@ export default function CreateProductPage() {
   const [brandLabel, setBrandLabel] = useState("");
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const isDisabled = true;
 
   const [classificationValue, setClassificationValue] =
     useState("Au vieux campeur");
@@ -819,7 +820,7 @@ export default function CreateProductPage() {
                     <Input
                       element="input"
                       id="alias"
-                      label="Nom d'appel :"
+                      label="Alias :"
                       value={formData.alias}
                       onChange={handleChange}
                       validators={[]}
@@ -941,24 +942,52 @@ export default function CreateProductPage() {
                 </FormSection>
               </div>
 
-              <div className="w-[480px] h-[400px] flex flex-col gap-5 border-[5px] border-dashed border-slate-300 rounded-lg hover:bg-white hover:bg-opacity-75 transition ease-in-out delay-150 duration-300 cursor-pointer">
+              <div
+                className={`w-[480px] h-[400px] flex flex-col gap-5 border-[5px] border-dashed border-slate-300 rounded-lg ${
+                  isDisabled
+                    ? "bg-gray-200 cursor-not-allowed opacity-50"
+                    : "hover:bg-white hover:bg-opacity-75 transition ease-in-out delay-150 duration-300 cursor-pointer"
+                }`}
+              >
                 <div className="w-full h-full flex justify-center items-center rounded-md">
                   <div className="flex flex-col items-center text-center gap-5">
                     <div className="w-[120px]">
-                      <img src="/img/img_upload.png" alt="icone" />
+                      <img
+                        src="/img/img_upload.png"
+                        alt="icone"
+                        className={isDisabled ? "grayscale" : ""}
+                      />
                     </div>
                     <div className="flex flex-col gap-2">
-                      <p className="text-gray-600 text-[25px]">
+                      <p
+                        className={`text-gray-600 text-[25px] ${
+                          isDisabled ? "text-gray-400" : ""
+                        }`}
+                      >
                         Glissez déposez votre image ici
                       </p>
-                      <span className="text-gray-600 text-[15px]">ou</span>
-                      <button className="border-[3px] border-blue-400 rounded-full hover:font-bold py-1 hover:bg-gradient-to-r from-cyan-500 to-blue-500 hover:text-white transition-all">
+                      <span
+                        className={`text-gray-600 text-[15px] ${
+                          isDisabled ? "text-gray-400" : ""
+                        }`}
+                      >
+                        ou
+                      </span>
+                      <button
+                        disabled={isDisabled}
+                        className={`border-[3px] border-blue-400 rounded-full ${
+                          isDisabled
+                            ? "bg-gray-300 text-gray-500 border-gray-400"
+                            : "hover:bg-blue-500"
+                        }`}
+                      >
                         Téléchargez la depuis votre ordinateur
                       </button>
                     </div>
                   </div>
                 </div>
               </div>
+              
             </div>
             <div className="flex gap-2 mt-[50px]">
               <div className="w-1/4 flex flex-col">

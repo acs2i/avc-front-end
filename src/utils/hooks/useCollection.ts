@@ -41,7 +41,7 @@ export const useCollections = (initialInputValue: string = "", limit = 10) => {
   const searchCollections = async (inputValue: string) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/collection/search?label=${inputValue}&page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/collection/search?label=${inputValue}&code=${inputValue}&page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {

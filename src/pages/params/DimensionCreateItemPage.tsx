@@ -127,7 +127,7 @@ export default function DimensionCreateItemPage({
               create
               required
               gray
-              maxLength={50}
+              maxLength={5}
             />
             <Input
               element="input"

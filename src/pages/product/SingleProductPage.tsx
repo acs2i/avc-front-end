@@ -5,6 +5,7 @@ import useFetch from "../../utils/hooks/usefetch";
 import {
   ChevronLeft,
   CircleSlash2,
+  Copy,
   IterationCcw,
   Maximize2,
   Minimize2,
@@ -71,6 +72,20 @@ interface UserField {
   status: string;
   creator_id: any;
   additional_fields: CustomField[];
+}
+
+interface SupplierData {
+  supplier_id:
+    | {
+        _id?: string;
+        company_name: string;
+      }
+    | string;
+  company_name?: string;
+  supplier_ref: string;
+  pcb: string;
+  custom_cat: string;
+  made_in: string;
 }
 
 interface FormData {
@@ -171,8 +186,10 @@ const SupplierList: React.FC<SupplierListProps> = ({
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                         onClick={() => onSupplierClick(supplier, index)}
-                        className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md p-3 ${
-                          index === 0 ? "bg-[#3B71CA]" : "bg-slate-400"
+                        className={`text-center rounded-md cursor-pointer hover:brightness-110 shadow-md p-3 ${
+                          index === 0
+                            ? "bg-gradient-to-r from-cyan-600 to-cyan-800 text-white"
+                            : "bg-slate-300 text-gray-500"
                         }`}
                       >
                         <div className="flex items-center justify-between">
@@ -180,7 +197,7 @@ const SupplierList: React.FC<SupplierListProps> = ({
                             {supplier.label}
                           </span>
                           {index === 0 && (
-                            <span className="text-xs text-white bg-blue-600 px-2 py-1 rounded">
+                            <span className="text-xs text-white bg-cyan-800 px-2 py-1 rounded border border-white">
                               Fournisseur Principal
                             </span>
                           )}
@@ -225,6 +242,10 @@ export default function SingleProductPage() {
   const [brandLabel, setBrandLabel] = useState("");
   const [inputValueBrand, setInputValueBrand] = useState("");
   const [optionsBrand, setOptionsBrand] = useState<BrandOption[]>([]);
+  const [differences, setDifferences] = useState<
+    { field: string; productValue: any; uvcValue: any }[]
+  >([]);
+  const [isDifferenceModalOpen, setIsDifferenceModalOpen] = useState(false);
   const [selectedOptionBrand, setSelectedOptionBrand] =
     useState<SingleValue<BrandOption> | null>(null);
   const [inputValueFamily, setInputValueFamily] = useState("");
@@ -489,6 +510,23 @@ export default function SingleProductPage() {
   const [sizes, setSizes] = useState<string[]>(formData.initialSizes);
   const [colors, setColors] = useState<string[]>(formData.initialColors);
   const [uvcGrid, setUvcGrid] = useState<boolean[][]>(formData.initialGrid);
+
+  
+  const filterOptions = (inputValue: string, options: any[]) => {
+    const input = inputValue ? inputValue.toLowerCase() : "";
+    return options.filter((option) => {
+      const name = option.label ? option.label.toLowerCase() : "";
+      const code = option.code ? option.code.toLowerCase() : ""; // Vérifiez si le code existe
+      return name.includes(input) || code.includes(input);
+    });
+  };
+  
+  const formatOptionLabel = ({ label, code }: { label: string; code: string }) => (
+    <div className="flex items-center justify-between">
+      <span>{label}</span>
+      <span className="text-gray-400 text-sm">({code})</span>
+    </div>
+  );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -825,6 +863,7 @@ export default function SingleProductPage() {
           (collection: CollectionOption) => ({
             value: collection._id,
             label: collection.label,
+            code: collection.code,
           })
         );
 
@@ -837,7 +876,7 @@ export default function SingleProductPage() {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/collection/search?label=${inputValueCollection}&page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/collection/search?label=${inputValueCollection}&code=${inputValueCollection}&page=${currentPage}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -851,6 +890,7 @@ export default function SingleProductPage() {
         (collection: CollectionOption) => ({
           value: collection._id,
           label: collection.label,
+          code: collection.code,
         })
       );
 
@@ -1057,6 +1097,48 @@ export default function SingleProductPage() {
       }
     } catch (error) {
       console.error("Erreur lors de la requête", error);
+    }
+  };
+
+  const checkDifferences = () => {
+    const detectedDifferences: {
+      field: string;
+      productValue: any;
+      uvcValue: any;
+    }[] = [];
+
+    formDataUvc.uvc.forEach((uvc, index) => {
+      [
+        "collectionUvc",
+        "paeu",
+        "tbeu_pb",
+        "tbeu_pmeu",
+        "height",
+        "width",
+        "length",
+        "gross_weight",
+        "net_weight",
+      ].forEach((field) => {
+        const productValue = formData[field as keyof typeof formData];
+        const uvcValue = uvc[field as keyof typeof uvc];
+
+        if (
+          productValue !== undefined &&
+          uvcValue !== undefined &&
+          productValue !== uvcValue
+        ) {
+          detectedDifferences.push({
+            field,
+            productValue,
+            uvcValue,
+          });
+        }
+      });
+    });
+
+    if (detectedDifferences.length > 0) {
+      setDifferences(detectedDifferences);
+      setIsDifferenceModalOpen(true);
     }
   };
 
@@ -1336,7 +1418,129 @@ export default function SingleProductPage() {
       };
     });
   };
-  console.log(product);
+
+
+  
+
+  const prepareDraftData = () => {
+    // Étape 1 : Préparer les données pour le draft
+    const formattedSuppliers = formData.suppliers.map((supplier: SupplierData) => {
+      let companyName = "Nom inconnu";
+    
+      // Vérifie si supplier_id est un objet avec company_name
+      if (typeof supplier.supplier_id === "object" && supplier.supplier_id?.company_name) {
+        companyName = supplier.supplier_id.company_name;
+      } else if (typeof supplier.supplier_id === "string") {
+        companyName = supplier.supplier_id; // Utilisez la chaîne directement si c'est une string
+      }
+    
+      return {
+        supplier_id: companyName,
+        supplier_ref: "",
+        pcb: supplier.pcb || "",
+        custom_cat: supplier.custom_cat || "",
+        made_in: supplier.made_in || "",
+      };
+    });
+
+    const draftData = {
+      creator_id: creatorId._id,
+      reference: "",
+      alias: formData.alias || "",
+      short_label: formData.short_label || "",
+      long_label: formData.long_label,
+      type: formData.type,
+      tag_ids: Array.isArray(formData.tag_ids)
+      ? formData.tag_ids.map((tag) => tag.code || "Tag inconnu")
+      : [],
+      suppliers: formattedSuppliers,
+      dimension_types: Array.isArray(formData.dimension_types)
+      ? formData.dimension_types
+      : [formData.dimension_types || "Type par défaut"],
+      brand_ids: Array.isArray(formData.brand_ids)
+    ? formData.brand_ids.map((brand) => brand.label || "Marque inconnue")
+    : ["Marque inconnue"],
+  collection_ids: Array.isArray(formData.collection_ids)
+    ? formData.collection_ids.map((collection) => collection.label || "Collection inconnue")
+    : ["Collection inconnue"],
+      paeu: formData.paeu || 0,
+      tbeu_pb: formData.tbeu_pb || 0,
+      tbeu_pmeu: formData.tbeu_pmeu || 0,
+      height: formData.height || "0",
+      width: formData.width || "0",
+      length: formData.length || "0",
+      comment: formData.comment || "",
+      gross_weight: formData.gross_weight || "0",
+      net_weight: formData.net_weight || "0",
+      size_unit: formData.size_unit || "",
+      weigth_unit: formData.weigth_unit || "",
+      imgPath: formData.imgPath || "",
+      status: "Draft", // Toujours `Draft` pour un draft
+      step: 1, // Étape initiale d'un draft
+      additional_fields: formData.additional_fields || [],
+      uvc: formDataUvc.uvc.map((uvc) => ({
+        code: "",
+        dimensions: uvc.dimensions,
+        prices: {
+          price: {
+            paeu: uvc.prices?.price?.paeu || 0,
+            tbeu_pb: uvc.prices?.price?.tbeu_pb || 0,
+            tbeu_pmeu: uvc.prices?.price?.tbeu_pmeu || 0,
+          },
+        },
+        collectionUvc: uvc.collectionUvc,
+        height: uvc.height || "0",
+        width: uvc.width || "0",
+        length: uvc.length || "0",
+        gross_weight: uvc.gross_weight || "0",
+        net_weight: uvc.net_weight || "0",
+        eans: uvc.eans || [],
+        ean: "",
+        status: "A",
+      })),
+    };
+
+    return draftData;
+  };
+
+  const handleDuplicate = async () => {
+    setIsLoading(true);
+    try {
+      const draftData = prepareDraftData(); // Préparer les données
+      console.log("Draft data being sent:", draftData); // Affichez les données avant de les envoyer
+
+      // Étape 2 : Envoyer les données à la route /draft
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/draft`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(draftData),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.error || "Erreur lors de la création du draft"
+        );
+      }
+
+      const newDraft = await response.json();
+      notifySuccess("Draft créé avec succès !");
+      navigate(`/draft/${newDraft._id}`);
+    } catch (error) {
+      console.error("Erreur lors de la duplication :", error);
+      notifyError("Erreur lors de la création du draft");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  console.log(formData);
   return (
     <>
       <Modal
@@ -1486,7 +1690,11 @@ export default function SingleProductPage() {
                         : "text-green-600"
                     } font-semibold hover:brightness-75`}
                   >
-                    {formData.status === "A" ? <TriangleAlert size={15} /> : <IterationCcw size={15} />}
+                    {formData.status === "A" ? (
+                      <TriangleAlert size={15} />
+                    ) : (
+                      <IterationCcw size={15} />
+                    )}
                     <span>
                       {formData.status === "A"
                         ? "Désactiver la référence"
@@ -1505,6 +1713,16 @@ export default function SingleProductPage() {
                   >
                     <Pen size={15} />
                     {isModify ? "Annuler modification" : "Modifier"}
+                  </Button>
+                  <Button
+                    size="small"
+                    blue
+                    type="button"
+                    onClick={handleDuplicate}
+                    disabled={product?.status === "D"}
+                  >
+                    <Copy size={15} />
+                    Dupliquer
                   </Button>
                 </div>
               ) : (
@@ -1563,7 +1781,7 @@ export default function SingleProductPage() {
                         </div>
                         <div className="grid grid-cols-4 gap-2 py-2">
                           <span className="col-span-1 font-[700] text-slate-500 text-[13px]">
-                            Nom d'appel :
+                            Alias :
                           </span>
                           {!isModify ? (
                             <span className="col-span-3 text-gray-600 whitespace-nowrap text-[14px]">
@@ -1809,7 +2027,7 @@ export default function SingleProductPage() {
                             </span>
                           ) : (
                             <select
-                              className="col-span-6 border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 py-2"
+                              className="w-[200px] border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 py-2"
                               value={formData.type}
                               onChange={(e) => handleTypeChange(e.target.value)}
                             >
@@ -1853,10 +2071,15 @@ export default function SingleProductPage() {
                             </span>
                           ) : (
                             <CreatableSelect
-                              className="col-span-6"
+                              className="w-[180px]"
                               value={selectedOptionCollection}
                               onChange={handleChangeCollection}
                               onInputChange={handleInputChangeCollection}
+                              onFocus={() => handleInputChangeCollection("")}
+                              filterOption={(option, input) => 
+                                filterOptions(input, [option.data])[0] !== undefined
+                              }
+                              formatOptionLabel={formatOptionLabel}
                               options={optionsCollection}
                               inputValue={inputValueCollection}
                               placeholder={
@@ -1941,9 +2164,9 @@ export default function SingleProductPage() {
                               Hauteur
                             </span>
                             {!isModify ? (
-                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {product?.height || "0"}
-                                {product?.size_unit || "m"}
+                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px] capitalize">
+                                {product?.height || "0"}{" "}
+                                ({product?.size_unit || "M"})
                               </span>
                             ) : (
                               <input
@@ -1961,8 +2184,8 @@ export default function SingleProductPage() {
                             </span>
                             {!isModify ? (
                               <span className="ext-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {product?.length || "0"}
-                                {product?.size_unit || "m"}
+                                {product?.length || "0"}{" "}
+                                ({product?.size_unit || "M"})
                               </span>
                             ) : (
                               <input
@@ -1980,8 +2203,8 @@ export default function SingleProductPage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {product?.width || "0"}
-                                {product?.size_unit || "m"}
+                                {product?.width || "0"}{" "}
+                                ({product?.size_unit || "M"})
                               </span>
                             ) : (
                               <input
@@ -2001,8 +2224,8 @@ export default function SingleProductPage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {product?.gross_weight || "0"}
-                                {product?.weigth_unit || "kg"}
+                                {product?.gross_weight || "0"}{" "}
+                                ({product?.weigth_unit || "KG"})
                               </span>
                             ) : (
                               <input
@@ -2020,8 +2243,8 @@ export default function SingleProductPage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 text-[14px]">
-                                {product?.net_weight || "0"}
-                                {product?.weigth_unit || "kg"}
+                                {product?.net_weight || "0"}{" "}
+                                ({product?.weigth_unit || "KG"})
                               </span>
                             ) : (
                               <input

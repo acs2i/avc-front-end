@@ -53,7 +53,7 @@ const FamilySection: React.FC<FamilySelectorProps> = ({
             filterOptions(input, [option.data])[0] !== undefined
           }
           formatOptionLabel={formatOptionLabel}
-          placeholder="Rechercher ou créer une famille"
+          placeholder="Tapez Votre Recherche..."
           styles={{
             ...customStyles,
             menu: (base) => ({

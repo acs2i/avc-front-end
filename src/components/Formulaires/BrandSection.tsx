@@ -60,7 +60,7 @@ const BrandSection: React.FC<BrandSelectorProps> = ({
                 filterOptions(input, [option.data])[0] !== undefined
               }
               formatOptionLabel={formatOptionLabel}
-              placeholder="Rechercher ou créer une marque"
+              placeholder="Tapez votre recherche..."
               styles={{
                 ...customStyles,
                 menu: (base) => ({

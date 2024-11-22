@@ -71,7 +71,10 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
         <thead>
           <tr className="bg-gray-50">
             <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
-              Code UVC
+              UVC Preref
+            </th>
+            <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
+              UVC Colombus
             </th>
             <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
               Couleur
@@ -93,6 +96,9 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
               <tr key={index} className="hover:bg-gray-50">
                 <td className="border px-4 py-2 text-center text-sm">
                   {uvcReference}
+                </td>
+                <td className="border px-4 py-2 text-center text-sm">
+                  -
                 </td>
                 <td className="border px-4 py-2 text-center text-sm">
                   {couleur}

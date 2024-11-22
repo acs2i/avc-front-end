@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Maximize2, Palette, Plus, Ruler, Check, X, Trash2 } from "lucide-react";
+import {
+  Maximize2,
+  Palette,
+  Plus,
+  Ruler,
+  Check,
+  X,
+  Trash2,
+} from "lucide-react";
 import Modal from "./Shared/Modal";
 
 interface UVCGridProps {
@@ -97,6 +105,17 @@ const UVCGrid: React.FC<UVCGridProps> = ({
     const updatedGrid = uvcGrid.filter((_, index) => index !== colorIndex);
 
     setColors(updatedColors);
+    setUvcGrid(updatedGrid);
+    updateDimensions(updatedGrid);
+  };
+
+  const handleDeleteColumn = (sizeIndex: number): void => {
+    const updatedSizes = sizes.filter((_, index) => index !== sizeIndex);
+    const updatedGrid = uvcGrid.map((row) =>
+      row.filter((_, index) => index !== sizeIndex)
+    );
+
+    setSizes(updatedSizes);
     setUvcGrid(updatedGrid);
     updateDimensions(updatedGrid);
   };
@@ -360,25 +379,27 @@ const UVCGrid: React.FC<UVCGridProps> = ({
                   className="px-1 py-2 text-center border border-solid border-gray-300 border-b"
                 >
                   {isModify && isEditable ? (
-                    <input
-                      type="text"
-                      value={size}
-                      onChange={(e) => handleSizeChange(index, e.target.value)}
-                      className="w-full text-center bg-gray-100 focus:outline-none"
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={size}
+                        onChange={(e) =>
+                          handleSizeChange(index, e.target.value)
+                        }
+                        className="w-full text-center bg-gray-100 focus:outline-none"
+                      />
+                      <button
+                        onClick={() => handleDeleteColumn(index)}
+                        className="absolute right-0 text-red-500 hover:text-red-700"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
                   ) : (
                     size
                   )}
                 </th>
               ))}
-               {isModify && (
-                <th
-                  scope="col"
-                  className="px-1 py-2 text-center border border-solid border-gray-300 border-b"
-                >
-                  <Trash2 size={18}/>
-                </th>
-              )}
             </tr>
           </thead>
           <tbody className="relative text-center text-[12px]">
@@ -389,14 +410,22 @@ const UVCGrid: React.FC<UVCGridProps> = ({
               >
                 <td className="max-w-[200px] py-2 px-2 border">
                   {isModify && isEditable ? (
-                    <input
-                      type="text"
-                      value={color}
-                      onChange={(e) =>
-                        handleColorChange(colorIndex, e.target.value)
-                      }
-                      className="w-full text-center bg-white focus:outline-none"
-                    />
+                    <div className="flex items-center">
+                      <button
+                        onClick={() => handleDeleteRow(colorIndex)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                      <input
+                        type="text"
+                        value={color}
+                        onChange={(e) =>
+                          handleColorChange(colorIndex, e.target.value)
+                        }
+                        className="w-full text-center bg-white focus:outline-none"
+                      />
+                    </div>
                   ) : (
                     color
                   )}
@@ -423,16 +452,6 @@ const UVCGrid: React.FC<UVCGridProps> = ({
                     )}
                   </td>
                 ))}
-                {isModify && (
-                  <td className="py-2 px-2 border text-center">
-                    <button
-                      onClick={() => handleDeleteRow(colorIndex)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </td>
-                )}
               </tr>
             ))}
           </tbody>

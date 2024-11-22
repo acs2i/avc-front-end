@@ -20,6 +20,8 @@ import { useBrands } from "../../utils/hooks/useBrands";
 import { useUsers } from "../../utils/hooks/useUsers";
 import { useFamily } from "../../utils/hooks/useFamily";
 import GestionFormComponent from "../../components/GestionFormComponent";
+import { useIsoCode } from "../../utils/hooks/useIsoCode";
+import IsoCodeSection from "../../components/Formulaires/IsoCodeSection";
 
 interface Contact {
   firstname: string;
@@ -84,30 +86,27 @@ interface Buyer {
 }
 
 const customStyles = {
-  control: (provided: any) => ({
-    ...provided,
-    border: "none",
-    boxShadow: "none",
-    borderRadius: "10px",
-    "&:hover": {
-      border: "none",
-    },
-  }),
   option: (provided: any, state: any) => ({
     ...provided,
-    borderBottom: "1px solid #e5e5e5",
-    backgroundColor: state.isSelected ? "#e5e5e5" : "white",
-    color: state.isSelected ? "black" : "gray",
-    "&:hover": {
-      backgroundColor: "#e5e5e5",
-      color: "black",
+    backgroundColor: state.isFocused ? '#d1e7fd' : 'white',
+    color: state.isFocused ? '#0d6efd' : 'black',
+    cursor: 'pointer',
+  }),
+  control: (provided: any) => ({
+    ...provided,
+    borderColor: '#ced4da',
+    '&:hover': {
+      borderColor: '#0d6efd'
     },
   }),
-  singleValue: (provided: any) => ({
+  menu: (provided: any) => ({
     ...provided,
-    color: "gray",
+    zIndex: 9999,
   }),
 };
+
+
+
 
 export default function CreateSupplierPage() {
   const navigate = useNavigate();
@@ -201,6 +200,14 @@ export default function CreateSupplierPage() {
     handleInputChangeFamily,
     handleChangeFamily,
   } = useFamily("", 10);
+
+  const {
+    inputValueIsoCode,
+    optionsIsoCode,
+    isoCodes,
+    handleInputChangeIsoCode,
+    handleChangeIsoCode,
+  } = useIsoCode("", 10);
 
   useEffect(() => {
     setUserOptions(optionsUser);
@@ -315,6 +322,15 @@ export default function CreateSupplierPage() {
       ...formData,
       [e.target.id]: e.target.value,
     });
+  };
+
+  const handleCountryChange = (
+    selectedOption: { value: string; label: string } | null
+  ) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      country: selectedOption ? selectedOption.value : "",
+    }));
   };
 
   // Fonction qui ajoute un contact
@@ -639,16 +655,16 @@ export default function CreateSupplierPage() {
                   create
                   gray
                 />
-                <Input
-                  element="input"
-                  id="country"
-                  label="Pays :"
-                  value={formData.country}
-                  onChange={handleChange}
-                  validators={[]}
-                  placeholder="France"
-                  create
-                  gray
+                <IsoCodeSection
+                  isoCode={isoCodes}
+                  optionsIsoCode={optionsIsoCode}
+                  handleChangeIsoCode={(selectedOption) => {
+                    handleChangeIsoCode(selectedOption, 0);
+                    handleCountryChange(selectedOption);
+                  }}
+                  handleInputChangeIsoCode={handleInputChangeIsoCode}
+                  inputValueIsoCode={inputValueIsoCode}
+                  customStyles={customStyles}
                 />
               </FormSection>
             </div>

@@ -53,7 +53,8 @@ const UVCPriceTable: React.FC<UVCPriceTableProps> = ({
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-gray-50">
-            <th className="border px-4 py-2 text-sm font-semibold text-gray-600">Code UVC</th>
+            <th className="border px-4 py-2 text-sm font-semibold text-gray-600">UVC Preref</th>
+            <th className="border px-4 py-2 text-sm font-semibold text-gray-600">UVC Colombus</th>
             <th className="border px-4 py-2 text-sm font-semibold text-gray-600">Couleur</th>
             <th className="border px-4 py-2 text-sm font-semibold text-gray-600">Taille</th>
             <th className="border px-4 py-2 text-sm font-semibold text-gray-600">Prix Achat (PAEU)</th>
@@ -74,6 +75,7 @@ const UVCPriceTable: React.FC<UVCPriceTableProps> = ({
             return (
               <tr key={index} className="hover:bg-gray-50">
                 <td className="border px-4 py-2 text-center text-sm">{uvcReference}</td>
+                <td className="border px-4 py-2 text-center text-sm">-</td>
                 <td className="border px-4 py-2 text-center text-sm">{color}</td>
                 <td className="border px-4 py-2 text-center text-sm">{size}</td>
                 <td className="border px-4 py-2 text-center bg-blue-50">
