@@ -47,9 +47,9 @@ interface FormData {
   web_url: string;
   siret: string;
   tva: string;
-  address_1: string;
-  address_2: string;
-  address_3: string;
+  address1: string;
+  address2: string;
+  address3: string;
   city: string;
   postal: string;
   country: string;
@@ -146,9 +146,9 @@ export default function CreateSupplierPage() {
     web_url: "",
     siret: "",
     tva: "",
-    address_1: "",
-    address_2: "",
-    address_3: "",
+    address1: "",
+    address2: "",
+    address3: "",
     city: "",
     postal: "",
     country: "",
@@ -602,9 +602,9 @@ export default function CreateSupplierPage() {
               <FormSection title="Adresse" size="h-[550px]">
                 <Input
                   element="input"
-                  id="address_1"
+                  id="address1"
                   label="Adresse 1 :"
-                  value={formData.address_1}
+                  value={formData.address1}
                   onChange={handleChange}
                   validators={[]}
                   placeholder="14 rue mon adresse"
@@ -613,9 +613,9 @@ export default function CreateSupplierPage() {
                 />
                 <Input
                   element="input"
-                  id="address_2"
+                  id="address2"
                   label="Adresse 2 :"
-                  value={formData.address_2}
+                  value={formData.address2}
                   onChange={handleChange}
                   validators={[]}
                   placeholder="Complément d'adresse"
@@ -624,9 +624,9 @@ export default function CreateSupplierPage() {
                 />
                 <Input
                   element="input"
-                  id="address_3"
+                  id="address3"
                   label="Adresse 3 :"
-                  value={formData.address_3}
+                  value={formData.address3}
                   onChange={handleChange}
                   validators={[]}
                   placeholder="Complément d'adresse"

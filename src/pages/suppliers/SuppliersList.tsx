@@ -13,7 +13,7 @@ interface Supplier {
   _id: string;
   code: string;
   company_name: string;
-  address_1: string;
+  address1: string;
   postal: string;
   city: string;
   country: string;
@@ -373,8 +373,8 @@ export default function SuppliersList() {
                     <span>{truncateText(supplier?.company_name || "", 25)}</span>
                   </td>
                   <td className="px-6 py-2">
-                    {supplier.address_1 ? (
-                      supplier.address_1
+                    {supplier.address1 ? (
+                      supplier.address1
                     ) : (
                       <CircleSlash2 size={13} />
                     )}

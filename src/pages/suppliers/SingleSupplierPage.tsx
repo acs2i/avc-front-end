@@ -74,9 +74,9 @@ interface Supplier {
   web_url: string;
   siret: string;
   tva: string;
-  address_1: string;
-  address_2: string;
-  address_3: string;
+  address1: string;
+  address2: string;
+  address3: string;
   city: string;
   postal: string;
   country: string;
@@ -121,9 +121,9 @@ interface Conditions {
   // Ajout des champs manquants
   siret?: string;
   tva?: string;
-  address_1?: string;
-  address_2?: string;
-  address_3?: string;
+  address1?: string;
+  address2?: string;
+  address3?: string;
   city?: string;
   postal?: string;
   country?: string;
@@ -166,9 +166,9 @@ interface Commerciale {
   web_url: string;
   siret: string;
   tva: string;
-  address_1: string;
-  address_2: string;
-  address_3: string;
+  address1: string;
+  address2: string;
+  address3: string;
   city: string;
   postal: string;
   country: string;
@@ -191,9 +191,9 @@ interface FormData {
   web_url: string;
   siret: string;
   tva: string;
-  address_1: string;
-  address_2: string;
-  address_3: string;
+  address1: string;
+  address2: string;
+  address3: string;
   city: string;
   postal: string;
   country: string;
@@ -217,9 +217,9 @@ interface FormDataCondition {
   web_url: string;
   siret: string;
   tva: string;
-  address_1: string;
-  address_2: string;
-  address_3: string;
+  address1: string;
+  address2: string;
+  address3: string;
   city: string;
   postal: string;
   country: string;
@@ -318,9 +318,9 @@ export default function SingleSupplierPage() {
     web_url: supplier?.web_url || "",
     siret: supplier?.siret || "",
     tva: supplier?.tva || "",
-    address_1: supplier?.address_1 || "",
-    address_2: supplier?.address_2 || "",
-    address_3: supplier?.address_3 || "",
+    address1: supplier?.address1 || "",
+    address2: supplier?.address2 || "",
+    address3: supplier?.address3 || "",
     city: supplier?.city || "",
     postal: supplier?.postal || "",
     country: supplier?.country || "",
@@ -365,9 +365,9 @@ export default function SingleSupplierPage() {
       web_url: supplier?.web_url || "",
       email: supplier?.email || "",
       phone: supplier?.phone || "",
-      address_1: supplier?.address_1 || "",
-      address_2: supplier?.address_2 || "",
-      address_3: supplier?.address_3 || "",
+      address1: supplier?.address1 || "",
+      address2: supplier?.address2 || "",
+      address3: supplier?.address3 || "",
       city: supplier?.city || "",
       postal: supplier?.postal || "",
       country: supplier?.country || "",
@@ -475,9 +475,9 @@ export default function SingleSupplierPage() {
         web_url: supplier.web_url || "",
         siret: supplier.siret || "",
         tva: supplier.tva || "",
-        address_1: supplier.address_1 || "",
-        address_2: supplier.address_2 || "",
-        address_3: supplier.address_3 || "",
+        address1: supplier.address1 || "",
+        address2: supplier.address2 || "",
+        address3: supplier.address3 || "",
         city: supplier.city || "",
         postal: supplier.postal || "",
         country: supplier.country || "",
@@ -564,9 +564,9 @@ export default function SingleSupplierPage() {
         brand_id: brandLabels,
 
         // Adresses
-        address_1: condition.address_1,
-        address_2: condition.address_2,
-        address_3: condition.address_3,
+        address1: condition.address1,
+        address2: condition.address2,
+        address3: condition.address3,
         postal: condition.postal,
         country: condition.country,
 
@@ -1405,34 +1405,34 @@ export default function SingleSupplierPage() {
                     <>
                       <Input
                         element="input"
-                        id="address_1"
+                        id="address1"
                         label="Adresse 1 :"
-                        value={formData.address_1}
+                        value={formData.address1}
                         onChange={handleChange}
                         validators={[]}
-                        placeholder={supplier?.address_1}
+                        placeholder={supplier?.address1}
                         create
                         gray
                       />
                       <Input
                         element="input"
-                        id="address_2"
+                        id="address2"
                         label="Adresse 2 :"
-                        value={formData.address_2}
+                        value={formData.address2}
                         onChange={handleChange}
                         validators={[]}
-                        placeholder={supplier?.address_2}
+                        placeholder={supplier?.address2}
                         create
                         gray
                       />
                       <Input
                         element="input"
-                        id="address_3"
+                        id="address3"
                         label="Adresse 3 :"
-                        value={formData.address_3}
+                        value={formData.address3}
                         onChange={handleChange}
                         validators={[]}
-                        placeholder={supplier?.address_3}
+                        placeholder={supplier?.address3}
                         create
                         gray
                       />
@@ -1476,9 +1476,9 @@ export default function SingleSupplierPage() {
                         <span className="font-bold text-gray-700">
                           Adresse 1 :
                         </span>
-                        {supplier?.address_1 ? (
+                        {supplier?.address1 ? (
                           <p className="font-[600] text-slate-500">
-                            {supplier?.address_1}
+                            {supplier?.address1}
                           </p>
                         ) : (
                           <div className="font-[600] text-slate-500">
@@ -1490,9 +1490,9 @@ export default function SingleSupplierPage() {
                         <span className="font-bold text-gray-700">
                           Adresse 2 :
                         </span>
-                        {supplier?.address_2 ? (
+                        {supplier?.address2 ? (
                           <p className="font-[600] text-slate-500">
-                            {supplier?.address_2}
+                            {supplier?.address2}
                           </p>
                         ) : (
                           <div className="font-[600] text-slate-500">
@@ -1504,9 +1504,9 @@ export default function SingleSupplierPage() {
                         <span className="font-bold text-gray-700">
                           Adresse 3 :
                         </span>
-                        {supplier?.address_3 ? (
+                        {supplier?.address3 ? (
                           <p className="font-[600] text-slate-500">
-                            {supplier?.address_3}
+                            {supplier?.address3}
                           </p>
                         ) : (
                           <div className="font-[600] text-slate-500">

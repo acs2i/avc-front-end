@@ -24,9 +24,9 @@ interface Supplier {
   web_url: string;
   email: string;
   phone: string;
-  address_1: string;
-  address_2: string;
-  address_3: string;
+  address1: string;
+  address2: string;
+  address3: string;
   postal: string;
   country: string;
   contacts?: any[];
