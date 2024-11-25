@@ -217,6 +217,12 @@ export type Uvc = {
   net_weight?: string; 
 }
 
+interface CustomField {
+  label: string;
+  value: string;
+  field_type?: string;
+}
+
 export type DatalakeUvc = {
   product_id: any;
   code: string;
@@ -233,6 +239,7 @@ export type DatalakeUvc = {
   length?: string;
   gross_weight?: string;
   net_weight?: string; 
+  additional_fields?: CustomField[];
 }
 
 export type Supplier = {

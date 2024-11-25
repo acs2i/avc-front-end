@@ -52,6 +52,7 @@ import {
   Draggable,
   DropResult,
 } from "react-beautiful-dnd";
+import truncateText from "../../utils/func/Formattext";
 
 interface formDataUVC {
   uvc: DatalakeUvc[];
@@ -354,6 +355,210 @@ export default function SingleProductPage() {
     ],
   });
 
+  // Ajoutez ces fonctions juste après vos interfaces et avant votre composant
+  const isDifferent = (oldValue: any, newValue: any): boolean => {
+    // Si les deux valeurs sont des tableaux
+    if (Array.isArray(oldValue) && Array.isArray(newValue)) {
+      if (oldValue.length !== newValue.length) return true;
+
+      // Pour les tableaux d'objets (comme suppliers, uvc_ids)
+      if (typeof oldValue[0] === "object") {
+        return (
+          JSON.stringify(
+            oldValue.sort((a, b) =>
+              JSON.stringify(a).localeCompare(JSON.stringify(b))
+            )
+          ) !==
+          JSON.stringify(
+            newValue.sort((a, b) =>
+              JSON.stringify(a).localeCompare(JSON.stringify(b))
+            )
+          )
+        );
+      }
+
+      // Pour les tableaux simples
+      return (
+        JSON.stringify(oldValue.sort()) !== JSON.stringify(newValue.sort())
+      );
+    }
+
+    // Si les deux valeurs sont des objets
+    if (
+      typeof oldValue === "object" &&
+      oldValue !== null &&
+      typeof newValue === "object" &&
+      newValue !== null
+    ) {
+      const oldKeys = Object.keys(oldValue);
+      const newKeys = Object.keys(newValue);
+
+      if (oldKeys.length !== newKeys.length) return true;
+
+      return oldKeys.some((key) => isDifferent(oldValue[key], newValue[key]));
+    }
+
+    // Pour les valeurs simples
+    return oldValue !== newValue;
+  };
+
+const createUpdateEntry = (oldProduct: any, newProduct: any, userName: string) => {
+  const changes: any = {};
+  
+  // Fonction pour normaliser les IDs ObjectId en strings
+  const normalizeId = (id: any) => {
+    if (typeof id === 'object' && id !== null) {
+      return id.toString(); // Convertit ObjectId en string
+    }
+    return id;
+  };
+
+  // Fonction pour extraire les données essentielles
+  const extractEssentialData = (item: any, type: string) => {
+    if (!item) return null;
+
+    switch (type) {
+      case 'tag':
+        return {
+          _id: normalizeId(item._id || item),
+          code: item.code || '',
+          name: item.name || '',
+          level: item.level || ''
+        };
+
+      case 'brand':
+        return {
+          _id: normalizeId(item._id || item),
+          label: item.label || ''
+        };
+
+      case 'collection':
+        return {
+          _id: normalizeId(item._id || item),
+          label: item.label || ''
+        };
+
+      case 'supplier':
+        if (typeof item === 'object') {
+          return {
+            supplier_id: normalizeId(item.supplier_id),
+            supplier_ref: item.supplier_ref || '',
+            pcb: item.pcb || '',
+            custom_cat: item.custom_cat || '',
+            made_in: item.made_in || ''
+          };
+        }
+        return item;
+
+      default:
+        return item;
+    }
+  };
+
+  // Fonction pour formater la valeur selon le type de champ
+  const formatValue = (value: any, field: string) => {
+    if (!value) return value;
+
+    switch (field) {
+      case 'tag_ids':
+        return Array.isArray(value) 
+          ? value.map(tag => extractEssentialData(tag, 'tag'))
+          : value;
+
+      case 'brand_ids':
+        return Array.isArray(value)
+          ? value.map(brand => extractEssentialData(brand, 'brand'))
+          : value;
+
+      case 'collection_ids':
+        return Array.isArray(value)
+          ? value.map(collection => extractEssentialData(collection, 'collection'))
+          : value;
+
+      case 'suppliers':
+        return Array.isArray(value)
+          ? value.map(supplier => extractEssentialData(supplier, 'supplier'))
+          : value;
+
+      case 'uvc_ids':
+        return Array.isArray(value)
+          ? value.map(uvc => ({
+              _id: normalizeId(uvc._id || uvc),
+              code: uvc.code || '',
+              dimensions: uvc.dimensions || []
+            }))
+          : value;
+
+      // Pour les champs simples
+      case 'short_label':
+      case 'long_label':
+      case 'alias':
+      case 'reference':
+      case 'type':
+      case 'comment':
+        return value ? value.toString() : '';
+
+      // Pour les champs numériques
+      case 'paeu':
+      case 'tbeu_pb':
+      case 'tbeu_pmeu':
+        return typeof value === 'number' ? value : parseFloat(value) || 0;
+
+      default:
+        return value;
+    }
+  };
+
+  // Liste des champs à suivre
+  const fieldsToTrack = [
+    'reference',
+    'alias',
+    'short_label',
+    'long_label',
+    'type',
+    'tag_ids',
+    'suppliers',
+    'dimension_types',
+    'brand_ids',
+    'collection_ids',
+    'paeu',
+    'tbeu_pb',
+    'tbeu_pmeu',
+    'height',
+    'width',
+    'length',
+    'comment',
+    'size_unit',
+    'weigth_unit',
+    'gross_weight',
+    'net_weight',
+    'blocked'
+  ];
+
+  // Comparer chaque champ
+  fieldsToTrack.forEach(field => {
+    const oldValue = formatValue(oldProduct[field], field);
+    const newValue = formatValue(newProduct[field], field);
+
+    // Ne comparer que si les valeurs sont différentes
+    if (JSON.stringify(oldValue) !== JSON.stringify(newValue)) {
+      changes[field] = {
+        oldValue,
+        newValue
+      };
+    }
+  });
+
+  // Retourner l'entrée de mise à jour
+  return {
+    updated_at: new Date(),
+    updated_by: userName,
+    changes: Object.keys(changes).length > 0 ? changes : undefined,
+    file_name: `PRODUCT_UPDATE_${new Date().toISOString().split('T')[0].replace(/-/g, '')}_${new Date().getHours()}${new Date().getMinutes()}${new Date().getSeconds()}.csv`
+  };
+};
+
+
   const transformedSuppliers =
     product?.suppliers?.map((supplier) => ({
       supplier_id: supplier.supplier_id?.company_name || "ID inconnu",
@@ -511,7 +716,6 @@ export default function SingleProductPage() {
   const [colors, setColors] = useState<string[]>(formData.initialColors);
   const [uvcGrid, setUvcGrid] = useState<boolean[][]>(formData.initialGrid);
 
-  
   const filterOptions = (inputValue: string, options: any[]) => {
     const input = inputValue ? inputValue.toLowerCase() : "";
     return options.filter((option) => {
@@ -520,8 +724,14 @@ export default function SingleProductPage() {
       return name.includes(input) || code.includes(input);
     });
   };
-  
-  const formatOptionLabel = ({ label, code }: { label: string; code: string }) => (
+
+  const formatOptionLabel = ({
+    label,
+    code,
+  }: {
+    label: string;
+    code: string;
+  }) => (
     <div className="flex items-center justify-between">
       <span>{label}</span>
       <span className="text-gray-400 text-sm">({code})</span>
@@ -1199,7 +1409,7 @@ export default function SingleProductPage() {
   const handleUpdateReference = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-
+  
     try {
       // Créer les UVC et récupérer leurs IDs
       const uvcPromises = formDataUvc.uvc.map(async (uvc) => {
@@ -1214,54 +1424,40 @@ export default function SingleProductPage() {
             body: JSON.stringify(uvc),
           }
         );
-
+  
         if (!response.ok) {
           throw new Error("Erreur lors de la création des UVC !");
         }
-
+  
         const createdUvc = await response.json();
         return createdUvc._id;
       });
-
+  
       const uvcIds = await Promise.all(uvcPromises);
-
+  
       // Formater les fournisseurs sélectionnés
-      const formattedSuppliers: Supplier[] = selectedSuppliers.map(
-        (supplierOption) => ({
-          supplier_id: supplierOption.value,
-          supplier_ref: supplierOption.supplier_ref || "",
-          pcb: supplierOption.pcb || "",
-          custom_cat: supplierOption.custom_cat || "",
-          made_in: supplierOption.made_in || "",
-          company_name: supplierOption.company_name || "",
-        })
-      );
-
-      // Créer l'objet de mise à jour
+      const formattedSuppliers = selectedSuppliers.map((supplierOption) => ({
+        supplier_id: supplierOption.value,
+        supplier_ref: supplierOption.supplier_ref || "",
+        pcb: supplierOption.pcb || "",
+        custom_cat: supplierOption.custom_cat || "",
+        made_in: supplierOption.made_in || "",
+        company_name: supplierOption.company_name || "",
+      }));
+  
+      // Préparer les données mises à jour
       const updatedFormData = {
         ...formData,
         uvc_ids: uvcIds,
         suppliers: formattedSuppliers,
       };
-
-      // Enregistrer les modifications
-      const changes = Object.keys(updatedFormData).reduce((acc, key) => {
-        const typedKey = key as keyof typeof updatedFormData; // Assurez-vous que `key` est bien une clé de `updatedFormData`
-
-        if (updatedFormData[typedKey] !== formData[typedKey]) {
-          acc[typedKey] = updatedFormData[typedKey];
-        }
-        return acc;
-      }, {} as Partial<typeof updatedFormData>);
-
-      // Préparer `updateEntry`
-      const updateEntry = {
-        updated_at: new Date(),
-        updated_by: creatorId.username,
-        changes,
-      };
-
-      // Envoyer la requête de mise à jour avec `updateEntry`
+  
+      // Créer l'entrée de mise à jour
+      const updateEntry = createUpdateEntry(product, updatedFormData, creatorId.username);
+  
+      console.log('Changements détectés:', updateEntry.changes); // Pour debug
+  
+      // Envoyer la requête
       const productResponse = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`,
         {
@@ -1270,10 +1466,13 @@ export default function SingleProductPage() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ ...updatedFormData, updateEntry }),
+          body: JSON.stringify({
+            ...updatedFormData,
+            updateEntry
+          }),
         }
       );
-
+  
       if (productResponse.ok) {
         notifySuccess("Le produit a bien été mis à jour !");
         window.location.reload();
@@ -1319,17 +1518,8 @@ export default function SingleProductPage() {
           }),
         }
       );
-
-      if (response.ok) {
-        notifySuccess("Ordre des fournisseurs mis à jour avec succès !");
-      } else {
-        notifyError(
-          "Erreur lors de la mise à jour de l'ordre des fournisseurs !"
-        );
-      }
     } catch (error) {
       console.error("Erreur lors de la mise à jour", error);
-      notifyError("Erreur lors de la mise à jour de l'ordre des fournisseurs");
     }
   };
 
@@ -1419,29 +1609,31 @@ export default function SingleProductPage() {
     });
   };
 
-
-  
-
   const prepareDraftData = () => {
     // Étape 1 : Préparer les données pour le draft
-    const formattedSuppliers = formData.suppliers.map((supplier: SupplierData) => {
-      let companyName = "Nom inconnu";
-    
-      // Vérifie si supplier_id est un objet avec company_name
-      if (typeof supplier.supplier_id === "object" && supplier.supplier_id?.company_name) {
-        companyName = supplier.supplier_id.company_name;
-      } else if (typeof supplier.supplier_id === "string") {
-        companyName = supplier.supplier_id; // Utilisez la chaîne directement si c'est une string
+    const formattedSuppliers = formData.suppliers.map(
+      (supplier: SupplierData) => {
+        let companyName = "Nom inconnu";
+
+        // Vérifie si supplier_id est un objet avec company_name
+        if (
+          typeof supplier.supplier_id === "object" &&
+          supplier.supplier_id?.company_name
+        ) {
+          companyName = supplier.supplier_id.company_name;
+        } else if (typeof supplier.supplier_id === "string") {
+          companyName = supplier.supplier_id; // Utilisez la chaîne directement si c'est une string
+        }
+
+        return {
+          supplier_id: companyName,
+          supplier_ref: "",
+          pcb: supplier.pcb || "",
+          custom_cat: supplier.custom_cat || "",
+          made_in: supplier.made_in || "",
+        };
       }
-    
-      return {
-        supplier_id: companyName,
-        supplier_ref: "",
-        pcb: supplier.pcb || "",
-        custom_cat: supplier.custom_cat || "",
-        made_in: supplier.made_in || "",
-      };
-    });
+    );
 
     const draftData = {
       creator_id: creatorId._id,
@@ -1451,18 +1643,20 @@ export default function SingleProductPage() {
       long_label: formData.long_label,
       type: formData.type,
       tag_ids: Array.isArray(formData.tag_ids)
-      ? formData.tag_ids.map((tag) => tag.code || "Tag inconnu")
-      : [],
+        ? formData.tag_ids.map((tag) => tag.code || "Tag inconnu")
+        : [],
       suppliers: formattedSuppliers,
       dimension_types: Array.isArray(formData.dimension_types)
-      ? formData.dimension_types
-      : [formData.dimension_types || "Type par défaut"],
+        ? formData.dimension_types
+        : [formData.dimension_types || "Type par défaut"],
       brand_ids: Array.isArray(formData.brand_ids)
-    ? formData.brand_ids.map((brand) => brand.label || "Marque inconnue")
-    : ["Marque inconnue"],
-  collection_ids: Array.isArray(formData.collection_ids)
-    ? formData.collection_ids.map((collection) => collection.label || "Collection inconnue")
-    : ["Collection inconnue"],
+        ? formData.brand_ids.map((brand) => brand.label || "Marque inconnue")
+        : ["Marque inconnue"],
+      collection_ids: Array.isArray(formData.collection_ids)
+        ? formData.collection_ids.map(
+            (collection) => collection.label || "Collection inconnue"
+          )
+        : ["Collection inconnue"],
       paeu: formData.paeu || 0,
       tbeu_pb: formData.tbeu_pb || 0,
       tbeu_pmeu: formData.tbeu_pmeu || 0,
@@ -1539,6 +1733,12 @@ export default function SingleProductPage() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!isModify) {
+      setIsModifyUvc(false);
+    }
+  }, [isModify]);
 
   console.log(formData);
   return (
@@ -2076,8 +2276,9 @@ export default function SingleProductPage() {
                               onChange={handleChangeCollection}
                               onInputChange={handleInputChangeCollection}
                               onFocus={() => handleInputChangeCollection("")}
-                              filterOption={(option, input) => 
-                                filterOptions(input, [option.data])[0] !== undefined
+                              filterOption={(option, input) =>
+                                filterOptions(input, [option.data])[0] !==
+                                undefined
                               }
                               formatOptionLabel={formatOptionLabel}
                               options={optionsCollection}
@@ -2165,8 +2366,8 @@ export default function SingleProductPage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px] capitalize">
-                                {product?.height || "0"}{" "}
-                                ({product?.size_unit || "M"})
+                                {product?.height || "0"} (
+                                {product?.size_unit || "M"})
                               </span>
                             ) : (
                               <input
@@ -2184,8 +2385,8 @@ export default function SingleProductPage() {
                             </span>
                             {!isModify ? (
                               <span className="ext-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {product?.length || "0"}{" "}
-                                ({product?.size_unit || "M"})
+                                {product?.length || "0"} (
+                                {product?.size_unit || "M"})
                               </span>
                             ) : (
                               <input
@@ -2203,8 +2404,8 @@ export default function SingleProductPage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {product?.width || "0"}{" "}
-                                ({product?.size_unit || "M"})
+                                {product?.width || "0"} (
+                                {product?.size_unit || "M"})
                               </span>
                             ) : (
                               <input
@@ -2224,8 +2425,8 @@ export default function SingleProductPage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                {product?.gross_weight || "0"}{" "}
-                                ({product?.weigth_unit || "KG"})
+                                {product?.gross_weight || "0"} (
+                                {product?.weigth_unit || "KG"})
                               </span>
                             ) : (
                               <input
@@ -2243,8 +2444,8 @@ export default function SingleProductPage() {
                             </span>
                             {!isModify ? (
                               <span className="col-span-6 text-gray-600 text-[14px]">
-                                {product?.net_weight || "0"}{" "}
-                                ({product?.weigth_unit || "KG"})
+                                {product?.net_weight || "0"} (
+                                {product?.weigth_unit || "KG"})
                               </span>
                             ) : (
                               <input
@@ -2481,8 +2682,10 @@ export default function SingleProductPage() {
                 </div>
                 {onglet === "infos" && product && (
                   <UVCInfosTable
-                    isModify={isModifyUvc}
-                    reference={product?.reference}
+                    isModify={isModify}
+                    isModifyUvc={isModifyUvc}
+                    setModifyUvc={setIsModifyUvc}
+                    reference={truncateText(product?.reference, 15) || ""}
                     collection={
                       product?.collection_ids?.[0]?.label || "Non spécifiée"
                     }
@@ -2505,14 +2708,16 @@ export default function SingleProductPage() {
                 )}
                 {onglet === "price" && product && (
                   <UVCPriceTable
-                    reference={product?.reference}
+                    reference={truncateText(product?.reference, 15) || ""}
                     uvcPrices={formDataUvc.uvc}
                     globalPrices={{
                       paeu: formData.paeu,
                       tbeu_pb: formData.tbeu_pb,
                       tbeu_pmeu: formData.tbeu_pmeu,
                     }}
-                    isModify={isModifyUvc}
+                    isModify={isModify}
+                    isModifyUvc={isModifyUvc}
+                    setModifyUvc={setIsModifyUvc}
                     onPriceChange={(index, field, value) => {
                       setFormDataUvc((prevFormData) => {
                         const updatedUVCs = [...prevFormData.uvc];
@@ -2539,7 +2744,7 @@ export default function SingleProductPage() {
                 )}
                 {onglet === "supplier" && product && (
                   <UVCSupplierTable
-                    reference={product.reference || ""}
+                    reference={truncateText(product?.reference, 15) || ""}
                     uvcDimension={formData.uvc_ids || []}
                     type="product"
                     data={{
@@ -2550,7 +2755,7 @@ export default function SingleProductPage() {
 
                 {onglet === "weight" && product && (
                   <UVCMeasureTable
-                    reference={product?.reference}
+                    reference={truncateText(product?.reference, 15) || ""}
                     uvcMeasure={formDataUvc.uvc}
                     Measure={{
                       height: product?.height || "0",
@@ -2561,7 +2766,9 @@ export default function SingleProductPage() {
                     }}
                     size_unit={product?.size_unit || "m"}
                     weight_unit={product?.weigth_unit || "kg"}
-                    isModify={isModifyUvc}
+                    isModify={isModify}
+                    isModifyUvc={isModifyUvc}
+                    setModifyUvc={setIsModifyUvc}
                     onUpdateMeasures={(index, field, value) => {
                       setFormDataUvc((prev) => {
                         const updatedUvc = [...prev.uvc];
@@ -2576,14 +2783,14 @@ export default function SingleProductPage() {
                 )}
                 {onglet === "ean" && product && (
                   <UVCEanTable
-                    reference={product?.reference}
+                    reference={truncateText(product?.reference, 15) || ""}
                     uvcDimension={formData.uvc_ids}
                   />
                 )}
                 {onglet === "bloc" && product && (
                   <UVCBlockTable
                     isModify={isModifyUvc}
-                    reference={product?.reference}
+                    reference={truncateText(product?.reference, 15) || ""}
                     placeholder={(index) =>
                       formData.uvc_ids[index]?.collectionUvc ||
                       formData.collection_ids[0]?.label ||

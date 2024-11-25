@@ -390,7 +390,7 @@ const UVCGrid: React.FC<UVCGridProps> = ({
                       />
                       <button
                         onClick={() => handleDeleteColumn(index)}
-                        className="absolute right-0 text-red-500 hover:text-red-700"
+                        className="absolute right-0 text-gray-800 hover:text-red-700"
                       >
                         <Trash2 size={13} />
                       </button>
@@ -413,7 +413,7 @@ const UVCGrid: React.FC<UVCGridProps> = ({
                     <div className="flex items-center">
                       <button
                         onClick={() => handleDeleteRow(colorIndex)}
-                        className="text-red-500 hover:text-red-700"
+                        className="text-gray-800 hover:text-red-700"
                       >
                         <Trash2 size={13} />
                       </button>
