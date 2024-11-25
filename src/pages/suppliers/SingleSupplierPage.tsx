@@ -606,7 +606,7 @@ export default function SingleSupplierPage() {
       };
 
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1//generate-pdf`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/generate-pdf`,
         {
           method: "POST",
           headers: {
