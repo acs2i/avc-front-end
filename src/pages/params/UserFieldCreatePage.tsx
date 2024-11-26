@@ -20,7 +20,9 @@ interface CustomField {
   field_name: string;
   field_type: string;
   options?: string[];
+  default_value?: string;
   value?: string;
+  hasUserSelectedDefault?: boolean;
 }
 
 interface FormData {
@@ -49,7 +51,13 @@ export default function UserFieldCreatePage({
     label: "",
     apply_to: "",
     additional_fields: [
-      { field_name: "", field_type: "text", options: [], value: "" },
+      {
+        field_name: "",
+        field_type: "text",
+        options: [],
+        value: "",
+        default_value: "",
+      },
     ],
     status: "A",
   });
@@ -100,17 +108,24 @@ export default function UserFieldCreatePage({
   const handleFieldTypeSelection = (index: number, type: string) => {
     const updatedFields = [...formData.additional_fields];
     updatedFields[index].field_type = type;
-
-    // Pas besoin de définir des options pour boolean pendant la création
+  
     if (type === "multiple_choice") {
       updatedFields[index].options = [""];
+      updatedFields[index].default_value = "";
+      updatedFields[index].hasUserSelectedDefault = false;
+    } else if (type === "boolean") {
+      updatedFields[index].options = ["Oui", "Non"];
+      updatedFields[index].default_value = "Oui"; // Par défaut "Oui"
+      updatedFields[index].hasUserSelectedDefault = false;
     } else {
       updatedFields[index].options = [];
+      updatedFields[index].default_value = "";
     }
-
+  
     updatedFields[index].value = updatedFields[index].value || "";
     setFormData({ ...formData, additional_fields: updatedFields });
   };
+  
 
   const handleOptionChange = (
     fieldIndex: number,
@@ -118,11 +133,41 @@ export default function UserFieldCreatePage({
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const updatedFields = [...formData.additional_fields];
-    updatedFields[fieldIndex].options![optionIndex] = e.target.value;
+    const newValue = e.target.value;
+    updatedFields[fieldIndex].options![optionIndex] = newValue;
+
+    // Si c'est la première option qui est modifiée ET qu'aucune valeur par défaut n'a été définie
+    // ET que c'est la première fois qu'on modifie cette option
+    if (
+      optionIndex === 0 &&
+      !updatedFields[fieldIndex].hasUserSelectedDefault &&
+      !updatedFields[fieldIndex].default_value
+    ) {
+      updatedFields[fieldIndex].default_value = newValue;
+      updatedFields[fieldIndex].hasUserSelectedDefault = true;
+    }
+
     setFormData({ ...formData, additional_fields: updatedFields });
   };
 
+  const handleDefaultValueChange = (fieldIndex: number, value: string) => {
+    const updatedFields = [...formData.additional_fields];
+    updatedFields[fieldIndex].default_value = value;
+    updatedFields[fieldIndex].hasUserSelectedDefault = true;
+    setFormData({ ...formData, additional_fields: updatedFields });
+  };
+
+  const isLastOptionEmpty = (fieldIndex: number) => {
+    const options = formData.additional_fields[fieldIndex].options || [];
+    return options.length > 0 && options[options.length - 1] === "";
+  };
+
   const addOption = (fieldIndex: number) => {
+    // Vérifier si la dernière option est vide
+    if (isLastOptionEmpty(fieldIndex)) {
+      return; // Ne rien faire si la dernière option est vide
+    }
+
     const updatedFields = [...formData.additional_fields];
     updatedFields[fieldIndex].options!.push("");
     setFormData({ ...formData, additional_fields: updatedFields });
@@ -171,6 +216,7 @@ export default function UserFieldCreatePage({
     }
   };
 
+  console.log(formData);
   return (
     <section className="w-full p-4">
       <form className="mb-[50px]" onSubmit={handleSubmit}>
@@ -184,7 +230,7 @@ export default function UserFieldCreatePage({
         </div>
         <div className="w-full bg-yellow-400 mt-3 p-4 text-yellow-800 text-[15px] rounded-md shadow-md font-semibold flex gap-2 border-[1px] border-orange-400">
           <div>
-            <TriangleAlert size={20}/>
+            <TriangleAlert size={20} />
           </div>
           <p>
             Vous êtes sur le point de créer un nouveau champ utilisateur. Si
@@ -302,41 +348,83 @@ export default function UserFieldCreatePage({
                   </div>
                 </div>
 
-                {(field.field_type === "multiple_choice" ||
-                  field.field_type === "boolean") && (
+                {field.field_type === "multiple_choice" && (
                   <div className="mt-4">
                     {field.options!.map((option, optionIndex) => (
-                      <Input
-                        key={optionIndex}
-                        element="input"
-                        id={`option_${optionIndex}`}
-                        label={`Option ${optionIndex + 1}`}
-                        placeholder={`Option ${optionIndex + 1}`}
-                        onChange={(e) =>
-                          handleOptionChange(
-                            index,
-                            optionIndex,
-                            e as React.ChangeEvent<HTMLInputElement>
-                          )
-                        }
-                        validators={[]}
-                        value={option}
-                        required
-                        create
-                        gray
-                      />
-                    ))}
-                    {field.field_type === "multiple_choice" && (
-                      <div
-                        className="mt-3 flex items-center gap-2 text-orange-400 cursor-pointer hover:text-orange-300"
-                        onClick={() => addOption(index)}
-                      >
-                        <Plus size={15} />
-                        <span className="font-bold text-[13px]">
-                          Ajouter une option
-                        </span>
+                      <div key={optionIndex} className="flex items-end gap-2">
+                        <Input
+                          element="input"
+                          id={`option_${optionIndex}`}
+                          label={`Option ${optionIndex + 1}`}
+                          placeholder={`Option ${optionIndex + 1}`}
+                          onChange={(e) =>
+                            handleOptionChange(
+                              index,
+                              optionIndex,
+                              e as React.ChangeEvent<HTMLInputElement>
+                            )
+                          }
+                          validators={[]}
+                          value={option}
+                          required
+                          create
+                          gray
+                        />
+                        <input
+                          type="radio"
+                          checked={field.default_value === option}
+                          onChange={() =>
+                            handleDefaultValueChange(index, option)
+                          }
+                          className="h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500"
+                          name={`default-value-${index}`}
+                        />
+                        <label className="text-gray-700 text-sm">
+                          Par défaut
+                        </label>
                       </div>
-                    )}
+                    ))}
+                    <div
+                      className={`mt-3 flex items-center gap-2 ${
+                        isLastOptionEmpty(index)
+                          ? "text-gray-400 cursor-not-allowed"
+                          : "text-orange-400 cursor-pointer hover:text-orange-300"
+                      }`}
+                      onClick={() =>
+                        !isLastOptionEmpty(index) && addOption(index)
+                      }
+                    >
+                      <Plus size={15} />
+                      <span className="font-bold text-[13px]">
+                        Ajouter une option
+                      </span>
+                    </div>
+                  </div>
+                )}
+                {field.field_type === "boolean" && (
+                  <div className="mt-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Valeur par défaut
+                    </label>
+                    <div className="flex gap-4">
+                      {["Oui", "Non"].map((option) => (
+                        <div key={option} className="flex items-center gap-2">
+                          <input
+                            type="radio"
+                            checked={
+                              field.default_value === option ||
+                              (!field.default_value && option === "Oui") // Par défaut, "Oui" est coché
+                            }
+                            onChange={() =>
+                              handleDefaultValueChange(index, option)
+                            }
+                            className="h-5 w-5 text-blue-600 border-gray-300 focus:ring-blue-500"
+                            name={`default-value-${index}`}
+                          />
+                          <label className="text-gray-700">{option}</label>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>

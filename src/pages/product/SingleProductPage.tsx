@@ -62,6 +62,7 @@ interface CustomField {
   field_name: string;
   field_type: string;
   options?: string[];
+  default_value?: string;
   value?: string;
 }
 
@@ -235,6 +236,7 @@ export default function SingleProductPage() {
   const token = useSelector((state: any) => state.auth.token);
   const creatorId = useSelector((state: any) => state.auth.user);
   const [fieldValues, setFieldValues] = useState<{ [key: string]: any }>({});
+  const [hasEanConflict, setHasEanConflict] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -402,162 +404,175 @@ export default function SingleProductPage() {
     return oldValue !== newValue;
   };
 
-const createUpdateEntry = (oldProduct: any, newProduct: any, userName: string) => {
-  const changes: any = {};
-  
-  // Fonction pour normaliser les IDs ObjectId en strings
-  const normalizeId = (id: any) => {
-    if (typeof id === 'object' && id !== null) {
-      return id.toString(); // Convertit ObjectId en string
-    }
-    return id;
-  };
+  const createUpdateEntry = (
+    oldProduct: any,
+    newProduct: any,
+    userName: string
+  ) => {
+    const changes: any = {};
 
-  // Fonction pour extraire les données essentielles
-  const extractEssentialData = (item: any, type: string) => {
-    if (!item) return null;
+    // Fonction pour normaliser les IDs ObjectId en strings
+    const normalizeId = (id: any) => {
+      if (typeof id === "object" && id !== null) {
+        return id.toString(); // Convertit ObjectId en string
+      }
+      return id;
+    };
 
-    switch (type) {
-      case 'tag':
-        return {
-          _id: normalizeId(item._id || item),
-          code: item.code || '',
-          name: item.name || '',
-          level: item.level || ''
-        };
+    // Fonction pour extraire les données essentielles
+    const extractEssentialData = (item: any, type: string) => {
+      if (!item) return null;
 
-      case 'brand':
-        return {
-          _id: normalizeId(item._id || item),
-          label: item.label || ''
-        };
-
-      case 'collection':
-        return {
-          _id: normalizeId(item._id || item),
-          label: item.label || ''
-        };
-
-      case 'supplier':
-        if (typeof item === 'object') {
+      switch (type) {
+        case "tag":
           return {
-            supplier_id: normalizeId(item.supplier_id),
-            supplier_ref: item.supplier_ref || '',
-            pcb: item.pcb || '',
-            custom_cat: item.custom_cat || '',
-            made_in: item.made_in || ''
+            _id: normalizeId(item._id || item),
+            code: item.code || "",
+            name: item.name || "",
+            level: item.level || "",
           };
-        }
-        return item;
 
-      default:
-        return item;
-    }
+        case "brand":
+          return {
+            _id: normalizeId(item._id || item),
+            label: item.label || "",
+          };
+
+        case "collection":
+          return {
+            _id: normalizeId(item._id || item),
+            label: item.label || "",
+          };
+
+        case "supplier":
+          if (typeof item === "object") {
+            return {
+              supplier_id: normalizeId(item.supplier_id),
+              supplier_ref: item.supplier_ref || "",
+              pcb: item.pcb || "",
+              custom_cat: item.custom_cat || "",
+              made_in: item.made_in || "",
+            };
+          }
+          return item;
+
+        default:
+          return item;
+      }
+    };
+
+    // Fonction pour formater la valeur selon le type de champ
+    const formatValue = (value: any, field: string) => {
+      if (!value) return value;
+
+      switch (field) {
+        case "tag_ids":
+          return Array.isArray(value)
+            ? value.map((tag) => extractEssentialData(tag, "tag"))
+            : value;
+
+        case "brand_ids":
+          return Array.isArray(value)
+            ? value.map((brand) => extractEssentialData(brand, "brand"))
+            : value;
+
+        case "collection_ids":
+          return Array.isArray(value)
+            ? value.map((collection) =>
+                extractEssentialData(collection, "collection")
+              )
+            : value;
+
+        case "suppliers":
+          return Array.isArray(value)
+            ? value.map((supplier) =>
+                extractEssentialData(supplier, "supplier")
+              )
+            : value;
+
+        case "uvc_ids":
+          return Array.isArray(value)
+            ? value.map((uvc) => ({
+                _id: normalizeId(uvc._id || uvc),
+                code: uvc.code || "",
+                dimensions: uvc.dimensions || [],
+              }))
+            : value;
+
+        // Pour les champs simples
+        case "short_label":
+        case "long_label":
+        case "alias":
+        case "reference":
+        case "type":
+        case "comment":
+          return value ? value.toString() : "";
+
+        // Pour les champs numériques
+        case "paeu":
+        case "tbeu_pb":
+        case "tbeu_pmeu":
+          return typeof value === "number" ? value : parseFloat(value) || 0;
+
+        default:
+          return value;
+      }
+    };
+
+    // Liste des champs à suivre
+    const fieldsToTrack = [
+      "reference",
+      "alias",
+      "short_label",
+      "long_label",
+      "type",
+      "tag_ids",
+      "suppliers",
+      "dimension_types",
+      "brand_ids",
+      "collection_ids",
+      "paeu",
+      "tbeu_pb",
+      "tbeu_pmeu",
+      "height",
+      "width",
+      "length",
+      "comment",
+      "size_unit",
+      "weigth_unit",
+      "gross_weight",
+      "net_weight",
+      "blocked",
+    ];
+
+    // Comparer chaque champ
+    fieldsToTrack.forEach((field) => {
+      const oldValue = formatValue(oldProduct[field], field);
+      const newValue = formatValue(newProduct[field], field);
+
+      // Ne comparer que si les valeurs sont différentes
+      if (JSON.stringify(oldValue) !== JSON.stringify(newValue)) {
+        changes[field] = {
+          oldValue,
+          newValue,
+        };
+      }
+    });
+
+    // Retourner l'entrée de mise à jour
+    return {
+      updated_at: new Date(),
+      updated_by: userName,
+      changes: Object.keys(changes).length > 0 ? changes : undefined,
+      file_name: `PRODUCT_UPDATE_${new Date()
+        .toISOString()
+        .split("T")[0]
+        .replace(
+          /-/g,
+          ""
+        )}_${new Date().getHours()}${new Date().getMinutes()}${new Date().getSeconds()}.csv`,
+    };
   };
-
-  // Fonction pour formater la valeur selon le type de champ
-  const formatValue = (value: any, field: string) => {
-    if (!value) return value;
-
-    switch (field) {
-      case 'tag_ids':
-        return Array.isArray(value) 
-          ? value.map(tag => extractEssentialData(tag, 'tag'))
-          : value;
-
-      case 'brand_ids':
-        return Array.isArray(value)
-          ? value.map(brand => extractEssentialData(brand, 'brand'))
-          : value;
-
-      case 'collection_ids':
-        return Array.isArray(value)
-          ? value.map(collection => extractEssentialData(collection, 'collection'))
-          : value;
-
-      case 'suppliers':
-        return Array.isArray(value)
-          ? value.map(supplier => extractEssentialData(supplier, 'supplier'))
-          : value;
-
-      case 'uvc_ids':
-        return Array.isArray(value)
-          ? value.map(uvc => ({
-              _id: normalizeId(uvc._id || uvc),
-              code: uvc.code || '',
-              dimensions: uvc.dimensions || []
-            }))
-          : value;
-
-      // Pour les champs simples
-      case 'short_label':
-      case 'long_label':
-      case 'alias':
-      case 'reference':
-      case 'type':
-      case 'comment':
-        return value ? value.toString() : '';
-
-      // Pour les champs numériques
-      case 'paeu':
-      case 'tbeu_pb':
-      case 'tbeu_pmeu':
-        return typeof value === 'number' ? value : parseFloat(value) || 0;
-
-      default:
-        return value;
-    }
-  };
-
-  // Liste des champs à suivre
-  const fieldsToTrack = [
-    'reference',
-    'alias',
-    'short_label',
-    'long_label',
-    'type',
-    'tag_ids',
-    'suppliers',
-    'dimension_types',
-    'brand_ids',
-    'collection_ids',
-    'paeu',
-    'tbeu_pb',
-    'tbeu_pmeu',
-    'height',
-    'width',
-    'length',
-    'comment',
-    'size_unit',
-    'weigth_unit',
-    'gross_weight',
-    'net_weight',
-    'blocked'
-  ];
-
-  // Comparer chaque champ
-  fieldsToTrack.forEach(field => {
-    const oldValue = formatValue(oldProduct[field], field);
-    const newValue = formatValue(newProduct[field], field);
-
-    // Ne comparer que si les valeurs sont différentes
-    if (JSON.stringify(oldValue) !== JSON.stringify(newValue)) {
-      changes[field] = {
-        oldValue,
-        newValue
-      };
-    }
-  });
-
-  // Retourner l'entrée de mise à jour
-  return {
-    updated_at: new Date(),
-    updated_by: userName,
-    changes: Object.keys(changes).length > 0 ? changes : undefined,
-    file_name: `PRODUCT_UPDATE_${new Date().toISOString().split('T')[0].replace(/-/g, '')}_${new Date().getHours()}${new Date().getMinutes()}${new Date().getSeconds()}.csv`
-  };
-};
-
 
   const transformedSuppliers =
     product?.suppliers?.map((supplier) => ({
@@ -1409,7 +1424,7 @@ const createUpdateEntry = (oldProduct: any, newProduct: any, userName: string) =
   const handleUpdateReference = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-  
+
     try {
       // Créer les UVC et récupérer leurs IDs
       const uvcPromises = formDataUvc.uvc.map(async (uvc) => {
@@ -1424,17 +1439,17 @@ const createUpdateEntry = (oldProduct: any, newProduct: any, userName: string) =
             body: JSON.stringify(uvc),
           }
         );
-  
+
         if (!response.ok) {
           throw new Error("Erreur lors de la création des UVC !");
         }
-  
+
         const createdUvc = await response.json();
         return createdUvc._id;
       });
-  
+
       const uvcIds = await Promise.all(uvcPromises);
-  
+
       // Formater les fournisseurs sélectionnés
       const formattedSuppliers = selectedSuppliers.map((supplierOption) => ({
         supplier_id: supplierOption.value,
@@ -1444,19 +1459,23 @@ const createUpdateEntry = (oldProduct: any, newProduct: any, userName: string) =
         made_in: supplierOption.made_in || "",
         company_name: supplierOption.company_name || "",
       }));
-  
+
       // Préparer les données mises à jour
       const updatedFormData = {
         ...formData,
         uvc_ids: uvcIds,
         suppliers: formattedSuppliers,
       };
-  
+
       // Créer l'entrée de mise à jour
-      const updateEntry = createUpdateEntry(product, updatedFormData, creatorId.username);
-  
-      console.log('Changements détectés:', updateEntry.changes); // Pour debug
-  
+      const updateEntry = createUpdateEntry(
+        product,
+        updatedFormData,
+        creatorId.username
+      );
+
+      console.log("Changements détectés:", updateEntry.changes); // Pour debug
+
       // Envoyer la requête
       const productResponse = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`,
@@ -1468,11 +1487,11 @@ const createUpdateEntry = (oldProduct: any, newProduct: any, userName: string) =
           },
           body: JSON.stringify({
             ...updatedFormData,
-            updateEntry
+            updateEntry,
           }),
         }
       );
-  
+
       if (productResponse.ok) {
         notifySuccess("Le produit a bien été mis à jour !");
         window.location.reload();
@@ -1935,7 +1954,12 @@ const createUpdateEntry = (oldProduct: any, newProduct: any, userName: string) =
                   >
                     Annuler
                   </Button>
-                  <Button size="small" blue>
+                  <Button
+                    size="small"
+                    type="submit"
+                    blue
+                    disabled={isLoading || hasEanConflict}
+                  >
                     Valider
                   </Button>
                 </div>
@@ -2357,7 +2381,7 @@ const createUpdateEntry = (oldProduct: any, newProduct: any, userName: string) =
                   </div>
                   {/* Prix produit */}
                   <div className="w-1/4">
-                    <FormSection title="Cotes et poids">
+                    <FormSection title="Cotes et Poids">
                       <div className="grid grid-cols-2 gap-3">
                         <div>
                           <div className="flex items-center gap-2 py-2">
@@ -2464,7 +2488,7 @@ const createUpdateEntry = (oldProduct: any, newProduct: any, userName: string) =
                 </div>
                 <div className="mt-[30px]">
                   {!isModify && (
-                    <FormSection title="Champs utilisateur">
+                    <FormSection title="Champs Utilisateur">
                       <div>
                         {userFields
                           .filter((field) => field.apply_to === "Produit")
@@ -2478,6 +2502,11 @@ const createUpdateEntry = (oldProduct: any, newProduct: any, userName: string) =
                                 )
                               : null;
 
+                            const displayValue =
+                              supplierField?.value ||
+                              field.additional_fields[0]?.default_value ||
+                              "Non renseigné";
+
                             return (
                               <div
                                 key={index}
@@ -2488,7 +2517,7 @@ const createUpdateEntry = (oldProduct: any, newProduct: any, userName: string) =
                                 </span>
 
                                 <span className="col-span-3 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                                  {supplierField?.value || "Non renseigné"}
+                                  {displayValue}
                                 </span>
                               </div>
                             );
@@ -2509,32 +2538,35 @@ const createUpdateEntry = (oldProduct: any, newProduct: any, userName: string) =
                                     {field.label}
                                   </h3>
                                   {field.additional_fields.map(
-                                    (customField, index) => (
-                                      <div
-                                        key={`${field._id}-${index}`}
-                                        className="mb-4"
-                                      >
-                                        <DynamicField
-                                          id={`${field._id}-${index}`}
-                                          name={customField.field_name}
-                                          fieldType={customField.field_type}
-                                          value={
-                                            fieldValues[
-                                              `${field._id}-${index}`
-                                            ] || ""
-                                          }
-                                          onChange={(e) =>
-                                            handleFieldChange(
-                                              field.label,
-                                              customField.field_type,
-                                              `${field._id}-${index}`,
-                                              e.target.value
-                                            )
-                                          }
-                                          options={customField.options}
-                                        />
-                                      </div>
-                                    )
+                                    (customField, index) => {
+                                      const fieldValue =
+                                        fieldValues[`${field._id}-${index}`] ||
+                                        customField.default_value || // Pré-remplir avec la valeur par défaut
+                                        "";
+
+                                      return (
+                                        <div
+                                          key={`${field._id}-${index}`}
+                                          className="mb-4"
+                                        >
+                                          <DynamicField
+                                            id={`${field._id}-${index}`}
+                                            name={customField.field_name}
+                                            fieldType={customField.field_type}
+                                            value={fieldValue}
+                                            onChange={(e) =>
+                                              handleFieldChange(
+                                                field.label,
+                                                customField.field_type,
+                                                `${field._id}-${index}`,
+                                                e.target.value
+                                              )
+                                            }
+                                            options={customField.options}
+                                          />
+                                        </div>
+                                      );
+                                    }
                                   )}
                                 </div>
                               ))}
@@ -2614,6 +2646,7 @@ const createUpdateEntry = (oldProduct: any, newProduct: any, userName: string) =
                     blue
                     type="button"
                     onClick={() => setIsModifyUvc((prev) => !prev)}
+                    disabled={isLoading || hasEanConflict}
                   >
                     {isModifyUvc ? "Générer les UVC" : "Modifier les UVC"}
                   </Button>
@@ -2783,10 +2816,39 @@ const createUpdateEntry = (oldProduct: any, newProduct: any, userName: string) =
                 )}
                 {onglet === "ean" && product && (
                   <UVCEanTable
+                    isModify={isModify}
+                    isModifyUvc={isModifyUvc}
                     reference={truncateText(product?.reference, 15) || ""}
                     uvcDimension={formData.uvc_ids}
+                    onUpdateEan={(uvcIndex, eanIndex, value) => {
+                      setFormData((prev) => {
+                        const updatedUvc = [...prev.uvc_ids];
+                        updatedUvc[uvcIndex].eans[eanIndex] = value;
+                        return { ...prev, uvc_ids: updatedUvc };
+                      });
+                    }}
+                    onCheckEan={async (ean) => {
+                      try {
+                        const response = await fetch(
+                          `${process.env.REACT_APP_URL_DEV}/api/v1/uvc/check-eans`,
+                          {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ ean }),
+                          }
+                        );
+                        const data = await response.json();
+                        const exists = data.message.includes("exists");
+                        setHasEanConflict(exists); // Met à jour l'état du conflit
+                        return { exists, productId: data.product?._id || null };
+                      } catch (error) {
+                        console.error("Error checking EAN:", error);
+                        return { exists: false, productId: null };
+                      }
+                    }}
                   />
                 )}
+
                 {onglet === "bloc" && product && (
                   <UVCBlockTable
                     isModify={isModifyUvc}

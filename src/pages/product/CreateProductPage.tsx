@@ -79,10 +79,18 @@ interface FormData {
   initialGrid: any[];
 }
 
+interface DefaultValue {
+  label: string;
+  value: string;
+  field_type: string;
+  id: string;
+}
+
 interface CustomField {
   field_name: string;
   field_type: string;
   options?: string[];
+  default_value?: string;
   value?: string;
 }
 
@@ -731,6 +739,45 @@ export default function CreateProductPage() {
     fetchTax();
   }, []);
 
+  useEffect(() => {
+    if (userFields.length > 0) {
+      const defaultValues: DefaultValue[] = [];
+  
+      userFields
+        .filter((field) => field.apply_to === "Produit")
+        .forEach((field) => {
+          field.additional_fields.forEach((customField, index) => {
+            if (customField.default_value) {
+              defaultValues.push({
+                label: field.label,
+                value: customField.default_value,
+                field_type: customField.field_type,
+                id: `${field._id}-${index}`,
+              });
+  
+              // Met à jour directement `fieldValues` pour afficher les valeurs par défaut
+              setFieldValues((prevFieldValues) => ({
+                ...prevFieldValues,
+                [`${field._id}-${index}`]: customField.default_value,
+              }));
+            }
+          });
+        });
+  
+      // Ajoutez les valeurs par défaut dans formData.additional_fields
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        additional_fields: [
+          ...prevFormData.additional_fields.filter(
+            (field) => !defaultValues.some((df) => df.label === field.label)
+          ),
+          ...defaultValues,
+        ],
+      }));
+    }
+  }, [userFields]);
+  
+
   console.log(formData);
   return (
     <>
@@ -987,7 +1034,6 @@ export default function CreateProductPage() {
                   </div>
                 </div>
               </div>
-              
             </div>
             <div className="flex gap-2 mt-[50px]">
               <div className="w-1/4 flex flex-col">
@@ -1233,7 +1279,9 @@ export default function CreateProductPage() {
                                 name={customField.field_name}
                                 fieldType={customField.field_type}
                                 value={
-                                  fieldValues[`${field._id}-${index}`] || ""
+                                  fieldValues[`${field._id}-${index}`] ||
+                                  customField.default_value || // Préremplir avec default_value si aucune valeur
+                                  ""
                                 }
                                 onChange={(e) =>
                                   handleFieldChange(
