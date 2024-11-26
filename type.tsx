@@ -99,6 +99,7 @@ export type SupplierDetail = {
   pcb: string;
   custom_cat: string;
   made_in: string;
+  value?: string;
 }
 
 export type TagDetail = {
@@ -236,6 +237,7 @@ export type DatalakeUvc = {
 }
 
 export type Supplier = {
+  _id?: string;
   supplier_id: string;
   supplier_ref: string;
   pcb: string;
@@ -266,7 +268,7 @@ export type CollectionOption = {
 };
 
 export type SuppliersOption = {
-  _id: string;
+  _id?: string;
   value: string;
   label: string;
   company_name: string;
