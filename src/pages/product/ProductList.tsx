@@ -172,7 +172,7 @@ export default function ProductList() {
     }
 
     if (selectedFamily && selectedFamily.name) {
-      params.tag = selectedFamily.name;
+      params.family = selectedFamily.name;
     }
 
     if (selectedSubFamily && selectedSubFamily.name) {
