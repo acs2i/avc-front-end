@@ -35,7 +35,7 @@ import { useUsers } from "../../utils/hooks/useUsers";
 import { useFamily } from "../../utils/hooks/useFamily";
 import { useIsoCode } from "../../utils/hooks/useIsoCode";
 import IsoCodeSection from "../../components/Formulaires/IsoCodeSection";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, Draggable, DropResult } from "react-beautiful-dnd";
 
 interface BrandId {
   _id: string;
@@ -982,41 +982,27 @@ export default function SingleSupplierPage() {
     return result;
   };
 
-  const handleDragEnd = (result: any) => {
+  const handleDragEnd = (result: DropResult) => {
     if (
       !result.destination ||
       result.destination.index === result.source.index
     ) {
       return;
     }
-
-    if (result.destination.index === result.source.index) {
-      return;
-    }
-
+  
     // Réorganiser les contacts
     const updatedContacts = reorderContacts(
-      supplier?.contacts || [],
+      formData.contacts, // Utilisez formData.contacts au lieu de supplier?.contacts
       result.source.index,
       result.destination.index
     );
-
-    // Mettre à jour le supplier
-    setSupplier((prev) =>
-      prev
-        ? {
-            ...prev,
-            contacts: updatedContacts,
-          }
-        : undefined
-    );
-
+  
     // Mettre à jour formData
     setFormData((prev) => ({
       ...prev,
       contacts: updatedContacts,
     }));
-
+  
     if (supplier) {
       setSupplier((prev) =>
         prev
@@ -1027,15 +1013,15 @@ export default function SingleSupplierPage() {
           : prev
       );
     }
-
+  
     // Mettre à jour le tableau conditions avec les contacts réorganisés
     setConditions((prev) =>
       prev.map((condition) => ({
         ...condition,
-        contacts: updatedContacts, // Ceci assure que tous les contacts dans chaque condition sont alignés
+        contacts: updatedContacts,
       }))
     );
-
+  
     // Mettre à jour formDataCondition
     setFormDataCondition((prev) => ({
       ...prev,
@@ -1634,64 +1620,64 @@ export default function SingleSupplierPage() {
               </FormSection>
               <FormSection title="Contacts">
                 {isModify ? (
-                  <DragDropContext onDragEnd={handleDragEnd}>
-                    <Droppable droppableId="contacts">
-                      {(provided) => (
-                        <div
-                          className="flex flex-col gap-2 mt-3"
-                          {...provided.droppableProps}
-                          ref={provided.innerRef}
-                        >
-                          {formData.contacts &&
-                          formData.contacts.filter(
-                            (contact) => contact?.firstname
-                          ).length > 0 ? (
-                            <>
-                              {formData.contacts
-                                .filter((contact) => contact?.firstname)
-                                .map((contact, index) => (
-                                  <Draggable
-                                    key={`contact-${index}`}
-                                    draggableId={`contact-${index}`}
-                                    index={index}
-                                  >
-                                    {(provided) => (
-                                      <div
-                                        ref={provided.innerRef}
-                                        {...provided.draggableProps}
-                                        {...provided.dragHandleProps}
-                                        className={`text-center rounded-md cursor-move hover:brightness-125 shadow-md p-3 ${
-                                          index === 0
-                                            ? "bg-gradient-to-r from-cyan-600 to-cyan-800 text-white"
-                                            : "bg-slate-300 text-gray-500"
-                                        }`}
-                                      >
-                                        <div className="flex items-center justify-between">
-                                          <span className="text-[20px] font-bold">
-                                            {contact.firstname}{" "}
-                                            {contact.lastname}
-                                          </span>
-                                          {index === 0 && (
-                                            <span className="text-xs text-white bg-cyan-800 px-2 py-1 rounded border border-white">
-                                              Contact Principal
-                                            </span>
-                                          )}
-                                        </div>
-                                      </div>
-                                    )}
-                                  </Draggable>
-                                ))}
-                              {provided.placeholder}
-                            </>
-                          ) : (
-                            <p className="text-gray-400 font-bold text-xs">
-                              Aucun contact enregistré pour ce fournisseur
-                            </p>
-                          )}
-                        </div>
-                      )}
-                    </Droppable>
-                  </DragDropContext>
+                   <DragDropContext onDragEnd={handleDragEnd}>
+                   <Droppable droppableId="contacts">
+                     {(provided) => (
+                       <div
+                         className="flex flex-col gap-2 mt-3"
+                         {...provided.droppableProps}
+                         ref={provided.innerRef}
+                       >
+                         {formData.contacts &&
+                         formData.contacts.filter(
+                           (contact) => contact?.firstname
+                         ).length > 0 ? (
+                           <>
+                             {formData.contacts
+                               .filter((contact) => contact?.firstname)
+                               .map((contact, index) => (
+                                 <Draggable
+                                   key={`contact-${index}`}
+                                   draggableId={`contact-${index}`}
+                                   index={index}
+                                 >
+                                   {(provided) => (
+                                     <div
+                                       ref={provided.innerRef}
+                                       {...provided.draggableProps}
+                                       {...provided.dragHandleProps}
+                                       className={`text-center rounded-md cursor-move hover:brightness-125 shadow-md p-3 ${
+                                         index === 0
+                                           ? "bg-gradient-to-r from-cyan-600 to-cyan-800 text-white"
+                                           : "bg-slate-300 text-gray-500"
+                                       }`}
+                                     >
+                                       <div className="flex items-center justify-between">
+                                         <span className="text-[20px] font-bold">
+                                           {contact.firstname}{" "}
+                                           {contact.lastname}
+                                         </span>
+                                         {index === 0 && (
+                                           <span className="text-xs text-white bg-cyan-800 px-2 py-1 rounded border border-white">
+                                             Contact Principal
+                                           </span>
+                                         )}
+                                       </div>
+                                     </div>
+                                   )}
+                                 </Draggable>
+                               ))}
+                             {provided.placeholder}
+                           </>
+                         ) : (
+                           <p className="text-gray-400 font-bold text-xs">
+                             Aucun contact enregistré pour ce fournisseur
+                           </p>
+                         )}
+                       </div>
+                     )}
+                   </Droppable>
+                 </DragDropContext>
                 ) : (
                   <div className="flex flex-col gap-2 mt-3">
                     {supplier?.contacts && supplier.contacts.length > 0 ? (
