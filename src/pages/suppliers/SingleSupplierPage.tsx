@@ -180,6 +180,7 @@ interface Commerciale {
   buyers: Buyer[];
   conditions: Condition[];
   createdAt: any;
+  filePath?: string[];
 }
 
 interface FormData {
@@ -1047,12 +1048,42 @@ export default function SingleSupplierPage() {
 
   // Ajoutez cette fonction de gestion du fichier
   const handleFileUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
+    conditionId: string
   ) => {
     const file = event.target.files?.[0];
-    if (file) {
-      setFileName(file.name);
-      // Ici vous pouvez ajouter la logique de traitement du fichier PDF
+    if (!file || !conditionId) return;
+  
+    setIsLoading(true);
+    setFileName(file.name);
+  
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+  
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/condition/${conditionId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "PUT",
+          body: formData,
+        }
+      );
+  
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+  
+      const result = await response.json();
+      notifySuccess('Fichier uploadé avec succès');
+      
+    } catch (error) {
+      console.error('Upload error:', error);
+      notifyError('Erreur lors de l\'upload du fichier');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -1668,7 +1699,9 @@ export default function SingleSupplierPage() {
                         <div
                           key={`contact-${index}`}
                           className={`text-center rounded-md shadow-md p-3 ${
-                            index === 0 ? "bg-gradient-to-r from-cyan-600 to-cyan-800 text-white" : "bg-slate-300 text-gray-500"
+                            index === 0
+                              ? "bg-gradient-to-r from-cyan-600 to-cyan-800 text-white"
+                              : "bg-slate-300 text-gray-500"
                           }`}
                         >
                           <div className="flex items-center justify-between">
@@ -1907,17 +1940,23 @@ export default function SingleSupplierPage() {
                                     {/* Input caché */}
                                     <input
                                       type="file"
-                                      accept=".csv, .xlsx, .xls"
-                                      onChange={handleFileUpload}
+                                      accept=".pdf"
+                                      onChange={(e) => {
+                                        e.stopPropagation();
+                                        handleFileUpload(e, condition._id);
+                                      }}
                                       className="hidden"
-                                      id="fileUpload"
+                                      id={`fileUpload-${condition._id}`}
+                                      data-condition-id={condition._id} // Important: ajout de l'attribut data
                                     />
-
-                                    {/* Label lié à l'input */}
-                                    <label htmlFor="fileUpload" className="cursor-pointer">
+                                    <label
+                                      htmlFor={`fileUpload-${condition._id}`}
+                                      className="cursor-pointer w-full h-full flex items-center justify-center"
+                                    >
                                       <img
                                         src="/img/pdf_up.png"
                                         alt="Upload PDF"
+                                        className="w-full h-full object-contain"
                                       />
                                     </label>
                                   </div>
