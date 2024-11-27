@@ -35,7 +35,7 @@ import { useUsers } from "../../utils/hooks/useUsers";
 import { useFamily } from "../../utils/hooks/useFamily";
 import { useIsoCode } from "../../utils/hooks/useIsoCode";
 import IsoCodeSection from "../../components/Formulaires/IsoCodeSection";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, Draggable, DropResult } from "react-beautiful-dnd";
 
 interface BrandId {
   _id: string;
@@ -75,9 +75,9 @@ interface Supplier {
   web_url: string;
   siret: string;
   tva: string;
-  address_1: string;
-  address_2: string;
-  address_3: string;
+  address1: string;
+  address2: string;
+  address3: string;
   city: string;
   postal: string;
   country: string;
@@ -122,9 +122,9 @@ interface Conditions {
   // Ajout des champs manquants
   siret?: string;
   tva?: string;
-  address_1?: string;
-  address_2?: string;
-  address_3?: string;
+  address1?: string;
+  address2?: string;
+  address3?: string;
   city?: string;
   postal?: string;
   country?: string;
@@ -167,9 +167,9 @@ interface Commerciale {
   web_url: string;
   siret: string;
   tva: string;
-  address_1: string;
-  address_2: string;
-  address_3: string;
+  address1: string;
+  address2: string;
+  address3: string;
   city: string;
   postal: string;
   country: string;
@@ -181,6 +181,7 @@ interface Commerciale {
   buyers: Buyer[];
   conditions: Condition[];
   createdAt: any;
+  filePath?: string[];
 }
 
 interface FormData {
@@ -192,9 +193,9 @@ interface FormData {
   web_url: string;
   siret: string;
   tva: string;
-  address_1: string;
-  address_2: string;
-  address_3: string;
+  address1: string;
+  address2: string;
+  address3: string;
   city: string;
   postal: string;
   country: string;
@@ -218,9 +219,9 @@ interface FormDataCondition {
   web_url: string;
   siret: string;
   tva: string;
-  address_1: string;
-  address_2: string;
-  address_3: string;
+  address1: string;
+  address2: string;
+  address3: string;
   city: string;
   postal: string;
   country: string;
@@ -319,9 +320,9 @@ export default function SingleSupplierPage() {
     web_url: supplier?.web_url || "",
     siret: supplier?.siret || "",
     tva: supplier?.tva || "",
-    address_1: supplier?.address_1 || "",
-    address_2: supplier?.address_2 || "",
-    address_3: supplier?.address_3 || "",
+    address1: supplier?.address1 || "",
+    address2: supplier?.address2 || "",
+    address3: supplier?.address3 || "",
     city: supplier?.city || "",
     postal: supplier?.postal || "",
     country: supplier?.country || "",
@@ -366,9 +367,9 @@ export default function SingleSupplierPage() {
       web_url: supplier?.web_url || "",
       email: supplier?.email || "",
       phone: supplier?.phone || "",
-      address_1: supplier?.address_1 || "",
-      address_2: supplier?.address_2 || "",
-      address_3: supplier?.address_3 || "",
+      address1: supplier?.address1 || "",
+      address2: supplier?.address2 || "",
+      address3: supplier?.address3 || "",
       city: supplier?.city || "",
       postal: supplier?.postal || "",
       country: supplier?.country || "",
@@ -476,9 +477,9 @@ export default function SingleSupplierPage() {
         web_url: supplier.web_url || "",
         siret: supplier.siret || "",
         tva: supplier.tva || "",
-        address_1: supplier.address_1 || "",
-        address_2: supplier.address_2 || "",
-        address_3: supplier.address_3 || "",
+        address1: supplier.address1 || "",
+        address2: supplier.address2 || "",
+        address3: supplier.address3 || "",
         city: supplier.city || "",
         postal: supplier.postal || "",
         country: supplier.country || "",
@@ -565,9 +566,9 @@ export default function SingleSupplierPage() {
         brand_id: brandLabels,
 
         // Adresses
-        address_1: condition.address_1,
-        address_2: condition.address_2,
-        address_3: condition.address_3,
+        address1: condition.address1,
+        address2: condition.address2,
+        address3: condition.address3,
         postal: condition.postal,
         country: condition.country,
 
@@ -607,7 +608,7 @@ export default function SingleSupplierPage() {
       };
 
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1//generate-pdf`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/generate-pdf`,
         {
           method: "POST",
           headers: {
@@ -982,41 +983,27 @@ export default function SingleSupplierPage() {
     return result;
   };
 
-  const handleDragEnd = (result: any) => {
+  const handleDragEnd = (result: DropResult) => {
     if (
       !result.destination ||
       result.destination.index === result.source.index
     ) {
       return;
     }
-
-    if (result.destination.index === result.source.index) {
-      return;
-    }
-
+  
     // Réorganiser les contacts
     const updatedContacts = reorderContacts(
-      supplier?.contacts || [],
+      formData.contacts, // Utilisez formData.contacts au lieu de supplier?.contacts
       result.source.index,
       result.destination.index
     );
-
-    // Mettre à jour le supplier
-    setSupplier((prev) =>
-      prev
-        ? {
-            ...prev,
-            contacts: updatedContacts,
-          }
-        : undefined
-    );
-
+  
     // Mettre à jour formData
     setFormData((prev) => ({
       ...prev,
       contacts: updatedContacts,
     }));
-
+  
     if (supplier) {
       setSupplier((prev) =>
         prev
@@ -1027,15 +1014,15 @@ export default function SingleSupplierPage() {
           : prev
       );
     }
-
+  
     // Mettre à jour le tableau conditions avec les contacts réorganisés
     setConditions((prev) =>
       prev.map((condition) => ({
         ...condition,
-        contacts: updatedContacts, // Ceci assure que tous les contacts dans chaque condition sont alignés
+        contacts: updatedContacts,
       }))
     );
-
+  
     // Mettre à jour formDataCondition
     setFormDataCondition((prev) => ({
       ...prev,
@@ -1048,12 +1035,42 @@ export default function SingleSupplierPage() {
 
   // Ajoutez cette fonction de gestion du fichier
   const handleFileUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
+    conditionId: string
   ) => {
     const file = event.target.files?.[0];
-    if (file) {
-      setFileName(file.name);
-      // Ici vous pouvez ajouter la logique de traitement du fichier PDF
+    if (!file || !conditionId) return;
+  
+    setIsLoading(true);
+    setFileName(file.name);
+  
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+  
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/condition/${conditionId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "PUT",
+          body: formData,
+        }
+      );
+  
+      if (!response.ok) {
+        throw new Error('Upload failed');
+      }
+  
+      const result = await response.json();
+      notifySuccess('Fichier uploadé avec succès');
+      
+    } catch (error) {
+      console.error('Upload error:', error);
+      notifyError('Erreur lors de l\'upload du fichier');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -1406,34 +1423,34 @@ export default function SingleSupplierPage() {
                     <>
                       <Input
                         element="input"
-                        id="address_1"
+                        id="address1"
                         label="Adresse 1 :"
-                        value={formData.address_1}
+                        value={formData.address1}
                         onChange={handleChange}
                         validators={[]}
-                        placeholder={supplier?.address_1}
+                        placeholder={supplier?.address1}
                         create
                         gray
                       />
                       <Input
                         element="input"
-                        id="address_2"
+                        id="address2"
                         label="Adresse 2 :"
-                        value={formData.address_2}
+                        value={formData.address2}
                         onChange={handleChange}
                         validators={[]}
-                        placeholder={supplier?.address_2}
+                        placeholder={supplier?.address2}
                         create
                         gray
                       />
                       <Input
                         element="input"
-                        id="address_3"
+                        id="address3"
                         label="Adresse 3 :"
-                        value={formData.address_3}
+                        value={formData.address3}
                         onChange={handleChange}
                         validators={[]}
-                        placeholder={supplier?.address_3}
+                        placeholder={supplier?.address3}
                         create
                         gray
                       />
@@ -1477,9 +1494,9 @@ export default function SingleSupplierPage() {
                         <span className="font-bold text-gray-700">
                           Adresse 1 :
                         </span>
-                        {supplier?.address_1 ? (
+                        {supplier?.address1 ? (
                           <p className="font-[600] text-slate-500">
-                            {supplier?.address_1}
+                            {supplier?.address1}
                           </p>
                         ) : (
                           <div className="font-[600] text-slate-500">
@@ -1491,9 +1508,9 @@ export default function SingleSupplierPage() {
                         <span className="font-bold text-gray-700">
                           Adresse 2 :
                         </span>
-                        {supplier?.address_2 ? (
+                        {supplier?.address2 ? (
                           <p className="font-[600] text-slate-500">
-                            {supplier?.address_2}
+                            {supplier?.address2}
                           </p>
                         ) : (
                           <div className="font-[600] text-slate-500">
@@ -1505,9 +1522,9 @@ export default function SingleSupplierPage() {
                         <span className="font-bold text-gray-700">
                           Adresse 3 :
                         </span>
-                        {supplier?.address_3 ? (
+                        {supplier?.address3 ? (
                           <p className="font-[600] text-slate-500">
-                            {supplier?.address_3}
+                            {supplier?.address3}
                           </p>
                         ) : (
                           <div className="font-[600] text-slate-500">
@@ -1604,64 +1621,64 @@ export default function SingleSupplierPage() {
               </FormSection>
               <FormSection title="Contacts">
                 {isModify ? (
-                  <DragDropContext onDragEnd={handleDragEnd}>
-                    <Droppable droppableId="contacts">
-                      {(provided) => (
-                        <div
-                          className="flex flex-col gap-2 mt-3"
-                          {...provided.droppableProps}
-                          ref={provided.innerRef}
-                        >
-                          {formData.contacts &&
-                          formData.contacts.filter(
-                            (contact) => contact?.firstname
-                          ).length > 0 ? (
-                            <>
-                              {formData.contacts
-                                .filter((contact) => contact?.firstname)
-                                .map((contact, index) => (
-                                  <Draggable
-                                    key={`contact-${index}`}
-                                    draggableId={`contact-${index}`}
-                                    index={index}
-                                  >
-                                    {(provided) => (
-                                      <div
-                                        ref={provided.innerRef}
-                                        {...provided.draggableProps}
-                                        {...provided.dragHandleProps}
-                                        className={`text-center rounded-md cursor-move hover:brightness-125 shadow-md p-3 ${
-                                          index === 0
-                                            ? "bg-gradient-to-r from-cyan-600 to-cyan-800 text-white"
-                                            : "bg-slate-300 text-gray-500"
-                                        }`}
-                                      >
-                                        <div className="flex items-center justify-between">
-                                          <span className="text-[20px] font-bold">
-                                            {contact.firstname}{" "}
-                                            {contact.lastname}
-                                          </span>
-                                          {index === 0 && (
-                                            <span className="text-xs text-white bg-cyan-800 px-2 py-1 rounded border border-white">
-                                              Contact Principal
-                                            </span>
-                                          )}
-                                        </div>
-                                      </div>
-                                    )}
-                                  </Draggable>
-                                ))}
-                              {provided.placeholder}
-                            </>
-                          ) : (
-                            <p className="text-gray-400 font-bold text-xs">
-                              Aucun contact enregistré pour ce fournisseur
-                            </p>
-                          )}
-                        </div>
-                      )}
-                    </Droppable>
-                  </DragDropContext>
+                   <DragDropContext onDragEnd={handleDragEnd}>
+                   <Droppable droppableId="contacts">
+                     {(provided) => (
+                       <div
+                         className="flex flex-col gap-2 mt-3"
+                         {...provided.droppableProps}
+                         ref={provided.innerRef}
+                       >
+                         {formData.contacts &&
+                         formData.contacts.filter(
+                           (contact) => contact?.firstname
+                         ).length > 0 ? (
+                           <>
+                             {formData.contacts
+                               .filter((contact) => contact?.firstname)
+                               .map((contact, index) => (
+                                 <Draggable
+                                   key={`contact-${index}`}
+                                   draggableId={`contact-${index}`}
+                                   index={index}
+                                 >
+                                   {(provided) => (
+                                     <div
+                                       ref={provided.innerRef}
+                                       {...provided.draggableProps}
+                                       {...provided.dragHandleProps}
+                                       className={`text-center rounded-md cursor-move hover:brightness-125 shadow-md p-3 ${
+                                         index === 0
+                                           ? "bg-gradient-to-r from-cyan-600 to-cyan-800 text-white"
+                                           : "bg-slate-300 text-gray-500"
+                                       }`}
+                                     >
+                                       <div className="flex items-center justify-between">
+                                         <span className="text-[20px] font-bold">
+                                           {contact.firstname}{" "}
+                                           {contact.lastname}
+                                         </span>
+                                         {index === 0 && (
+                                           <span className="text-xs text-white bg-cyan-800 px-2 py-1 rounded border border-white">
+                                             Contact Principal
+                                           </span>
+                                         )}
+                                       </div>
+                                     </div>
+                                   )}
+                                 </Draggable>
+                               ))}
+                             {provided.placeholder}
+                           </>
+                         ) : (
+                           <p className="text-gray-400 font-bold text-xs">
+                             Aucun contact enregistré pour ce fournisseur
+                           </p>
+                         )}
+                       </div>
+                     )}
+                   </Droppable>
+                 </DragDropContext>
                 ) : (
                   <div className="flex flex-col gap-2 mt-3">
                     {supplier?.contacts && supplier.contacts.length > 0 ? (
@@ -1920,20 +1937,21 @@ export default function SingleSupplierPage() {
                                     {/* Input caché */}
                                     <input
                                       type="file"
-                                      accept=".csv, .xlsx, .xls"
-                                      onChange={handleFileUpload}
+                                      accept=".pdf"
+                                      onChange={(e) => {
+                                        e.stopPropagation();
+                                        handleFileUpload(e, condition._id);
+                                      }}
                                       className="hidden"
                                       id="fileUpload"
                                     />
 
                                     {/* Label lié à l'input */}
-                                    <label
-                                      htmlFor="fileUpload"
-                                      className="cursor-pointer"
-                                    >
+                                    <label htmlFor="fileUpload" className="cursor-pointer">
                                       <img
                                         src="/img/pdf_up.png"
                                         alt="Upload PDF"
+                                        className="w-full h-full object-contain"
                                       />
                                     </label>
                                   </div>

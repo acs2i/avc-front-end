@@ -99,6 +99,20 @@ interface FormData {
   initialGrid: any[];
 }
 
+interface NormalizedSupplier {
+  _id: string; // Requis par SuppliersOption
+  supplier_id: string;
+  value: string;
+  label: string;
+  company_name: string;
+  supplier_ref: string;
+  pcb: string;
+  custom_cat: string;
+  made_in: string;
+  code?: string; // Requis par SupplierDetail
+  index?: number;
+}
+
 const customStyles = {
   control: (provided: any) => ({
     ...provided,
@@ -254,46 +268,75 @@ export default function DraftUpdatePage() {
     });
   };
 
+  const normalizeSupplier = (supplier: any): NormalizedSupplier => {
+    return {
+      _id: supplier._id || supplier.supplier_id || supplier.value || "",
+      supplier_id: supplier.supplier_id || supplier.value || "",
+      value: supplier.value || supplier.supplier_id || "",
+      label: supplier.label || supplier.company_name || "",
+      company_name: supplier.company_name || supplier.label || "",
+      supplier_ref: supplier.supplier_ref || "",
+      pcb: supplier.pcb || "",
+      custom_cat: supplier.custom_cat || "",
+      made_in: supplier.made_in || "",
+      code: supplier.code || "", // Pour SupplierDetail
+    };
+  };
+
   const reorderSuppliers = (
-    list: SuppliersOption[],
+    list: (Supplier | SuppliersOption)[],
     startIndex: number,
     endIndex: number
   ): SuppliersOption[] => {
-    // Filtrer les éléments undefined et invalides
-    const validList = list.filter((supplier) => 
-      supplier && (supplier.value || supplier.supplier_id)
-    );
-    
+    // Créer un Set des supplier_id pour éviter les doublons
+    const seen = new Set();
+
+    // Filtrer les doublons en gardant la première occurrence
+    const validList = list
+      .filter(Boolean)
+      .filter((supplier) => {
+        const id =
+          "supplier_id" in supplier ? supplier.supplier_id : "Sans nom";
+        const isDuplicate = seen.has(id);
+        seen.add(id);
+        return !isDuplicate;
+      })
+      .map((supplier): SuppliersOption => {
+        if ("_id" in supplier) {
+          return supplier as SuppliersOption;
+        } else {
+          return {
+            _id: supplier.supplier_id,
+            value: supplier.supplier_id,
+            label: supplier.supplier_id,
+            company_name: supplier.company_name,
+            supplier_id: supplier.supplier_id,
+            supplier_ref: supplier.supplier_ref,
+            pcb: supplier.pcb,
+            custom_cat: supplier.custom_cat,
+            made_in: supplier.made_in,
+          };
+        }
+      });
+
     const result = Array.from(validList);
     const [removed] = result.splice(startIndex, 1);
     result.splice(endIndex, 0, removed);
     return result;
   };
-  
 
   // Add handleDragEnd function
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
-  
-    const updatedSuppliers = reorderSuppliers(
-      selectedSuppliers,
-      result.source.index,
-      result.destination.index
-    );
-  
-    setSelectedSuppliers(updatedSuppliers);
-  
-    // Update formData avec vérification des valeurs
+
+    const reorderedSuppliers = Array.from(formData.suppliers);
+    const [removed] = reorderedSuppliers.splice(result.source.index, 1);
+    reorderedSuppliers.splice(result.destination.index, 0, removed);
+
+    // Mettre à jour l'état des fournisseurs
     setFormData((prevFormData) => ({
       ...prevFormData,
-      suppliers: updatedSuppliers.map((supplier) => ({
-        supplier_id: supplier.value || supplier.supplier_id || '',
-        supplier_ref: supplier.supplier_ref || '',
-        pcb: supplier.pcb || '',
-        custom_cat: supplier.custom_cat || '',
-        made_in: supplier.made_in || '',
-        company_name: supplier.company_name || '',
-      })),
+      suppliers: reorderedSuppliers,
     }));
   };
 
@@ -1680,74 +1723,64 @@ export default function DraftUpdatePage() {
                                 {...provided.droppableProps}
                                 ref={provided.innerRef}
                               >
-                                {[
-                                  ...(draft?.suppliers || []),
-                                  ...selectedSuppliers,
-                                ]
-                                  .filter((supplier) => supplier) // Filtrer les suppliers undefined
-                                  .map((supplierDetail, index) => {
-                                    const draftSupplier =
-                                      draft?.suppliers?.find(
-                                        (draftSup) =>
-                                          draftSup?.supplier_id ===
-                                          supplierDetail?.supplier_id
-                                      );
+                                {formData.suppliers.map((supplier, index) => {
+                                  const draggableId = `supplier-${supplier.supplier_id}`;
 
-                                    const combinedSupplier = {
-                                      ...supplierDetail,
-                                      ...draftSupplier,
-                                    };
-
-                                    // Générer un ID unique pour le drag & drop
-                                    const draggableId =
-                                      combinedSupplier?.supplier_id
-                                        ? String(combinedSupplier.supplier_id)
-                                        : `supplier-${index}`;
-
-                                    return (
-                                      <Draggable
-                                        key={draggableId}
-                                        draggableId={draggableId}
-                                        index={index}
-                                        isDragDisabled={!isModify}
-                                      >
-                                        {(provided) => (
-                                          <div
-                                            ref={provided.innerRef}
-                                            {...provided.draggableProps}
-                                            {...provided.dragHandleProps}
-                                            onClick={() => {
-                                              if (combinedSupplier) {
-                                                setSelectedSupplier({
-                                                  ...combinedSupplier,
-                                                  index,
-                                                } as SupplierDetail);
-                                                setModalSupplierisOpen(true);
-                                              }
-                                            }}
-                                            className={`text-center rounded-md cursor-pointer hover:brightness-110 shadow-md p-3 ${
-                                              index === 0
-                                                ? "bg-gradient-to-r from-cyan-600 to-cyan-800 text-white"
-                                                : "bg-slate-300 text-gray-500"
-                                            }`}
-                                          >
-                                            <div className="flex items-center justify-between">
-                                              <span className="text-[20px] text-white font-bold">
-                                                {combinedSupplier?.company_name ||
-                                                  combinedSupplier?.supplier_id ||
-                                                  "Sans nom"}
+                                  return (
+                                    <Draggable
+                                      key={draggableId}
+                                      draggableId={draggableId}
+                                      index={index}
+                                      isDragDisabled={!isModify}
+                                    >
+                                      {(provided) => (
+                                        <div
+                                          ref={provided.innerRef}
+                                          {...provided.draggableProps}
+                                          {...provided.dragHandleProps}
+                                          onClick={() => {
+                                            const supplierDetailData: SupplierDetail =
+                                              {
+                                                index,
+                                                code: supplier.supplier_id,
+                                                company_name:
+                                                  supplier.company_name,
+                                                supplier_id:
+                                                  supplier.supplier_id,
+                                                supplier_ref:
+                                                  supplier.supplier_ref,
+                                                pcb: supplier.pcb,
+                                                custom_cat: supplier.custom_cat,
+                                                made_in: supplier.made_in,
+                                                value: supplier.supplier_id,
+                                              };
+                                            setSelectedSupplier(
+                                              supplierDetailData
+                                            );
+                                            setModalSupplierisOpen(true);
+                                          }}
+                                          className={`text-center rounded-md cursor-pointer hover:brightness-110 shadow-md p-3 ${
+                                            index === 0
+                                              ? "bg-gradient-to-r from-cyan-600 to-cyan-800 text-white"
+                                              : "bg-slate-300 text-gray-500"
+                                          }`}
+                                        >
+                                          <div className="flex items-center justify-between">
+                                            <span className="text-[20px] text-white font-bold">
+                                              {supplier.supplier_id ||
+                                                "Sans nom"}
+                                            </span>
+                                            {index === 0 && (
+                                              <span className="text-xs text-white bg-cyan-800 px-2 py-1 rounded border border-white">
+                                                Fournisseur Principal
                                               </span>
-                                              {index === 0 && (
-                                                <span className="text-xs text-white bg-cyan-800 px-2 py-1 rounded border border-white">
-                                                  Fournisseur Principal
-                                                </span>
-                                              )}
-                                            </div>
+                                            )}
                                           </div>
-                                        )}
-                                      </Draggable>
-                                    );
-                                  })}
+                                        </div>
+                                      )}
+                                    </Draggable>
+                                  );
+                                })}
                                 {provided.placeholder}
                               </div>
                             )}

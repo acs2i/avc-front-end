@@ -24,9 +24,9 @@ interface Supplier {
   web_url: string;
   email: string;
   phone: string;
-  address_1: string;
-  address_2: string;
-  address_3: string;
+  address1: string;
+  address2: string;
+  address3: string;
   postal: string;
   country: string;
   contacts?: any[];
@@ -102,14 +102,14 @@ const INITIAL_CARDS: InitialCard[] = [
     labels: ["Actif", "Inactif"],
     chartType: "pie",
   },
-  {
-    id: 2,
-    title: "UVC",
-    subtitle: "Actifs avec/sans EAN",
-    data1: [50, 50],
-    labels: ["Avec EAN", "Sans EAN"],
-    chartType: "pie",
-  },
+  // {
+  //   id: 2,
+  //   title: "UVC",
+  //   subtitle: "Actifs avec/sans EAN",
+  //   data1: [50, 50],
+  //   labels: ["Avec EAN", "Sans EAN"],
+  //   chartType: "pie",
+  // },
   {
     id: 3,
     title: "Marques",

@@ -18,6 +18,8 @@ export default function Navbar() {
   const userId = useSelector((state: any) => state?.auth?.user?._id);
   const token = useSelector((state: any) => state.auth.token);
   const [drawerIsOpen, setDrawerIsOpen] = useState(false);
+  const [environnment, setEnvironnment] = useState(process.env.REACT_APP_STATUS_ENVIRONNEMENT || "TEST");
+  console.log(process.env.REACT_APP_STATUS_ENVIRONNEMENT)
   const { darkMode, toggleDarkMode } = useTheme();
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
@@ -66,7 +68,7 @@ export default function Navbar() {
   };
 
   useEffect(() => {
-      fetchNotifications();
+    fetchNotifications();
   }, []);
 
   useEffect(() => {
@@ -75,7 +77,7 @@ export default function Navbar() {
     }
   }, [drawerIsOpen]);
 
-  const unreadNotificationsCount = notifications.filter(n => !n.read).length;
+  const unreadNotificationsCount = notifications.filter((n) => !n.read).length;
 
   return (
     <>
@@ -94,7 +96,9 @@ export default function Navbar() {
               {notifications.map((notification, index) => (
                 <li key={index} className="text-[15px] flex flex-col">
                   <span>{notification.message}</span>
-                  <span className="text-[9px] italic text-gray-700">{new Date(notification.date).toLocaleString()}</span>
+                  <span className="text-[9px] italic text-gray-700">
+                    {new Date(notification.date).toLocaleString()}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -142,7 +146,9 @@ export default function Navbar() {
               required
             />
           </div>
+          
           <div className="flex items-center gap-3 dark:text-white text-gray-600">
+          <span className="bg-gray-800 text-orange-300 rounded text-[24px]">{environnment}</span>
             <div
               className={`w-[30px] h-[30px] flex items-center justify-center rounded-full cursor-pointer ${
                 darkMode
@@ -157,15 +163,18 @@ export default function Navbar() {
               onClick={() => setDrawerIsOpen(true)}
               className="relative cursor-pointer"
             >
-               {unreadNotificationsCount > 0 && (
+              {unreadNotificationsCount > 0 && (
                 <div className="absolute h-[15px] w-[15px] bg-red-600 right-[-5px] top-[-5px] rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs">{unreadNotificationsCount}</span>
+                  <span className="text-white text-xs">
+                    {unreadNotificationsCount}
+                  </span>
                 </div>
               )}
               <Bell size={20} />
             </div>
             <Grip size={20} />
             <AccountMenu />
+            
           </div>
         </div>
       </nav>

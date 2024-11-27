@@ -11,7 +11,7 @@ type TagOption = {
   value: string;
   label: string;
   name: string;
-  code: string
+  code: string;
 };
 
 export const useFamily = (initialInputValue: string = "", limit = 10) => {
@@ -23,12 +23,15 @@ export const useFamily = (initialInputValue: string = "", limit = 10) => {
   // Fetch all families (tags de niveau "famille")
   const fetchAllFamilies = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_URL_DEV}/api/v1/tag`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tag`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -44,41 +47,31 @@ export const useFamily = (initialInputValue: string = "", limit = 10) => {
       console.error("Erreur lors du fetch des familles :", error);
     }
   };
-  
 
   // Search families by input value
   const searchFamilies = async (inputValue: string) => {
     try {
-        // Déterminer le paramètre de recherche, soit `name`, soit `code`
-        const searchParam = isNaN(Number(inputValue)) ? "name" : "code";
-        
-        const response = await fetch(
-            `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?${searchParam}=${inputValue}&page=${currentPage}&limit=${limit}`,
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+      const response = await fetch(
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?level=famile`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-
-        const data = await response.json();
-        const optionsFamily = data.data?.map((tag: Tag) => ({
-            value: tag.code,
-            label: tag.name,
-            name: tag.name,
-            code: tag.code,
-        }));
-
-        setOptionsFamily(optionsFamily);
+      );
+      const data = await response.json();
+      const optionsSubFamily = data.data?.map((tag: Tag) => ({
+        value: tag.code,
+        label: tag.name,
+        name: tag.name,
+        code: tag.code,
+      }));
+      setOptionsFamily(optionsSubFamily);
     } catch (error) {
-        console.error("Erreur lors de la recherche des familles :", error);
+      console.error("Erreur lors de la requête", error);
     }
-};
+  };
 
   // Handle input changes for family search
   const handleInputChangeFamily = async (inputValueFamily: string) => {
@@ -89,7 +82,6 @@ export const useFamily = (initialInputValue: string = "", limit = 10) => {
       await searchFamilies(inputValueFamily);
     }
   };
-  
 
   // Handle family selection changes (pas besoin d'index)
   const handleChangeFamily = (selectedOption: TagOption | null) => {

@@ -65,27 +65,27 @@ const useCardsHook = () => {
 
     }, [activeUvcTotal, inactiveUvcTotal])
 
-    useEffect(() => {
-        if(activeNoEansUvcTotal !== undefined && inactiveNoEansUvcTotal !== undefined ) {
-            const doesExist: number = cards.findIndex((c: Card) => c.id === 2);
+    // useEffect(() => {
+    //     if(activeNoEansUvcTotal !== undefined && inactiveNoEansUvcTotal !== undefined ) {
+    //         const doesExist: number = cards.findIndex((c: Card) => c.id === 2);
             
-            if(doesExist === -1) {
-                console.log("h")
+    //         if(doesExist === -1) {
+    //             console.log("h")
 
-                const c: Card =   {
-                  id: 2,
-                  title: "UVC",
-                  data1: [activeNoEansUvcTotal, inactiveNoEansUvcTotal],
-                  subtitle: "Actifs avec/sans EAN",
-                  labels: ["Avec EAN", "Sans EAN"],
-                  chartType: "pie",
-                };
+    //             const c: Card =   {
+    //               id: 2,
+    //               title: "UVC",
+    //               data1: [activeNoEansUvcTotal, inactiveNoEansUvcTotal],
+    //               subtitle: "Actifs avec/sans EAN",
+    //               labels: ["Avec EAN", "Sans EAN"],
+    //               chartType: "pie",
+    //             };
     
-                setCards([...cards, c])
-            }
-        }
+    //             setCards([...cards, c])
+    //         }
+    //     }
 
-    }, [activeNoEansUvcTotal, inactiveNoEansUvcTotal])
+    // }, [activeNoEansUvcTotal, inactiveNoEansUvcTotal])
 
     useEffect(() => {
 
@@ -197,7 +197,7 @@ const useCardsHook = () => {
 
     // check to see if we should finally show cards
     useEffect(() => {
-        if(cards.length === 5) {
+        if(cards.length === 4) {
             setIsLoadingCards(false)
         }
     },[cards])

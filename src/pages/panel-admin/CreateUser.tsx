@@ -30,7 +30,7 @@ export default function CreateUserPage() {
   const [formData, setFormData] = useState<FormData>({
     username: "",
     email: "",
-    password: "",
+    password: "uknown",
     authorization: "",
     comment: "",
   });
@@ -82,10 +82,23 @@ export default function CreateUserPage() {
 
       if (response.ok) {
         setTimeout(() => {
+          
+        
+          const emailInitPass = formData.email;
+          const response = fetch(
+            `${process.env.REACT_APP_URL_DEV}/api/v1/auth/forgot-password`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ emailInitPass }),
+            }
+          );
           notifySuccess("Utilisateur créé avec succès !");
           setIsLoading(false);
           navigate("/admin");
-        }, 1000);
+      }, 2000);
       } else {
         notifyError("Erreur lors de la création !");
       }
@@ -93,7 +106,6 @@ export default function CreateUserPage() {
       console.error("Erreur lors de la requête", error);
     }
   };
-
 
   return (
     <section className="w-full h-screen bg-gray-100 p-7">
@@ -130,7 +142,7 @@ export default function CreateUserPage() {
               required
               create
             />
-            <div className="relative">
+            <div className="relative hidden">
               <div
                 className="absolute right-[-30px] top-[45px] translate-y-[50%] text-gray-500 hover:text-gray-400 cursor-pointer"
                 onMouseDown={() => setShowPass(true)}

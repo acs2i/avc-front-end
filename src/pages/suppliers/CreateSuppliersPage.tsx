@@ -22,6 +22,12 @@ import { useFamily } from "../../utils/hooks/useFamily";
 import GestionFormComponent from "../../components/GestionFormComponent";
 import { useIsoCode } from "../../utils/hooks/useIsoCode";
 import IsoCodeSection from "../../components/Formulaires/IsoCodeSection";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "react-beautiful-dnd";
 
 interface Contact {
   firstname: string;
@@ -47,9 +53,9 @@ interface FormData {
   web_url: string;
   siret: string;
   tva: string;
-  address_1: string;
-  address_2: string;
-  address_3: string;
+  address1: string;
+  address2: string;
+  address3: string;
   city: string;
   postal: string;
   country: string;
@@ -113,6 +119,20 @@ const customStyles = {
   }),
 };
 
+const reorderContacts = (
+  list: Contact[],
+  startIndex: number,
+  endIndex: number
+) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+  return result;
+};
+
+
+
+
 export default function CreateSupplierPage() {
   const navigate = useNavigate();
   const creatorId = useSelector((state: any) => state.auth.user);
@@ -151,9 +171,9 @@ export default function CreateSupplierPage() {
     web_url: "",
     siret: "",
     tva: "",
-    address_1: "",
-    address_2: "",
-    address_3: "",
+    address1: "",
+    address2: "",
+    address3: "",
     city: "",
     postal: "",
     country: "",
@@ -247,6 +267,27 @@ export default function CreateSupplierPage() {
     setFormData((prevFormData) => ({
       ...prevFormData,
       buyers: updatedBuyers,
+    }));
+  };
+
+  const handleDragEnd = (result: DropResult) => {
+    if (
+      !result.destination ||
+      result.destination.index === result.source.index
+    ) {
+      return;
+    }
+
+    const updatedContacts = reorderContacts(
+      selectedContacts,
+      result.source.index,
+      result.destination.index
+    );
+
+    setSelectedContacts(updatedContacts);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      contacts: updatedContacts,
     }));
   };
 
@@ -645,9 +686,9 @@ export default function CreateSupplierPage() {
               <FormSection title="Adresse" size="h-[550px]">
                 <Input
                   element="input"
-                  id="address_1"
+                  id="address1"
                   label="Adresse 1 :"
-                  value={formData.address_1}
+                  value={formData.address1}
                   onChange={handleChange}
                   validators={[]}
                   placeholder="14 rue mon adresse"
@@ -656,9 +697,9 @@ export default function CreateSupplierPage() {
                 />
                 <Input
                   element="input"
-                  id="address_2"
+                  id="address2"
                   label="Adresse 2 :"
-                  value={formData.address_2}
+                  value={formData.address2}
                   onChange={handleChange}
                   validators={[]}
                   placeholder="Complément d'adresse"
@@ -667,9 +708,9 @@ export default function CreateSupplierPage() {
                 />
                 <Input
                   element="input"
-                  id="address_3"
+                  id="address3"
                   label="Adresse 3 :"
-                  value={formData.address_3}
+                  value={formData.address3}
                   onChange={handleChange}
                   validators={[]}
                   placeholder="Complément d'adresse"
@@ -728,18 +769,59 @@ export default function CreateSupplierPage() {
                 />
               </FormSection>
               <FormSection title="Contacts">
-                <div className="flex flex-col gap-2">
-                  {selectedContacts.map((contact, index) => (
-                    <div
-                      key={index}
-                      className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md bg-slate-400`}
-                    >
-                      <span className="text-[20px] text-white font-bold">
-                        {contact.firstname} {contact.lastname}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                <DragDropContext onDragEnd={handleDragEnd}>
+                  <Droppable droppableId="contacts">
+                    {(provided) => (
+                      <div
+                        className="flex flex-col gap-2 mt-3"
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                      >
+                        {selectedContacts.length > 0 ? (
+                          <>
+                            {selectedContacts.map((contact, index) => (
+                              <Draggable
+                                key={`contact-${index}`}
+                                draggableId={`contact-${index}`}
+                                index={index}
+                              >
+                                {(provided) => (
+                                  <div
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    className={`text-center rounded-md cursor-move hover:brightness-125 shadow-md p-3 ${
+                                      index === 0
+                                        ? "bg-gradient-to-r from-cyan-600 to-cyan-800 text-white"
+                                        : "bg-slate-300 text-gray-500"
+                                    }`}
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-[20px] font-bold">
+                                        {contact.firstname} {contact.lastname}
+                                      </span>
+                                      {index === 0 && (
+                                        <span className="text-xs text-white bg-cyan-800 px-2 py-1 rounded border border-white">
+                                          Contact Principal
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                              </Draggable>
+                            ))}
+                            {provided.placeholder}
+                          </>
+                        ) : (
+                          <p className="text-gray-400 font-bold text-xs">
+                            Aucun contact enregistré pour ce fournisseur
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
+
                 <div
                   className="flex flex-col items-center justify-center p-[20px] text-orange-400 hover:text-orange-300 cursor-pointer"
                   onClick={() => setContactModalIsOpen(true)}
