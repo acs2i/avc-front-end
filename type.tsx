@@ -201,6 +201,7 @@ export type Price = {
 }
 
 export type Uvc = {
+  _id?: string;
   code: string;
   dimensions: string[];
   prices: Price;

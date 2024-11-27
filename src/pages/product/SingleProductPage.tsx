@@ -1315,7 +1315,6 @@ export default function SingleProductPage() {
 
       if (response.ok) {
         const result = await response.json();
-        console.log(result);
         setProduct(result);
       } else {
         console.error("Erreur lors de la requête");
@@ -1474,8 +1473,6 @@ export default function SingleProductPage() {
         creatorId.username
       );
 
-      console.log("Changements détectés:", updateEntry.changes); // Pour debug
-
       // Envoyer la requête
       const productResponse = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/product/${id}`,
@@ -1583,7 +1580,6 @@ export default function SingleProductPage() {
 
       const data = await response.json();
       setUserFields(data.data);
-      console.log(data.data);
     } catch (error) {
       console.error("Erreur lors de la requête", error);
     } finally {
@@ -1720,7 +1716,6 @@ export default function SingleProductPage() {
     setIsLoading(true);
     try {
       const draftData = prepareDraftData(); // Préparer les données
-      console.log("Draft data being sent:", draftData); // Affichez les données avant de les envoyer
 
       // Étape 2 : Envoyer les données à la route /draft
       const response = await fetch(
@@ -1759,7 +1754,6 @@ export default function SingleProductPage() {
     }
   }, [isModify]);
 
-  console.log(formData);
   return (
     <>
       <Modal
@@ -2819,7 +2813,14 @@ export default function SingleProductPage() {
                     isModify={isModify}
                     isModifyUvc={isModifyUvc}
                     reference={truncateText(product?.reference, 15) || ""}
-                    uvcDimension={formData.uvc_ids}
+                    uvcDimension={formData.uvc_ids.map((uvc) => ({
+                      ...uvc,
+                      id: uvc._id || "default-id",
+                      code: uvc.code || "default-code",
+                      dimensions: uvc.dimensions || [], 
+                      ean: uvc.ean || "", 
+                      eans: uvc.eans || [],
+                    }))}
                     onUpdateEan={(uvcIndex, eanIndex, value) => {
                       setFormData((prev) => {
                         const updatedUvc = [...prev.uvc_ids];
@@ -2827,23 +2828,27 @@ export default function SingleProductPage() {
                         return { ...prev, uvc_ids: updatedUvc };
                       });
                     }}
-                    onCheckEan={async (ean) => {
+                    onCheckEan={async (ean, uvcId, currentEanIndex) => {
                       try {
                         const response = await fetch(
                           `${process.env.REACT_APP_URL_DEV}/api/v1/uvc/check-eans`,
                           {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ ean }),
+                            body: JSON.stringify({ ean, uvcId, currentEanIndex }),
                           }
                         );
                         const data = await response.json();
-                        const exists = data.message.includes("exists");
-                        setHasEanConflict(exists); // Met à jour l'état du conflit
-                        return { exists, productId: data.product?._id || null };
+                        console.log(data);
+                        setHasEanConflict(data.exist);
+                        return {
+                          exists: data.exist,
+                          productId: data.product?._id || null,
+                          uvcId: data.uvcId || null,
+                        };
                       } catch (error) {
                         console.error("Error checking EAN:", error);
-                        return { exists: false, productId: null };
+                        return { exists: false, productId: null, uvcId: null };
                       }
                     }}
                   />
