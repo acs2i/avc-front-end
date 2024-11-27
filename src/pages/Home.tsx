@@ -102,14 +102,14 @@ const INITIAL_CARDS: InitialCard[] = [
     labels: ["Actif", "Inactif"],
     chartType: "pie",
   },
-  {
-    id: 2,
-    title: "UVC",
-    subtitle: "Actifs avec/sans EAN",
-    data1: [50, 50],
-    labels: ["Avec EAN", "Sans EAN"],
-    chartType: "pie",
-  },
+  // {
+  //   id: 2,
+  //   title: "UVC",
+  //   subtitle: "Actifs avec/sans EAN",
+  //   data1: [50, 50],
+  //   labels: ["Avec EAN", "Sans EAN"],
+  //   chartType: "pie",
+  // },
   {
     id: 3,
     title: "Marques",
