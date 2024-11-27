@@ -77,7 +77,7 @@ export default function Navbar() {
     }
   }, [drawerIsOpen]);
 
-  const unreadNotificationsCount = notifications.filter((n) => !n.read).length;
+  // const unreadNotificationsCount = notifications.filter((n) => !n.read).length;
 
   return (
     <>
@@ -163,13 +163,13 @@ export default function Navbar() {
               onClick={() => setDrawerIsOpen(true)}
               className="relative cursor-pointer"
             >
-              {unreadNotificationsCount > 0 && (
+              {/* {unreadNotificationsCount > 0 && (
                 <div className="absolute h-[15px] w-[15px] bg-red-600 right-[-5px] top-[-5px] rounded-full flex items-center justify-center">
                   <span className="text-white text-xs">
                     {unreadNotificationsCount}
                   </span>
                 </div>
-              )}
+              )} */}
               <Bell size={20} />
             </div>
             <Grip size={20} />
