@@ -22,6 +22,12 @@ import { useFamily } from "../../utils/hooks/useFamily";
 import GestionFormComponent from "../../components/GestionFormComponent";
 import { useIsoCode } from "../../utils/hooks/useIsoCode";
 import IsoCodeSection from "../../components/Formulaires/IsoCodeSection";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "react-beautiful-dnd";
 
 interface Contact {
   firstname: string;
@@ -88,15 +94,15 @@ interface Buyer {
 const customStyles = {
   option: (provided: any, state: any) => ({
     ...provided,
-    backgroundColor: state.isFocused ? '#d1e7fd' : 'white',
-    color: state.isFocused ? '#0d6efd' : 'black',
-    cursor: 'pointer',
+    backgroundColor: state.isFocused ? "#d1e7fd" : "white",
+    color: state.isFocused ? "#0d6efd" : "black",
+    cursor: "pointer",
   }),
   control: (provided: any) => ({
     ...provided,
-    borderColor: '#ced4da',
-    '&:hover': {
-      borderColor: '#0d6efd'
+    borderColor: "#ced4da",
+    "&:hover": {
+      borderColor: "#0d6efd",
     },
   }),
   menu: (provided: any) => ({
@@ -105,8 +111,16 @@ const customStyles = {
   }),
 };
 
-
-
+const reorderContacts = (
+  list: Contact[],
+  startIndex: number,
+  endIndex: number
+) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+  return result;
+};
 
 export default function CreateSupplierPage() {
   const navigate = useNavigate();
@@ -242,6 +256,27 @@ export default function CreateSupplierPage() {
     setFormData((prevFormData) => ({
       ...prevFormData,
       buyers: updatedBuyers,
+    }));
+  };
+
+  const handleDragEnd = (result: DropResult) => {
+    if (
+      !result.destination ||
+      result.destination.index === result.source.index
+    ) {
+      return;
+    }
+
+    const updatedContacts = reorderContacts(
+      selectedContacts,
+      result.source.index,
+      result.destination.index
+    );
+
+    setSelectedContacts(updatedContacts);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      contacts: updatedContacts,
     }));
   };
 
@@ -685,18 +720,59 @@ export default function CreateSupplierPage() {
                 />
               </FormSection>
               <FormSection title="Contacts">
-                <div className="flex flex-col gap-2">
-                  {selectedContacts.map((contact, index) => (
-                    <div
-                      key={index}
-                      className={`text-center rounded-md cursor-pointer hover:brightness-125 shadow-md bg-slate-400`}
-                    >
-                      <span className="text-[20px] text-white font-bold">
-                        {contact.firstname} {contact.lastname}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                <DragDropContext onDragEnd={handleDragEnd}>
+                  <Droppable droppableId="contacts">
+                    {(provided) => (
+                      <div
+                        className="flex flex-col gap-2 mt-3"
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                      >
+                        {selectedContacts.length > 0 ? (
+                          <>
+                            {selectedContacts.map((contact, index) => (
+                              <Draggable
+                                key={`contact-${index}`}
+                                draggableId={`contact-${index}`}
+                                index={index}
+                              >
+                                {(provided) => (
+                                  <div
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    className={`text-center rounded-md cursor-move hover:brightness-125 shadow-md p-3 ${
+                                      index === 0
+                                        ? "bg-gradient-to-r from-cyan-600 to-cyan-800 text-white"
+                                        : "bg-slate-300 text-gray-500"
+                                    }`}
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-[20px] font-bold">
+                                        {contact.firstname} {contact.lastname}
+                                      </span>
+                                      {index === 0 && (
+                                        <span className="text-xs text-white bg-cyan-800 px-2 py-1 rounded border border-white">
+                                          Contact Principal
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                              </Draggable>
+                            ))}
+                            {provided.placeholder}
+                          </>
+                        ) : (
+                          <p className="text-gray-400 font-bold text-xs">
+                            Aucun contact enregistré pour ce fournisseur
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
+
                 <div
                   className="flex flex-col items-center justify-center p-[20px] text-orange-400 hover:text-orange-300 cursor-pointer"
                   onClick={() => setContactModalIsOpen(true)}
