@@ -1564,6 +1564,8 @@ export default function DraftUpdatePage() {
                                   draft?.brand_ids[0] ||
                                   "Selectionnez une marque"
                                 }
+                                noOptionsMessage={() => "No options"}
+                                isValidNewOption={() => false}
                               />
                             )}
                           </div>
@@ -1601,6 +1603,8 @@ export default function DraftUpdatePage() {
                                   draft?.tag_ids[0] ||
                                   "Selectionnez une Famille"
                                 }
+                                noOptionsMessage={() => "No options"}
+                                isValidNewOption={() => false}
                               />
                             )}
                           </div>
@@ -1638,6 +1642,8 @@ export default function DraftUpdatePage() {
                                   draft?.tag_ids[1] ||
                                   "Selectionnez une Sous-fFamille"
                                 }
+                                noOptionsMessage={() => "No options"}
+                                isValidNewOption={() => false}
                               />
                             )}
                           </div>
@@ -1675,6 +1681,8 @@ export default function DraftUpdatePage() {
                                   draft?.tag_ids[2] ||
                                   "Selectionnez une Sous-sous-Famille"
                                 }
+                                noOptionsMessage={() => "No options"}
+                                isValidNewOption={() => false}
                               />
                             )}
                           </div>
@@ -1857,6 +1865,8 @@ export default function DraftUpdatePage() {
                               inputValue={inputValueCollection}
                               isClearable
                               placeholder={draft?.collection_ids[0]}
+                              noOptionsMessage={() => "No options"}
+                              isValidNewOption={() => false}
                             />
                           )}
                         </div>

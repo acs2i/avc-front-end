@@ -40,8 +40,7 @@ const BrandSection: React.FC<BrandSelectorProps> = ({
   // Formatage personnalisé des options
   const formatOptionLabel = ({ label, code }: { label: string; code?: string }) => (
     <div className="flex items-center justify-between">
-      <span>{label}</span>
-      {code && <span className="text-gray-400 text-sm">({code})</span>}
+      <span>{code} - {label}</span>
     </div>
   );
 
