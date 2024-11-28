@@ -148,7 +148,7 @@ const UVCMeasureTable: React.FC<UVCMeasureTableProps> = ({
                   {isModify && isModifyUvc ? (
                     <input
                       type="number"
-                      className="w-20 p-1 border rounded"
+                      className="w-20 p-1 border rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       placeholder={uvc.height || Measure.height}
                       onChange={(e) =>
                         onUpdateMeasures?.(index, "height", e.target.value)
@@ -162,7 +162,7 @@ const UVCMeasureTable: React.FC<UVCMeasureTableProps> = ({
                   {isModify && isModifyUvc ? (
                     <input
                       type="number"
-                      className="w-20 p-1 border rounded"
+                      className="w-20 p-1 border rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       placeholder={uvc.length || Measure.long}
                       onChange={(e) =>
                         onUpdateMeasures?.(index, "length", e.target.value)
@@ -176,7 +176,7 @@ const UVCMeasureTable: React.FC<UVCMeasureTableProps> = ({
                   {isModify && isModifyUvc ? (
                     <input
                       type="number"
-                      className="w-20 p-1 border rounded"
+                      className="w-20 p-1 border rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       placeholder={uvc.width || Measure.width}
                       onChange={(e) =>
                         onUpdateMeasures?.(index, "width", e.target.value)
@@ -190,7 +190,7 @@ const UVCMeasureTable: React.FC<UVCMeasureTableProps> = ({
                   {isModify && isModifyUvc ? (
                     <input
                       type="number"
-                      className="w-20 p-1 border rounded"
+                      className="w-20 p-1 border rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       placeholder={uvc.gross_weight || Measure.weight_brut}
                       onChange={(e) =>
                         onUpdateMeasures?.(
@@ -208,7 +208,7 @@ const UVCMeasureTable: React.FC<UVCMeasureTableProps> = ({
                   {isModify && isModifyUvc ? (
                     <input
                       type="number"
-                      className="w-20 p-1 border rounded"
+                      className="w-20 p-1 border rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                       placeholder={uvc.net_weight || Measure.weight_net}
                       onChange={(e) =>
                         onUpdateMeasures?.(index, "net_weight", e.target.value)

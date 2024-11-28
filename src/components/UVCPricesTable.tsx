@@ -88,7 +88,7 @@ const UVCPriceTable: React.FC<UVCPriceTableProps> = ({
                       type="number"
                       value={paeu}
                       onChange={(e) => onPriceChange(index, "paeu", parseFloat(e.target.value) || 0)}
-                      className="w-full p-1 text-center border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full p-1 text-center border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                   ) : (
                     <span className="text-sm">{paeu} €</span>
@@ -100,7 +100,7 @@ const UVCPriceTable: React.FC<UVCPriceTableProps> = ({
                       type="number"
                       value={tbeu_pb}
                       onChange={(e) => onPriceChange(index, "tbeu_pb", parseFloat(e.target.value) || 0)}
-                      className="w-full p-1 text-center border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full p-1 text-center border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                   ) : (
                     <span className="text-sm">{tbeu_pb} €</span>
@@ -112,7 +112,7 @@ const UVCPriceTable: React.FC<UVCPriceTableProps> = ({
                       type="number"
                       value={tbeu_pmeu}
                       onChange={(e) => onPriceChange(index, "tbeu_pmeu", parseFloat(e.target.value) || 0)}
-                      className="w-full p-1 text-center border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full p-1 text-center border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                   ) : (
                     <span className="text-sm">{tbeu_pmeu} €</span>

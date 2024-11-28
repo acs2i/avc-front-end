@@ -226,6 +226,12 @@ export default function ProductList() {
 
   console.log(products);
 
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   return (
     <section className="w-full">
       <Header
@@ -247,6 +253,7 @@ export default function ProductList() {
               placeholder="Rechercher par code"
               value={codeValue}
               onChange={(e) => setCodeValue(e.target.value)}
+              onKeyPress={handleKeyPress}
               autoComplete="off"
             />
           </div>
@@ -259,6 +266,7 @@ export default function ProductList() {
               placeholder="Rechercher par nom"
               value={labelValue}
               onChange={(e) => setLabelValue(e.target.value)}
+              onKeyPress={handleKeyPress}
               autoComplete="off"
             />
           </div>
@@ -283,6 +291,7 @@ export default function ProductList() {
               placeholder="Tapez Votre Recherche..."
               value={supplierValue}
               onChange={(e) => setSupplierValue(e.target.value)}
+              onKeyPress={handleKeyPress}
               autoComplete="off"
             />
           </div>
@@ -322,6 +331,7 @@ export default function ProductList() {
               value="all"
               checked={selectedActiveValue === "all"}
               onChange={() => setSelectedActiveValue("all")}
+              onKeyPress={handleKeyPress}
             />
             <label
               htmlFor="tous"
@@ -338,6 +348,7 @@ export default function ProductList() {
               value="A"
               checked={selectedActiveValue === "A"}
               onChange={() => setSelectedActiveValue("A")}
+              onKeyPress={handleKeyPress}
             />
             <label
               htmlFor="actif"
@@ -354,6 +365,7 @@ export default function ProductList() {
               value="I"
               checked={selectedActiveValue === "I"}
               onChange={() => setSelectedActiveValue("I")}
+              onKeyPress={handleKeyPress}
             />
             <label
               htmlFor="inactif"
