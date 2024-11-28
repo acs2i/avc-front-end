@@ -35,9 +35,12 @@ interface UVCMeasureTableProps {
     weight_brut: string;
     weight_net: string;
   };
+  isModifyUvc?: boolean;
+  setModifyUvc?: (value: boolean) => void;
   size_unit: string;
   weight_unit: string;
   isModify?: boolean;
+
   onUpdateMeasures?: (index: number, field: string, value: string) => void;
 }
 
@@ -48,6 +51,8 @@ const UVCMeasureTable: React.FC<UVCMeasureTableProps> = ({
   size_unit,
   weight_unit,
   isModify = false,
+  isModifyUvc,
+  setModifyUvc,
   onUpdateMeasures,
 }) => {
   return (
@@ -140,7 +145,7 @@ const UVCMeasureTable: React.FC<UVCMeasureTableProps> = ({
                   {taille}
                 </td>
                 <td className="border px-4 py-2 text-center text-sm bg-blue-50">
-                  {isModify ? (
+                  {isModify && isModifyUvc ? (
                     <input
                       type="number"
                       className="w-20 p-1 border rounded"
@@ -154,7 +159,7 @@ const UVCMeasureTable: React.FC<UVCMeasureTableProps> = ({
                   )}
                 </td>
                 <td className="border px-4 py-2 text-center text-sm  bg-blue-50">
-                  {isModify ? (
+                  {isModify && isModifyUvc ? (
                     <input
                       type="number"
                       className="w-20 p-1 border rounded"
@@ -168,7 +173,7 @@ const UVCMeasureTable: React.FC<UVCMeasureTableProps> = ({
                   )}
                 </td>
                 <td className="border px-4 py-2 text-center text-sm bg-blue-50">
-                  {isModify ? (
+                  {isModify && isModifyUvc ? (
                     <input
                       type="number"
                       className="w-20 p-1 border rounded"
@@ -182,7 +187,7 @@ const UVCMeasureTable: React.FC<UVCMeasureTableProps> = ({
                   )}
                 </td>
                 <td className="border px-4 py-2 text-center text-sm  bg-blue-50">
-                  {isModify ? (
+                  {isModify && isModifyUvc ? (
                     <input
                       type="number"
                       className="w-20 p-1 border rounded"
@@ -200,7 +205,7 @@ const UVCMeasureTable: React.FC<UVCMeasureTableProps> = ({
                   )}
                 </td>
                 <td className="border px-4 py-2 text-center text-sm bg-blue-50">
-                  {isModify ? (
+                  {isModify && isModifyUvc ? (
                     <input
                       type="number"
                       className="w-20 p-1 border rounded"

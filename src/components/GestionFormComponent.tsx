@@ -50,10 +50,24 @@ const GestionFormComponent: React.FC<GestionFormComponentProps> = ({
   onCloseModal,
   userOptions,
   handleUserSearchInput,
-  handleInputChangeUser, // Ajouter ici
+  handleInputChangeUser,
   familyOptions,
   handleFamilySearchInput,
 }) => {
+  const [allUsers, setAllUsers] = useState(userOptions);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const showAllUsers = async () => {
+    if (userOptions.length === 0) {
+      setIsLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setAllUsers(userOptions);
+      setIsLoading(false);
+    } else {
+      setAllUsers(userOptions);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4 p-4">
       <h6>Assistant(e)</h6>
@@ -61,31 +75,38 @@ const GestionFormComponent: React.FC<GestionFormComponentProps> = ({
         value={admin ? { label: admin, value: admin } : null}
         onChange={(option) => handleAdminChange(option ? option.value : "")}
         onInputChange={(inputValue) => setAdminSearchInput(inputValue)}
-        onFocus={() => handleInputChangeUser("")}
-        options={adminOptions}
+        onFocus={showAllUsers}
+        options={
+          isLoading
+            ? [{ label: "Chargement...", value: "" }] // Affiche le chargement
+            : allUsers.length > 0
+            ? allUsers // Affiche les utilisateurs si disponibles
+            : [{ label: "Aucun utilisateur trouvé", value: "" }] // Message par défaut
+        }
         placeholder="Sélectionnez un utilisateur"
         styles={customStyles}
         isClearable
         isValidNewOption={() => false}
       />
+
       <h6>Acheteur(s)</h6>
       {buyers.map((buyer, index) => (
         <div key={index} className="grid grid-cols-2 gap-2">
           <div>
             <CreatableSelect
-              value={
-                buyer.user ? { label: buyer.user, value: buyer.user } : null
-              }
+              value={admin ? { label: admin, value: admin } : null}
               onChange={(option) =>
-                handleBuyerChange(index, "user", option?.value || "")
+                handleAdminChange(option ? option.value : "")
               }
-              onInputChange={(inputValue) =>
-                handleUserSearchInput(inputValue, index)
+              onInputChange={(inputValue) => setAdminSearchInput(inputValue)}
+              onFocus={showAllUsers}
+              options={
+                isLoading ? [{ label: "Chargement...", value: "" }] : allUsers
               }
-              options={userOptions}
               placeholder="Sélectionnez un utilisateur"
               styles={customStyles}
               isClearable
+              isValidNewOption={() => false}
             />
           </div>
           <div>

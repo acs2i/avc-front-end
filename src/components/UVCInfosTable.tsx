@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useCollections } from "../utils/hooks/useCollection";
 import CollectionSection from "./Formulaires/CollectionSection";
 import { Info } from "lucide-react";
@@ -6,6 +6,8 @@ import { Info } from "lucide-react";
 interface UVCInfosTableProps {
   reference: string;
   isModify?: boolean;
+  isModifyUvc?: boolean;
+  setModifyUvc?: (value: boolean) => void;
   collection?: any;
   uvcDimension: { code: string; dimensions: string[]; collectionUvc: any }[];
   customStyles: any;
@@ -16,6 +18,8 @@ interface UVCInfosTableProps {
 const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
   reference,
   isModify,
+  isModifyUvc,
+  setModifyUvc,
   collection,
   uvcDimension,
   customStyles,
@@ -33,19 +37,24 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
   );
 
   const handleLocalInputChange = (index: number, newInputValue: string) => {
-    // Mettre à jour uniquement la valeur de la ligne concernée
     const updatedValues = [...localInputValues];
     updatedValues[index] = newInputValue;
     setLocalInputValues(updatedValues);
 
-    // Appeler la fonction du hook pour fetch les données
     handleInputChangeCollection(newInputValue);
   };
+
+  // Gérer la dépendance entre isModify et isModifyUvc
+  useEffect(() => {
+    if (!isModify && isModifyUvc && setModifyUvc) {
+      setModifyUvc(false); // Force isModifyUvc à false si isModify est false
+    }
+  }, [isModify, isModifyUvc, setModifyUvc]);
 
   if (!collection) {
     return (
       <div className="bg-gray-200 p-4 rounded-md shadow-md font-semibold text-gray-700 flex items-center gap-2">
-        <Info/>
+        <Info />
         <span>Aucune collection n'a été ajoutée au brouillon</span>
       </div>
     );
@@ -60,7 +69,7 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
           <div>
             <span className="text-gray-600">Collection : </span>
             <span className="font-medium">
-              {collection ? collection : "Aucune collection n'a été ajouté"}
+              {collection ? collection : "Aucune collection n'a été ajoutée"}
             </span>
           </div>
         </div>
@@ -97,9 +106,7 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
                 <td className="border px-4 py-2 text-center text-sm">
                   {uvcReference}
                 </td>
-                <td className="border px-4 py-2 text-center text-sm">
-                  -
-                </td>
+                <td className="border px-4 py-2 text-center text-sm">-</td>
                 <td className="border px-4 py-2 text-center text-sm">
                   {couleur}
                 </td>
@@ -107,7 +114,7 @@ const UVCInfosTable: React.FC<UVCInfosTableProps> = ({
                   {taille}
                 </td>
                 <td className="border px-4 py-2 text-center text-sm bg-blue-50">
-                  {isModify ? (
+                  {isModify && isModifyUvc ? (
                     <CollectionSection
                       collection={uvc.collectionUvc}
                       placeholder={placeholder(index)}

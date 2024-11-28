@@ -2,6 +2,8 @@ import React from "react";
 
 interface UVCPriceTableProps {
   reference: string;
+  isModifyUvc?: boolean;
+  setModifyUvc?: (value: boolean) => void;
   uvcPrices: {
     code: string;
     dimensions: string[];
@@ -28,6 +30,8 @@ const UVCPriceTable: React.FC<UVCPriceTableProps> = ({
   uvcPrices,
   globalPrices,
   isModify,
+  isModifyUvc,
+  setModifyUvc,
   onPriceChange,
 }) => {
   return (
@@ -79,7 +83,7 @@ const UVCPriceTable: React.FC<UVCPriceTableProps> = ({
                 <td className="border px-4 py-2 text-center text-sm">{color}</td>
                 <td className="border px-4 py-2 text-center text-sm">{size}</td>
                 <td className="border px-4 py-2 text-center bg-blue-50">
-                  {isModify ? (
+                  {isModify && isModifyUvc ? (
                     <input
                       type="number"
                       value={paeu}
@@ -91,7 +95,7 @@ const UVCPriceTable: React.FC<UVCPriceTableProps> = ({
                   )}
                 </td>
                 <td className="border px-4 py-2 text-center bg-blue-50">
-                  {isModify ? (
+                  {isModify && isModifyUvc ? (
                     <input
                       type="number"
                       value={tbeu_pb}
@@ -103,7 +107,7 @@ const UVCPriceTable: React.FC<UVCPriceTableProps> = ({
                   )}
                 </td>
                 <td className="border px-4 py-2 text-center bg-blue-50">
-                  {isModify ? (
+                  {isModify && isModifyUvc ? (
                     <input
                       type="number"
                       value={tbeu_pmeu}

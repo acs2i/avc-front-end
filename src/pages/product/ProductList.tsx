@@ -487,7 +487,7 @@ export default function ProductList() {
                         </span>
                         <span className="mx-1">-</span>
                         <span>
-                          {product.suppliers[0].supplier_id?.company_name ??
+                          {truncateText(product.suppliers[0].supplier_id?.company_name, 10) ??
                             "NA"}
                         </span>
                       </div>

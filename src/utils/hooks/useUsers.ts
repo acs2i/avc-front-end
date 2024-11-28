@@ -18,7 +18,7 @@ export const useUsers = (initialInputValue: string = "", limit = 10) => {
   const fetchAllUsers = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/auth/search?page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/auth/all-users`,
         {
           method: "GET",
           headers: {
@@ -38,6 +38,7 @@ export const useUsers = (initialInputValue: string = "", limit = 10) => {
       console.error("Erreur lors de la récupération des utilisateurs :", error);
     }
   };
+  
   
 
   const searchUsers = async (inputValue: string) => {

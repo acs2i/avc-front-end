@@ -46,6 +46,7 @@ interface CustomField {
   field_name: string;
   field_type: string;
   options?: string[];
+  default_value: string;
   value?: string;
 }
 
@@ -1796,26 +1797,35 @@ export default function SingleSupplierPage() {
             </div>
             <div className="mt-[30px]">
               {!isModify && (
-                <FormSection title="Champs utilisateur">
+                <FormSection title="Champs Utilisateur">
                   <div>
                     {userFields
                       .filter((field) => field.apply_to === "Fournisseur")
                       .map((field: any, index: number) => {
-                        const supplierField = supplier?.additional_fields.find(
-                          (supField: any) => supField.label === field.label
-                        );
+                        const supplierField = Array.isArray(
+                          supplier?.additional_fields
+                        )
+                          ? supplier.additional_fields.find(
+                              (supField: any) => supField.label === field.label
+                            )
+                          : null;
+
+                        const displayValue =
+                          supplierField?.value ||
+                          field.additional_fields[0]?.default_value ||
+                          "Non renseigné";
 
                         return (
                           <div
                             key={index}
                             className="grid grid-cols-12 gap-2 py-2"
                           >
-                            <span className="col-span-3 font-[700] text-slate-500 text-[13px]">
+                            <span className="col-span-3 font-[700] text-slate-600 text-[13px]">
                               {field.label} :
                             </span>
 
-                            <span className="col-span-3 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px]">
-                              {supplierField?.value || "Non renseigné"}
+                            <span className="col-span-3 text-gray-500 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px] font-semibold">
+                              {displayValue}
                             </span>
                           </div>
                         );
@@ -1857,8 +1867,9 @@ export default function SingleSupplierPage() {
                                           fieldValues[
                                             `${field._id}-${index}`
                                           ] ||
-                                          supplierField?.value ||
-                                          ""
+                                          supplierField?.value || // Valeur déjà associée au fournisseur
+                                          customField.default_value ||
+                                          "" // Valeur par défaut
                                         }
                                         onChange={(e) =>
                                           handleFieldChange(
@@ -1932,13 +1943,11 @@ export default function SingleSupplierPage() {
                                         handleFileUpload(e, condition._id);
                                       }}
                                       className="hidden"
-                                      id={`fileUpload-${condition._id}`}
-                                      data-condition-id={condition._id} // Important: ajout de l'attribut data
+                                      id="fileUpload"
                                     />
-                                    <label
-                                      htmlFor={`fileUpload-${condition._id}`}
-                                      className="cursor-pointer w-full h-full flex items-center justify-center"
-                                    >
+
+                                    {/* Label lié à l'input */}
+                                    <label htmlFor="fileUpload" className="cursor-pointer">
                                       <img
                                         src="/img/pdf_up.png"
                                         alt="Upload PDF"

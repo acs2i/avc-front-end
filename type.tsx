@@ -202,6 +202,7 @@ export type Price = {
 }
 
 export type Uvc = {
+  _id?: string;
   code: string;
   dimensions: string[];
   prices: Price;
@@ -216,6 +217,12 @@ export type Uvc = {
   length?: string;
   gross_weight?: string;
   net_weight?: string; 
+}
+
+interface CustomField {
+  label: string;
+  value: string;
+  field_type?: string;
 }
 
 export type DatalakeUvc = {
@@ -234,6 +241,7 @@ export type DatalakeUvc = {
   length?: string;
   gross_weight?: string;
   net_weight?: string; 
+  additional_fields?: CustomField[];
 }
 
 export type Supplier = {
