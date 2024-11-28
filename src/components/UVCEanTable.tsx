@@ -48,8 +48,8 @@ const UVCEanTable: React.FC<UVCEanTableProps> = ({
     eanIndex: number,
     value: string
   ) => {
-    const uvcId = uvcDimension[uvcIndex]?.id; // Récupération de l'UVC ID
-    console.log({ ean: value, uvcId, currentEanIndex: eanIndex }); // Vérifiez les valeurs
+    const uvcId = uvcDimension[uvcIndex]?.id;
+    console.log({ ean: value, uvcId, currentEanIndex: eanIndex });
     onUpdateEan(uvcIndex, eanIndex, value);
     debounceCheckEan(uvcIndex, eanIndex, value);
   };
@@ -61,11 +61,11 @@ const UVCEanTable: React.FC<UVCEanTableProps> = ({
       if (timeout) clearTimeout(timeout);
 
       timeout = setTimeout(async () => {
-        const uvcId = uvcDimension[uvcIndex]?.id; // Récupération de l'UVC ID
-        const result = await onCheckEan(value, uvcId, eanIndex); // Inclure uvcId et eanIndex
+        const uvcId = uvcDimension[uvcIndex]?.id; 
+        const result = await onCheckEan(value, uvcId, eanIndex);
         console.log(`Validation pour ${uvcIndex}-${eanIndex}:`, result);
 
-        const isDuplicate = result.exists && result.uvcId !== uvcId; // Vérifie si l'UVC est différent
+        const isDuplicate = result.exists && result.uvcId !== uvcId;
 
         setValidationErrors((prev) => ({
           ...prev,
