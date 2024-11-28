@@ -67,7 +67,7 @@ const GestionFormComponent: React.FC<GestionFormComponentProps> = ({
       setAllUsers(userOptions);
     }
   };
-
+  
   return (
     <div className="flex flex-col gap-4 p-4">
       <h6>Assistant(e)</h6>
@@ -76,19 +76,12 @@ const GestionFormComponent: React.FC<GestionFormComponentProps> = ({
         onChange={(option) => handleAdminChange(option ? option.value : "")}
         onInputChange={(inputValue) => setAdminSearchInput(inputValue)}
         onFocus={showAllUsers}
-        options={
-          isLoading
-            ? [{ label: "Chargement...", value: "" }] // Affiche le chargement
-            : allUsers.length > 0
-            ? allUsers // Affiche les utilisateurs si disponibles
-            : [{ label: "Aucun utilisateur trouvé", value: "" }] // Message par défaut
-        }
+        options={allUsers}
         placeholder="Sélectionnez un utilisateur"
         styles={customStyles}
         isClearable
         isValidNewOption={() => false}
       />
-
       <h6>Acheteur(s)</h6>
       {buyers.map((buyer, index) => (
         <div key={index} className="grid grid-cols-2 gap-2">

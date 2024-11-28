@@ -2243,7 +2243,8 @@ export default function DraftUpdatePage() {
                 </div>
                 {onglet === "infos" && draft && (
                   <UVCInfosTable
-                    isModify={isModifyUvc}
+                    isModify={isModify}
+                    isModifyUvc={isModifyUvc}
                     collection={
                       formData.collection_ids[0] || "Aucune collection"
                     }
@@ -2265,13 +2266,14 @@ export default function DraftUpdatePage() {
                 {onglet === "price" && draft && (
                   <UVCPriceTable
                     reference={draft?.reference}
-                    uvcPrices={formData.uvc} // Passez directement formData.uvc sans le mapping
+                    uvcPrices={formData.uvc}
                     globalPrices={{
                       paeu: formData.paeu,
                       tbeu_pb: formData.tbeu_pb,
                       tbeu_pmeu: formData.tbeu_pmeu,
                     }}
-                    isModify={isModifyUvc}
+                    isModify={isModify}
+                    isModifyUvc={isModifyUvc}
                     onPriceChange={(index, field, value) => {
                       setFormData((prevFormData) => {
                         const updatedUVCs = [...prevFormData.uvc];
@@ -2322,7 +2324,8 @@ export default function DraftUpdatePage() {
                     }}
                     size_unit={draft?.size_unit || "m"}
                     weight_unit={draft?.weigth_unit || "kg"}
-                    isModify={isModifyUvc}
+                    isModify={isModify}
+                    isModifyUvc={isModifyUvc}
                     onUpdateMeasures={(index, field, value) => {
                       setFormData((prev) => {
                         const updatedUvc = [...prev.uvc];
