@@ -2642,7 +2642,7 @@ export default function SingleProductPage() {
                     onClick={() => setIsModifyUvc((prev) => !prev)}
                     disabled={isLoading || hasEanConflict}
                   >
-                    {isModifyUvc ? "Générer les UVC" : "Modifier les UVC"}
+                    {isModifyUvc ? "Enregistrer" : "Modifier les UVC"}
                   </Button>
                 </div>
               )}

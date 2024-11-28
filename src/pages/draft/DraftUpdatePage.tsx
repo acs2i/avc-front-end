@@ -2176,7 +2176,7 @@ export default function DraftUpdatePage() {
                     onClick={() => setIsModifyUvc((prev) => !prev)}
                     type="button"
                   >
-                    {isModifyUvc ? "Générer les UVC" : "Modifier les UVC"}
+                    {isModifyUvc ? "Enregistrer" : "Modifier les UVC"}
                   </Button>
                 )}
               </div>
