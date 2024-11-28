@@ -66,6 +66,8 @@ const FamilySection: React.FC<FamilySelectorProps> = ({
           className="block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
           openMenuOnFocus
           onMenuOpen={() => handleInputChangeFamily("")}
+          noOptionsMessage={() => "No options"}
+          isValidNewOption={() => false}
         />
       </div>
     </div>

@@ -20,16 +20,17 @@ const CollectionSection: React.FC<CollectionSelectorProps> = ({
   placeholder,
   customStyles,
 }) => {
-
+  // Fonction de filtrage améliorée
   const filterOptions = (inputValue: string, options: any[]) => {
-    const input = inputValue ? inputValue.toLowerCase() : "";
+    const input = inputValue.toLowerCase();
     return options.filter((option) => {
-      const name = option.label ? option.label.toLowerCase() : "";
+      const label = option.label ? option.label.toLowerCase() : "";
       const code = option.code ? option.code.toLowerCase() : "";
-      return name.includes(input) || code.includes(input);
+      return label.includes(input) || code.includes(input);
     });
   };
 
+  // Formatage personnalisé des options
   const formatOptionLabel = ({ label, code }: { label: string; code: string }) => (
     <div className="flex items-center justify-between">
       <span>{label}</span>
@@ -41,21 +42,31 @@ const CollectionSection: React.FC<CollectionSelectorProps> = ({
     <div className="relative w-full flex flex-col gap-3">
       <div>
         <CreatableSelect
-          value={collection} // Gérer une seule collection
-          onChange={handleChangeCollection} // Pas d'index ici
+          value={collection}
+          onChange={handleChangeCollection}
           onInputChange={handleInputChangeCollection}
           onFocus={() => handleInputChangeCollection("")}
+          inputValue={inputValueCollection}
+          options={optionsCollection}
           filterOption={(option, input) => 
             filterOptions(input, [option.data])[0] !== undefined
           }
           formatOptionLabel={formatOptionLabel}
-          inputValue={inputValueCollection}
-          options={optionsCollection}
-          placeholder={placeholder}
-          styles={customStyles}
+          placeholder={placeholder || "Tapez Votre Recherche..."}
+          styles={{
+            ...customStyles,
+            menu: (base) => ({
+              ...base,
+              zIndex: 9999
+            })
+          }}
           menuPortalTarget={document.body}
           isClearable
           className="block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
+          openMenuOnFocus
+          onMenuOpen={() => handleInputChangeCollection("")}
+          noOptionsMessage={() => "No options"}
+          isValidNewOption={() => false}
         />
       </div>
     </div>

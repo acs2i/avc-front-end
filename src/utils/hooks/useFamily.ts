@@ -24,7 +24,7 @@ export const useFamily = (initialInputValue: string = "", limit = 10) => {
   const fetchAllFamilies = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/tag`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?level=famille&status=A`,
         {
           method: "GET",
           headers: {
@@ -52,7 +52,7 @@ export const useFamily = (initialInputValue: string = "", limit = 10) => {
   const searchFamilies = async (inputValue: string) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?level=famille`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?level=famille&status=A`,
         {
           method: "GET",
           headers: {
