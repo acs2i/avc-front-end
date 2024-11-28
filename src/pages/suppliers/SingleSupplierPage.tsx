@@ -814,25 +814,21 @@ export default function SingleSupplierPage() {
   const handleBuyerChange = (
     index: number,
     field: keyof Buyer,
-    value: string | string[] // Champ pouvant être soit un tableau de chaînes soit une chaîne unique
+    value: string | string[]
   ) => {
     const updatedBuyers = [...buyers];
-
-    // Vérifier le type de champ attendu et assigner en conséquence
     if (field === "family" && Array.isArray(value)) {
-      // Si c'est "family", on attend un tableau de chaînes
-      updatedBuyers[index][field] = value as string[];
+      updatedBuyers[index].family = value;
     } else if (field === "user" && typeof value === "string") {
-      // Si c'est "user", on attend une chaîne unique
-      updatedBuyers[index][field] = value as string;
+      updatedBuyers[index].user = value;
     }
-
     setBuyers(updatedBuyers);
-    setFormData((prevFormData) => ({
-      ...prevFormData,
+    setFormData((prev) => ({
+      ...prev,
       buyers: updatedBuyers,
     }));
   };
+  
 
   const addBuyer = () => {
     setBuyers((prev) => [...prev, { family: [], user: "" } as Buyer]);
@@ -1469,7 +1465,7 @@ export default function SingleSupplierPage() {
                         element="input"
                         id="postal"
                         label="Code postal :"
-                        value=""
+                        value={formData.postal}
                         onChange={handleChange}
                         validators={[]}
                         placeholder={supplier?.postal}
