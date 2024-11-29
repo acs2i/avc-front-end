@@ -235,6 +235,7 @@ export default function SingleProductPage() {
   const { id } = useParams();
   const token = useSelector((state: any) => state.auth.token);
   const creatorId = useSelector((state: any) => state.auth.user);
+  const [hasFormatError, setHasFormatError] = useState(false);
   const [fieldValues, setFieldValues] = useState<{ [key: string]: any }>({});
   const [hasEanConflict, setHasEanConflict] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
@@ -322,7 +323,16 @@ export default function SingleProductPage() {
     blocked: product?.blocked || "",
     imgPath: "",
     status: "A",
-    uvc_ids: [],
+    uvc_ids: product?.uvc_ids || [
+      {
+        _id: "",
+        code: "",
+        dimensions: [],
+        eans: ["-"], // Ajoutez une valeur par défaut vide
+        ean: "",
+        prices: { supplier_id: "", price: { paeu: 0, tbeu_pb: 0, tbeu_pmeu: 0 } },
+      },
+    ],
     initialSizes: ["000"],
     initialColors: ["000"],
     initialGrid: [[true]],
@@ -603,6 +613,10 @@ export default function SingleProductPage() {
     return result;
   };
 
+  const handleFormatErrorChange = (hasError: boolean) => {
+    setHasFormatError(hasError);
+  };
+
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
 
@@ -699,7 +713,7 @@ export default function SingleProductPage() {
           },
           collectionUvc:
             uvc.collectionUvc || product.collection_ids[0]?.label || "",
-          eans: uvc.eans || [],
+          eans: uvc.eans || ["-"],
           ean: uvc.ean || "",
           status: uvc.status || "A",
           made_in: uvc.made_in,
@@ -1282,7 +1296,7 @@ export default function SingleProductPage() {
             formData.uvc_ids[i]?.collectionUvc ||
             formData.collection_ids[0]?.label ||
             "Aucune collection enregistré",
-          eans: existingUvc?.eans || [],
+          eans: existingUvc?.eans || ["-"],
           ean: existingUvc?.ean || "",
           barcodePath: existingUvc?.barcodePath || "",
           height: existingUvc?.height || "",
@@ -1753,7 +1767,7 @@ export default function SingleProductPage() {
       setIsModifyUvc(false);
     }
   }, [isModify]);
-
+console.log(formData)
   return (
     <>
       <Modal
@@ -1952,7 +1966,7 @@ export default function SingleProductPage() {
                     size="small"
                     type="submit"
                     blue
-                    disabled={isLoading || hasEanConflict}
+                    disabled={isLoading || hasEanConflict || hasFormatError}
                   >
                     Valider
                   </Button>
@@ -2640,7 +2654,7 @@ export default function SingleProductPage() {
                     blue
                     type="button"
                     onClick={() => setIsModifyUvc((prev) => !prev)}
-                    disabled={isLoading || hasEanConflict}
+                    disabled={isLoading || hasEanConflict || hasFormatError}
                   >
                     {isModifyUvc ? "Générer les UVC" : "Modifier les UVC"}
                   </Button>
@@ -2652,7 +2666,7 @@ export default function SingleProductPage() {
                 className={`border-t-[1px] border-gray-300 px-5 py-2 overflow-y-auto ${
                   isFullScreen
                     ? "fixed right-0 top-0 w-full h-screen z-[9999] bg-gray-100"
-                    : "w-[70%]"
+                    : "w-full"
                 }`}
               >
                 <UVCGrid
@@ -2668,7 +2682,7 @@ export default function SingleProductPage() {
                   uvcGrid={uvcGrid}
                   isFullScreen={toggleFullScreen}
                   isModify={isModifyUvc}
-                  isEditable={true}
+                  isEditable={false}
                 />
               </div>
             )}
@@ -2677,7 +2691,7 @@ export default function SingleProductPage() {
                 className={`border-t-[1px] border-gray-300 px-5 py-2 ${
                   isFullScreen
                     ? "fixed right-0 top-0 w-full h-screen z-[9999] bg-gray-100"
-                    : "w-[70%]"
+                    : "w-full"
                 } overflow-y-auto`}
               >
                 <div className="flex items-center justify-between">
@@ -2819,14 +2833,24 @@ export default function SingleProductPage() {
                       code: uvc.code || "default-code",
                       dimensions: uvc.dimensions || [], 
                       ean: uvc.ean || "", 
-                      eans: uvc.eans || [],
+                      eans: uvc.eans || ["-"],
                     }))}
                     onUpdateEan={(uvcIndex, eanIndex, value) => {
-                      setFormData((prev) => {
-                        const updatedUvc = [...prev.uvc_ids];
-                        updatedUvc[uvcIndex].eans[eanIndex] = value;
-                        return { ...prev, uvc_ids: updatedUvc };
-                      });
+                      const previousEans = formData.uvc_ids.map((uvc) => [...uvc.eans]);
+                      try {
+                        setFormData((prev) => {
+                          const updatedUvc = [...prev.uvc_ids];
+                          updatedUvc[uvcIndex].eans[eanIndex] = value; // Mettre à jour temporairement
+                          return { ...prev, uvc_ids: updatedUvc };
+                        });
+                      } catch (error) {
+                        // Si une erreur survient, remettez la valeur précédente
+                        setFormData((prev) => {
+                          const restoredUvc = [...prev.uvc_ids];
+                          restoredUvc[uvcIndex].eans = previousEans[uvcIndex];
+                          return { ...prev, uvc_ids: restoredUvc };
+                        });
+                      }
                     }}
                     onCheckEan={async (ean, uvcId, currentEanIndex) => {
                       try {
@@ -2851,6 +2875,7 @@ export default function SingleProductPage() {
                         return { exists: false, productId: null, uvcId: null };
                       }
                     }}
+                    onFormatErrorChange={handleFormatErrorChange}
                   />
                 )}
 

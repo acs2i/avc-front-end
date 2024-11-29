@@ -1,5 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { isValidEan13 } from "../utils/func/checkEan";
+
+interface ConflictDetails {
+  ean: string;
+  uvcId: string;
+  uvcIndex: number;
+  eanIndex: number;
+  originalValue: string;
+}
 
 interface UVCEanTableProps {
   reference: string;
@@ -22,6 +31,7 @@ interface UVCEanTableProps {
     productId: string | null;
     uvcId: string | null;
   }>;
+  onFormatErrorChange: (hasFormatError: boolean) => void;
 }
 
 const UVCEanTable: React.FC<UVCEanTableProps> = ({
@@ -29,57 +39,199 @@ const UVCEanTable: React.FC<UVCEanTableProps> = ({
   uvcDimension,
   onUpdateEan,
   onCheckEan,
+  onFormatErrorChange,
   isModify,
   isModifyUvc,
 }) => {
   const [validationErrors, setValidationErrors] = useState<{
     [key: string]: boolean;
   }>({});
-  const [showModal, setShowModal] = useState(false); // Contrôle de la modale
+  const [showModal, setShowModal] = useState(false);
+  const [originalValues, setOriginalValues] = useState<{
+    [key: string]: string;
+  }>({});
   const [linkedProductId, setLinkedProductId] = useState<string | null>(null);
-  const [conflictDetails, setConflictDetails] = useState<{
-    ean: string;
-    uvcId: string;
-    eanIndex: number;
-  } | null>(null);
+  const [conflictDetails, setConflictDetails] =
+    useState<ConflictDetails | null>(null);
+  const [formatErrorDetails, setFormatErrorDetails] =
+    useState<ConflictDetails | null>(null);
+  const [displayValues, setDisplayValues] = useState(
+    uvcDimension.map((uvc) => ({ id: uvc.id, eans: [...uvc.eans] }))
+  );
+  const [baseValues, setBaseValues] = useState(
+    uvcDimension.map((uvc) => ({ id: uvc.id, eans: [...uvc.eans] }))
+  );
 
-  const handleEanChange = (
+  const checkForDuplicatesInSameUVC = (
     uvcIndex: number,
     eanIndex: number,
     value: string
-  ) => {
-    const uvcId = uvcDimension[uvcIndex]?.id; // Récupération de l'UVC ID
-    console.log({ ean: value, uvcId, currentEanIndex: eanIndex }); // Vérifiez les valeurs
-    onUpdateEan(uvcIndex, eanIndex, value);
-    debounceCheckEan(uvcIndex, eanIndex, value);
+  ): boolean => {
+    const currentUVC = uvcDimension[uvcIndex];
+    if (!currentUVC || !currentUVC.eans) return false;
+
+    // Check if the same EAN exists at a different index in the same UVC
+    return currentUVC.eans.some(
+      (ean, index) => ean === value && index !== eanIndex && value !== ""
+    );
   };
 
+  const handleEanChange = (uvcIndex: number, eanIndex: number, value: string) => {
+    const key = `${uvcIndex}-${eanIndex}`;
+
+    // Si la valeur est vide, nettoyer les erreurs et ne pas déclencher de validation
+    if (value.trim() === "") {
+        setValidationErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors[key];
+            return newErrors;
+        });
+
+        // Restaurer la valeur vide dans le parent
+        onUpdateEan(uvcIndex, eanIndex, "");
+        return;
+    }
+
+    // Si la valeur saisie est identique à l'originale, nettoyez les erreurs
+    if (originalValues[key] === value) {
+        setValidationErrors((prev) => {
+            const newErrors = { ...prev };
+            delete newErrors[key];
+            return newErrors;
+        });
+        onFormatErrorChange(false); // Aucune erreur de format
+        onUpdateEan(uvcIndex, eanIndex, value); // Mettez à jour la valeur
+        return; // Ne continuez pas la validation
+    }
+
+    // Sauvegarder la valeur originale si elle n'existe pas déjà
+    if (!(key in originalValues)) {
+        setOriginalValues((prev) => ({
+            ...prev,
+            [key]: uvcDimension[uvcIndex].eans[eanIndex],
+        }));
+    }
+
+    const isValid = isValidEan13(value);
+    onFormatErrorChange(!isValid);
+
+    setValidationErrors((prev) => ({
+        ...prev,
+        [key]: !isValid,
+    }));
+
+    onUpdateEan(uvcIndex, eanIndex, value);
+
+    if (isValid) {
+        debounceCheckEan(uvcIndex, eanIndex, value);
+    }
+};
+  
+  
+  const handleCancel = () => {
+    if (conflictDetails) {
+      // Fermer la modale sans réinitialiser la valeur
+      setShowModal(false);
+  
+      // Conserver l'erreur pour indiquer que la valeur est en conflit
+      setValidationErrors((prev) => ({
+        ...prev,
+        [`${conflictDetails.uvcIndex}-${conflictDetails.eanIndex}`]: true,
+      }));
+  
+      // Réinitialiser les détails du conflit
+      setConflictDetails(null);
+    }
+  };
+  
+  
+  
   const debounceCheckEan = (() => {
     let timeout: NodeJS.Timeout | null = null;
 
     return (uvcIndex: number, eanIndex: number, value: string) => {
-      if (timeout) clearTimeout(timeout);
+        if (timeout) clearTimeout(timeout);
 
-      timeout = setTimeout(async () => {
-        const uvcId = uvcDimension[uvcIndex]?.id; // Récupération de l'UVC ID
-        const result = await onCheckEan(value, uvcId, eanIndex); // Inclure uvcId et eanIndex
-        console.log(`Validation pour ${uvcIndex}-${eanIndex}:`, result);
+        // Ignorer les validations si la valeur est vide
+        if (value.trim() === "") return;
 
-        const isDuplicate = result.exists && result.uvcId !== uvcId; // Vérifie si l'UVC est différent
+        timeout = setTimeout(async () => {
+            const uvcId = uvcDimension[uvcIndex]?.id;
 
-        setValidationErrors((prev) => ({
-          ...prev,
-          [`${uvcIndex}-${eanIndex}`]: isDuplicate,
-        }));
+            const hasDuplicateInSameUVC = checkForDuplicatesInSameUVC(
+                uvcIndex,
+                eanIndex,
+                value
+            );
 
-        if (isDuplicate) {
-          setLinkedProductId(result.productId);
-          setConflictDetails({ ean: value, uvcId: result.uvcId!, eanIndex });
-          setShowModal(true);
-        }
-      }, 500);
+            if (hasDuplicateInSameUVC) {
+                setValidationErrors((prev) => ({
+                    ...prev,
+                    [`${uvcIndex}-${eanIndex}`]: true,
+                }));
+
+                setConflictDetails({
+                    ean: value,
+                    uvcId: uvcId,
+                    uvcIndex,
+                    eanIndex,
+                    originalValue:
+                        originalValues[`${uvcIndex}-${eanIndex}`] ||
+                        uvcDimension[uvcIndex].eans[eanIndex],
+                });
+
+                setShowModal(true);
+                // PAS DE RETURN ICI -> Continuer pour appeler le backend
+            }
+
+            // Appeler le backend pour vérifier globalement
+            const result = await onCheckEan(value, uvcId, eanIndex);
+            const isDuplicate = result.exists && result.uvcId !== uvcId;
+
+            setValidationErrors((prev) => ({
+                ...prev,
+                [`${uvcIndex}-${eanIndex}`]: isDuplicate,
+            }));
+
+            if (isDuplicate) {
+                setConflictDetails({
+                    ean: value,
+                    uvcId: result.uvcId!,
+                    uvcIndex,
+                    eanIndex,
+                    originalValue:
+                        originalValues[`${uvcIndex}-${eanIndex}`] ||
+                        uvcDimension[uvcIndex].eans[eanIndex],
+                });
+                setLinkedProductId(result.productId);
+                setShowModal(true);
+            }
+        }, 500);
     };
-  })();
+})();
+
+  
+  
+
+  useEffect(() => {
+    // À chaque changement de `uvcDimension`, mettez à jour les valeurs de base
+    setBaseValues(
+      uvcDimension.map((uvc) => ({ id: uvc.id, eans: [...uvc.eans] }))
+    );
+    setDisplayValues(
+      uvcDimension.map((uvc) => ({ id: uvc.id, eans: [...uvc.eans] }))
+    );
+  }, [uvcDimension]);
+
+  useEffect(() => {
+    const initialValues: { [key: string]: string } = {};
+    uvcDimension.forEach((uvc, uvcIndex) => {
+      uvc.eans.forEach((ean, eanIndex) => {
+        initialValues[`${uvcIndex}-${eanIndex}`] = ean;
+      });
+    });
+    setOriginalValues(initialValues);
+  }, [uvcDimension]);
 
   const handleUpdateEan = async (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -186,7 +338,7 @@ const UVCEanTable: React.FC<UVCEanTableProps> = ({
                 Mettre à jour l'EAN
               </button>
               <button
-                onClick={() => setShowModal(false)}
+                onClick={handleCancel}
                 className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
               >
                 Annuler
@@ -200,24 +352,24 @@ const UVCEanTable: React.FC<UVCEanTableProps> = ({
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-gray-50">
-            <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
+            <th className="border px-4 text-sm font-semibold text-gray-600 w-[200px]">
               Code UVC
             </th>
-            <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
+            <th className="border px-4 py-2 text-sm font-semibold text-gray-600]  w-[200px]">
               Couleur
             </th>
-            <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
+            <th className="border px-4 py-2 text-sm font-semibold text-gray-600  w-[200px]">
               Taille
             </th>
-            <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
+            <th className="border px-4 py-2 text-sm font-semibold text-gray-600 w-[200px]">
               EAN Principal
             </th>
-            {uvcDimension[0]?.eans.map((_, eanIndex) => (
+            {Array.from({ length: 9 }, (_, index) => (
               <th
-                key={eanIndex}
-                className="border px-4 py-2 text-sm font-semibold text-gray-600"
+                key={`ean-${index + 2}`}
+                className="border px-4 py-2 text-sm font-semibold text-gray-600 w-[150px]"
               >
-                EAN {eanIndex + 2}
+                <p className="w-[150px]">EAN {index + 2}</p>
               </th>
             ))}
           </tr>
@@ -241,35 +393,29 @@ const UVCEanTable: React.FC<UVCEanTableProps> = ({
                 <td className="border px-4 py-2 text-center text-sm">
                   {uvc.ean || "-"}
                 </td>
-                {uvc.eans && Array.isArray(uvc.eans) ? (
-                  uvc.eans.map((ean, eanIndex) => (
-                    <td
-                      key={eanIndex}
-                      className="border px-4 py-2 text-center text-sm bg-blue-50"
-                    >
-                      {isModify && isModifyUvc ? (
-                        <input
-                          type="text"
-                          className={`border px-2 py-1 text-sm w-full ${
-                            validationErrors[`${uvcIndex}-${eanIndex}`]
-                              ? "border-red-500 focus:outline-none focus:ring-red-500 transition-all focus:border-[2px] focus:border-red-500 focus:shadow-[0_0px_0px_5px_rgba(232,62,39,0.2)]"
-                              : ""
-                          }`}
-                          value={ean}
-                          onChange={(e) =>
-                            handleEanChange(uvcIndex, eanIndex, e.target.value)
-                          }
-                        />
-                      ) : (
-                        ean || "-"
-                      )}
-                    </td>
-                  ))
-                ) : (
-                  <td colSpan={4} className="text-center text-red-500">
-                    Aucun EAN disponible
+                {Array.from({ length: 9 }, (_, eanIndex) => (
+                  <td
+                    key={`uvc-${uvcIndex}-ean-${eanIndex + 1}`}
+                    className="border px-4 py-2 text-center text-sm bg-blue-50 w-[150px]"
+                  >
+                    {isModify && isModifyUvc ? (
+                      <input
+                        type="text"
+                        className={`border px-2 py-1 text-sm w-[150px] ${
+                          validationErrors[`${uvcIndex}-${eanIndex}`]
+                            ? "border-red-500 focus:outline-none focus:ring-red-500 transition-all focus:border-[2px] focus:border-red-500 focus:shadow-[0_0px_0px_5px_rgba(232,62,39,0.2)]"
+                            : ""
+                        }`}
+                        value={uvc.eans?.[eanIndex] || ""}
+                        onChange={(e) =>
+                          handleEanChange(uvcIndex, eanIndex, e.target.value)
+                        }
+                      />
+                    ) : (
+                      uvc.eans?.[eanIndex] || "-"
+                    )}
                   </td>
-                )}
+                ))}
               </tr>
             );
           })}
