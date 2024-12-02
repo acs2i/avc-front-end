@@ -236,6 +236,7 @@ export default function SingleProductPage() {
   const token = useSelector((state: any) => state.auth.token);
   const creatorId = useSelector((state: any) => state.auth.user);
   const [hasFormatError, setHasFormatError] = useState(false);
+  const [editableColumnIndex, setEditableColumnIndex] = useState<number | null>(null);
   const [fieldValues, setFieldValues] = useState<{ [key: string]: any }>({});
   const [hasEanConflict, setHasEanConflict] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
@@ -1762,12 +1763,18 @@ export default function SingleProductPage() {
     }
   };
 
+  const handleColumnEdit = (index: number) => {
+    setEditableColumnIndex(index);
+  };
+
   useEffect(() => {
     if (!isModify) {
       setIsModifyUvc(false);
     }
   }, [isModify]);
-console.log(formData)
+
+console.log(product)
+
   return (
     <>
       <Modal
@@ -2654,7 +2661,7 @@ console.log(formData)
                     blue
                     type="button"
                     onClick={() => setIsModifyUvc((prev) => !prev)}
-                    disabled={isLoading || hasEanConflict || hasFormatError}
+                    disabled={isLoading || hasEanConflict}
                   >
                     {isModifyUvc ? "Générer les UVC" : "Modifier les UVC"}
                   </Button>
@@ -2836,24 +2843,30 @@ console.log(formData)
                       eans: uvc.eans || ["-"],
                     }))}
                     onUpdateEan={(uvcIndex, eanIndex, value) => {
-                      const previousEans = formData.uvc_ids.map((uvc) => [...uvc.eans]);
-                      try {
-                        setFormData((prev) => {
+                      setFormData(prev => {
                           const updatedUvc = [...prev.uvc_ids];
-                          updatedUvc[uvcIndex].eans[eanIndex] = value; // Mettre à jour temporairement
+                          
+                          // Si c'est une mise à jour globale (-1)
+                          if (eanIndex === -1) {
+                              if (updatedUvc[uvcIndex]?.eans) {
+                                  updatedUvc[uvcIndex].eans = updatedUvc[uvcIndex].eans.map(ean => 
+                                      ean === value ? value : ean
+                                  );
+                              }
+                          } else {
+                              // Mise à jour d'un EAN spécifique
+                              if (!updatedUvc[uvcIndex].eans) {
+                                  updatedUvc[uvcIndex].eans = [];
+                              }
+                              updatedUvc[uvcIndex].eans[eanIndex] = value;
+                          }
+                          
                           return { ...prev, uvc_ids: updatedUvc };
-                        });
-                      } catch (error) {
-                        // Si une erreur survient, remettez la valeur précédente
-                        setFormData((prev) => {
-                          const restoredUvc = [...prev.uvc_ids];
-                          restoredUvc[uvcIndex].eans = previousEans[uvcIndex];
-                          return { ...prev, uvc_ids: restoredUvc };
-                        });
-                      }
-                    }}
+                      });
+                  }}
                     onCheckEan={async (ean, uvcId, currentEanIndex) => {
                       try {
+                        
                         const response = await fetch(
                           `${process.env.REACT_APP_URL_DEV}/api/v1/uvc/check-eans`,
                           {
