@@ -6,6 +6,8 @@ interface UVCInfosTableProps {
   reference: string;
   isModify?: boolean;
   block?: any;
+  reason?: string;
+  reason_display?: boolean;
   uvcDimension: { code: string; dimensions: string[]; collectionUvc: any }[];
   customStyles: any;
   placeholder: (index: number) => string;
@@ -16,6 +18,8 @@ const UVCBlockTable: React.FC<UVCInfosTableProps> = ({
   reference,
   isModify,
   block,
+  reason,
+  reason_display,
   uvcDimension,
   customStyles,
   placeholder,
@@ -60,6 +64,9 @@ const UVCBlockTable: React.FC<UVCInfosTableProps> = ({
             <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
               Blocage
             </th>
+            <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
+              Motif
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -80,6 +87,9 @@ const UVCBlockTable: React.FC<UVCInfosTableProps> = ({
                 </td>
                 <td className="border px-4 py-2 text-center text-sm">
                  {block}
+                </td>
+                <td className="border px-4 py-2 text-center text-sm">
+                 {reason}
                 </td>
               </tr>
             );

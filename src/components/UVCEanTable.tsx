@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { isValidEan13 } from "../utils/func/checkEan";
-import { Pen } from "lucide-react";
+import { OctagonX, Pen, TriangleAlert } from "lucide-react";
 import { isValid } from "date-fns";
+import { Tooltip } from "@mui/material";
 
 interface ConflictDetails {
   ean: string;
@@ -23,6 +24,7 @@ interface UVCEanTableProps {
     ean: string;
     eans: string[];
   }[];
+  onResetConflict: () => void;
   onUpdateEan: (uvcIndex: number, eanIndex: number, value: string) => void;
   onCheckEan: (
     ean: string,
@@ -42,6 +44,7 @@ const UVCEanTable: React.FC<UVCEanTableProps> = ({
   onUpdateEan,
   onCheckEan,
   onFormatErrorChange,
+  onResetConflict,
   isModify,
   isModifyUvc,
 }) => {
@@ -49,9 +52,10 @@ const UVCEanTable: React.FC<UVCEanTableProps> = ({
     [key: string]: boolean;
   }>({});
   const [showModal, setShowModal] = useState(false);
+  const [focusedInput, setFocusedInput] = useState<string | null>(null);
   const [invalidEanErrors, setInvalidEanErrors] = useState<{
     [key: string]: boolean;
-  }>({});  
+  }>({});
   const [originalValues, setOriginalValues] = useState<{
     [key: string]: string;
   }>({});
@@ -79,75 +83,79 @@ const UVCEanTable: React.FC<UVCEanTableProps> = ({
     );
   };
 
- const handleEanChange = (
-  uvcIndex: number,
-  eanIndex: number,
-  value: string
-) => {
-  const key = `${uvcIndex}-${eanIndex}`;
+  const handleEanChange = (
+    uvcIndex: number,
+    eanIndex: number,
+    value: string
+  ) => {
+    const key = `${uvcIndex}-${eanIndex}`;
+    onResetConflict();
+    // Si la valeur est vide, nettoyer les erreurs et arrêter la validation
+    if (value.trim() === "") {
+      setInvalidEanErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[key];
+        return newErrors;
+      });
 
-  // Si la valeur est vide, nettoyer les erreurs et arrêter la validation
-  if (value.trim() === "") {
-    setInvalidEanErrors((prev) => {
-      const newErrors = { ...prev };
-      delete newErrors[key];
-      return newErrors;
-    });
+      setValidationErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[key];
+        return newErrors;
+      });
 
+      // Réinitialiser les détails du conflit
+      if (
+        conflictDetails?.uvcIndex === uvcIndex &&
+        conflictDetails?.eanIndex === eanIndex
+      ) {
+        setConflictDetails(null);
+      }
+
+      onFormatErrorChange(false);
+
+      // Restaurer la valeur vide dans le parent
+      onUpdateEan(uvcIndex, eanIndex, "");
+      return;
+    }
+
+    // Si une saisie commence, réinitialiser les erreurs associées
     setValidationErrors((prev) => {
       const newErrors = { ...prev };
       delete newErrors[key];
       return newErrors;
     });
 
-    // Réinitialiser les détails du conflit
-    if (conflictDetails?.uvcIndex === uvcIndex && conflictDetails?.eanIndex === eanIndex) {
-      setConflictDetails(null);
+    setInvalidEanErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[key];
+      return newErrors;
+    });
+
+    // Sauvegarder la valeur originale si elle n'existe pas déjà
+    if (!(key in originalValues)) {
+      setOriginalValues((prev) => ({
+        ...prev,
+        [key]: uvcDimension[uvcIndex].eans[eanIndex],
+      }));
     }
 
-    // Restaurer la valeur vide dans le parent
-    onUpdateEan(uvcIndex, eanIndex, "");
-    return;
-  }
-
-  // Si une saisie commence, réinitialiser les erreurs associées
-  setValidationErrors((prev) => {
-    const newErrors = { ...prev };
-    delete newErrors[key];
-    return newErrors;
-  });
-
-  setInvalidEanErrors((prev) => {
-    const newErrors = { ...prev };
-    delete newErrors[key];
-    return newErrors;
-  });
-
-  // Sauvegarder la valeur originale si elle n'existe pas déjà
-  if (!(key in originalValues)) {
-    setOriginalValues((prev) => ({
+    const isValid = isValidEan13(value);
+    onFormatErrorChange(!isValid);
+    // Mettre à jour les erreurs de format localement
+    setInvalidEanErrors((prev) => ({
       ...prev,
-      [key]: uvcDimension[uvcIndex].eans[eanIndex],
+      [key]: !isValid,
     }));
-  }
 
-  const isValid = isValidEan13(value);
+    // Mettre à jour la valeur dans le parent
+    onUpdateEan(uvcIndex, eanIndex, value);
 
-  // Mettre à jour les erreurs de format localement
-  setInvalidEanErrors((prev) => ({
-    ...prev,
-    [key]: !isValid,
-  }));
-
-  // Mettre à jour la valeur dans le parent
-  onUpdateEan(uvcIndex, eanIndex, value);
-
-  // Si la valeur est valide, effectuer une vérification globale
-  if (isValid) {
-    debounceCheckEan(uvcIndex, eanIndex, value);
-  }
-};
-
+    // Si la valeur est valide, effectuer une vérification globale
+    if (isValid) {
+      debounceCheckEan(uvcIndex, eanIndex, value);
+    }
+  };
 
   const handleCancel = () => {
     if (conflictDetails) {
@@ -413,24 +421,47 @@ const UVCEanTable: React.FC<UVCEanTableProps> = ({
                     key={`uvc-${uvcIndex}-ean-${eanIndex + 1}`}
                     className="border px-4 py-2 text-center text-sm bg-blue-50 w-[150px]"
                   >
-                    {isModify && isModifyUvc ? (
-                      <input
-                        type="text"
-                        className={`border px-2 py-1 text-sm w-[150px] focus:outline-none ${
-                          invalidEanErrors[`${uvcIndex}-${eanIndex}`]
-                            ? "border-yellow-400"
-                            : validationErrors[`${uvcIndex}-${eanIndex}`]
-                            ? "border-red-500"
-                            : ""
-                        }`}
-                        value={uvc.eans?.[eanIndex] || ""}
-                        onChange={(e) =>
-                          handleEanChange(uvcIndex, eanIndex, e.target.value)
-                        }
-                      />
-                    ) : (
-                      uvc.eans?.[eanIndex] || "-"
-                    )}
+                    <div className="relative">
+                      {isModify && isModifyUvc ? (
+                        <input
+                          type="text"
+                          className={`border px-2 py-1 text-sm w-[150px] focus:outline-none rounded-md ${
+                            invalidEanErrors[`${uvcIndex}-${eanIndex}`]
+                              ? "border-[2px] border-yellow-400"
+                              : validationErrors[`${uvcIndex}-${eanIndex}`]
+                              ? "border-[2px] border-red-500"
+                              : ""
+                          }`}
+                          value={uvc.eans?.[eanIndex] || ""}
+                          onChange={(e) =>
+                            handleEanChange(uvcIndex, eanIndex, e.target.value)
+                          }
+                        />
+                      ) : (
+                        uvc.eans?.[eanIndex] || "-"
+                      )}
+
+                      {invalidEanErrors[`${uvcIndex}-${eanIndex}`] && (
+                        <Tooltip
+                          title="Cet EAN ne correspond pas au format EAN 13"
+                          placement="top"
+                        >
+                          <div className="absolute top-[-5px] right-[-10px]">
+                            <TriangleAlert
+                              size={12}
+                              className="text-yellow-600"
+                            />
+                          </div>
+                        </Tooltip>
+                      )}
+                      {validationErrors[`${uvcIndex}-${eanIndex}`] && (
+                        <Tooltip title="Cet EAN existe déjà" placement="top">
+                          <div className="absolute top-[-5px] right-[-10px]">
+                            <OctagonX size={12} className="text-red-600" />
+                          </div>
+                        </Tooltip>
+                      )}
+                    </div>
                   </td>
                 ))}
               </tr>

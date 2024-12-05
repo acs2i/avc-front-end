@@ -140,6 +140,7 @@ export type Product = {
   brand_ids: any[];
   collection_ids: any[];
   blocked?: string;
+  blocked_reason_code?: string;
   height: string;
   width: string;
   length: string;
