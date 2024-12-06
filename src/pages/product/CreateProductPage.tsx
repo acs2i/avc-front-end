@@ -1365,7 +1365,7 @@ export default function CreateProductPage() {
                       type="button"
                       onClick={() => setIsModifyUvc((prev) => !prev)}
                     >
-                      {isModifyUvc ? "Générer les UVC" : "Modifier les UVC"}
+                      {isModifyUvc ? "Enregistrer" : "Modifier les UVC"}
                     </Button>
                   </div>
                 }

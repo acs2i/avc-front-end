@@ -49,6 +49,7 @@ import {
   Draggable,
   DropResult,
 } from "react-beautiful-dnd";
+import truncateText from "../../utils/func/Formattext";
 
 interface CustomField {
   field_name: string;
@@ -87,6 +88,8 @@ interface FormData {
   length: string;
   comment: string;
   size_unit: string;
+  blocked: string;
+  blocked_reason_code: string;
   weigth_unit: string;
   gross_weight: string;
   net_weight: string;
@@ -178,6 +181,8 @@ export default function DraftUpdatePage() {
     tbeu_pb: draft?.tbeu_pb || 0,
     tbeu_pmeu: draft?.tbeu_pmeu || 0,
     height: draft?.height || "",
+    blocked: draft?.blocked || "",
+    blocked_reason_code: draft?.blocked_reason_code || "",
     width: draft?.width || "",
     length: draft?.length || "",
     comment: draft?.comment || "",
@@ -443,6 +448,8 @@ export default function DraftUpdatePage() {
             },
             collectionUvc,
             barcodePath: "",
+            blocked: existingUvc.blocked || "Non",
+            blocked_reason_code: existingUvc.blocked_reason_code || "",
             eans: [],
             ean: "",
             status: "",
@@ -520,6 +527,8 @@ export default function DraftUpdatePage() {
         weigth_unit: draft.weigth_unit || "",
         gross_weight: draft.gross_weight || "",
         net_weight: draft.net_weight || "",
+        blocked: draft?.blocked || "",
+        blocked_reason_code: draft?.blocked_reason_code || "",
         imgPath: draft.imgPath || "",
         status: draft.status === "A" ? "A" : "I",
         additional_fields: draft.additional_fields || {},
@@ -1213,6 +1222,60 @@ export default function DraftUpdatePage() {
       setIsCreate(false);
     }
   };
+
+  const updateUvcProperty = (
+    index: number,
+    property: string,
+    value: any
+  ) => {
+    setFormData((prevFormDataUvc) => {
+      const updatedUvc = [...prevFormDataUvc.uvc];
+      updatedUvc[index] = {
+        ...updatedUvc[index],
+        [property]: value,
+      };
+  
+      // Synchronisez formData si applicable
+      if (property === "blocked" || property === "blocked_reason_code") {
+        setFormData((prevFormData) => {
+          const updatedUvcIds = [...prevFormData.uvc];
+          updatedUvcIds[index] = {
+            ...updatedUvcIds[index],
+            [property]: value,
+          };
+          return {
+            ...prevFormData,
+            uvc_ids: updatedUvcIds,
+          };
+        });
+      }
+  
+      return {
+        ...prevFormDataUvc,
+        uvc: updatedUvc,
+      };
+    });
+  };
+  
+  const handleUpdateBlocked = (index: number, updatedCollection: any) => {
+    const isBlockedNo = updatedCollection.blocked === "Non";
+  
+    // Met à jour la propriété `blocked`
+    updateUvcProperty(index, "blocked", updatedCollection.blocked);
+  
+    // Réinitialise `blocked_reason_code` si `blocked` est "Non"
+    if (isBlockedNo) {
+      updateUvcProperty(index, "blocked_reason_code", "");
+    }
+  };
+
+  const handleUpdateBlockReason = (index: number, updatedReason: any) => {
+    const reason = typeof updatedReason === "object" 
+      ? updatedReason.value || updatedReason.label 
+      : updatedReason;
+    updateUvcProperty(index, "blocked_reason_code", reason);
+  };
+  
 
   console.log(selectedSupplier);
   return (
@@ -2176,7 +2239,7 @@ export default function DraftUpdatePage() {
                     onClick={() => setIsModifyUvc((prev) => !prev)}
                     type="button"
                   >
-                    {isModifyUvc ? "Générer les UVC" : "Modifier les UVC"}
+                    {isModifyUvc ? "Enregistrer" : "Modifier les UVC"}
                   </Button>
                 )}
               </div>
@@ -2348,22 +2411,34 @@ export default function DraftUpdatePage() {
                 )}
                 {onglet === "bloc" && draft && (
                   <UVCBlockTable
-                    isModify={isModifyUvc}
-                    reference={draft?.reference}
-                    placeholder={(index) =>
-                      formData.uvc[index]?.collectionUvc ||
-                      formData.collection_ids[0]?.label ||
-                      ""
-                    }
-                    block="Non"
-                    uvcDimension={formData.uvc.map((uvc) => ({
-                      code: uvc.code,
-                      dimensions: uvc.dimensions,
-                      collectionUvc: uvc.collectionUvc,
-                    }))}
-                    customStyles={customStyles}
-                    handleUpdateCollection={handleUpdateCollection}
-                  />
+                  isModify={isModify}
+                  isModifyUvc={isModifyUvc}
+                  reference={truncateText(product?.reference, 15) || ""}
+                  placeholder={(index) => {
+                    const uvcSpecific = formData.uvc[index]?.blocked_reason_code;
+                    const productGlobal = formData.blocked_reason_code;
+                    const uvcGlobal = formData.uvc?.[index]?.blocked_reason_code;
+                  
+                    // Si l'une de ces valeurs est un objet, prenez la clé `label` ou `value`
+                    const formatBlockedReason = (reason: any) =>
+                      typeof reason === "object" && reason !== null ? reason.label || reason.value || "" : reason;
+                  
+                    return formatBlockedReason(uvcSpecific) || formatBlockedReason(productGlobal) || formatBlockedReason(uvcGlobal) || "";
+                  }}
+                  
+                  blockValue={formData.blocked}
+                  reason={formData.blocked_reason_code || "-"}
+                  uvcDimension={formData.uvc.map((uvc) => ({
+                    code: uvc.code,
+                    dimensions: uvc.dimensions,
+                    collectionUvc: uvc.collectionUvc,
+                    blocked: uvc.blocked,
+                    blocked_reason_code: uvc.blocked_reason_code,
+                  }))} 
+                  customStyles={customStyles}
+                  handleUpdateBlocked={handleUpdateBlocked}
+                  handleUpdateBlockedReason={handleUpdateBlockReason}
+                />
                 )}
               </div>
             )}

@@ -374,6 +374,7 @@ export default function SingleProductPage() {
         ean: "",
         status: "",
         blocked: "",
+        blocked_reason_code: "",
         barcodePath: "",
         height: product?.height || "",
         width: product?.width || "",
@@ -1805,12 +1806,67 @@ export default function SingleProductPage() {
   };
 
   useEffect(() => {
-    const selectedBlockId = blocks[0]?._id || ""; // Récupérer le premier ID ou une chaîne vide
+    const selectedBlockId = blocks[0]?._id || ""; 
     setFormData((prevFormData) => ({
       ...prevFormData,
-      blocked_reason_code: selectedBlockId, // Assigner un seul ID
+      blocked_reason_code: selectedBlockId,
     }));
   }, [blocks]);
+
+
+  const updateUvcProperty = (
+    index: number,
+    property: string,
+    value: any
+  ) => {
+    setFormDataUvc((prevFormDataUvc) => {
+      const updatedUvc = [...prevFormDataUvc.uvc];
+      updatedUvc[index] = {
+        ...updatedUvc[index],
+        [property]: value,
+      };
+  
+      // Synchronisez formData si applicable
+      if (property === "blocked" || property === "blocked_reason_code") {
+        setFormData((prevFormData) => {
+          const updatedUvcIds = [...prevFormData.uvc_ids];
+          updatedUvcIds[index] = {
+            ...updatedUvcIds[index],
+            [property]: value,
+          };
+          return {
+            ...prevFormData,
+            uvc_ids: updatedUvcIds,
+          };
+        });
+      }
+  
+      return {
+        ...prevFormDataUvc,
+        uvc: updatedUvc,
+      };
+    });
+  };
+  
+  const handleUpdateBlocked = (index: number, updatedCollection: any) => {
+    const isBlockedNo = updatedCollection.blocked === "Non";
+  
+    // Met à jour la propriété `blocked`
+    updateUvcProperty(index, "blocked", updatedCollection.blocked);
+  
+    // Réinitialise `blocked_reason_code` si `blocked` est "Non"
+    if (isBlockedNo) {
+      updateUvcProperty(index, "blocked_reason_code", "");
+    }
+  };
+
+  const handleUpdateBlockReason = (index: number, updatedReason: any) => {
+    const reason = typeof updatedReason === "object" 
+      ? updatedReason.value || updatedReason.label 
+      : updatedReason;
+    updateUvcProperty(index, "blocked_reason_code", reason);
+  };
+  
 
   console.log(formData);
 
@@ -2402,27 +2458,31 @@ export default function SingleProductPage() {
                           )}
                         </div>
 
-                        {formData.blocked === "Oui" && <div className="grid grid-cols-2 items-center gap-x-4">
-                          <span className="font-[700] text-slate-500 text-[12px]">
-                            Raison du blocage :
-                          </span>
-                          {!isModify ? (
-                            <div>
-                              <span className="col-span-6 text-gray-600 text-[14px]">
-                                {product?.blocked_reason_code ? product?.blocked_reason_code : "-"}
-                              </span>
-                            </div>
-                          ) : (
-                            <BlockSection
-                              blocks={blocks}
-                              optionsBlock={optionsBlock}
-                              handleChangeBlock={handleChangeBlock}
-                              handleInputChangeBlock={handleInputChangeBlock}
-                              inputValueBlock={inputValueBlock}
-                              customStyles={customStyles}
-                            />
-                          )}
-                        </div>}
+                        {formData.blocked === "Oui" && (
+                          <div className="grid grid-cols-2 items-center gap-x-4">
+                            <span className="font-[700] text-slate-500 text-[12px]">
+                              Raison du blocage :
+                            </span>
+                            {!isModify ? (
+                              <div>
+                                <span className="col-span-6 text-gray-600 text-[14px]">
+                                  {product?.blocked_reason_code
+                                    ? product?.blocked_reason_code
+                                    : "-"}
+                                </span>
+                              </div>
+                            ) : (
+                              <BlockSection
+                                blocks={blocks}
+                                optionsBlock={optionsBlock}
+                                handleChangeBlock={handleChangeBlock}
+                                handleInputChangeBlock={handleInputChangeBlock}
+                                inputValueBlock={inputValueBlock}
+                                customStyles={customStyles}
+                              />
+                            )}
+                          </div>
+                        )}
                       </div>
                     </FormSection>
                   </div>
@@ -2756,7 +2816,7 @@ export default function SingleProductPage() {
                     onClick={() => setIsModifyUvc((prev) => !prev)}
                     disabled={isLoading || hasEanConflict || hasFormatError}
                   >
-                    {isModifyUvc ? "Générer les UVC" : "Modifier les UVC"}
+                    {isModifyUvc ? "Enregistrer" : "Modifier les UVC"}
                   </Button>
                 </div>
               )}
@@ -2991,22 +3051,33 @@ export default function SingleProductPage() {
 
                 {onglet === "bloc" && product && (
                   <UVCBlockTable
-                    isModify={isModifyUvc}
+                    isModify={isModify}
+                    isModifyUvc={isModifyUvc}
                     reference={truncateText(product?.reference, 15) || ""}
-                    placeholder={(index) =>
-                      formData.uvc_ids[index]?.collectionUvc ||
-                      formData.collection_ids[0]?.label ||
-                      ""
-                    }
-                    block={formData.blocked}
-                    reason={formData.blocked_reason_code ? formData.blocked_reason_code : "-"} 
+                    placeholder={(index) => {
+                      const uvcSpecific = formData.uvc_ids[index]?.blocked_reason_code;
+                      const productGlobal = formData.blocked_reason_code;
+                      const uvcGlobal = formDataUvc.uvc?.[index]?.blocked_reason_code;
+                    
+                      // Si l'une de ces valeurs est un objet, prenez la clé `label` ou `value`
+                      const formatBlockedReason = (reason: any) =>
+                        typeof reason === "object" && reason !== null ? reason.label || reason.value || "" : reason;
+                    
+                      return formatBlockedReason(uvcSpecific) || formatBlockedReason(productGlobal) || formatBlockedReason(uvcGlobal) || "";
+                    }}
+                    
+                    blockValue={formData.blocked}
+                    reason={formData.blocked_reason_code || "-"}
                     uvcDimension={formData.uvc_ids.map((uvc) => ({
                       code: uvc.code,
                       dimensions: uvc.dimensions,
                       collectionUvc: uvc.collectionUvc,
-                    }))}
+                      blocked: uvc.blocked,
+                      blocked_reason_code: uvc.blocked_reason_code,
+                    }))} 
                     customStyles={customStyles}
-                    handleUpdateCollection={handleUpdateCollection}
+                    handleUpdateBlocked={handleUpdateBlocked}
+                    handleUpdateBlockedReason={handleUpdateBlockReason}
                   />
                 )}
               </div>

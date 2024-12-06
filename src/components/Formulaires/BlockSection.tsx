@@ -7,6 +7,7 @@ interface BlockSelectorProps {
   optionsBlock: any[];
   handleChangeBlock: (selectedOption: any, index: number) => void;
   handleInputChangeBlock: (inputValueBlock: string) => void;
+  placeholder?: string;
   inputValueBlock: string;
   customStyles: any;
 }
@@ -17,6 +18,7 @@ const BlockSection: React.FC<BlockSelectorProps> = ({
   handleChangeBlock,
   handleInputChangeBlock,
   inputValueBlock,
+  placeholder,
   customStyles,
 }) => {
   // Fonction de filtrage améliorée
@@ -55,7 +57,7 @@ const BlockSection: React.FC<BlockSelectorProps> = ({
                 filterOptions(input, [option.data])[0] !== undefined
               }
               formatOptionLabel={formatOptionLabel}
-              placeholder="Recherche..."
+              placeholder={placeholder}
               styles={{
                 ...customStyles,
                 menu: (base) => ({
