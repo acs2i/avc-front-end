@@ -237,6 +237,8 @@ const UVCEanTable: React.FC<UVCEanTableProps> = ({
     };
   })();
 
+  const hasValidationErrors = Object.keys(validationErrors).length > 0;
+
   useEffect(() => {
     // À chaque changement de `uvcDimension`, mettez à jour les valeurs de base
     setBaseValues(
@@ -435,6 +437,10 @@ const UVCEanTable: React.FC<UVCEanTableProps> = ({
                           value={uvc.eans?.[eanIndex] || ""}
                           onChange={(e) =>
                             handleEanChange(uvcIndex, eanIndex, e.target.value)
+                          }
+                          disabled={
+                            hasValidationErrors &&
+                            !validationErrors[`${uvcIndex}-${eanIndex}`]
                           }
                         />
                       ) : (
