@@ -140,6 +140,7 @@ export type Product = {
   brand_ids: any[];
   collection_ids: any[];
   blocked?: string;
+  blocked_reason_code?: string;
   height: string;
   width: string;
   length: string;
@@ -175,6 +176,8 @@ export type Draft = {
   length: string;
   comment: string;
   size_unit: string;
+  blocked?: string;
+  blocked_reason_code?: string;
   weigth_unit: string;
   gross_weight: string;
   net_weight: string;
@@ -212,6 +215,7 @@ export type Uvc = {
   barcodePath: string;
   status: string;
   blocked?: string;
+  blocked_reason_code?: string;
   height?: string;
   width?: string;
   length?: string;
@@ -235,6 +239,7 @@ export type DatalakeUvc = {
   collectionUvc: string;
   status: string;
   blocked?: string;
+  blocked_reason_code?: string;
   barcodePath: string;
   height?: string;
   width?: string;

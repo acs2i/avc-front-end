@@ -24,6 +24,7 @@ interface UVCGridProps {
   isFullScreen?: any;
   isModify?: boolean;
   isEditable?: boolean;
+  isProductPage?: boolean;
 }
 
 interface Grid {
@@ -57,6 +58,8 @@ const UVCGrid: React.FC<UVCGridProps> = ({
   const [showSizeGridOptions, setShowSizeGridOptions] = useState(false);
   const [showColorGridOptions, setShowColorGridOptions] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newSizes, setNewSizes] = useState<number[]>([]);
+  const [newColors, setNewColors] = useState<number[]>([]);
 
   useEffect(() => {
     updateDimensions(uvcGrid);
@@ -135,19 +138,25 @@ const UVCGrid: React.FC<UVCGridProps> = ({
   };
 
   const addNewColor = () => {
-    const newColors = [...colors, ""];
+    // Ajoute une nouvelle couleur vide au tableau des couleurs
+    const newColorsArray = [...colors, ""];
+    // Ajoute une nouvelle ligne au tableau uvcGrid avec des cases par défaut cochées
     const newGrid = [...uvcGrid, sizes.map(() => true)];
-    setColors(newColors);
+    // Met à jour les couleurs et la grille
+    setColors(newColorsArray);
     setUvcGrid(newGrid);
     updateDimensions(newGrid);
+    // Ajoute l'index de la nouvelle couleur dans newColors pour permettre sa modification
+    setNewColors([...newColors, newColorsArray.length - 1]);
   };
 
   const addNewSize = () => {
-    const newSizes = [...sizes, ""];
-    const newGrid = uvcGrid.map((row) => [...row, true]);
-    setSizes(newSizes);
+    const newSizesArray = [...sizes, ""]; // Ajoute une nouvelle taille vide
+    const newGrid = uvcGrid.map((row) => [...row, true]); // Ajoute une colonne cochée
+    setSizes(newSizesArray);
     setUvcGrid(newGrid);
     updateDimensions(newGrid);
+    setNewSizes([...newSizes, newSizesArray.length - 1]); // Ajoute l'index (nombre)
   };
 
   const handleColorChange = (index: number, value: string) => {
@@ -378,7 +387,7 @@ const UVCGrid: React.FC<UVCGridProps> = ({
                   scope="col"
                   className="px-1 py-2 text-center border border-solid border-gray-300 border-b"
                 >
-                  {isModify && isEditable ? (
+                  {isModify && (isEditable || newSizes.includes(index)) ? (
                     <div className="relative">
                       <input
                         type="text"
@@ -409,7 +418,8 @@ const UVCGrid: React.FC<UVCGridProps> = ({
                 className="border text-gray-700 cursor-pointer"
               >
                 <td className="max-w-[200px] py-2 px-2 border">
-                  {isModify && isEditable ? (
+                  {isModify &&
+                  (isEditable || newColors.includes(colorIndex)) ? (
                     <div className="flex items-center">
                       <button
                         onClick={() => handleDeleteRow(colorIndex)}
@@ -439,7 +449,28 @@ const UVCGrid: React.FC<UVCGridProps> = ({
                       <input
                         type="checkbox"
                         checked={uvcGrid[colorIndex][sizeIndex]}
-                        onChange={() => toggleCheckbox(colorIndex, sizeIndex)}
+                        onChange={() =>
+                          (isEditable ||
+                            newSizes.includes(sizeIndex) ||
+                            newColors.includes(colorIndex)) &&
+                          toggleCheckbox(colorIndex, sizeIndex)
+                        }
+                        disabled={
+                          !(
+                            isEditable ||
+                            newSizes.includes(sizeIndex) ||
+                            newColors.includes(colorIndex)
+                          )
+                        }
+                        className={
+                          !(
+                            isEditable ||
+                            newSizes.includes(sizeIndex) ||
+                            newColors.includes(colorIndex)
+                          )
+                            ? "cursor-not-allowed"
+                            : ""
+                        }
                       />
                     ) : uvcGrid[colorIndex][sizeIndex] ? (
                       <div className="flex items-center justify-center">

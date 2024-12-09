@@ -53,6 +53,8 @@ import {
   DropResult,
 } from "react-beautiful-dnd";
 import truncateText from "../../utils/func/Formattext";
+import BlockSection from "../../components/Formulaires/BlockSection";
+import { useBlocks } from "../../utils/hooks/useBlock";
 
 interface formDataUVC {
   uvc: DatalakeUvc[];
@@ -110,6 +112,7 @@ interface FormData {
   length: string;
   comment: string;
   blocked: string;
+  blocked_reason_code: string;
   size_unit: string;
   weigth_unit: string;
   gross_weight: string;
@@ -122,6 +125,13 @@ interface FormData {
   initialColors: any[];
   initialGrid: any[];
 }
+
+type BlockOption = {
+  _id: string;
+  value: string;
+  code: number;
+  label: string;
+};
 
 interface SupplierListProps {
   suppliers: SuppliersOption[];
@@ -235,6 +245,10 @@ export default function SingleProductPage() {
   const { id } = useParams();
   const token = useSelector((state: any) => state.auth.token);
   const creatorId = useSelector((state: any) => state.auth.user);
+  const [hasFormatError, setHasFormatError] = useState(false);
+  const [editableColumnIndex, setEditableColumnIndex] = useState<number | null>(
+    null
+  );
   const [fieldValues, setFieldValues] = useState<{ [key: string]: any }>({});
   const [hasEanConflict, setHasEanConflict] = useState(false);
   const { notifySuccess, notifyError } = useNotify();
@@ -319,10 +333,23 @@ export default function SingleProductPage() {
     weigth_unit: product?.weigth_unit || "",
     gross_weight: product?.gross_weight || "",
     net_weight: product?.net_weight || "",
-    blocked: product?.blocked || "",
+    blocked: product?.blocked || "Non",
+    blocked_reason_code: product?.blocked_reason_code || "",
     imgPath: "",
     status: "A",
-    uvc_ids: [],
+    uvc_ids: product?.uvc_ids || [
+      {
+        _id: "",
+        code: "",
+        dimensions: [],
+        eans: ["-"], // Ajoutez une valeur par défaut vide
+        ean: "",
+        prices: {
+          supplier_id: "",
+          price: { paeu: 0, tbeu_pb: 0, tbeu_pmeu: 0 },
+        },
+      },
+    ],
     initialSizes: ["000"],
     initialColors: ["000"],
     initialGrid: [[true]],
@@ -347,6 +374,7 @@ export default function SingleProductPage() {
         ean: "",
         status: "",
         blocked: "",
+        blocked_reason_code: "",
         barcodePath: "",
         height: product?.height || "",
         width: product?.width || "",
@@ -356,6 +384,15 @@ export default function SingleProductPage() {
       },
     ],
   });
+  const {
+    inputValueBlock,
+    optionsBlock,
+    blocks,
+    handleInputChangeBlock,
+    handleChangeBlock,
+    addBlockField,
+    removeBrandField,
+  } = useBlocks("", 10);
 
   // Ajoutez ces fonctions juste après vos interfaces et avant votre composant
   const isDifferent = (oldValue: any, newValue: any): boolean => {
@@ -603,6 +640,11 @@ export default function SingleProductPage() {
     return result;
   };
 
+  const handleFormatErrorChange = (hasError: boolean) => {
+    setHasFormatError(hasError);
+    console.log(hasFormatError);
+  };
+
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
 
@@ -653,6 +695,7 @@ export default function SingleProductPage() {
         weigth_unit: product?.weigth_unit || "",
         gross_weight: product?.gross_weight || "",
         blocked: product?.blocked || "",
+        blocked_reason_code: product?.blocked_reason_code || "",
         net_weight: product?.net_weight || "",
         imgPath: product.imgPath || "",
         status: product.status || "A",
@@ -699,7 +742,7 @@ export default function SingleProductPage() {
           },
           collectionUvc:
             uvc.collectionUvc || product.collection_ids[0]?.label || "",
-          eans: uvc.eans || [],
+          eans: uvc.eans || ["-"],
           ean: uvc.ean || "",
           status: uvc.status || "A",
           made_in: uvc.made_in,
@@ -1282,7 +1325,7 @@ export default function SingleProductPage() {
             formData.uvc_ids[i]?.collectionUvc ||
             formData.collection_ids[0]?.label ||
             "Aucune collection enregistré",
-          eans: existingUvc?.eans || [],
+          eans: existingUvc?.eans || ["-"],
           ean: existingUvc?.ean || "",
           barcodePath: existingUvc?.barcodePath || "",
           height: existingUvc?.height || "",
@@ -1748,11 +1791,84 @@ export default function SingleProductPage() {
     }
   };
 
+  const handleColumnEdit = (index: number) => {
+    setEditableColumnIndex(index);
+  };
+
   useEffect(() => {
     if (!isModify) {
       setIsModifyUvc(false);
     }
   }, [isModify]);
+
+  const resetHasEanConflict = () => {
+    setHasEanConflict(false);
+  };
+
+  useEffect(() => {
+    const selectedBlockId = blocks[0]?._id || ""; 
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      blocked_reason_code: selectedBlockId,
+    }));
+  }, [blocks]);
+
+
+  const updateUvcProperty = (
+    index: number,
+    property: string,
+    value: any
+  ) => {
+    setFormDataUvc((prevFormDataUvc) => {
+      const updatedUvc = [...prevFormDataUvc.uvc];
+      updatedUvc[index] = {
+        ...updatedUvc[index],
+        [property]: value,
+      };
+  
+      // Synchronisez formData si applicable
+      if (property === "blocked" || property === "blocked_reason_code") {
+        setFormData((prevFormData) => {
+          const updatedUvcIds = [...prevFormData.uvc_ids];
+          updatedUvcIds[index] = {
+            ...updatedUvcIds[index],
+            [property]: value,
+          };
+          return {
+            ...prevFormData,
+            uvc_ids: updatedUvcIds,
+          };
+        });
+      }
+  
+      return {
+        ...prevFormDataUvc,
+        uvc: updatedUvc,
+      };
+    });
+  };
+  
+  const handleUpdateBlocked = (index: number, updatedCollection: any) => {
+    const isBlockedNo = updatedCollection.blocked === "Non";
+  
+    // Met à jour la propriété `blocked`
+    updateUvcProperty(index, "blocked", updatedCollection.blocked);
+  
+    // Réinitialise `blocked_reason_code` si `blocked` est "Non"
+    if (isBlockedNo) {
+      updateUvcProperty(index, "blocked_reason_code", "");
+    }
+  };
+
+  const handleUpdateBlockReason = (index: number, updatedReason: any) => {
+    const reason = typeof updatedReason === "object" 
+      ? updatedReason.value || updatedReason.label 
+      : updatedReason;
+    updateUvcProperty(index, "blocked_reason_code", reason);
+  };
+  
+
+  console.log(formData);
 
   return (
     <>
@@ -1952,7 +2068,7 @@ export default function SingleProductPage() {
                     size="small"
                     type="submit"
                     blue
-                    disabled={isLoading || hasEanConflict}
+                    disabled={isLoading || hasEanConflict || hasFormatError}
                   >
                     Valider
                   </Button>
@@ -2234,18 +2350,20 @@ export default function SingleProductPage() {
                   {/* Caractéristiques produit */}
                   <div className="w-1/4">
                     <FormSection title="Caractéristiques Produit">
-                      <div className="mt-3">
-                        <div className="flex items-center gap-2 py-2">
+                      <div className="mt-3 grid grid-cols-1 gap-2">
+                        <div className="grid grid-cols-2 items-center gap-x-4">
                           <span className="font-[700] text-slate-500 text-[12px]">
                             Type :
                           </span>
                           {!isModify ? (
-                            <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px] capitalize">
-                              {product.type ? product.type : "Marchandise"}
-                            </span>
+                            <div>
+                              <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px] capitalize">
+                                {product.type ? product.type : "Marchandise"}
+                              </span>
+                            </div>
                           ) : (
                             <select
-                              className="w-[200px] border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 py-2"
+                              className="w-full border rounded-md p-1 bg-white focus:outline-none focus:border-blue-500 py-2"
                               value={formData.type}
                               onChange={(e) => handleTypeChange(e.target.value)}
                             >
@@ -2257,39 +2375,43 @@ export default function SingleProductPage() {
                             </select>
                           )}
                         </div>
-                        <div className="flex items-center gap-2 py-2">
+                        <div className="grid grid-cols-2 items-center gap-x-4">
                           <span className="font-[700] text-slate-500 text-[12px]">
                             Dimensions :
                           </span>
-                          <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px] capitalize">
-                            {product.dimension_types &&
-                            product.dimension_types.length > 0 ? (
-                              product.dimension_types.join(" / ")
-                            ) : (
-                              <CircleSlash2 size={15} />
-                            )}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2 py-2">
-                          <span className="font-[700] text-slate-500 text-[12px]">
-                            Collection :
-                          </span>
-                          {!isModify ? (
-                            <span className="col-span-6 text-gray-600 text-[14px]">
-                              {product.collection_ids &&
-                              product.collection_ids.length > 0 ? (
-                                product.collection_ids.map(
-                                  (collection, index) => (
-                                    <p key={index}>{collection.label}</p>
-                                  )
-                                )
+                          <div>
+                            <span className="col-span-6 text-gray-600 whitespace-nowrap overflow-ellipsis overflow-hidden text-[14px] capitalize">
+                              {product.dimension_types &&
+                              product.dimension_types.length > 0 ? (
+                                product.dimension_types.join(" / ")
                               ) : (
                                 <CircleSlash2 size={15} />
                               )}
                             </span>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 items-center gap-x-4">
+                          <span className="font-[700] text-slate-500 text-[12px]">
+                            Collection :
+                          </span>
+                          {!isModify ? (
+                            <div>
+                              <span className="col-span-6 text-gray-600 text-[14px]">
+                                {product.collection_ids &&
+                                product.collection_ids.length > 0 ? (
+                                  product.collection_ids.map(
+                                    (collection, index) => (
+                                      <p key={index}>{collection.label}</p>
+                                    )
+                                  )
+                                ) : (
+                                  <CircleSlash2 size={15} />
+                                )}
+                              </span>
+                            </div>
                           ) : (
                             <CreatableSelect
-                              className="w-[180px]"
+                              className="w-full"
                               value={selectedOptionCollection}
                               onChange={handleChangeCollection}
                               onInputChange={handleInputChangeCollection}
@@ -2309,6 +2431,58 @@ export default function SingleProductPage() {
                             />
                           )}
                         </div>
+                        <div className="grid grid-cols-2 items-center gap-x-4">
+                          <span className="font-[700] text-slate-500 text-[12px]">
+                            Blocage :
+                          </span>
+                          {!isModify ? (
+                            <div>
+                              <span className="col-span-6 text-gray-600 text-[14px]">
+                                {formData.blocked === "Oui" ? "Oui" : "Non"}
+                              </span>
+                            </div>
+                          ) : (
+                            <select
+                              className="w-full border rounded-md p-1 bg-white text-gray-600 focus:outline-none focus:border-blue-500"
+                              value={formData.blocked}
+                              onChange={(e) =>
+                                setFormData((prevFormData) => ({
+                                  ...prevFormData,
+                                  blocked: e.target.value,
+                                }))
+                              }
+                            >
+                              <option value="Non">Non</option>
+                              <option value="Oui">Oui</option>
+                            </select>
+                          )}
+                        </div>
+
+                        {formData.blocked === "Oui" && (
+                          <div className="grid grid-cols-2 items-center gap-x-4">
+                            <span className="font-[700] text-slate-500 text-[12px]">
+                              Raison du blocage :
+                            </span>
+                            {!isModify ? (
+                              <div>
+                                <span className="col-span-6 text-gray-600 text-[14px]">
+                                  {product?.blocked_reason_code
+                                    ? product?.blocked_reason_code
+                                    : "-"}
+                                </span>
+                              </div>
+                            ) : (
+                              <BlockSection
+                                blocks={blocks}
+                                optionsBlock={optionsBlock}
+                                handleChangeBlock={handleChangeBlock}
+                                handleInputChangeBlock={handleInputChangeBlock}
+                                inputValueBlock={inputValueBlock}
+                                customStyles={customStyles}
+                              />
+                            )}
+                          </div>
+                        )}
                       </div>
                     </FormSection>
                   </div>
@@ -2640,9 +2814,9 @@ export default function SingleProductPage() {
                     blue
                     type="button"
                     onClick={() => setIsModifyUvc((prev) => !prev)}
-                    disabled={isLoading || hasEanConflict}
+                    disabled={isLoading || hasEanConflict || hasFormatError}
                   >
-                    {isModifyUvc ? "Générer les UVC" : "Modifier les UVC"}
+                    {isModifyUvc ? "Enregistrer" : "Modifier les UVC"}
                   </Button>
                 </div>
               )}
@@ -2652,7 +2826,7 @@ export default function SingleProductPage() {
                 className={`border-t-[1px] border-gray-300 px-5 py-2 overflow-y-auto ${
                   isFullScreen
                     ? "fixed right-0 top-0 w-full h-screen z-[9999] bg-gray-100"
-                    : "w-[70%]"
+                    : "w-full"
                 }`}
               >
                 <UVCGrid
@@ -2668,7 +2842,7 @@ export default function SingleProductPage() {
                   uvcGrid={uvcGrid}
                   isFullScreen={toggleFullScreen}
                   isModify={isModifyUvc}
-                  isEditable={true}
+                  isEditable={false}
                 />
               </div>
             )}
@@ -2677,7 +2851,7 @@ export default function SingleProductPage() {
                 className={`border-t-[1px] border-gray-300 px-5 py-2 ${
                   isFullScreen
                     ? "fixed right-0 top-0 w-full h-screen z-[9999] bg-gray-100"
-                    : "w-[70%]"
+                    : "w-full"
                 } overflow-y-auto`}
               >
                 <div className="flex items-center justify-between">
@@ -2817,14 +2991,30 @@ export default function SingleProductPage() {
                       ...uvc,
                       id: uvc._id || "default-id",
                       code: uvc.code || "default-code",
-                      dimensions: uvc.dimensions || [], 
-                      ean: uvc.ean || "", 
-                      eans: uvc.eans || [],
+                      dimensions: uvc.dimensions || [],
+                      ean: uvc.ean || "",
+                      eans: uvc.eans || ["-"],
                     }))}
+                    onResetConflict={resetHasEanConflict}
                     onUpdateEan={(uvcIndex, eanIndex, value) => {
                       setFormData((prev) => {
                         const updatedUvc = [...prev.uvc_ids];
-                        updatedUvc[uvcIndex].eans[eanIndex] = value;
+
+                        // Si c'est une mise à jour globale (-1)
+                        if (eanIndex === -1) {
+                          if (updatedUvc[uvcIndex]?.eans) {
+                            updatedUvc[uvcIndex].eans = updatedUvc[
+                              uvcIndex
+                            ].eans.map((ean) => (ean === value ? value : ean));
+                          }
+                        } else {
+                          // Mise à jour d'un EAN spécifique
+                          if (!updatedUvc[uvcIndex].eans) {
+                            updatedUvc[uvcIndex].eans = [];
+                          }
+                          updatedUvc[uvcIndex].eans[eanIndex] = value;
+                        }
+
                         return { ...prev, uvc_ids: updatedUvc };
                       });
                     }}
@@ -2835,7 +3025,11 @@ export default function SingleProductPage() {
                           {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ ean, uvcId, currentEanIndex }),
+                            body: JSON.stringify({
+                              ean,
+                              uvcId,
+                              currentEanIndex,
+                            }),
                           }
                         );
                         const data = await response.json();
@@ -2851,26 +3045,39 @@ export default function SingleProductPage() {
                         return { exists: false, productId: null, uvcId: null };
                       }
                     }}
+                    onFormatErrorChange={handleFormatErrorChange}
                   />
                 )}
 
                 {onglet === "bloc" && product && (
                   <UVCBlockTable
-                    isModify={isModifyUvc}
+                    isModify={isModify}
+                    isModifyUvc={isModifyUvc}
                     reference={truncateText(product?.reference, 15) || ""}
-                    placeholder={(index) =>
-                      formData.uvc_ids[index]?.collectionUvc ||
-                      formData.collection_ids[0]?.label ||
-                      ""
-                    }
-                    block="Non"
+                    placeholder={(index) => {
+                      const uvcSpecific = formData.uvc_ids[index]?.blocked_reason_code;
+                      const productGlobal = formData.blocked_reason_code;
+                      const uvcGlobal = formDataUvc.uvc?.[index]?.blocked_reason_code;
+                    
+                      // Si l'une de ces valeurs est un objet, prenez la clé `label` ou `value`
+                      const formatBlockedReason = (reason: any) =>
+                        typeof reason === "object" && reason !== null ? reason.label || reason.value || "" : reason;
+                    
+                      return formatBlockedReason(uvcSpecific) || formatBlockedReason(productGlobal) || formatBlockedReason(uvcGlobal) || "";
+                    }}
+                    
+                    blockValue={formData.blocked}
+                    reason={formData.blocked_reason_code || "-"}
                     uvcDimension={formData.uvc_ids.map((uvc) => ({
                       code: uvc.code,
                       dimensions: uvc.dimensions,
                       collectionUvc: uvc.collectionUvc,
-                    }))}
+                      blocked: uvc.blocked,
+                      blocked_reason_code: uvc.blocked_reason_code,
+                    }))} 
                     customStyles={customStyles}
-                    handleUpdateCollection={handleUpdateCollection}
+                    handleUpdateBlocked={handleUpdateBlocked}
+                    handleUpdateBlockedReason={handleUpdateBlockReason}
                   />
                 )}
               </div>
