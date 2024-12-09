@@ -67,7 +67,7 @@ const GestionFormComponent: React.FC<GestionFormComponentProps> = ({
       setAllUsers(userOptions);
     }
   };
-  
+
   return (
     <div className="flex flex-col gap-4 p-4">
       <h6>Assistant(e)</h6>
@@ -87,11 +87,16 @@ const GestionFormComponent: React.FC<GestionFormComponentProps> = ({
         <div key={index} className="grid grid-cols-2 gap-2">
           <div>
             <CreatableSelect
-              value={admin ? { label: admin, value: admin } : null}
-              onChange={(option) =>
-                handleAdminChange(option ? option.value : "")
+              value={
+                buyer.user ? { label: buyer.user, value: buyer.user } : null
+              } // Utilisation de buyer.user
+              onChange={
+                (option) =>
+                  handleBuyerChange(index, "user", option ? option.value : "") // Mise à jour correcte du champ user
               }
-              onInputChange={(inputValue) => setAdminSearchInput(inputValue)}
+              onInputChange={(inputValue) =>
+                handleUserSearchInput(inputValue, index)
+              } // Recherche spécifique à l'acheteur
               onFocus={showAllUsers}
               options={
                 isLoading ? [{ label: "Chargement...", value: "" }] : allUsers
@@ -110,7 +115,7 @@ const GestionFormComponent: React.FC<GestionFormComponentProps> = ({
                 const selectedFamilies = options
                   ? options.map((opt) => opt.value)
                   : [];
-                handleBuyerChange(index, "family", selectedFamilies);
+                handleBuyerChange(index, "family", selectedFamilies); // Mise à jour des familles
               }}
               onInputChange={(inputValue) => {
                 if (typeof inputValue === "string")

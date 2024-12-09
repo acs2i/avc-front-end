@@ -35,7 +35,12 @@ import { useUsers } from "../../utils/hooks/useUsers";
 import { useFamily } from "../../utils/hooks/useFamily";
 import { useIsoCode } from "../../utils/hooks/useIsoCode";
 import IsoCodeSection from "../../components/Formulaires/IsoCodeSection";
-import { DragDropContext, Droppable, Draggable, DropResult } from "react-beautiful-dnd";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "react-beautiful-dnd";
 
 interface BrandId {
   _id: string;
@@ -828,7 +833,6 @@ export default function SingleSupplierPage() {
       buyers: updatedBuyers,
     }));
   };
-  
 
   const addBuyer = () => {
     setBuyers((prev) => [...prev, { family: [], user: "" } as Buyer]);
@@ -986,20 +990,20 @@ export default function SingleSupplierPage() {
     ) {
       return;
     }
-  
+
     // Réorganiser les contacts
     const updatedContacts = reorderContacts(
       formData.contacts, // Utilisez formData.contacts au lieu de supplier?.contacts
       result.source.index,
       result.destination.index
     );
-  
+
     // Mettre à jour formData
     setFormData((prev) => ({
       ...prev,
       contacts: updatedContacts,
     }));
-  
+
     if (supplier) {
       setSupplier((prev) =>
         prev
@@ -1010,7 +1014,7 @@ export default function SingleSupplierPage() {
           : prev
       );
     }
-  
+
     // Mettre à jour le tableau conditions avec les contacts réorganisés
     setConditions((prev) =>
       prev.map((condition) => ({
@@ -1018,7 +1022,7 @@ export default function SingleSupplierPage() {
         contacts: updatedContacts,
       }))
     );
-  
+
     // Mettre à jour formDataCondition
     setFormDataCondition((prev) => ({
       ...prev,
@@ -1036,14 +1040,14 @@ export default function SingleSupplierPage() {
   ) => {
     const file = event.target.files?.[0];
     if (!file || !conditionId) return;
-  
+
     setIsLoading(true);
     setFileName(file.name);
-  
+
     try {
       const formData = new FormData();
-      formData.append('file', file);
-  
+      formData.append("file", file);
+
       const response = await fetch(
         `${process.env.REACT_APP_URL_DEV}/api/v1/condition/${conditionId}`,
         {
@@ -1054,17 +1058,16 @@ export default function SingleSupplierPage() {
           body: formData,
         }
       );
-  
+
       if (!response.ok) {
-        throw new Error('Upload failed');
+        throw new Error("Upload failed");
       }
-  
+
       const result = await response.json();
-      notifySuccess('Fichier uploadé avec succès');
-      
+      notifySuccess("Fichier uploadé avec succès");
     } catch (error) {
-      console.error('Upload error:', error);
-      notifyError('Erreur lors de l\'upload du fichier');
+      console.error("Upload error:", error);
+      notifyError("Erreur lors de l'upload du fichier");
     } finally {
       setIsLoading(false);
     }
@@ -1076,6 +1079,8 @@ export default function SingleSupplierPage() {
       setIsExpanded(false);
     }, 3000);
   };
+
+  console.log(formData);
 
   return (
     <>
@@ -1200,28 +1205,24 @@ export default function SingleSupplierPage() {
                 <div className="flex items-center justify-between gap-3 mt-[50px]">
                   {!isModify ? (
                     <div className="flex items-center gap-2">
-                      <div
+                      <Button
                         onClick={(e) => {
                           e.preventDefault();
                           handleStatusChange();
                         }}
-                        className={`cursor-pointer text-[13px] flex items-center gap-2 ${
-                          formData.status === "A"
-                            ? "text-red-500"
-                            : "text-green-600"
-                        } font-bold hover:brightness-75`}
+                        size="small"
+                        danger
                       >
                         {formData.status === "A" ? (
                           <TriangleAlert size={15} />
                         ) : (
                           <IterationCcw size={15} />
                         )}
-                        <span>
-                          {formData.status === "A"
-                            ? "Désactiver le fournisseur"
-                            : "Réactiver le fournisseur"}
-                        </span>
-                      </div>
+
+                        {formData.status === "A"
+                          ? "Désactiver le fournisseur"
+                          : "Réactiver le fournisseur"}
+                      </Button>
                       <Button
                         blue
                         size="small"
@@ -1452,23 +1453,23 @@ export default function SingleSupplierPage() {
                       />
                       <Input
                         element="input"
-                        id="city"
-                        label="Ville :"
-                        value={formData.city}
-                        onChange={handleChange}
-                        validators={[]}
-                        placeholder={supplier?.city}
-                        create
-                        gray
-                      />
-                      <Input
-                        element="input"
                         id="postal"
                         label="Code postal :"
                         value={formData.postal}
                         onChange={handleChange}
                         validators={[]}
                         placeholder={supplier?.postal}
+                        create
+                        gray
+                      />
+                      <Input
+                        element="input"
+                        id="city"
+                        label="Ville :"
+                        value={formData.city}
+                        onChange={handleChange}
+                        validators={[]}
+                        placeholder={supplier?.city}
                         create
                         gray
                       />
@@ -1529,18 +1530,6 @@ export default function SingleSupplierPage() {
                         )}
                       </div>
                       <div className="mt-3 flex items-center gap-3">
-                        <span className="font-bold text-gray-700">Ville :</span>
-                        {supplier?.city ? (
-                          <p className="font-[600] text-slate-500">
-                            {supplier?.city}
-                          </p>
-                        ) : (
-                          <div className="font-[600] text-slate-500">
-                            <CircleSlash2 size={13} />
-                          </div>
-                        )}
-                      </div>
-                      <div className="mt-3 flex items-center gap-3">
                         <span className="font-bold text-gray-700">
                           Code postal :
                         </span>
@@ -1554,6 +1543,19 @@ export default function SingleSupplierPage() {
                           </div>
                         )}
                       </div>
+                      <div className="mt-3 flex items-center gap-3">
+                        <span className="font-bold text-gray-700">Ville :</span>
+                        {supplier?.city ? (
+                          <p className="font-[600] text-slate-500">
+                            {supplier?.city}
+                          </p>
+                        ) : (
+                          <div className="font-[600] text-slate-500">
+                            <CircleSlash2 size={13} />
+                          </div>
+                        )}
+                      </div>
+
                       <div className="mt-3 flex items-center gap-3">
                         <span className="font-bold text-gray-700">Pays :</span>
                         {supplier?.country ? (
@@ -1574,6 +1576,41 @@ export default function SingleSupplierPage() {
             <div className="flex gap-4 mt-[30px]">
               <FormSection title="Marques">
                 <div className="mt-3">
+                  {/* Afficher les marques déjà enregistrées pour le produit */}
+                  {formData?.brand_id && formData?.brand_id.length > 0 && (
+                    <div className="mb-4">
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {supplier?.brand_id.map((brand, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-center gap-2 bg-slate-300 py-2 px-4 rounded-md shadow-md w-full"
+                          >
+                            <span className="font-[600] text-gray-500 capitalize">
+                              {brand?.label}
+                            </span>
+                            {isModify && (
+                              <button
+                                type="button"
+                                className="text-gray-500 hover:text-gray-300"
+                                onClick={() =>
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    brand_id: prev.brand_id.filter(
+                                      (brandId) => brandId !== brand._id
+                                    ),
+                                  }))
+                                }
+                              >
+                                <Trash size={15} />
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Afficher la BrandSection pour ajouter ou modifier des marques */}
                   {isModify ? (
                     <BrandSection
                       brands={brands}
@@ -1587,94 +1624,76 @@ export default function SingleSupplierPage() {
                       addBrand
                       displayTrash
                     />
-                  ) : supplier?.brand_id && supplier?.brand_id.length > 0 ? (
-                    <div>
-                      {supplier?.brand_id.map((brand, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center gap-2 mt-2 bg-slate-300 justify-center py-3 relative rounded-md shadow-md"
-                        >
-                          <span className="font-[600] text-gray-500 capitalize">
-                            {brand?.label}
-                          </span>
-                          <button
-                            type="button"
-                            className="text-gray-500 hover:text-gray-300 absolute right-[13px]"
-                          >
-                            <X size={18} />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
+                  ) : supplier?.brand_id && supplier?.brand_id.length === 0 ? (
                     <div>
                       <p className="text-gray-400 font-bold text-xs">
                         Aucune marque associée à ce fournisseur
                       </p>
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </FormSection>
+
               <FormSection title="Contacts">
                 {isModify ? (
-                   <DragDropContext onDragEnd={handleDragEnd}>
-                   <Droppable droppableId="contacts">
-                     {(provided) => (
-                       <div
-                         className="flex flex-col gap-2 mt-3"
-                         {...provided.droppableProps}
-                         ref={provided.innerRef}
-                       >
-                         {formData.contacts &&
-                         formData.contacts.filter(
-                           (contact) => contact?.firstname
-                         ).length > 0 ? (
-                           <>
-                             {formData.contacts
-                               .filter((contact) => contact?.firstname)
-                               .map((contact, index) => (
-                                 <Draggable
-                                   key={`contact-${index}`}
-                                   draggableId={`contact-${index}`}
-                                   index={index}
-                                 >
-                                   {(provided) => (
-                                     <div
-                                       ref={provided.innerRef}
-                                       {...provided.draggableProps}
-                                       {...provided.dragHandleProps}
-                                       className={`text-center rounded-md cursor-move hover:brightness-125 shadow-md p-3 ${
-                                         index === 0
-                                           ? "bg-gradient-to-r from-cyan-600 to-cyan-800 text-white"
-                                           : "bg-slate-300 text-gray-500"
-                                       }`}
-                                     >
-                                       <div className="flex items-center justify-between">
-                                         <span className="text-[20px] font-bold">
-                                           {contact.firstname}{" "}
-                                           {contact.lastname}
-                                         </span>
-                                         {index === 0 && (
-                                           <span className="text-xs text-white bg-cyan-800 px-2 py-1 rounded border border-white">
-                                             Contact Principal
-                                           </span>
-                                         )}
-                                       </div>
-                                     </div>
-                                   )}
-                                 </Draggable>
-                               ))}
-                             {provided.placeholder}
-                           </>
-                         ) : (
-                           <p className="text-gray-400 font-bold text-xs">
-                             Aucun contact enregistré pour ce fournisseur
-                           </p>
-                         )}
-                       </div>
-                     )}
-                   </Droppable>
-                 </DragDropContext>
+                  <DragDropContext onDragEnd={handleDragEnd}>
+                    <Droppable droppableId="contacts">
+                      {(provided) => (
+                        <div
+                          className="flex flex-col gap-2 mt-3"
+                          {...provided.droppableProps}
+                          ref={provided.innerRef}
+                        >
+                          {formData.contacts &&
+                          formData.contacts.filter(
+                            (contact) => contact?.firstname
+                          ).length > 0 ? (
+                            <>
+                              {formData.contacts
+                                .filter((contact) => contact?.firstname)
+                                .map((contact, index) => (
+                                  <Draggable
+                                    key={`contact-${index}`}
+                                    draggableId={`contact-${index}`}
+                                    index={index}
+                                  >
+                                    {(provided) => (
+                                      <div
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        {...provided.dragHandleProps}
+                                        className={`text-center rounded-md cursor-move hover:brightness-125 shadow-md p-3 ${
+                                          index === 0
+                                            ? "bg-gradient-to-r from-cyan-600 to-cyan-800 text-white"
+                                            : "bg-slate-300 text-gray-500"
+                                        }`}
+                                      >
+                                        <div className="flex items-center justify-between">
+                                          <span className="text-[20px] font-bold">
+                                            {contact.firstname}{" "}
+                                            {contact.lastname}
+                                          </span>
+                                          {index === 0 && (
+                                            <span className="text-xs text-white bg-cyan-800 px-2 py-1 rounded border border-white">
+                                              Contact Principal
+                                            </span>
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </Draggable>
+                                ))}
+                              {provided.placeholder}
+                            </>
+                          ) : (
+                            <p className="text-gray-400 font-bold text-xs">
+                              Aucun contact enregistré pour ce fournisseur
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </Droppable>
+                  </DragDropContext>
                 ) : (
                   <div className="flex flex-col gap-2 mt-3">
                     {supplier?.contacts && supplier.contacts.length > 0 ? (
@@ -1943,7 +1962,10 @@ export default function SingleSupplierPage() {
                                     />
 
                                     {/* Label lié à l'input */}
-                                    <label htmlFor="fileUpload" className="cursor-pointer">
+                                    <label
+                                      htmlFor="fileUpload"
+                                      className="cursor-pointer"
+                                    >
                                       <img
                                         src="/img/pdf_up.png"
                                         alt="Upload PDF"

@@ -36,7 +36,7 @@ const ContactFormComponent: React.FC<ContactFormComponentProps> = ({
   };
 
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4 p-4 max-h-[60vh] overflow-y-auto">
       <h2 className="text-lg font-bold">Ajouter un contact</h2>
       <form  onKeyDown={handleKeyDown}>
         <Input
@@ -99,7 +99,7 @@ const ContactFormComponent: React.FC<ContactFormComponentProps> = ({
           placeholder="Email"
           create
         />
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-2 mt-3">
           <button
             type="button"
             className="px-4 py-2 bg-gray-500 text-white rounded"

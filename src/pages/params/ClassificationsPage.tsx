@@ -34,6 +34,8 @@ const ClassificationsPageContent: React.FC<ClassificationsPageProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [levelFilter, setLevelFilter] = useState<string>("");
   const [totalItem, setTotalItem] = useState<number | null>(null);
   const [families, setFamilies] = useState<Tag[]>([]);
   const { getSortState } = useSortContext();
@@ -52,8 +54,21 @@ const ClassificationsPageContent: React.FC<ClassificationsPageProps> = ({
   const fetchFamily = async () => {
     setIsLoading(true);
     try {
+      const queryParams = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: limit.toString(),
+      });
+  
+      if (statusFilter !== "") {
+        queryParams.append("status", statusFilter);
+      }
+  
+      if (levelFilter !== "") {
+        queryParams.append("level", levelFilter); // Toujours inclure `level` si défini
+      }
+  
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/tag?page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tag?${queryParams.toString()}`,
         {
           method: "GET",
           headers: {
@@ -61,7 +76,7 @@ const ClassificationsPageContent: React.FC<ClassificationsPageProps> = ({
           },
         }
       );
-
+  
       const data = await response.json();
       setFamilies(data.data);
       setTotalItem(data.total);
@@ -71,6 +86,8 @@ const ClassificationsPageContent: React.FC<ClassificationsPageProps> = ({
       setIsLoading(false);
     }
   };
+  
+  
 
   useEffect(() => {
     if (highlightedFamilyId) {
@@ -81,7 +98,8 @@ const ClassificationsPageContent: React.FC<ClassificationsPageProps> = ({
 
   useEffect(() => {
     fetchFamily();
-  }, [shouldRefetch, currentPage]);
+  }, [statusFilter, currentPage, shouldRefetch]);
+  
 
   const sortedFamilies = useMemo(() => {
     if (!sortState.column) return families;

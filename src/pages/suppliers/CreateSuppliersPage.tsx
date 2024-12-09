@@ -719,23 +719,23 @@ export default function CreateSupplierPage() {
                 />
                 <Input
                   element="input"
-                  id="city"
-                  label="Ville :"
-                  value={formData.city}
-                  onChange={handleChange}
-                  validators={[]}
-                  placeholder="Ajouter la ville"
-                  create
-                  gray
-                />
-                <Input
-                  element="input"
                   id="postal"
                   label="Code postal :"
                   value={formData.postal}
                   onChange={handleChange}
                   validators={[]}
                   placeholder="75019"
+                  create
+                  gray
+                />
+                <Input
+                  element="input"
+                  id="city"
+                  label="Ville :"
+                  value={formData.city}
+                  onChange={handleChange}
+                  validators={[]}
+                  placeholder="Ajouter la ville"
                   create
                   gray
                 />

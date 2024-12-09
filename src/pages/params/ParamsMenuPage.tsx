@@ -1094,9 +1094,9 @@ function ParamsMenuPageContent() {
                 id="tous"
                 name="status"
                 value="all"
-                checked={searchFields.status === "all"}
+                checked={searchFields.status === ""}
                 onChange={() =>
-                  setSearchFields({ ...searchFields, status: "all" })
+                  setSearchFields({ ...searchFields, status: "" })
                 }
               />
               <label
