@@ -183,11 +183,37 @@ const UVCEanTable: React.FC<UVCEanTableProps> = ({
       if (value.trim() === "") return;
 
       timeout = setTimeout(async () => {
-        const uvcId = uvcDimension[uvcIndex]?.id; // Récupération de l'UVC ID
-        const result = await onCheckEan(value, uvcId, eanIndex); // Inclure uvcId et eanIndex
-        console.log(`Validation pour ${uvcIndex}-${eanIndex}:`, result);
+        const uvcId = uvcDimension[uvcIndex]?.id;
 
-        const isDuplicate = result.exists && result.uvcId !== uvcId; // Vérifie si l'UVC est différent
+        const hasDuplicateInSameUVC = checkForDuplicatesInSameUVC(
+          uvcIndex,
+          eanIndex,
+          value
+        );
+
+        if (hasDuplicateInSameUVC) {
+          setValidationErrors((prev) => ({
+            ...prev,
+            [`${uvcIndex}-${eanIndex}`]: true,
+          }));
+
+          setConflictDetails({
+            ean: value,
+            uvcId: uvcId,
+            uvcIndex,
+            eanIndex,
+            originalValue:
+              originalValues[`${uvcIndex}-${eanIndex}`] ||
+              uvcDimension[uvcIndex].eans[eanIndex],
+          });
+
+          setShowModal(true);
+          // PAS DE RETURN ICI -> Continuer pour appeler le backend
+        }
+
+        // Appeler le backend pour vérifier globalement
+        const result = await onCheckEan(value, uvcId, eanIndex);
+        const isDuplicate = result.exists && result.uvcId !== uvcId;
 
         setValidationErrors((prev) => ({
           ...prev,
