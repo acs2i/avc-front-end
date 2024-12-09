@@ -23,7 +23,7 @@ export const useSubFamily = (initialInputValue: string = "", limit = 10) => {
   const fetchAllSubFamilies = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?level=sous-famille`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?level=sous-famille&status=A`,
         {
           method: "GET",
           headers: {
@@ -48,7 +48,7 @@ export const useSubFamily = (initialInputValue: string = "", limit = 10) => {
   const searchSubFamilies = async (inputValue: string) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?name=${inputValue}&level=sous-famille&page=${currentPage}&limit=${limit}`,
+        `${process.env.REACT_APP_URL_DEV}/api/v1/tag/search?name=${inputValue}&level=sous-famille&page=${currentPage}&limit=${limit}&status=A`,
         {
           method: "GET",
           headers: {

@@ -34,8 +34,7 @@ const SubSubFamilySection: React.FC<SubSubFamilySelectorProps> = ({
   // Formatage personnalisé des options
   const formatOptionLabel = ({ name, code }: { name: string; code: string }) => (
     <div className="flex items-center justify-between">
-      <span>{name}</span>
-      <span className="text-gray-400 text-sm">({code})</span>
+      <span>{code} - {name}</span>
     </div>
   );
 

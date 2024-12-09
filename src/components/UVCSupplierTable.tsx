@@ -155,7 +155,7 @@ const UVCSupplierTable: React.FC<UVCSupplierTableProps> = ({
               Fournisseur
             </th>
             <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
-              Référence fournisseur
+              Référence UVC fournisseur
             </th>
             <th className="border px-4 py-2 text-sm font-semibold text-gray-600">
               PCB

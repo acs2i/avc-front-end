@@ -34,8 +34,7 @@ const FamilySection: React.FC<FamilySelectorProps> = ({
   // Formatage personnalisé des options
   const formatOptionLabel = ({ name, code }: { name: string; code: string }) => (
     <div className="flex items-center justify-between">
-      <span>{name}</span>
-      <span className="text-gray-400 text-sm">({code})</span>
+      <span>{code} - {name}</span>
     </div>
   );
 
@@ -66,6 +65,8 @@ const FamilySection: React.FC<FamilySelectorProps> = ({
           className="block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"
           openMenuOnFocus
           onMenuOpen={() => handleInputChangeFamily("")}
+          noOptionsMessage={() => "No options"}
+          isValidNewOption={() => false}
         />
       </div>
     </div>
