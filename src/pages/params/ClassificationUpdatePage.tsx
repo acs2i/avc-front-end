@@ -50,11 +50,11 @@ export default function ClassificationUpdatePage({
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleUpdate = async (isStatusUpdate = false, newStatus = '') => {
+  const handleUpdate = async (isStatusUpdate = false, newStatus = "") => {
     setIsLoading(true);
 
     const updatedData = isStatusUpdate
-      ? { status: newStatus || (formData.status === 'A' ? 'I' : 'A') }
+      ? { status: newStatus || (formData.status === "A" ? "I" : "A") }
       : Object.keys(formData).reduce((acc, key) => {
           const typedKey = key as keyof Tag;
           if (formData[typedKey] !== selectedFamily[typedKey]) {
@@ -84,9 +84,10 @@ export default function ClassificationUpdatePage({
       if (response.ok) {
         let message = "Classification modifiée avec succès !";
         if (isStatusUpdate) {
-          message = updatedData.status === 'A' 
-            ? "Classification réactivée avec succès !" 
-            : "Classification désactivée avec succès !";
+          message =
+            updatedData.status === "A"
+              ? "Classification réactivée avec succès !"
+              : "Classification désactivée avec succès !";
         }
         notifySuccess(message);
         setIsModify(false);
@@ -97,9 +98,10 @@ export default function ClassificationUpdatePage({
         console.error("Error response:", errorData);
         let errorMessage = "Erreur lors de la modification";
         if (isStatusUpdate) {
-          errorMessage = updatedData.status === 'A'
-            ? "Erreur lors de la réactivation"
-            : "Erreur lors de la désactivation";
+          errorMessage =
+            updatedData.status === "A"
+              ? "Erreur lors de la réactivation"
+              : "Erreur lors de la désactivation";
         }
         notifyError(errorMessage);
       }
@@ -126,18 +128,24 @@ export default function ClassificationUpdatePage({
           </h1>
         </div>
         <div className="flex items-center gap-4">
-          {!isModify && formData.status !== 'I' && (
+          {!isModify && formData.status !== "I" && (
             <div onClick={() => setIsModify(true)} className="cursor-pointer">
               <span className="text-[12px] text-blue-500">Modifier</span>
             </div>
           )}
-          {formData.status === 'I' && (
-            <div onClick={() => handleUpdate(true, 'A')} className="cursor-pointer">
+          {formData.status === "I" && (
+            <div
+              onClick={() => handleUpdate(true, "A")}
+              className="cursor-pointer"
+            >
               <span className="text-[12px] text-green-500">Réactiver</span>
             </div>
           )}
-          {formData.status === 'A' && (
-            <div onClick={() => handleUpdate(true, 'I')} className="cursor-pointer">
+          {formData.status === "A" && (
+            <div
+              onClick={() => handleUpdate(true, "I")}
+              className="cursor-pointer"
+            >
               <span className="text-[12px] text-red-500">Désactiver</span>
             </div>
           )}
@@ -170,7 +178,7 @@ export default function ClassificationUpdatePage({
             create
             onChange={handleInputChange}
             gray
-            disabled={!isModify || formData.status === 'I'}
+            disabled={!isModify || formData.status === "I"}
             maxLength={100}
           />
         </div>
@@ -226,7 +234,10 @@ export default function ClassificationUpdatePage({
                     <div className="text-[13px] text-gray-500 font-[500]">
                       {Object.entries(update.changes).map(([key, value]) => (
                         <p key={key}>
-                          Modification du Libellé en <span className="font-bold">{String(value)}</span>
+                          {key === "status"
+                            ? `Modification du Statut en `
+                            : `Modification du Libellé en `}
+                          <span className="font-bold">{String(value)}</span>
                         </p>
                       ))}
                     </div>
