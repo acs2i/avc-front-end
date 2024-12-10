@@ -8,8 +8,10 @@ import {
   ChevronLeft,
   ChevronUp,
   CircleSlash2,
+  Download,
   File,
   IterationCcw,
+  Paperclip,
   Pen,
   Plus,
   Trash,
@@ -20,7 +22,7 @@ import CreatableSelect from "react-select/creatable";
 import { SingleValue } from "react-select";
 import Button from "../../components/FormElements/Button";
 import useNotify from "../../utils/hooks/useToast";
-import { CircularProgress, Collapse } from "@mui/material";
+import { CircularProgress, Collapse, Tooltip } from "@mui/material";
 import FormSection from "../../components/Formulaires/FormSection";
 import BrandSection from "../../components/Formulaires/BrandSection";
 import DynamicField from "../../components/FormElements/DynamicField";
@@ -303,7 +305,9 @@ export default function SingleSupplierPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isModify, setIsModify] = useState(false);
   const [admin, setAdmin] = useState("");
-  const [buyers, setBuyers] = useState<Buyer[]>([{ family: [], user: "", subFamily: [] }]);
+  const [buyers, setBuyers] = useState<Buyer[]>([
+    { family: [], user: "", subFamily: [] },
+  ]);
   const [userOptions, setUserOptions] = useState<
     { label: string; value: string }[]
   >([]);
@@ -672,20 +676,19 @@ export default function SingleSupplierPage() {
     const selectedBrandIds = brands
       .filter((brand) => brand !== null) // Filtrer les valeurs nulles
       .map((brand) => brand._id || ""); // Mapper les IDs des marques
-  
+
     setFormData((prevFormData) => {
       // Fusionner les anciennes valeurs avec les nouvelles
       const updatedBrandIds = Array.from(
         new Set([...prevFormData.brand_id, ...selectedBrandIds]) // Éviter les doublons
       );
-  
+
       return {
         ...prevFormData,
         brand_id: updatedBrandIds,
       };
     });
   }, [brands]);
-  
 
   const updateStatus = async (newStatus: string) => {
     setIsLoading(true);
@@ -722,7 +725,6 @@ export default function SingleSupplierPage() {
       setIsLoading(false);
     }
   };
-
 
   const handleStatusChange = () => {
     const newStatus = formData.status === "A" ? "I" : "A";
@@ -827,35 +829,34 @@ export default function SingleSupplierPage() {
     field: keyof Buyer,
     value: string | string[]
   ) => {
-    setBuyers(prevBuyers => {
+    setBuyers((prevBuyers) => {
       const updatedBuyers = [...prevBuyers];
       if (field === "family" && Array.isArray(value)) {
         updatedBuyers[index] = {
           ...updatedBuyers[index],
-          family: value
+          family: value,
         };
       } else if (field === "subFamily" && Array.isArray(value)) {
         updatedBuyers[index] = {
           ...updatedBuyers[index],
-          subFamily: value
+          subFamily: value,
         };
       } else if (field === "user" && typeof value === "string") {
         updatedBuyers[index] = {
           ...updatedBuyers[index],
-          user: value
+          user: value,
         };
       }
-      
+
       // Mise à jour du formData après la modification des buyers
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        buyers: updatedBuyers
+        buyers: updatedBuyers,
       }));
-      
+
       return updatedBuyers;
     });
   };
-  
 
   const addBuyer = () => {
     const newBuyer = { family: [], subFamily: [], user: "" };
@@ -869,13 +870,12 @@ export default function SingleSupplierPage() {
       return updatedBuyers;
     });
   };
-  
+
   useEffect(() => {
     if (supplier && supplier.buyers) {
       setBuyers(supplier.buyers);
     }
   }, [supplier]);
-  
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -1988,40 +1988,40 @@ export default function SingleSupplierPage() {
                                   </p>
                                 </div>
                                 <div className="text-gray-500 flex items-center gap-2">
-                                  <div
-                                    onClick={(e: React.MouseEvent) => {
-                                      e.stopPropagation();
-                                      handlePdf(condition, index);
-                                    }}
-                                    className="cursor-pointer w-[40px] h-[40px] flex justify-center rounded-md bg-gradient-to-b from-red-400 to-red-600 p-[5px] hover:scale-110 transition shadow-md"
-                                  >
-                                    <img src="/img/pdf_down.png" />
-                                  </div>
-                                  <div className="cursor-pointer w-[40px] h-[40px] flex justify-center rounded-md bg-gradient-to-b from-red-400 to-red-600 p-[5px] hover:scale-110 transition shadow-md">
-                                    {/* Input caché */}
-                                    <input
-                                      type="file"
-                                      accept=".pdf"
-                                      onChange={(e) => {
+                                  <Tooltip title="Télécharger le PDF" placement="top">
+                                    <div
+                                      onClick={(e: React.MouseEvent) => {
                                         e.stopPropagation();
-                                        handleFileUpload(e, condition._id);
+                                        handlePdf(condition, index);
                                       }}
-                                      className="hidden"
-                                      id="fileUpload"
-                                    />
-
-                                    {/* Label lié à l'input */}
-                                    <label
-                                      htmlFor="fileUpload"
-                                      className="cursor-pointer"
+                                      className="cursor-pointer w-[40px] h-[40px] flex justify-center items-center hover:bg-slate-200 transition"
                                     >
-                                      <img
-                                        src="/img/pdf_up.png"
-                                        alt="Upload PDF"
-                                        className="w-full h-full object-contain"
+                                      <Download />
+                                    </div>
+                                  </Tooltip>
+                                  <Tooltip title="Joindre un pdf" placement="top">
+                                    <div className="cursor-pointer w-[40px] h-[40px] flex justify-center items-center hover:bg-slate-200 transition">
+                                      {/* Input caché */}
+                                      <input
+                                        type="file"
+                                        accept=".pdf"
+                                        onChange={(e) => {
+                                          e.stopPropagation();
+                                          handleFileUpload(e, condition._id);
+                                        }}
+                                        className="hidden"
+                                        id="fileUpload"
                                       />
-                                    </label>
-                                  </div>
+
+                                      {/* Label lié à l'input */}
+                                      <label
+                                        htmlFor="fileUpload"
+                                        className="cursor-pointer"
+                                      >
+                                        <Paperclip />
+                                      </label>
+                                    </div>
+                                  </Tooltip>
                                 </div>
                               </div>
                             </div>
