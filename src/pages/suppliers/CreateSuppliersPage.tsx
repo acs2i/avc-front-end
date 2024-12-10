@@ -28,6 +28,7 @@ import {
   Draggable,
   DropResult,
 } from "react-beautiful-dnd";
+import { useSubFamily } from "../../utils/hooks/useSubFamily";
 
 interface Contact {
   firstname: string;
@@ -40,6 +41,7 @@ interface Contact {
 
 interface Buyer {
   family: string[];
+  subFamily: string[];
   user: string;
 }
 
@@ -146,7 +148,7 @@ export default function CreateSupplierPage() {
     { name: "", value: "" },
   ]);
   const [admin, setAdmin] = useState("");
-  const [buyers, setBuyers] = useState<Buyer[]>([{ family: [], user: "" }]);
+  const [buyers, setBuyers] = useState<Buyer[]>([{ family: [], user: "", subFamily: [] }]);
   const [searchInputs, setSearchInputs] = useState<{ [key: string]: string }>(
     {}
   );
@@ -227,6 +229,15 @@ export default function CreateSupplierPage() {
   } = useFamily("", 10);
 
   const {
+    inputValueSubFamily,
+    optionsSubFamily,
+    selectedSubFamily,
+    setOptionsSubFamily,
+    handleInputChangeSubFamily,
+    handleChangeSubFamily,
+  } = useSubFamily("", 10);
+
+  const {
     inputValueIsoCode,
     optionsIsoCode,
     isoCodes,
@@ -250,24 +261,35 @@ export default function CreateSupplierPage() {
   const handleBuyerChange = (
     index: number,
     field: keyof Buyer,
-    value: string | string[] // Champ pouvant être soit un tableau de chaînes soit une chaîne unique
+    value: string | string[]
   ) => {
-    const updatedBuyers = [...buyers];
-
-    // Vérifier le type de champ attendu et assigner en conséquence
-    if (field === "family" && Array.isArray(value)) {
-      // Si c'est "family", on attend un tableau de chaînes
-      updatedBuyers[index][field] = value as string[];
-    } else if (field === "user" && typeof value === "string") {
-      // Si c'est "user", on attend une chaîne unique
-      updatedBuyers[index][field] = value as string;
-    }
-
-    setBuyers(updatedBuyers);
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      buyers: updatedBuyers,
-    }));
+    setBuyers(prevBuyers => {
+      const updatedBuyers = [...prevBuyers];
+      if (field === "family" && Array.isArray(value)) {
+        updatedBuyers[index] = {
+          ...updatedBuyers[index],
+          family: value
+        };
+      } else if (field === "subFamily" && Array.isArray(value)) {
+        updatedBuyers[index] = {
+          ...updatedBuyers[index],
+          subFamily: value
+        };
+      } else if (field === "user" && typeof value === "string") {
+        updatedBuyers[index] = {
+          ...updatedBuyers[index],
+          user: value
+        };
+      }
+      
+      // Mise à jour du formData après la modification des buyers
+      setFormData(prev => ({
+        ...prev,
+        buyers: updatedBuyers
+      }));
+      
+      return updatedBuyers;
+    });
   };
 
   const handleDragEnd = (result: DropResult) => {
@@ -419,10 +441,10 @@ export default function CreateSupplierPage() {
 
   // Ajoute un nouvel acheteur
   const addBuyer = () => {
-    setBuyers((prev) => [...prev, { family: [], user: "" } as Buyer]); // family comme tableau vide
+    setBuyers((prev) => [...prev, { family: [], user: "", subFamily: [] } as Buyer]); // family comme tableau vide
     setFormData((prevFormData) => ({
       ...prevFormData,
-      buyers: [...prevFormData.buyers, { family: [], user: "" } as Buyer], // family comme tableau vide
+      buyers: [...prevFormData.buyers, { family: [], user: "", subFamily: [] } as Buyer], // family comme tableau vide
     }));
   };
 
@@ -533,7 +555,7 @@ export default function CreateSupplierPage() {
         onClose={() => setGestionModalIsOpen(false)}
         header="Ajouter un(e) gestionnaire"
       >
-        <GestionFormComponent
+          <GestionFormComponent
           admin={admin}
           buyers={buyers}
           adminOptions={userOptions}
@@ -550,9 +572,14 @@ export default function CreateSupplierPage() {
           handleUserSearchInput={(input, index) =>
             handleSearchInputChange(input, `buyer-${index}`)
           }
+          // Ajoutez ces props pour la recherche de familles
           familyOptions={optionsFamily}
+          subFamilyOptions={optionsSubFamily}
           handleFamilySearchInput={handleInputChangeFamily}
-          handleInputChangeUser={handleInputChangeUser} // Ajout ici
+          handleSubFamilySearchInput={handleInputChangeSubFamily}
+          handleInputChangeUser={function (inputValue: string): void {
+            throw new Error("Function not implemented.");
+          }}
         />
       </Modal>
       <section className="w-full bg-slate-50 p-7">
@@ -856,6 +883,9 @@ export default function CreateSupplierPage() {
                             <th className="py-2 px-4 border-b text-left font-semibold">
                               Famille
                             </th>
+                            <th className="py-2 px-4 border-b text-left font-semibold">
+                              Sous-famille
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
@@ -869,6 +899,11 @@ export default function CreateSupplierPage() {
                               <td className="py-2 px-4 border-b">
                                 <span className="capitalize font-bold">
                                   {buyer.family?.join(" | ") || "N/A"}{" "}
+                                </span>
+                              </td>
+                              <td className="py-2 px-4 border-b">
+                                <span className="capitalize font-bold">
+                                  {buyer.subFamily?.join(" | ") || "N/A"}{" "}
                                 </span>
                               </td>
                             </tr>

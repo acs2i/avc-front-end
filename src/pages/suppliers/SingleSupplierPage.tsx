@@ -41,6 +41,7 @@ import {
   Draggable,
   DropResult,
 } from "react-beautiful-dnd";
+import { useSubFamily } from "../../utils/hooks/useSubFamily";
 
 interface BrandId {
   _id: string;
@@ -67,6 +68,7 @@ interface UserField {
 
 interface Buyer {
   family: string[];
+  subFamily: string[];
   user: string;
 }
 
@@ -301,7 +303,7 @@ export default function SingleSupplierPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isModify, setIsModify] = useState(false);
   const [admin, setAdmin] = useState("");
-  const [buyers, setBuyers] = useState<Buyer[]>([{ family: [], user: "" }]);
+  const [buyers, setBuyers] = useState<Buyer[]>([{ family: [], user: "", subFamily: [] }]);
   const [userOptions, setUserOptions] = useState<
     { label: string; value: string }[]
   >([]);
@@ -388,10 +390,6 @@ export default function SingleSupplierPage() {
     }
   );
 
-  console.log(formData);
-  console.log(formDataCondition);
-  console.log(conditions);
-
   const {
     inputValueUser,
     optionsUser,
@@ -429,6 +427,15 @@ export default function SingleSupplierPage() {
     handleInputChangeFamily,
     handleChangeFamily,
   } = useFamily("", 10);
+
+  const {
+    inputValueSubFamily,
+    optionsSubFamily,
+    selectedSubFamily,
+    setOptionsSubFamily,
+    handleInputChangeSubFamily,
+    handleChangeSubFamily,
+  } = useSubFamily("", 10);
 
   useEffect(() => {
     setUserOptions(optionsUser);
@@ -662,12 +669,23 @@ export default function SingleSupplierPage() {
   };
 
   useEffect(() => {
-    const selectedBrandIds = brands.map((brand) => brand?._id || "");
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      brand_id: selectedBrandIds,
-    }));
+    const selectedBrandIds = brands
+      .filter((brand) => brand !== null) // Filtrer les valeurs nulles
+      .map((brand) => brand._id || ""); // Mapper les IDs des marques
+  
+    setFormData((prevFormData) => {
+      // Fusionner les anciennes valeurs avec les nouvelles
+      const updatedBrandIds = Array.from(
+        new Set([...prevFormData.brand_id, ...selectedBrandIds]) // Éviter les doublons
+      );
+  
+      return {
+        ...prevFormData,
+        brand_id: updatedBrandIds,
+      };
+    });
   }, [brands]);
+  
 
   const updateStatus = async (newStatus: string) => {
     setIsLoading(true);
@@ -705,18 +723,6 @@ export default function SingleSupplierPage() {
     }
   };
 
-  <Button
-    blue
-    size="small"
-    type="button"
-    onClick={(e) => {
-      e.preventDefault();
-      setIsModify(true);
-    }}
-    disabled={supplier?.status === "I"}
-  >
-    {isModify ? "Annuler la modification" : "Modifier"}
-  </Button>;
 
   const handleStatusChange = () => {
     const newStatus = formData.status === "A" ? "I" : "A";
@@ -821,26 +827,55 @@ export default function SingleSupplierPage() {
     field: keyof Buyer,
     value: string | string[]
   ) => {
-    const updatedBuyers = [...buyers];
-    if (field === "family" && Array.isArray(value)) {
-      updatedBuyers[index].family = value;
-    } else if (field === "user" && typeof value === "string") {
-      updatedBuyers[index].user = value;
-    }
-    setBuyers(updatedBuyers);
-    setFormData((prev) => ({
-      ...prev,
-      buyers: updatedBuyers,
-    }));
+    setBuyers(prevBuyers => {
+      const updatedBuyers = [...prevBuyers];
+      if (field === "family" && Array.isArray(value)) {
+        updatedBuyers[index] = {
+          ...updatedBuyers[index],
+          family: value
+        };
+      } else if (field === "subFamily" && Array.isArray(value)) {
+        updatedBuyers[index] = {
+          ...updatedBuyers[index],
+          subFamily: value
+        };
+      } else if (field === "user" && typeof value === "string") {
+        updatedBuyers[index] = {
+          ...updatedBuyers[index],
+          user: value
+        };
+      }
+      
+      // Mise à jour du formData après la modification des buyers
+      setFormData(prev => ({
+        ...prev,
+        buyers: updatedBuyers
+      }));
+      
+      return updatedBuyers;
+    });
   };
+  
 
   const addBuyer = () => {
-    setBuyers((prev) => [...prev, { family: [], user: "" } as Buyer]);
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      buyers: [...prevFormData.buyers, { family: [], user: "" } as Buyer],
-    }));
+    const newBuyer = { family: [], subFamily: [], user: "" };
+    setBuyers((prevBuyers) => {
+      const updatedBuyers = [...prevBuyers, newBuyer];
+      // Mettez également à jour formData pour synchroniser les données
+      setFormData((prev) => ({
+        ...prev,
+        buyers: updatedBuyers,
+      }));
+      return updatedBuyers;
+    });
   };
+  
+  useEffect(() => {
+    if (supplier && supplier.buyers) {
+      setBuyers(supplier.buyers);
+    }
+  }, [supplier]);
+  
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -850,6 +885,7 @@ export default function SingleSupplierPage() {
       // Mise à jour complète de formData avant l'envoi
       const updatedFormData = {
         ...formData,
+        buyers: buyers,
         contacts: formData.contacts.filter(
           (contact) =>
             contact.firstname !== "" ||
@@ -1145,7 +1181,9 @@ export default function SingleSupplierPage() {
           }
           // Ajoutez ces props pour la recherche de familles
           familyOptions={optionsFamily}
+          subFamilyOptions={optionsSubFamily}
           handleFamilySearchInput={handleInputChangeFamily}
+          handleSubFamilySearchInput={handleInputChangeSubFamily}
           handleInputChangeUser={function (inputValue: string): void {
             throw new Error("Function not implemented.");
           }}
@@ -1243,11 +1281,14 @@ export default function SingleSupplierPage() {
                         size="small"
                         cancel
                         type="button"
-                        onClick={() => setIsModify(false)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setIsModify(false);
+                        }}
                       >
                         Annuler
                       </Button>
-                      <Button size="small" blue>
+                      <Button size="small" type="submit" blue>
                         Valider
                       </Button>
                     </div>
@@ -1741,11 +1782,11 @@ export default function SingleSupplierPage() {
               <FormSection title="Gestionnaires">
                 <div className="mt-2 flex flex-col">
                   {/* Affichage de l'assistant(e) pour `supplier` et `formData` */}
-                  {supplier?.admin && (
+                  {formData?.admin && (
                     <p className="text-[13px]">
                       Assistant(e) actuel(le) :{" "}
                       <span className="capitalize font-bold">
-                        {supplier.admin}
+                        {formData.admin}
                       </span>
                     </p>
                   )}
@@ -1759,7 +1800,7 @@ export default function SingleSupplierPage() {
                   )}
 
                   {/* Affichage des acheteurs pour `supplier` */}
-                  {supplier?.buyers && supplier.buyers.length > 0 && (
+                  {formData?.buyers && formData.buyers.length > 0 && (
                     <div className="mt-4 overflow-x-auto">
                       <p className="text-gray-600 font-semibold mb-2">
                         Acheteurs actuels :
@@ -1771,21 +1812,29 @@ export default function SingleSupplierPage() {
                               Acheteur
                             </th>
                             <th className="py-2 px-4 border-b text-left font-semibold">
-                              Famille
+                              Famille(s)
+                            </th>
+                            <th className="py-2 px-4 border-b text-left font-semibold">
+                              Sous-famille(s)
                             </th>
                           </tr>
                         </thead>
                         <tbody>
-                          {supplier.buyers.map((buyer, index) => (
+                          {formData.buyers.map((buyer, index) => (
                             <tr key={index} className="hover:bg-gray-100">
-                              <td className="py-2 px-4 border-b">
-                                <span className="capitalize font-bold">
+                              <td className="py-2 px-4 border-b text-gray-800">
+                                <span className="capitalize font-bold text-[12px]">
                                   {buyer.user || "N/A"}
                                 </span>
                               </td>
-                              <td className="py-2 px-4 border-b">
-                                <span className="capitalize font-bold">
+                              <td className="py-2 px-4 border-b text-gray-800">
+                                <span className="capitalize font-bold text-[12px]">
                                   {buyer.family?.join(" | ") || "N/A"}
+                                </span>
+                              </td>
+                              <td className="py-2 px-4 border-b text-gray-800">
+                                <span className="capitalize font-bold text-[12px]">
+                                  {buyer.subFamily?.join(" | ") || "N/A"}
                                 </span>
                               </td>
                             </tr>

@@ -3,6 +3,7 @@ import CreatableSelect from "react-select/creatable";
 import { Trash, Plus } from "lucide-react";
 
 interface BrandSelectorProps {
+  existingbrands?: any[];
   brands: any[];
   optionsBrand: any[];
   handleChangeBrand: (selectedOption: any, index: number) => void;
@@ -17,6 +18,7 @@ interface BrandSelectorProps {
 
 const BrandSection: React.FC<BrandSelectorProps> = ({
   brands,
+  existingbrands,
   optionsBrand,
   handleChangeBrand,
   removeBrandField,
@@ -31,16 +33,24 @@ const BrandSection: React.FC<BrandSelectorProps> = ({
   const filterOptions = (inputValue: string, options: any[]) => {
     const input = inputValue.toLowerCase();
     return options.filter(
-      option =>
+      (option) =>
         option.label.toLowerCase().includes(input) ||
         (option.code && option.code.toLowerCase().includes(input))
     );
   };
 
   // Formatage personnalisé des options
-  const formatOptionLabel = ({ label, code }: { label: string; code?: string }) => (
+  const formatOptionLabel = ({
+    label,
+    code,
+  }: {
+    label: string;
+    code?: string;
+  }) => (
     <div className="flex items-center justify-between">
-      <span>{code} - {label}</span>
+      <span>
+        {code} - {label}
+      </span>
     </div>
   );
 
@@ -55,7 +65,7 @@ const BrandSection: React.FC<BrandSelectorProps> = ({
               onInputChange={handleInputChangeBrand}
               inputValue={inputValueBrand}
               options={optionsBrand}
-              filterOption={(option, input) => 
+              filterOption={(option, input) =>
                 filterOptions(input, [option.data])[0] !== undefined
               }
               formatOptionLabel={formatOptionLabel}
@@ -64,8 +74,8 @@ const BrandSection: React.FC<BrandSelectorProps> = ({
                 ...customStyles,
                 menu: (base) => ({
                   ...base,
-                  zIndex: 9999
-                })
+                  zIndex: 9999,
+                }),
               }}
               menuPortalTarget={document.body}
               className="block text-sm py-1 w-full rounded-lg text-gray-500 border border-gray-200 focus:outline-none focus:ring-0 focus:border-gray-200 peer capitalize"

@@ -4,6 +4,7 @@ import Input from "./FormElements/Input";
 
 interface Buyer {
   family: string[];
+  subFamily: string[];
   user: string;
 }
 
@@ -24,7 +25,9 @@ interface GestionFormComponentProps {
   handleUserSearchInput: (inputValue: string, index: number) => void;
   handleInputChangeUser: (inputValue: string) => void; // Ajouter ici
   familyOptions: { label: string; value: string; code: string }[];
+  subFamilyOptions: { label: string; value: string; code: string }[];
   handleFamilySearchInput: (inputValue: string) => void;
+  handleSubFamilySearchInput: (inputValue: string) => void;
 }
 
 const customStyles = {
@@ -52,7 +55,9 @@ const GestionFormComponent: React.FC<GestionFormComponentProps> = ({
   handleUserSearchInput,
   handleInputChangeUser,
   familyOptions,
+  subFamilyOptions,
   handleFamilySearchInput,
+  handleSubFamilySearchInput,
 }) => {
   const [allUsers, setAllUsers] = useState(userOptions);
   const [isLoading, setIsLoading] = useState(false);
@@ -107,7 +112,7 @@ const GestionFormComponent: React.FC<GestionFormComponentProps> = ({
               isValidNewOption={() => false}
             />
           </div>
-          <div>
+          <div className="grid grid-cols-1 gap-4">
             <CreatableSelect
               isMulti
               value={buyer.family.map((fam) => ({ label: fam, value: fam }))}
@@ -115,7 +120,7 @@ const GestionFormComponent: React.FC<GestionFormComponentProps> = ({
                 const selectedFamilies = options
                   ? options.map((opt) => opt.value)
                   : [];
-                handleBuyerChange(index, "family", selectedFamilies); // Mise à jour des familles
+                handleBuyerChange(index, "family", selectedFamilies);
               }}
               onInputChange={(inputValue) => {
                 if (typeof inputValue === "string")
@@ -125,7 +130,31 @@ const GestionFormComponent: React.FC<GestionFormComponentProps> = ({
                 label: String(opt.code),
                 value: String(opt.code),
               }))}
-              placeholder="Sélectionnez une ou plusieurs familles"
+              placeholder="Sélectionnez une famille"
+              styles={customStyles}
+              isClearable
+            />
+            <CreatableSelect
+              isMulti
+              value={buyer.subFamily.map((subFam) => ({
+                label: subFam,
+                value: subFam,
+              }))}
+              onChange={(options) => {
+                const selectedSubFamilies = options
+                  ? options.map((opt) => opt.value)
+                  : [];
+                handleBuyerChange(index, "subFamily", selectedSubFamilies);
+              }}
+              onInputChange={(inputValue) => {
+                if (typeof inputValue === "string")
+                  handleSubFamilySearchInput(inputValue);
+              }}
+              options={subFamilyOptions.map((opt) => ({
+                label: String(opt.code),
+                value: String(opt.code),
+              }))}
+              placeholder="Sélectionnez une sous-famille"
               styles={customStyles}
               isClearable
             />
